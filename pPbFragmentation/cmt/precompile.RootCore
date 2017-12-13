@@ -1,0 +1,16 @@
+#!/bin/bash                                                                                                                                                                                                                                                                   
+
+if test precompile.RootCore -nt configured -o options -nt configured
+then
+    rm -f configured
+fi
+
+if test -e configured
+then
+    exit 0
+fi
+
+boost_program_options_lib=`ls $ROOTCOREDIR/lib | grep 'boost_program_options' | grep '\.so$' | sed 's/.*boost/boost/' | sed 's/\.so//' | head -n 1`
+$ROOTCOREDIR/scripts/set_field.sh Makefile.RootCore PACKAGE_PRELOAD $boost_program_options_lib
+echo using boost program option lib $boost_program_options_lib
+exit 0

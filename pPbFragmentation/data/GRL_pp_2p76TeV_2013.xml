@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE LumiRangeCollection SYSTEM "http://atlas-runquery.cern.ch/LumiRangeCollection.dtd">
+<!--This document is created by GoodRunsListWriter.-->
+<?xml-stylesheet type="text/xsl" href="/atlasdqm/grlview/grl.xsl" title="grlview" ?>
+<LumiRangeCollection>
+<NamedLumiRange>
+<Name>PHYS_HeavyIonP_All_Good</Name>
+<Version>2.1</Version>
+<Metadata Name="ARQEquivalentQuery">find run data13_2p76TeV.periodAllYear and dq PHYS_HeavyIonP_All_Good DEFECTS#DetStatus-v60-pro15 g</Metadata>
+<Metadata Name="Query">Period: data13_2p76TeV.AllYear; Defect: PHYS_HeavyIonP_All_Good; Defect tag: DetStatus-v60-pro15; Ignoring None</Metadata>
+<Metadata Name="RQTSVNVersion">DQDefects-00-01-00</Metadata>
+<Metadata Name="RunList">219171,219228,219257,219263,219296,219305,219322,219364</Metadata>
+<LumiBlockCollection>
+<Run>219171</Run>
+<LBRange Start="528" End="612"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219228</Run>
+<LBRange Start="322" End="335"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219257</Run>
+<LBRange Start="56" End="368"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219263</Run>
+<LBRange Start="60" End="117"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219296</Run>
+<LBRange Start="56" End="120"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219305</Run>
+<LBRange Start="275" End="366"/>
+<LBRange Start="368" End="766"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219322</Run>
+<LBRange Start="7" End="143"/>
+<LBRange Start="146" End="186"/>
+</LumiBlockCollection>
+<LumiBlockCollection>
+<Run>219364</Run>
+<LBRange Start="57" End="197"/>
+</LumiBlockCollection>
+</NamedLumiRange>
+</LumiRangeCollection>

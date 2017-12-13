@@ -1,0 +1,49 @@
+<?xml version="1.0" ?>
+<!DOCTYPE LumiRangeCollection
+  SYSTEM 'http://atlas-runquery.cern.ch/LumiRangeCollection.dtd'>
+<!-- Good-runs-list created by AtlRunQuery.py on 2012-03-23 22:35:53.925468 -->
+<LumiRangeCollection>
+   <NamedLumiRange>
+      <Name>SMjets</Name>
+      <Version>2.1</Version>
+      <Metadata Name="Query">find run data11_2p76TeV.periodAllYear and partition ATLAS and db DATA and ptag data11_2p76TeV and dq global_status DEFECTS#DetStatus-v38-pro10-01 g and dq atlsol DEFECTS#DetStatus-v38-pro10-01 g and dq atltor DEFECTS#DetStatus-v38-pro10-01 g and dq trig_jet DEFECTS#DetStatus-v38-pro10-01 g and dq cp_jet_jetb DEFECTS#DetStatus-v38-pro10-01 g and dq cp_jet_jetea DEFECTS#DetStatus-v38-pro10-01 g and dq cp_jet_jetec DEFECTS#DetStatus-v38-pro10-01 g and dq cp_jet_jetfa DEFECTS#DetStatus-v38-pro10-01 g and dq cp_jet_jetfc DEFECTS#DetStatus-v38-pro10-01 g and dq cp_met DEFECTS#DetStatus-v38-pro10-01 g and dq cp_btag_life DEFECTS#DetStatus-v38-pro10-01 g and dq cp_tracking DEFECTS#DetStatus-v38-pro10-01 g and dq idvx DEFECTS#DetStatus-v38-pro10-01 g and dq idbs DEFECTS#DetStatus-v38-pro10-01 g and dq lumi DEFECTS#DetStatus-v38-pro10-01 g  </Metadata>
+      <Metadata Name="RunList">178264,178229,178211,178163</Metadata>
+      <Metadata Name="RQTSVNVersion">CoolRunQuery-00-04-08</Metadata>
+      <Metadata Name="StreamListInfo">
+         <Stream Name="physics_Background" TotalNumOfEvents="2999" NumOfSelectedEvents="2843"/>
+         <Stream Name="physics_CosmicCalo" TotalNumOfEvents="569457" NumOfSelectedEvents="90928"/>
+         <Stream Name="physics_CosmicMuons" TotalNumOfEvents="25925" NumOfSelectedEvents="25037"/>
+         <Stream Name="physics_IDCosmic" TotalNumOfEvents="9069" NumOfSelectedEvents="8742"/>
+         <Stream Name="physics_JetTauEtmiss" TotalNumOfEvents="1325471" NumOfSelectedEvents="1309367"/>
+         <Stream Name="physics_L1Calo" TotalNumOfEvents="6958532" NumOfSelectedEvents="6737805"/>
+         <Stream Name="physics_L1MinBias" TotalNumOfEvents="704492" NumOfSelectedEvents="0"/>
+         <Stream Name="physics_L1Muon" TotalNumOfEvents="11075924" NumOfSelectedEvents="10703776"/>
+         <Stream Name="physics_MinBias" TotalNumOfEvents="29777390" NumOfSelectedEvents="28111367"/>
+         <Stream Name="physics_Standby" TotalNumOfEvents="137636" NumOfSelectedEvents="0"/>
+         <Stream Name="physics_ZeroBias" TotalNumOfEvents="45595" NumOfSelectedEvents="44184"/>
+      </Metadata>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178264</Run>
+         <LBRange Start="85" End="183"/>
+         <LBRange Start="401" End="423"/>
+         <LBRange Start="425" End="556"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178229</Run>
+         <LBRange Start="164" End="220"/>
+         <LBRange Start="222" End="595"/>
+         <LBRange Start="597" End="1062"/>
+         <LBRange Start="1092" End="1142"/>
+<!--     <LBRange Start="1244" End="1440"/> -->
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178211</Run>
+         <LBRange Start="160" End="307"/>
+      </LumiBlockCollection>
+      <LumiBlockCollection>
+         <Run PrescaleRD0="8" PrescaleRD1="8">178163</Run>
+         <LBRange Start="680" End="694"/>
+         <LBRange Start="709" End="799"/>
+      </LumiBlockCollection>
+   </NamedLumiRange>
+</LumiRangeCollection>
