@@ -632,25 +632,24 @@ EL::StatusCode PbPbFFShape :: execute (){
 						int dr_bin_truth_reco = trkcorr->GetdRBin(R_truth_reco);
 						int dr_bin_truth_truth = trkcorr->GetdRBin(R_truth_truth);
 
-						float eff_weight_truth = trkcorr->get_effcorr(track_mc_pt, track_mc_eta, cent_bin, eff_uncertainty);
 						float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0);
 
 						if (R_truth_truth < _dR_max)
 						{
 							int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(track_mc_eta,truth_jet_eta_vector.at(TruthJetIndex.at(i)))));
-							ChPS_raw_tt_deta.at(deta_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_tt_deta.at(deta_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
 
 							int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(track_mc_phi,truth_jet_phi_vector.at(TruthJetIndex.at(i)))));
-							ChPS_raw_tt_dphi.at(dphi_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_tt_dphi.at(dphi_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
 
-							ChPS_raw_tt.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_tt.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
 
 						}
 						if (R_reco_truth < _dR_max) ChPS_raw_rt.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt, matched_truth_jet_pt, jet_weight*eff_weight);
-						if (R_truth_reco < _dR_max) ChPS_raw_tr.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, jet_pt, jet_weight*eff_weight);
+						if (R_truth_reco < _dR_max) ChPS_raw_tr.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, jet_pt, jet_weight);
 						if (R_reco_reco < _dR_max) ChPS_raw_rr.at(dr_bin_reco_reco).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight);
 
-						if (R_truth_truth < _dR_max) ChPS_raw_tt_mod.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight_truth);
+						if (R_truth_truth < _dR_max) ChPS_raw_tt_mod.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
 
 						if (R < _dR_max)
 						{
