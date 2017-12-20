@@ -2,8 +2,7 @@
 
 #include "extras/global_variables.h"
 #include "combine_eff_jetpt_jety.c"
-#include "combine_eff_trketa_dev.c"
-
+#include "combine_eff_trketa.c"
 
 bool JX[5]={false,false,false,false,false};
 double w[5]={0,0,0,0,0};
@@ -66,6 +65,6 @@ void combine_samples(bool isPerf, bool isMC, string cut)
 	cout << endl;
 
 	combine_eff_jetpt_jety(theFiles, w, cut);
-//	combine_eff_trketa_dev(theFiles, w, cut);
-	
+	combine_eff_trketa(theFiles, w, cut);
+
 }

@@ -3,23 +3,31 @@
 #include "TVirtualFitter.h"
 void draw_eff_jetpt_jety(string cut = "ppTight")
 {
-	cout << "Draw_eff_smooth.c" << endl;
-	string name;
-
+	gErrorIgnoreLevel = 3001;
 	gStyle->SetOptTitle(0);
 	SetAtlasStyle();
 
-	string pt_binning;
-	pt_binning = "_pt_exclusive";
+	cout << "********	NOT FITTING IF PPTIGHT_TIGHT	********" << endl << endl;
+
+
+	string name;
 
 	//reading from input file
 	name = Form("mc_efficiency_jetpt_jety_%s.root", cut.c_str());
 	TFile *input_file = new TFile(name.c_str());
 
-	cout << "********NOT FITTING IF PPTIGHT_TIGHT********" << endl;
-	//creatign output file
 	name = Form("mc_eff_fits_jetpt_jety_%s.root",cut.c_str());
 	TFile *output_file = new TFile(name.c_str(),"recreate");
+	cout << Form("%s -> %s", input_file->GetName(), output_file->GetName()) << endl;
+
+	TAxis* jet_pt_binning = (TAxis*)input_file->Get("jet_pt_binning");
+	TAxis* trk_pt_binning = (TAxis*)input_file->Get("trk_pt_binning");
+	TAxis* jet_y_binning_coarse = (TAxis*)input_file->Get("jet_y_binning_coarse");
+	int n_jetpt_cuts = jet_pt_binning->GetNbins();
+	int n_trk_pt_bins = trk_pt_binning->GetNbins();
+	int n_jet_y_bins_coarse = jet_y_binning_coarse->GetNbins();
+
+
 	TCanvas *canvas1 = new TCanvas("C1", "C1",0.,0.,900,600);
 	TCanvas *canvas2 = new TCanvas("C3", "C2",0.,0.,900,600);
 
@@ -29,60 +37,35 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 	ltx->SetTextFont(43);
 	ltx->SetTextSize(15);
 	ltx->SetTextAlign(11);
-	TLegend *legend = new TLegend(0.10,0.3,0.9,0.70,NULL,"brNDC");
+
+	TLegend *legend = new TLegend(0.20,0.59,0.9,0.87,NULL,"brNDC");
 	legend->SetBorderSize(0);
 	legend->SetNColumns(1);
 	legend->SetTextFont(43);
 	legend->SetTextSize(12);
 
-	TLegend *legend1 = new TLegend(0.20,0.59,0.9,0.87,NULL,"brNDC");
-	legend1->SetBorderSize(0);
-	legend1->SetNColumns(1);
-	legend1->SetTextFont(43);
-	legend1->SetTextSize(12);
 
-	TLegend *legend2 = new TLegend(0.20,0.59,0.9,0.87,NULL,"brNDC");
-	legend2->SetBorderSize(0);
-	legend2->SetNColumns(1);
-	legend2->SetTextFont(43);
-	legend2->SetTextSize(10);
-
-
-	TAxis* jet_pt_binning = (TAxis*)input_file->Get("jet_pt_binning");
-	TAxis* trk_pt_binning = (TAxis*)input_file->Get("trk_pt_binning");
-	int n_jetpt_cuts = jet_pt_binning->GetNbins();
-	int n_trk_pt_bins = trk_pt_binning->GetNbins();
-
-	TGraphAsymmErrors* g_efficiency[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-	TH1* h_efficiency[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-	TH1* h_efficiency_fit[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-	TH1* h_fit_to_hist[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-
-	TF1 *fit_eff[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-	//	TH1* ConfidenceIntervals[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
-
-	TH1* h_tmp;
-	h_tmp = new TH1D("h_tmp","h_tmp",n_eta_cuts,eta_Slices);
-	TAxis *jet_y_binning = (TAxis*)h_tmp->GetXaxis();
-
-	output_file->cd();
-	jet_pt_binning->Write("jet_pt_binning");
-	jet_y_binning->Write("jet_y_binning");
-	h_tmp->Write("h_tmp");
+	vector<vector<vector<TGraphAsymmErrors*>>> g_efficiency(n_cent_cuts, vector<vector<TGraphAsymmErrors*>> (n_jet_y_bins_coarse, vector<TGraphAsymmErrors*> (n_jetpt_cuts)));
+	vector<vector<vector<TH1*>>> h_efficiency(n_cent_cuts, vector<vector<TH1*>> (n_jet_y_bins_coarse, vector<TH1*> (n_jetpt_cuts)));
+	vector<vector<vector<TH1*>>> h_efficiency_fit(n_cent_cuts, vector<vector<TH1*>> (n_jet_y_bins_coarse, vector<TH1*> (n_jetpt_cuts)));
+	vector<vector<vector<TH1*>>> h_fit_to_hist(n_cent_cuts, vector<vector<TH1*>> (n_jet_y_bins_coarse, vector<TH1*> (n_jetpt_cuts)));
+	vector<vector<vector<TF1*>>> fit_eff(n_cent_cuts, vector<vector<TF1*>> (n_jet_y_bins_coarse, vector<TF1*> (n_jetpt_cuts)));
+//
+//
+//
+//	TGraphAsymmErrors* g_efficiency[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
+//	TH1* h_efficiency[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
+//	TH1* h_efficiency_fit[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
+//	TH1* h_fit_to_hist[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
+//	TF1 *fit_eff[n_cent_cuts][n_eta_cuts][n_jetpt_cuts];
 
 	canvas1->cd();
 	legend->AddEntry(jet_pt_binning,"x","lp");
 	legend->Draw();
-	legend1->AddEntry(jet_pt_binning,"x","lp");
-	legend1->Draw();
-	legend2->AddEntry(jet_pt_binning,"x","lp");
-	legend2->Draw();
 	canvas1->Print("tmp.pdf");
 	remove("tmp.pdf");
 
 	legend->Clear();
-	legend1->Clear();
-	legend2->Clear();
 	canvas1->Clear();
 	bool smoothing = 0;
 
@@ -90,10 +73,10 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 	{
 		string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
-		for (int i_eta_cuts = 0; i_eta_cuts < n_eta_cuts; i_eta_cuts++)
+		for (int i_eta_cuts = 0; i_eta_cuts < n_jet_y_bins_coarse; i_eta_cuts++)
 		{
-			double eta_lo = eta_Slices[i_eta_cuts];
-			double eta_hi = eta_Slices[i_eta_cuts+1];
+			double eta_lo = jet_y_binning_coarse->GetBinLowEdge(i_eta_cuts+1);
+			double eta_hi = jet_y_binning_coarse->GetBinUpEdge(i_eta_cuts+1);
 
 			for (int i_jetpt_cuts = 0; i_jetpt_cuts < n_jetpt_cuts; i_jetpt_cuts++)
 			{
@@ -113,8 +96,6 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 					double trk_pT_lo = h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->GetBinLowEdge(i_bin);
 					if (trk_pT_hi > jet_pT_lo && cut != "ppTight_tight")
 					{
-						//						cout << Form("%2.4f - %2.4f : %2.4f - %2.4f", jet_pT_lo, jet_pT_hi, trk_pT_lo, trk_pT_hi) << endl;
-
 						fit_range_hi = h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetBinLowEdge(i_bin);
 						first_z_1_bin = i_bin;
 						break;
@@ -128,12 +109,9 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 
 				}
 
-
-
 				name = Form("fit_eff_eta%i_cent%i_pt%i",i_eta_cuts, i_cent_cuts, i_jetpt_cuts+1);
 				fit_eff[i_cent_cuts][i_eta_cuts][i_jetpt_cuts] = new TF1(name.c_str(),"[0] + [1]*log(x) + [2]*pow(log(x),2) + [3]*pow(log(x),3)");
 				fit_eff[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->SetRange(fit_range_lo,fit_range_hi);
-
 
 				//fit within special range
 				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->Fit(fit_eff[i_cent_cuts][i_eta_cuts][i_jetpt_cuts],"RQ0","");
@@ -181,8 +159,6 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 
 				}
 
-
-
 				//comparing histogram from fit to original points
 				name = Form("h_fit_to_hist_eta%i_cent%i_pt%i",i_eta_cuts, i_cent_cuts, i_jetpt_cuts+1);
 				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts] = (TH1*)h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->Clone(name.c_str());
@@ -202,10 +178,10 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 	}
 
 
-	for (int i_eta_cuts = 0; i_eta_cuts < n_eta_cuts; i_eta_cuts++)
+	for (int i_eta_cuts = 0; i_eta_cuts < n_jet_y_bins_coarse; i_eta_cuts++)
 	{
-		double eta_lo = eta_Slices[i_eta_cuts];
-		double eta_hi = eta_Slices[i_eta_cuts+1];
+		double eta_lo = jet_y_binning_coarse->GetBinLowEdge(i_eta_cuts+1);
+		double eta_hi = jet_y_binning_coarse->GetBinUpEdge(i_eta_cuts+1);
 
 		canvas1->cd();
 		canvas1->Clear();
@@ -220,7 +196,6 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 			canvas2->cd();
 			canvas2->Clear();
 			canvas2->Divide(3,2);
-
 
 			string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
@@ -240,7 +215,6 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 					if (trk_pT_lo >= jet_pT_hi) h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->SetBinContent(i_bin,-1);
 				}
 
-
 				SetHStyle(h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts], i_jetpt_cuts-start+1);
 				smallify(h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]);
 
@@ -249,14 +223,6 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetTitle("Efficiency");
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetTitle("p_{T}^{trk} [GeV]");
-
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetLabelSize(12);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetTitleOffset(2.5);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetTitleSize(14);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetLabelSize(12);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetTitleOffset(3.);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetTitleSize(14);
-//				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->SetMarkerSize(0.9);
 
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetRangeUser(0.2,1.);
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetRangeUser(1.,1e3);
@@ -270,10 +236,8 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 
 				if (i_eta_cuts == 0 && i_cent_cuts == 0)
 				{
-					legend1->AddEntry(h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts],name.c_str(),"lp");
+					legend->AddEntry(h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts],name.c_str(),"lp");
 				}
-
-
 
 				canvas2->cd(canvas_number);
 				gPad->SetLogx();
@@ -297,17 +261,15 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 				ltx->SetTextAlign(11);
 				ltx->DrawLatex(0.19,0.82,name.c_str());
 
-
 				canvas_number++;
-
 			}
 
 			canvas2->cd(2);
-			legend1->SetX1NDC(0.21);
-			legend1->SetY1NDC(0.19);
-			legend1->SetX2NDC(0.7);
-			legend1->SetY2NDC(0.53);
-			legend1->Draw();
+			legend->SetX1NDC(0.21);
+			legend->SetY1NDC(0.19);
+			legend->SetX2NDC(0.7);
+			legend->SetY2NDC(0.53);
+			legend->Draw();
 
 			canvas1->cd(i_cent_cuts+1);
 			name = Form("%s",centrality.c_str());
@@ -316,7 +278,7 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 
 
 			if (i_eta_cuts == 0 && i_cent_cuts == 0) name = "(";
-			else if (i_eta_cuts == n_eta_cuts - 1 && i_cent_cuts == n_cent_cuts - 1) name = ")";
+			else if (i_eta_cuts == n_jet_y_bins_coarse - 1 && i_cent_cuts == n_cent_cuts - 1) name = ")";
 			else name = "";
 			canvas2->Print(Form("eff_fitQual_cent_jetpt_jety_%s.pdf%s", cut.c_str(), name.c_str()), Form("Title: cent%i_jety%i",i_cent_cuts, i_eta_cuts));
 //			canvas2->Print(Form("eff_fitQual_cent%i_jetpt_jety%i_%s.pdf", i_cent_cuts, i_eta_cuts, cut.c_str()));
@@ -337,16 +299,16 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 		ltx->DrawLatex(0.19,0.210,name.c_str());
 
 		canvas1->cd(2);
-		legend1->SetX1NDC(0.21);
-		legend1->SetY1NDC(0.19);
-		legend1->SetX2NDC(0.7);
-		legend1->SetY2NDC(0.53);
-		legend1->SetTextSize(12);
-		legend1->Draw();
+		legend->SetX1NDC(0.21);
+		legend->SetY1NDC(0.19);
+		legend->SetX2NDC(0.7);
+		legend->SetY2NDC(0.53);
+		legend->SetTextSize(12);
+		legend->Draw();
 
 
 		if (i_eta_cuts == 0) name = Form("(");
-		else if (i_eta_cuts == n_eta_cuts - 1) name = Form(")");
+		else if (i_eta_cuts == n_jet_y_bins_coarse - 1) name = Form(")");
 		else name = Form("");
 		canvas1->Print(Form("eff_cent_jetpt_jety_%s.pdf%s",cut.c_str(), name.c_str()),Form("Title: jety%i",i_eta_cuts));
 //		canvas1->Print(Form("eff_centrality_jetpt_jety%i_%s.pdf",i_eta_cuts, cut.c_str()));
@@ -355,5 +317,3 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 	
 	output_file->Close();
 }
-
-
