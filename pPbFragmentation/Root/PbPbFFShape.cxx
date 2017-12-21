@@ -573,7 +573,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			{
 				ff_raw.at(dr_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
 				ChPS_raw.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
-
 				//Tracking validation histograms
 				if (jet_pt>80. && jet_pt<110.) h_reco_trk_map->Fill(pt,eta,phi);
 
@@ -588,8 +587,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 				//Only truth jets > 40 GeV and <2.1 in responses
 
 				float matched_truth_jet_pt = truth_jet_pt_vector.at(TruthJetIndex.at(i));
-//				if (matched_truth_jet_pt < _truthpTjetCut) continue;
-				if (fabs(truth_jet_eta_vector.at(TruthJetIndex.at(i)))>(2.5 - _dR_max)) continue;
 
 
 				bool isFake=true;
@@ -682,15 +679,16 @@ EL::StatusCode PbPbFFShape :: execute (){
 				if (isFake)
 				{
 					//TODO check weighting of UE
-					ff_UE_z.at(dr_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
-					ff_UE_pT.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
+					if (R < _dR_max)
+					{
+						ff_UE_z.at(dr_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
+						ff_UE_pT.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
 
-					int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)reco_posRes_ChPS.at(0).at(0)->GetYaxis());
-					UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
+						int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)reco_posRes_ChPS.at(0).at(0)->GetYaxis());
+						UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
+					}
 				}
-
 			}
-
 		} // end reco track loop
 
 
