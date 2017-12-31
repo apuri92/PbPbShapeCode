@@ -28,6 +28,6 @@
 #include "functions.c"
 #include "hstyle.c"
 
-int n_cent_cuts = 7;
+int n_cent_cuts = 7; //all bins, including inclusive
 
 #endif

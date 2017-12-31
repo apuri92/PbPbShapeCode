@@ -17,9 +17,9 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 	//	##############	Config done	##############"
 
 	//output root file
-	name = Form("raw_efficiency_trketa_%s_%s.root",dataset_type.c_str(), tracking_cut.c_str());
+	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
 	TFile *output_file = new TFile(name.c_str(),"recreate");
-	cout << Form("Raw efficiency root file: %s", output_file->GetName()) << endl;
+	cout << Form("Efficiency root file: %s", output_file->GetName()) << endl;
 
     //setting up fine eta for eff_trketa corrections
     vector<double> eta_range;
@@ -147,6 +147,11 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 					h_matched_1d->SetLineColor(kRed);
 					h_entries_1d->SetLineColor(kBlue);
 
+					h_total_1d->GetXaxis()->SetRangeUser(1,200);
+					h_matched_1d->GetXaxis()->SetRangeUser(1,200);
+					h_entries_1d->GetXaxis()->SetRangeUser(1,200);
+					h_ratio->GetXaxis()->SetRangeUser(1,200);
+
 					h_total_1d->Draw("hist");
 					h_matched_1d->Draw("same hist");
                     h_entries_1d->Draw("same hist text");
@@ -169,7 +174,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 
 					line->SetLineColor(kRed);
 					line->SetLineStyle(3);
-					line->DrawLine(1E-1,1,500,1);
+					line->DrawLine(1,1,200,1);
 
 					if (i_eta_cuts == 0 && i_cent_cuts == 0 && i_files == 0) name = "(";
                     else if (i_eta_cuts == n_trk_eta_bins_new - 1  && i_cent_cuts == n_cent_cuts - 1 && i_files == nFiles - 1) name = ")";
