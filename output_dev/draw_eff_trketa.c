@@ -9,7 +9,8 @@ void draw_eff_trketa()
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile("perf_config.cfg", EEnvLevel(1));
-
+	m_config->Print();
+	
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
@@ -70,7 +71,7 @@ void draw_eff_trketa()
             SetHStyle(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++);
             smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts));
 
-            h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.7,1);
+            h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.5,1);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,200);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetTitle("Efficiency");
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetTitle("#it{p}_{T}^{truth} [GeV]");

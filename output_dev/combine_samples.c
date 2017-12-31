@@ -24,9 +24,9 @@ void combine_samples()
 	double FilterEff[5], CrossSec[5], SumJetW[5];
 	get_weights(dataset_type, FilterEff, CrossSec, SumJetW);
 
-	filename[1] = Form("results/Perf_MC_JZ2_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
-	filename[2] = Form("results/Perf_MC_JZ2_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
-	filename[3] = Form("results/Perf_MC_JZ3_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
+	filename[1] = Form("raw_results/Perf_MC_JZ2_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
+	filename[2] = Form("raw_results/Perf_MC_JZ2_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
+	filename[3] = Form("raw_results/Perf_MC_JZ3_out_histo_%s_5p02_r001%s.root", dataset_type.c_str(), id.c_str());
 
 	//setting up vectors (note that vectors correspond to number of files (not 5)
 	std::vector<TFile*> theFiles;
