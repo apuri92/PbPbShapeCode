@@ -30,9 +30,11 @@ private:
 
 	TFile * _f_eff_jetpt;
 	TFile * _f_eff_trketa;
+    TFile * _f_eff_trketa_pp;
 
 	TGraphAsymmErrors *_g_eff_jept[6][10][20];
 	TH1 *_h_eff_trketa[25][10];
+    TH1 *_h_eff_trketa_pp[25][10];
 	TAxis *new_trk_eta_binning;
 
 	TAxis *jetpt_bins;
@@ -91,6 +93,7 @@ public:
 		if (_eff_jety) main_eff_file = "mc_eff_fits_pt_exclusive";
 		_f_eff_jetpt = new TFile(xfn + "/../pPbFragmentation/data/" + main_eff_file + "_" + _cutlevel + ".root","read");
 		_f_eff_trketa = new TFile(xfn + "/../pPbFragmentation/data/mc_eff_trketa_jetptinc_" + _cutlevel + ".root","read");
+        _f_eff_trketa_pp = new TFile(xfn + "/../pPbFragmentation/data/mc_eff_pp_trketa_jetptinc_" + _cutlevel + ".root","read");
 
 		cout << "Using: " << _f_eff_jetpt->GetName() << endl;
 
@@ -112,6 +115,7 @@ public:
 
 		//trk pt, trk eta based correction
 		cout << "Using: " << _f_eff_trketa->GetName() << endl;
+        cout << "Using: " << _f_eff_trketa_pp->GetName() << endl;
 		new_trk_eta_binning = (TAxis*)_f_eff_trketa->Get("new_trk_eta_binning");
 		int n_trketa_bins = new_trk_eta_binning->GetNbins();
 		for(int cent=0;cent<_nCent;cent++)
@@ -119,6 +123,7 @@ public:
 			for(int e=0;e<n_trketa_bins;e++)
 			{
 				_h_eff_trketa[e][cent]=(TH1*)_f_eff_trketa->Get(Form("hist_eff_eta%i_cent%i",e,cent));
+                _h_eff_trketa_pp[e][cent]=(TH1*)_f_eff_trketa_pp->Get(Form("hist_eff_eta%i_cent%i",e,cent));
 			}
 		}
 		//Residual eta correction to the efficiency
@@ -168,7 +173,7 @@ public:
 	//Int_t TrackCorrector::GetCentBin(int cent);
 	bool PassTracktoJetBalance(float trk_pt,float jet_pt,float trk_eta,float jet_eta,int cent);
 	float get_effcorr(float pt, float eta, int centrality, float uncert, float jet_pt, float jet_eta, float R);
-	float get_effcorr(float pt, float eta, int centrality, float uncert);
+	float get_effcorr(float pt, float eta, int centrality, float uncert, int dataset);
 	void correctChTrackpT(float &pt, int charge);
 	void correctChTrackpT(float &pt, float eta, float phi, int charge);
 	~TrackCorrector() {}

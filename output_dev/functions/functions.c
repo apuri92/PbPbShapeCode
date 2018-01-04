@@ -55,9 +55,9 @@ void get_weights(std::string dataset_type, double *FilterEff, double *CrossSec, 
 
 }
 
-string num_to_cent(int scheme, int i)
+std::string num_to_cent(int scheme, int i)
 {
-	string cent_label;
+	std::string cent_label;
 
 	if (scheme == 31)
 	{

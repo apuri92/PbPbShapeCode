@@ -69,7 +69,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
 	SetupBinning(0, "phi-trk", phiJetBins, phiJetBinsN);
-	SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk", phiTrkBins, phiTrkBinsN);
 	SetupBinning(0, "d0z0", d0z0Bins, d0z0BinsN);
@@ -174,6 +174,9 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 		temphist_3D = new TH3D(Form("h_trk_foreff_matched_cent%i",i),Form("h_trk_foreff_matched_cent%i",i), phiTrkBinsN, phiTrkBins, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
 		h_trk_foreff_matched.push_back(temphist_3D);
 
+        temphist_3D = new TH3D(Form("h_trk_foreff_entries_cent%i",i),Form("h_trk_foreff_entries_cent%i",i), phiTrkBinsN, phiTrkBins, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
+        h_trk_foreff_entries.push_back(temphist_3D);
+        
 		temphist_3D = new TH3D(Form("h_fake_v_jet_cent%i",i),Form("h_fake_v_jet_cent%i",i),ptJetBinsN,ptJetBins,ptTrkBinsN, ptTrkBins,etaFineBinsN,etaFineBins);
 		h_fake_v_jet.push_back(temphist_3D);
 
@@ -270,6 +273,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 		wk()->addOutput (h_trk_eff_map.at(i));
 		wk()->addOutput (h_eff_Injet_entries.at(i));
 		wk()->addOutput (h_eff_entries.at(i));
+        wk()->addOutput (h_trk_foreff_entries.at(i));
 		wk()->addOutput (h_trk_foreff_matched.at(i));
 		wk()->addOutput (h_trk_foreff_full.at(i));
 		wk()->addOutput (h_fake_v_jet.at(i));
@@ -351,9 +355,9 @@ EL::StatusCode TrackingPerformance :: initialize ()
 	EL_RETURN_CHECK("initialize()",m_trackSelectorTool->initialize());
 
 	//Calibration
-	const std::string name = "pPbFragmentation"; //string describing the current thread, for logging
+	const std::string name = "TrackingPerformance"; //string describing the current thread, for logging
 	TString jetAlgo = "AntiKt4HI"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
-	TString config = "JES_MC15CHI_060316.config"; //Path to global config used to initialize the tool (see below)
+	TString config = "JES_MC15c_HI_Nov2016.config"; //Path to global config used to initialize the tool (see below)
 	TString calibSeq = "EtaJES_DEV"; //String describing the calibration sequence to apply (see below)
 	bool isData = false; //bool describing if the events are data or from simulation
 
@@ -373,7 +377,7 @@ EL::StatusCode TrackingPerformance :: initialize ()
 
 	//Jet corrector
 	jetcorr = new JetCorrector();
-
+	jetcorr->is_pp = (_dataset==3); //dataset 3 is 5 TeV pp MC
 	cout << " Initialization done" << endl;
 	return EL::StatusCode::SUCCESS;
 }
@@ -588,41 +592,37 @@ EL::StatusCode TrackingPerformance :: execute (){
 	EL_RETURN_CHECK("execute()",store->record( updatedjets, "updatedjets" ));
 	EL_RETURN_CHECK("execute()",store->record( updatedjetsAux, "updatedjetsAux" ));
 
+	//In PbPb MC official derivations, the default jet kinematics in DFAntiKt4HI are already calibrated. Nothing more is needed
+	//in pp MC, there is no DF container. The AntiKt4HIJets container has unsubtracted, subtracted = EMScale, and default (incorrectly calibrated). To calibrate these, Set Consitutuent scale to usubtracted and calibrate
+
+
 	for( ; jet_itr != jet_end; ++jet_itr )
 	{
 		xAOD::Jet newjet;// = new xAOD::Jet();
 		newjet.makePrivateStore( **jet_itr );
 
 		const xAOD::JetFourMom_t jet_4mom_def = newjet.jetP4();
-		float def_jet_pt  = (jet_4mom_def.pt() * 0.001);
+		const xAOD::JetFourMom_t jet_4mom_subtr = newjet.jetP4("JetSubtractedScaleMomentum");
+		const xAOD::JetFourMom_t jet_4mom_unsubtr = newjet.jetP4("JetUnsubtractedScaleMomentum");
 
-		xAOD::JetFourMom_t jet_4mom = newjet.jetP4("JetSubtractedScaleMomentum"); //getting SubtractedScale instead of EMScale because EMScale is not in DFAntiKt4HI
-		float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
-		float uncalib_jet_eta  = (jet_4mom.eta());
-		float uncalib_jet_phi  = (jet_4mom.phi());
 
-		xAOD::JetFourMom_t jet_4mom_c = newjet.jetP4(); //getting calibrated pT from DFContainer in official derivations
-		float jet_pt  = (jet_4mom_c.pt() * 0.001);
-		float jet_eta  = (jet_4mom_c.eta());
-		float jet_phi  = (jet_4mom_c.phi());
-		
-		/*
-		const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet.jetP4("JetUnsubtractedScaleMomentum");
-		float unsubtracted_jet_pt  = (jet_4mom_unsubtracted.pt() * 0.001);
+		//if PbPb MC, no etajes calibration needed use defaults
+		if (_dataset == 4) //do nothing
 
-		newjet.setJetP4("JetPileupScaleMomentum",jet_4mom); //Setting PileupScale and ConstitScale because they are not in DFAntiKt4HI
-		newjet.setJetP4("JetConstitScaleMomentum",jet_4mom);
-		EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) );
+		//if pp MC, default is incorrect. Set constit to unsubtracted scale, and calibrate
+		if (_dataset == 3)
+		{
+			newjet.setJetP4("JetConstitScaleMomentum",jet_4mom_unsubtr);
+			EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) );
+		}
 
-		const xAOD::JetFourMom_t jet_4mom_xcalib = newjet.jetP4();
+		xAOD::JetFourMom_t jet_4mom_calib = newjet.jetP4();
+		float jet_pt  = (jet_4mom_calib.pt() * 0.001);
+		float jet_eta  = (jet_4mom_calib.eta());
+		float jet_phi  = (jet_4mom_calib.phi());
+		float jet_m   = (newjet.m()*0.001);
 
-		jet_pt  = (newjet.pt() * 0.001);
-		jet_eta = newjet.eta();
-		jet_phi = newjet.phi();
-		double jet_m   = (newjet.m()*0.001);
-
-		*/
-		if (fabs(jet_eta)>2.1) continue;
+		if (fabs(jet_eta)>2.5-_dR_max) continue;
 		if (jet_pt < _pTjetCut) continue;
 
 		jet_pt_xcalib_vector.push_back(jet_pt);
@@ -657,24 +657,8 @@ EL::StatusCode TrackingPerformance :: execute (){
 	vector<float> trk_good_matched_eta_reco, trk_good_matched_phi_reco, trk_good_matched_pt_reco;
 
 	//Loop over reconstructed tracks
-	for (const auto& trk : *recoTracks) {
-
-		//for {each reco track
-		//	if passed trk selector tool cuts
-		//		if truth link is valid
-		//			fill vector_valid_truthlink with 1
-		//			else fill vector_valid_truthlink with 0
-		//}
-		//
-		//for {each reco jet
-		//	for {each reco track
-		//		if valid_truthlink
-		//			match to jet (jet needs to have associated truthjetindex, \DeltaR should have truth trk kinematics)
-		//			track2jet balance with reco trk and reco jet
-		//		}
-		//}
-		//
-
+	for (const auto& trk : *recoTracks)
+    {
 		if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue;
 
 		//get the tracks....
@@ -915,13 +899,14 @@ EL::StatusCode TrackingPerformance :: execute (){
 			trk_good_matched_pt.push_back((*truthLink)->pt()*0.001);
 			trk_good_matched_phi.push_back((*truthLink)->phi());
 
-			trk_good_matched_phi.push_back((*truthLink)->phi());
-
 			trk_good_matched_pt_reco.push_back(pt);
 			trk_good_matched_eta_reco.push_back(eta);
 			trk_good_matched_phi_reco.push_back(phi);
 
 			trk_good_isMatched.push_back(1);
+//            cout << Form("event:%i	pt:	%f->%f	,eta: %f->%f	, phi:%f->%f", m_eventCounter, pt, (*truthLink)->pt()*0.001, eta, (*truthLink)->eta(), phi, (*truthLink)->phi()) << endl;
+            
+            
 			float MPS = (pt - (*truthLink)->pt()*0.001)/((*truthLink)->pt()*0.001);
 			h_trk_resolution->Fill((*truthLink)->pt()*0.001,(*truthLink)->eta(),MPS, event_weight);
 		}
@@ -951,6 +936,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 		if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity) //removed 12/8 for tracking efficienciy
 
 		h_reco_jet_map.at(cent_bin)->Fill(jet_pt, jet_eta, jet_phi, event_weight);
+        h_reco_jet_map.at(nCentBins-1)->Fill(jet_pt, jet_eta, jet_phi, event_weight);
 
 		for(unsigned int j = 0; j< trk_good_pt.size(); j++)
 		{
@@ -969,7 +955,11 @@ EL::StatusCode TrackingPerformance :: execute (){
 				float pt_truth = trk_good_matched_pt.at(tru_itr);
 
 				float R_truth = DeltaR(phi_truth,eta_truth,jet_phi,jet_eta);
-				if (R_truth > _dR_max) h_truth_outside.at(cent_bin)->Fill(pt_truth, eta_truth, phi_truth, event_weight);
+				if (R_truth > _dR_max)
+                {
+                    h_truth_outside.at(cent_bin)->Fill(pt_truth, eta_truth, phi_truth, event_weight);
+                    h_truth_outside.at(nCentBins-1)->Fill(pt_truth, eta_truth, phi_truth, event_weight);
+                }
 
 				tru_itr++;
 			}
@@ -990,10 +980,12 @@ EL::StatusCode TrackingPerformance :: execute (){
 			float pt_reco = trk_good_matched_pt_reco.at(j);
 
 			float R_reco = DeltaR(phi_reco,eta_reco,jet_phi,jet_eta);
-			if (R_reco > _dR_max) h_reco_outside.at(cent_bin)->Fill(pt_reco, eta_reco, phi_reco, event_weight);
+			if (R_reco > _dR_max)
+            {
+                h_reco_outside.at(cent_bin)->Fill(pt_reco, eta_reco, phi_reco, event_weight);
+                h_reco_outside.at(nCentBins-1)->Fill(pt_reco, eta_reco, phi_reco, event_weight);
+            }
 		}
-
-
 
 		//All good tracks
 		for(unsigned int j = 0; j< trk_good_pt.size(); j++)
@@ -1030,15 +1022,21 @@ EL::StatusCode TrackingPerformance :: execute (){
 
 			int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(eta,jet_eta)));
 			h_eff_deta_matched.at(deta_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_deta_matched.at(deta_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(phi,jet_phi)));
 			h_eff_dphi_matched.at(dphi_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_dphi_matched.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dR_bin = trkcorr->GetdRBin(R);
 			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			h_eff_matched.at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
-			h_trk_eff_matched_map.at(cent_bin)->Fill(pt, eta, phi, event_weight);
+            h_eff_matched.at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+
+            h_trk_eff_matched_map.at(cent_bin)->Fill(pt, eta, phi, event_weight);
+            h_trk_eff_matched_map.at(nCentBins-1)->Fill(pt, eta, phi, event_weight);
 
 			h_reco_Injet_matched[cent_bin]->Fill(jet_pt, pt_reco, eta, event_weight);
 			h_reco_Injet_matched[nCentBins-1]->Fill(jet_pt,pt_reco,eta, event_weight);
@@ -1048,8 +1046,9 @@ EL::StatusCode TrackingPerformance :: execute (){
 
 			if (isFirstPass)
 			{
-				h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight);
-				h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight);
+                float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+                h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight*eff_weight);
+				h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight*eff_weight);
 			}
 
 		}
@@ -1064,6 +1063,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 			int ty=getTypeTruth((*truth_itr)->barcode(),(*truth_itr)->pdgId(),(*truth_itr)->status(),(*truth_itr)->charge());
 			if(ty!=1 && ty!=5) continue;
 
+            
 			//get the tracks....
 			float eta = (*truth_itr)->eta();
 			float phi = (*truth_itr)->phi();
@@ -1075,27 +1075,39 @@ EL::StatusCode TrackingPerformance :: execute (){
 
 			int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(eta,jet_eta)));
 			h_eff_deta.at(deta_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_deta.at(deta_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(phi,jet_phi)));
 			h_eff_dphi.at(dphi_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_dphi.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dR_bin = trkcorr->GetdRBin(R);
 			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+            h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			h_eff_total.at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
-			h_trk_eff_map.at(cent_bin)->Fill(pt, eta, phi, event_weight);
-			h_eff_entries.at(cent_bin)->Fill(jet_pt, pt, eta);
+            h_eff_total.at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+            
+            h_trk_eff_map.at(cent_bin)->Fill(pt, eta, phi, event_weight);
+            h_trk_eff_map.at(nCentBins-1)->Fill(pt, eta, phi, event_weight);
+
+            h_eff_entries.at(cent_bin)->Fill(jet_pt, pt, eta);
+            h_eff_entries.at(nCentBins-1)->Fill(jet_pt, pt, eta);
 
 			h_eff_Injet[cent_bin]->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 			h_eff_Injet[nCentBins-1]->Fill(jet_pt,pt, fabs(rapidity), event_weight);
-			h_eff_Injet_entries[cent_bin]->Fill(jet_pt,pt,fabs(rapidity));
+			
+            h_eff_Injet_entries[cent_bin]->Fill(jet_pt,pt,fabs(rapidity));
 			h_eff_Injet_entries[nCentBins-1]->Fill(jet_pt,pt,fabs(rapidity));
 
 			if (isFirstPass)
 			{
 				h_trk_foreff_full[cent_bin]->Fill(phi, pt, eta, event_weight);
 				h_trk_foreff_full[nCentBins-1]->Fill(phi, pt, eta, event_weight);
-				h_truth_trk_map->Fill(pt,eta,phi, event_weight);
+                
+                h_trk_foreff_entries[cent_bin]->Fill(phi, pt, eta);
+                h_trk_foreff_entries[nCentBins-1]->Fill(phi, pt, eta);
+                h_truth_trk_map->Fill(pt,eta,phi, event_weight);
 			}
 		}
 

@@ -49,13 +49,15 @@ class JetCorrector
 	float min_jet_pt;
 	float max_jet_pt;
 	bool m_isMB;
-    
+	bool is_pp;
+
     JetCorrector() 
      {
 
          m_isMB = false;
          nJetYBins = 5;			// Default number of y bins
          JERcut = 999; //Cut in sigma of JER
+		 is_pp = false; //implemented for running over pp MC where no reweighting is required
          //Track-to-jet balance
 		 _nEta_JER = 8;			// number of eta bins 
 		 _nCent_JER = 8;			// number of centrality bins      

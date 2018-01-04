@@ -78,11 +78,13 @@ Int_t TrackCorrector::GetxBin(float x, TAxis* axis){
 	{
 		if (x >= axis->GetBinLowEdge(i+1) &&
 			x < axis->GetBinUpEdge(i+1)) xBin = i;
+        
+        if (x < axis->GetBinLowEdge(1)) xBin = 0;
 	}
 	if (xBin == -1)
 	{
 		xBin = axis->GetNbins() - 1;
-		cout << Form("Warning: did not find bin for variable at %f on axis %s. Using %i bin.",x, axis->GetName(), xBin) << endl;
+		cout << Form("TrackCorrector Warning: did not find bin for variable at %f on axis %s. Using %i bin.",x, axis->GetName(), xBin) << endl;
 	}
 
 	return xBin;
@@ -171,7 +173,7 @@ float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float unc
 }
 
 
-float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float uncert){
+float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float uncert, int dataset){
 
 	float weight = -1;
 
@@ -182,8 +184,8 @@ float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float unc
 	//main efficiency
 	float eff=1.;
 
-	eff = _h_eff_trketa[etabin][centrality]->GetBinContent(_h_eff_trketa[etabin][centrality]->FindBin(pt));
-
+    if (dataset == 4) eff = _h_eff_trketa[etabin][centrality]->GetBinContent(_h_eff_trketa[etabin][centrality]->FindBin(pt));
+    if (dataset == 3) eff = _h_eff_trketa_pp[etabin][centrality]->GetBinContent(_h_eff_trketa_pp[etabin][centrality]->FindBin(pt));
 	//pt weight
 	weight = 1./((eff + uncert));
 
@@ -191,7 +193,13 @@ float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float unc
 //	bool test = true;
 	if ((weight < 0.1 || weight>10.) || test)
 	{
-		cout << "Probably efficiency problem, weight: " << weight << " eff " << eff << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << endl;
+        cout << Form("Probably efficiency problem, weight: %f, eff: %f, pt: %f, eta: %f, etabin: %i, centrality: %i",
+                     weight,
+                     eff,
+                     pt,
+                     eta,
+                     etabin,
+                     centrality) << endl;
 
 		if (!test) cout << "Warning: Setting eff weight to 1" << endl;
 		if (!test) weight=1;

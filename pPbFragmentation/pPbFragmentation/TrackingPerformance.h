@@ -74,7 +74,8 @@ class TrackingPerformance : public BaseClass{
 	vector<TH3D*> h_eff_Injet_entries; //!
 	vector<TH3D*> h_trk_foreff_matched; //!
 	vector<TH3D*> h_trk_foreff_full; //!
-	vector<TH3D*> h_fake_v_jet; //!
+    vector<TH3D*> h_trk_foreff_entries; //!
+    vector<TH3D*> h_fake_v_jet; //!
 	vector<TH3D*> h_fake_v_jet_PV; //!
 	vector<TH3D*> h_trk_scale; //!
 	vector<TH3D*> h_trk_eta_scale; //!

@@ -2,7 +2,6 @@
 void PlotLabels_AtlasSim_q2_5(double x = 0.2, double y = 0.8, int size = 24, int align = 11, bool split=true)
 {
 	TLatex *   tex = new TLatex();
-	TPaveText *pt  = new TPaveText(.05,.1,.95,.8);
 
 
 	if (split) tex = new TLatex(x,y,"#splitline{#bf{#it{ATLAS Simulation}}}{Internal}");

@@ -28,11 +28,13 @@ Int_t JetCorrector::GetJetpTBin(float pt, TAxis* pt_bins) {
 	{
 		if (pt >= pt_bins->GetBinLowEdge(i+1) &&
 			pt < pt_bins->GetBinUpEdge(i+1)) xBin = i;
+        
+        if (pt < pt_bins->GetBinLowEdge(1)) xBin = 0;
 	}
 	if (xBin == -1)
 	{
 		xBin = pt_bins->GetNbins() - 1;
-		cout << Form("Warning: did not find bin for variable at %f on axis %s. Using %i bin.",pt, pt_bins->GetName(), xBin) << endl;
+		cout << Form("JetCorrector Warning: did not find bin for variable at %f on axis %s. Using %i bin.",pt, pt_bins->GetName(), xBin) << endl;
 	}
 
 	return xBin;
@@ -41,6 +43,8 @@ Int_t JetCorrector::GetJetpTBin(float pt, TAxis* pt_bins) {
 
 float JetCorrector::GetJetWeight(double pt, double eta, double phi)
 {
+	if (is_pp) return 1.0; //is using pp MC so no weighting required
+
 	int xb=event_weight_histo->GetXaxis()->FindBin(pt);
 	int yb=event_weight_histo->GetYaxis()->FindBin(eta);
 	int zb=event_weight_histo->GetZaxis()->FindBin(phi);
@@ -52,7 +56,10 @@ float JetCorrector::GetJetWeight(double pt, double eta, double phi)
 
 
 float JetCorrector::GetFCalWeight(float FCalEt) {
-	int centile = -1;
+	
+    if (is_pp) return 1.0; //is using pp MC so no weighting required
+
+    int centile = -1;
 	float event_weight_fcal=1;
 	for (int i=0; i<centiles.size(); i++)
 	{

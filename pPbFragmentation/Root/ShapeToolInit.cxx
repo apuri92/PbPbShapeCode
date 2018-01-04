@@ -128,13 +128,12 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	const std::string name = "PbPbFFShape"; //string describing the current thread, for logging
 	TString jetAlgo = "AntiKt4HI"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
 	TString config = "JES_MC15c_HI_Nov2016.config"; //Path to global config used to initialize the tool (see below)
-												  // JES_MC15c_HI_Nov2016 JES_MC15CHI_060316
-//	TString calibSeq = "EtaJES_DEV"; //String describing the calibration sequence to apply (see below)
-									 //bool isData = false; -- not used //bool describing if the events are data or from simulation
+	TString calibSeq = "EtaJES_DEV";
+	if (_data_switch == 0 && _dataset == 3) calibSeq = "EtaJES_Insitu_DEV"; //pp data
+	if (_data_switch == 0 && _dataset == 4) calibSeq = "Insitu_DEV"; //PbPb data
+	if (_data_switch == 1 && _dataset == 3) calibSeq = "EtaJES_DEV"; //pp MC
+	if (_data_switch == 1 && _dataset == 4) calibSeq = "EtaJES_DEV"; //PbPb MC - This is not used. Need to set something so it doesnt crash
 
-	TString calibSeq;
-	if (_data_switch == 0) calibSeq = "EtaJES_Insitu_DEV";
-	else calibSeq = "EtaJES_DEV";
 	
 	//insitu calibration
 //	TString jetAlgo_insitu = "AntiKt4EMTopo"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)

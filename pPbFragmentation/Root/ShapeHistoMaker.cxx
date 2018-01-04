@@ -30,6 +30,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	jetcorr->min_jet_pt = _pTjetCut+1;
 	jetcorr->max_jet_pt = 500.; //Maximum jet pt for reweighting
 	jetcorr->m_isMB = _isMB;
+    jetcorr->is_pp = (_dataset == 3);
 
 
 	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, dR_resBinsN;
