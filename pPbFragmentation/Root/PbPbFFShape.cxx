@@ -122,6 +122,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		cent_bin_fine = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING ); //Need for some tools
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
 		h_centrality->Fill(cent_bin,event_weight_fcal);
+		h_centrality->Fill(n_cent_bins-1,event_weight_fcal);
 
 		//Get HI clusters for flow
 		//const xAOD::CaloClusterContainer *hiclus(0);
@@ -523,9 +524,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			response_jet.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
             response_jet.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
             response_jet.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-            
-            cout << Form("%s, %f, %f, %f",response_jet.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->GetName(), jet_pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight) << endl; ;
-            
+
             truth_jet_y = truth_jet_y_vector.at(TruthJetIndex.at(i));
 			int y_truth_bin = jetcorr->GetJetYBin(truth_jet_y);
 
