@@ -247,6 +247,8 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 				smallify(h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]);
 				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetRangeUser(0.8,1.2);
 				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetRangeUser(1.,1e3);
+				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetTitle("Fit Quality");
+				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetTitle("p_{T}^{trk} [GeV]");
 				h_fit_to_hist[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->Draw("p");
 
 				line->SetLineColor(kRed);
