@@ -19,7 +19,7 @@ void get_posCorr()
 
 	name = Form("../raw_results/FF_MC_JZ_comb_out_histo_%s_5p02_r001.root", dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
-
+	cout << file->GetName() << endl;
 	TFile *output = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
 
 	TAxis* jet_pt_binning = (TAxis*)((TH3*)file->Get("h_reco_jet_spectrum_y0_cent0"))->GetXaxis();
@@ -48,6 +48,7 @@ void get_posCorr()
 		for (int i_jetpt = 0; i_jetpt < ptJetBinsN; i_jetpt++)
 		{
 			h_dR_change = (TH3*)file->Get(Form("h_dR_change_jetpt%i_cent%i",i_jetpt,i_cent));
+			h_dR_change->Sumw2();
 
 			//Initialize check histograms
 			for (int i_dR = 0; i_dR < dRBinsN; i_dR++)
@@ -72,6 +73,7 @@ void get_posCorr()
 				//2D Response
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH2*)h_dR_change->Project3D("yx");
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetName(Form("2D_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
+				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
 				name = Form("2D Resp. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 
@@ -80,6 +82,7 @@ void get_posCorr()
 
 				//Reco projection
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH1*)h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->ProjectionY(Form("reco_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
+				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
 				name = Form("Reco Proj. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 				name = Form("Reco_dR_c%i_j%i_trk%i",i_cent, i_jetpt, i_pt_bin);
@@ -89,6 +92,7 @@ void get_posCorr()
 
 				//Truth projection
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH1*)h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->ProjectionX(Form("truth_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
+				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
 				name = Form("Truth Proj. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 				name = Form("Truth_dR_c%i_j%i_trk%i",i_cent, i_jetpt, i_pt_bin);
@@ -345,8 +349,8 @@ void get_posCorr()
 					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1 - diff, 1 + diff);
 //					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(-4,5);
 					if (trk_iter == 0) legend3->AddEntry(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < p_{T}^{Jet} < %4.0f", pt_jet_lo, pt_jet_hi));
-					if (jet_iter == 0) h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
-					else h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
+					if (jet_iter == 0) h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("pe");
+					else h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same pe");
 					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
 				}
@@ -503,7 +507,7 @@ void get_posCorr()
 	c2->Print(Form("TruthProj_%s.pdf)", dataset_type.c_str()),"Title: End");
 	c3->Print(Form("RatioProj_%s.pdf)", dataset_type.c_str()),"Title: End");
 	c4->Print(Form("RespPurity_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c5->Print(Form("RespEfficiency.pdf_%s.pdf)", dataset_type.c_str()),"Title: End");
+	c5->Print(Form("RespEfficiency_%s.pdf)", dataset_type.c_str()),"Title: End");
 
 
 
