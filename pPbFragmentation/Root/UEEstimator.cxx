@@ -186,3 +186,37 @@ Float_t UEEstimator::GetDeltaPsi(float phi, float psi)
     while (diff > TMath::Pi()/2. ) diff = TMath::Pi() - diff;
     return fabs(diff);
 }
+
+void UEEstimator::initShapeUE()
+{
+
+	for (int i_dR = 0; i_dR < 13; i_dR++)
+	{
+		for (int i_dPsi = 0; i_dPsi < 16; i_dPsi++)
+		{
+			for (int i_pt = 0; i_pt < 10; i_pt++)
+			{
+				for (int i_cent = 0; i_cent < 5; i_cent++)
+				{
+					std::string name = Form("h_UE_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
+					h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
+				}
+			}
+		}
+	}
+
+}
+
+double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi)
+{
+	int bin_eta = h_UE[i_dR][i_dPsi][i_pt][i_cent]->GetXaxis()->FindBin(jet_eta);
+	int bin_phi = h_UE[i_dR][i_dPsi][i_pt][i_cent]->GetYaxis()->FindBin(jet_phi);
+	double val =  h_UE[i_dR][i_dPsi][i_pt][i_cent]->GetBinContent(bin_eta, bin_phi);
+	return val;
+}
+
+
+
+
+
+

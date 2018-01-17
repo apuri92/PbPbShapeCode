@@ -4,8 +4,10 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TH1F.h"
+#include "TH2.h"
 #include "pPbFragmentation/JetHelperTools.h"
 #include "TAxis.h"
+#include <TSystem.h>
 
 using namespace std;
 using namespace JetHelperTools;
@@ -29,7 +31,9 @@ class UEEstimator
     Float_t _bkgrCones_hpT[50];
     TF1* _f1_trkEta[10];
     TAxis * ptaxis;
-    
+    TFile *_f_ShapeUE;
+	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
+
     TH3D * _h_v2_EP;    
     TFile * _f_flowv2;
 
@@ -40,9 +44,9 @@ class UEEstimator
     Float_t Psi;
     Float_t m_maxjetdeltaR;
 
-    UEEstimator() 
+    UEEstimator()
      {
-      _nEta = 5;			// number of cones in eta direction 
+      _nEta = 5;			// number of cones in eta direction
       _nPhi = 8;			// number of cones in phi direction
       _maxNCones=_nEta*_nPhi;		// ID will be covered by _nEta*_nPhi=40 cones
       _w_ncones = _maxNCones;		// number of active cones (to be specified in ExcludeCones)
@@ -61,7 +65,10 @@ class UEEstimator
 			_h_eta_w[i][j]=(TH1F*)_f_weights->Get(Form("trk_eta_pt%i_cent%i",i,j)); //TODO update eta disitrbution
 		}				
 	  }
-	  
+
+		 TString path_to_UE = gSystem->GetFromPipe("echo $ROOTCOREBIN");
+		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","READ");
+
 	  //Parametrization from 2.76 TeV PbPb //TODO update eta disitrbution
 	  /*
 	  for (int i=0; i<10; i++)
@@ -76,10 +83,12 @@ class UEEstimator
       _f1_trkEta[5]->SetParameters( 47689.995455, 4.888658, 18614.531204, 414177156.622444);
       _f1_trkEta[6]->SetParameters( 90762.767213, 5.251247, 8.180272, -0.989233);
 	   */
-	   
+
 	   _f_flowv2 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/flowV2.root","read");
 	   _h_v2_EP = (TH3D*)_f_flowv2->Get("V2_EP");
-	           
+
+	   _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","read");;
+
       _etaOfCone = 0;	// eta position of a cone found for a given particle
       _phiOfCone = 0;	// phi position of a cone found for a given particle
       _deltaRToConeAxis = 0;	// distance between a position of a cone found for a given particle and that particle
@@ -104,7 +113,8 @@ class UEEstimator
     void FindCone(float trk_pt,float trk_eta,float trk_phi);
     Float_t CalculateEtaWeight(float trk_pT, float trk_eta, float jet_eta, Int_t icent);
     Float_t CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
-    
+    void initShapeUE();
+    double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi);
     Int_t GetTrackpTBin(float pt) {
     	Int_t bin=-1;
     		if (pt>0.2) bin=0; if (pt>1.) bin=1; if (pt>2.) bin=2; if (pt>3.) bin=3; if (pt>4.) bin=4; if (pt>5.) bin=5; 

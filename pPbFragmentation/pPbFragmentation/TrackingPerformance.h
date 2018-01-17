@@ -105,6 +105,7 @@ class TrackingPerformance : public BaseClass{
 	TH3 *h_z0sign_wrt_truth; //!
 	TH3 *h_d0sign_subset; //!
 	TH3 *h_z0sign_subset; //!
+	TH1D * h_centrality; //!
 
 	TH2 *h_d0_cut; //!
 	TH2 *h_d0_nocut; //!

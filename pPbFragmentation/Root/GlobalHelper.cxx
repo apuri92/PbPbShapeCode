@@ -75,6 +75,16 @@ Float_t GetAveragePsi(Float_t psi1, Float_t psi2)
    return ( (psi1+psi2)/2. + phase );
 }
 
+Int_t GetPsiBin(Float_t psi)
+{
+   int bin = -1;
+   for (float dPsi=0.;dPsi<TMath::Pi();dPsi=dPsi+0.1){
+   		if (psi<=dPsi) return bin;
+   		bin++;
+   }
+   return bin;
+}
+
 int GetCentralityBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 // @brief: returns a centrality bin [0-9] based on centralityScheme and MTGlobalEvent
 {
@@ -179,6 +189,25 @@ int GetGlobalBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 		
 		return -1;
 	}
+	else if (centralityScheme==34) // Pb+Pb 2015, 10% bins, I think this is correct for JER (P.B.)
+	{
+		// nominal 85%, full Fcal
+		if ( 3.61844 	<=centrality && centrality< 6.00     ) return 0;	// 0-5%
+		if ( 2.98931 	<=centrality && centrality< 3.61844  ) return 0;	// 5-10%
+		if ( 2.04651	<=centrality && centrality< 2.98931  ) return 1;	// 10-20%
+		if ( 1.36875	<=centrality && centrality< 2.04651  ) return 2;	// 20-30%
+		if ( 0.87541	<=centrality && centrality< 1.36875  ) return 3;	// 30-40%
+		if ( 0.525092	<=centrality && centrality< 0.87541  ) return 4;	// 40-50%
+		if ( 0.289595	<=centrality && centrality< 0.525092 ) return 5;	// 50-60%
+		if ( 0.14414	<=centrality && centrality< 0.289595 ) return 6;	// 60-70%
+		if ( 0.063719	<=centrality && centrality< 0.14414  ) return 7;	// 70-80%
+		
+		// Hijing doesn't have the same FCal distribution as data, let's keep everything
+		if(isMC && centrality>= 6.0) return 0;
+		if(isMC && 0.0<=centrality && centrality<0.063719) return 7;
+		
+		return -1;
+	}
 	else if (centralityScheme==20)	// p+Pb centrality
 	{
 		centrality = FCal_Et;
@@ -223,6 +252,7 @@ int GetCentralityNBins(Int_t centralityScheme)
 	if (centralityScheme==31) return 7;
 	if (centralityScheme==32) return 8;
 	if (centralityScheme==33) return 8;
+	if (centralityScheme==34) return 9;
 	if (centralityScheme==40) return 8;
 	
 	else return 1;

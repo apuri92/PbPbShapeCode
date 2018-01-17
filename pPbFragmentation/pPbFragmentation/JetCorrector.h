@@ -123,6 +123,7 @@ class JetCorrector
      }// end of constructor
 		
 	float GetFCalWeight(float FCalEt);
+	float GetFCalHPWeight(float FCalEt);
 	float GetJetWeight(double pt, double eta, double phi);
 	int GetJetYBin(float y);
 	int GetJetpTBin(float pT, TAxis* pt_bins);

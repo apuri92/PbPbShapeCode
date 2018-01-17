@@ -91,6 +91,9 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
 
+	h_centrality = new TH1D("Centrality","Centrality",10,0,10);
+	h_centrality->Sumw2();
+
 	h_trk_resolution = new TH3D("h_trk_resolution","h_trk_resolution",ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,trk_resN,trk_res);
 	h_trk_resolution->Sumw2();
 
@@ -107,6 +110,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 
 	wk()->addOutput (h_FCal_Et);
+	wk()->addOutput (h_centrality);
 	wk()->addOutput (h_RejectionHisto);
 	wk()->addOutput (h_trk_resolution);
 	wk()->addOutput (h_reco_trk_map);
@@ -476,11 +480,13 @@ EL::StatusCode TrackingPerformance :: execute (){
 		FCalEt=calos->at(5)->et()*1e-6;
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt, isHIJING);
 		cent_bin_fine = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING ); //Need for some tools
+//		event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
 
-		event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
-
-		if (isMC && isHIJING) event_weight_fcal = 1;
-	}
+//		if (isMC && isHIJING) event_weight_fcal = 1;
+//		cout << event_weight_fcal << endl;
+		h_centrality->Fill(cent_bin,event_weight_fcal);
+		h_centrality->Fill(nCentBins-1,event_weight_fcal);
+}
 
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
 
@@ -1044,9 +1050,10 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_Injet_matched[cent_bin]->Fill(jet_pt, pt, fabs(rapidity), event_weight);
 			h_eff_Injet_matched[nCentBins-1]->Fill(jet_pt, pt, fabs(rapidity), event_weight);
 
+			float eff_weight = 1;
 			if (isFirstPass)
 			{
-                float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+//                eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
                 h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight*eff_weight);
 				h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight*eff_weight);
 			}

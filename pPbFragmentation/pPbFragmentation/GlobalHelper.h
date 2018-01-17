@@ -19,6 +19,7 @@ int GetCentralityNBins(Int_t centralityScheme);
 float GetEventPlane(const xAOD::CaloClusterContainer *hiclus);
 float GetEventPlane(const xAOD::HIEventShapeContainer* calos);
 Float_t GetAveragePsi(Float_t psi1, Float_t psi2);
+Int_t GetPsiBin(Float_t psi);
 //@CODE_end
 
 #endif

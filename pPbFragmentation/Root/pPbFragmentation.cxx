@@ -103,6 +103,23 @@ EL::StatusCode pPbFragmentation :: histInitialize ()
 	SetupBinning(0, "hits_fine", finehitsBins, finehitsBinsN);
 	SetupBinning(0, "d0z0", d0z0Bins, d0z0BinsN);
    
+	
+	//Jet corrector
+	jetcorr = new JetCorrector();	
+	int _nJetYBins = jetcorr->nJetYBins;
+	
+	jetcorr->JERcut = _JERBalancecut;
+	//jetcorr->min_jet_pt = _pTjetCut+1;
+	jetcorr->min_jet_pt = 100.; //TODO
+	jetcorr->max_jet_pt = 630.944; //Maximum jet pt for reweighting 
+	jetcorr->m_isMB = _isMB;
+	
+	//Track corrector
+	int _nCentbins = GetCentralityNBins(_centrality_scheme);
+	trkcorr = new TrackCorrector(_cut_level.c_str(),GetCentralityNBins(31)-1,_eff_jety);
+	trkcorr->trkpTThreshold = 0.1; // not used
+   
+   
 	//Basic histograms
 	if(!_doSlimTree)
 	{
@@ -247,8 +264,11 @@ EL::StatusCode pPbFragmentation :: histInitialize ()
 			tree_ff->Branch("jet_centrality",&jet_centrality,"jet_centrality/I");
 		}
 		tree_ff->Branch("jet_isDummy",&jet_isDummy,"jet_isDummy/I");
+		tree_ff->Branch("jet_pt_JER",&jet_pt_JER,"jet_pt_JER/F");
+		tree_ff->Branch("jet_pt_JER2",&jet_pt_JER2,"jet_pt_JER2/F");
 		
 		tree_ff->Branch("track_pt",&track_pt);
+		tree_ff->Branch("track_pt_corr",&track_pt_corr);
 		if(!_doSlimTree) tree_ff->Branch("track_vertex_type",&track_vertex_type);
 		tree_ff->Branch("track_phi",&track_phi);
 		tree_ff->Branch("track_eta",&track_eta);
@@ -398,25 +418,48 @@ EL::StatusCode pPbFragmentation :: initialize ()
 
 	//Track Selection Tool
 	//_nTrkSelTools=2; - set in run_chain_pPbFragmentation.cxx
+
 	m_trackSelectionTool[0] = new InDet::InDetTrackSelectionTool("InDetTrackSelectionTool_0");
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[0]->setProperty("CutLevel","HITight"));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[0]->setProperty("CutLevel","TightPrimary"));
 
 	m_trackSelectionTool[1] = new InDet::InDetTrackSelectionTool("InDetTrackSelectionTool_1");
-	// tohle je skoro TightPrimary, ale mame jiny cut na IBL+BL hity (to je to useMinBiasInnermostLayersCut) a jsou ignorovany shared hity (to nejak neslo vypnout, proto jsem to tu zkoporoval)
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("CutLevel","NoCut"));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("maxAbsEta",2.5));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("minNSiHits", 9));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("maxNSiHoles", 2));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("maxNPixelHoles", 0));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("minEtaForStrictNSiHitsCut", 1.65));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("minNSiHitsAboveEtaCutoff", 11));
-	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("useMinBiasInnermostLayersCut",1)); // s timhle asi projdou tracky, ktere nemaji hity v IBL ani v BL a ktere nemaji expected hity v BL ani v IBL; podle me takove tracky nechceme (protoze ma platit nIBL+nBL>0), ale jine cuty by se o to mohly postarat...
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("CutLevel","TightPrimary"));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("maxD0overSigmaD0",3.0));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[1]->setProperty("maxZ0SinThetaoverSigmaZ0SinTheta",3.0));
+	
+	m_trackSelectionTool[2] = new InDet::InDetTrackSelectionTool("InDetTrackSelectionTool_2");
+	// tohle je skoro TightPrimary, ale jsou ignorovany shared hity (to nejak neslo vypnout, proto jsem to tu zkoporoval)
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("CutLevel","NoCut"));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("maxAbsEta",2.5));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("minNSiHits", 9));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("maxNSiHoles", 2));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("maxNPixelHoles", 0));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("minEtaForStrictNSiHitsCut", 1.65));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("minNSiHitsAboveEtaCutoff", 11));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[2]->setProperty("minNBothInnermostLayersHits",1));
+	
+	m_trackSelectionTool[3] = new InDet::InDetTrackSelectionTool("InDetTrackSelectionTool_3");
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("CutLevel","NoCut"));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("maxAbsEta",2.5));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("minNSiHits", 9));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("maxNSiHoles", 2));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("maxNPixelHoles", 0));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("minEtaForStrictNSiHitsCut", 1.65));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("minNSiHitsAboveEtaCutoff", 11));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("minNBothInnermostLayersHits",1));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("maxD0overSigmaD0",3.0));
+	EL_RETURN_CHECK("initialize()",m_trackSelectionTool[3]->setProperty("maxZ0SinThetaoverSigmaZ0SinTheta",3.0));	
+	
 	
 	for(int n=0;n<_nTrkSelTools;++n)
 	{
 		EL_RETURN_CHECK("initialize()",m_trackSelectionTool[n]->initialize());
 	}
 	
+	//Selector for FJR
+	m_trackSelectorTool_FJR = new InDet::InDetTrackSelectionTool("InDetTrackSelectorTool_FJR");
+	TrackHelperTools::SetCutLevel(m_trackSelectorTool_FJR, "FJR");
+	EL_RETURN_CHECK("initialize()",m_trackSelectorTool_FJR->initialize());
 	
 	//Corrections for track pT sagitta bias
 	//m_trkBiasingTool = new InDet::InDetTrackBiasingTool("InDetTrackBiasingTool");
@@ -527,6 +570,25 @@ EL::StatusCode pPbFragmentation :: initialize ()
 		smearTool=0;
 	}
 	
+	
+	//Pileup tool
+	
+	// ZDCAnalysisTool
+	m_zdcTools = new ZDC::ZdcAnalysisTool("ZdcAnalysisTool");
+	// HIPileupTool
+	m_hiPileup = new HI::HIPileupTool("PileupTool");
+		
+	if (_doPileupRejection) {
+		EL_RETURN_CHECK("initialize()",m_hiPileup->initialize());
+		EL_RETURN_CHECK("initialize()",m_zdcTools->initializeTool());
+	}
+	
+	// uncertainty provider    
+	uncertprovider = new UncertProvider(_uncert_index,_mcProbCut,_cut_level.c_str(), GetCentralityNBins(31)-1, _eff_jety);
+	_mcProbCut = uncertprovider->GetMCProb();
+	cout << "mc prob: " << _mcProbCut <<endl;
+	
+	
 	cout << " Initialization done" << endl;
 	return EL::StatusCode::SUCCESS;
 }
@@ -586,10 +648,10 @@ EL::StatusCode pPbFragmentation :: execute (){
 	
 	
 	FCalEt = 0;
-	int cent_bin=0;
+	int cent_bin=0,cent_bin_JER=0, cent_bin_JER2=0;
+	const xAOD::HIEventShapeContainer* calos = 0;
 	if (_centrality_scheme>1) {
 		//Centrality
-		const xAOD::HIEventShapeContainer* calos = 0;
 		EL_RETURN_CHECK("execute()",event->retrieve( calos, "CaloSums" ));
 		FCalEt = 0;
 		int x = 0;
@@ -602,6 +664,8 @@ EL::StatusCode pPbFragmentation :: execute (){
 			x++;
 		}
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt, isMC);
+		cent_bin_JER = GetCentralityBin(31, FCalEt, isMC);
+		cent_bin_JER2 = GetCentralityBin(34, FCalEt, isMC);
 		h_FCal_Et->Fill(FCalEt);
 	}  
 	if (cent_bin < 0) {
@@ -631,7 +695,6 @@ EL::StatusCode pPbFragmentation :: execute (){
 	}	
 	xAOD::VertexContainer::const_iterator vtx_itr = vertices->begin();
 	xAOD::VertexContainer::const_iterator vtx_end = vertices->end();
-	// find primary vertex
 	const xAOD::Vertex* primaryVertex = 0;
 	for(;vtx_itr!=vtx_end;++vtx_itr)
 	{
@@ -662,6 +725,28 @@ EL::StatusCode pPbFragmentation :: execute (){
 	if(!isMC){
 		if(   (eventInfo->errorState(xAOD::EventInfo::LAr)==xAOD::EventInfo::Error ) || (eventInfo->errorState(xAOD::EventInfo::Tile)==xAOD::EventInfo::Error ) || (eventInfo->errorState(xAOD::EventInfo::SCT)==xAOD::EventInfo::Error ) || (eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18) ) ){
 			h_RejectionHisto->Fill(4.5);			
+			keep = false;
+		}
+	}
+	
+	//Pileup	
+	if (_doPileupRejection){		
+		bool m_is_pileup = false;
+		if (!isMC) {	
+			const xAOD::ZdcModuleContainer* zdcMod = 0;
+			EL_RETURN_CHECK("execute",event->retrieve( zdcMod, "ZdcModules")); 
+			//const xAOD::HIEventShapeContainer* hiev = 0;
+			//EL_RETURN_CHECK("execute",event->retrieve( hiev, "HIEventShape"));
+			// ZDC
+			m_zdcTools->reprocessZdc();
+
+			// is Pileup
+			m_is_pileup = m_hiPileup->is_pileup( *calos, *zdcMod); // SAVE pileup Decision HERE 0 = NO pileup, 1 = pileup
+		}
+		//else m_is_pileup = (FCalEt > 4.8); //Remove pileup in MC
+				
+		if (m_is_pileup){
+			h_RejectionHisto->Fill(6.5);
 			keep = false;
 		}
 	}
@@ -734,10 +819,11 @@ EL::StatusCode pPbFragmentation :: execute (){
 	electrons_shallowCopy = xAOD::shallowCopyContainer( *electrons );
 	
 	//Jet vectors
-	vector<float> jet_pt_EM_vector, jet_pt_SEB_vector,jet_pt_prexcalib_vector,jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector,jet_m_vector,jet_uJER_vector;
+	vector<float> jet_pt_EM_vector, jet_pt_SEB_vector, jet_pt_prexcalib_vector,jet_pt_xcalib_vector, jet_phi_vector,jet_eta_vector, jet_m_vector,jet_uJER_vector,jet_JER_vector,jet_JER2_vector;
+	vector<bool> /*jet_isolated_vector, jet_IsTrig_vector,*/ isFake_vector;
 	vector<vector<float>> jet_uJES_vector;
 	vector<int> Is_jet_Good, Is_dummyJet;
-	vector<float> truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector;
+	vector<float> truth_jet_eta_vector,truth_jet_m_vector, truth_jet_phi_vector,truth_jet_pt_vector;
 	vector<int> truth_jet_indices, truth_jet_isDummy_vector;
 	vector<int> hasTruth;
 	vector<int> isTriggered[_nTriggers];
@@ -746,17 +832,6 @@ EL::StatusCode pPbFragmentation :: execute (){
 	vector<float> antikt2_pt,antikt2_phi,antikt2_eta;
 	
 	// Clear vectors
-	hasTruth.clear();
-	
-	truth_jet_indices.clear();
-	truth_jet_pt_vector.clear();
-	truth_jet_eta_vector.clear();
-	truth_jet_phi_vector.clear();
-	truth_jet_m_vector.clear();
-	jet_uJER_vector.clear();
-	jet_uJES_vector.clear();
-	truth_jet_isDummy_vector.clear();
-	
 	jet_pt_EM_vector.clear();
 	jet_pt_SEB_vector.clear();
 	jet_pt_prexcalib_vector.clear();
@@ -764,17 +839,49 @@ EL::StatusCode pPbFragmentation :: execute (){
 	jet_phi_vector.clear();
 	jet_eta_vector.clear();
 	jet_m_vector.clear();
+	jet_uJER_vector.clear();
+	jet_JER_vector.clear();
+	jet_JER2_vector.clear();
 	
-	Is_jet_Isolated.clear();
-	jet_NBJ_pT_vector.clear();
-	truth_jet_NBJ_pT_vector.clear();
-	InJet_muon_pT.clear(); 
-	InJet_electron_pT.clear();
+	//jet_isolated_vector.clear();
+	//jet_IsTrig_vector.clear();
+	isFake_vector.clear();
+	
+	jet_uJES_vector.clear();
+	
 	Is_jet_Good.clear();
+	Is_dummyJet.clear(); ////
+	
+	truth_jet_eta_vector.clear();
+	truth_jet_m_vector.clear();
+	truth_jet_phi_vector.clear();
+	truth_jet_pt_vector.clear();
+	
+	truth_jet_indices.clear();
+	truth_jet_isDummy_vector.clear();
+	
+	hasTruth.clear();
 	
 	for (int j=0;j<_nTriggers;j++){
 		isTriggered[j].clear();
 	}
+	
+	jet_NBJ_pT_vector.clear();
+	truth_jet_NBJ_pT_vector.clear();
+	
+	trig_EF_jet_pt.clear(); ////
+	trig_EF_jet_phi.clear(); ////
+	trig_EF_jet_eta.clear(); ////
+
+	antikt2_pt.clear(); ////
+	antikt2_phi.clear(); ////
+	antikt2_eta.clear(); ////
+	
+	
+	Is_jet_Isolated.clear();
+	InJet_muon_pT.clear(); 
+	InJet_electron_pT.clear();
+	
 	
 	truth_reco_jet_dR=0.0;
 	
@@ -822,32 +929,38 @@ EL::StatusCode pPbFragmentation :: execute (){
 	
 	//***** Reco jets*****
 	if (_truth_only==0) {
-		xAOD::TStore store; //For calibration
+		xAOD::TStore *store = new xAOD::TStore; //For calibration
 		const xAOD::JetContainer* jets = 0;
 		EL_RETURN_CHECK("execute()",event->retrieve( jets, _reco_jet_collection.c_str() ));
+		
+		xAOD::JetContainer* updatedjets = new xAOD::JetContainer();
+		xAOD::AuxContainerBase* updatedjetsAux = new xAOD::AuxContainerBase();
+		updatedjets->setStore( updatedjetsAux );
+		
+		store->record(updatedjets,"updatedjets");
+		store->record(updatedjetsAux,"updatedjetsAux");
 		
 		xAOD::JetContainer::const_iterator jet_itr = jets->begin();
 		xAOD::JetContainer::const_iterator jet_end = jets->end();
 		
-	/*	xAOD::JetContainer* updatedjets = new xAOD::JetContainer();
-		xAOD::AuxContainerBase* updatedjetsAux = new xAOD::AuxContainerBase();
-		updatedjets->setStore( updatedjetsAux );
-	*/	
-		int jet_counter=0;
-		for( ; jet_itr != jet_end; ++jet_itr ) {
-			jet_counter++;
-
+		for( ; jet_itr != jet_end; ++jet_itr ) 
+		{
 			xAOD::Jet* newjet = new xAOD::Jet();
 			newjet->makePrivateStore( **jet_itr );
 			//updatedjets->push_back( newjet );
 			
 			const xAOD::JetFourMom_t jet_4mom_def = newjet->jetP4();
+			float def_jet_pt  = (jet_4mom_def.pt() * 0.001);
+			
 			xAOD::JetFourMom_t jet_4mom;
 			if (_centrality_scheme==30) jet_4mom = newjet->jetP4("JetSubtractedScaleMomentum");
 			else jet_4mom = newjet->jetP4("JetEMScaleMomentum");
-			float def_jet_pt  = (jet_4mom_def.pt() * 0.001);
-			float unsubtracted_jet_pt  = (jet_4mom.pt() * 0.001);  
 			float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+			
+			
+			
+			float unsubtracted_jet_pt  = (jet_4mom.pt() * 0.001);  
+			
 			
 			if (_reco_jet_collection.find("HI") != std::string::npos) {
 				const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet->jetP4("JetUnsubtractedScaleMomentum");
@@ -925,8 +1038,16 @@ EL::StatusCode pPbFragmentation :: execute (){
 				jet_uJES_vector.push_back(uJES);	
 			}
 
+			//Fake jet rejection
+			if (_doFJR) {
+				//isFake_vector.push_back(GetFJR(jet_eta, jet_phi, track_jets));
+				isFake_vector.push_back(MTCorrector::GetFJR(newjet,m_trackSelectorTool_FJR));
+			}
+
 			delete newjet;
 		}
+		
+		store->clear();
 		
 		if(!_doSlimTree)
 		{
@@ -953,6 +1074,8 @@ EL::StatusCode pPbFragmentation :: execute (){
 			InJet_muon_pT.push_back(0);
 			InJet_electron_pT.push_back(0);
 			
+			isFake_vector.push_back(0);
+			
 			if (isMC)
 			{
 				jet_uJER_vector.push_back(-1);
@@ -976,8 +1099,14 @@ EL::StatusCode pPbFragmentation :: execute (){
 		//Get the R=0.2 jets
 		if (_reco_jet_collection.find("HI") != std::string::npos) {
 			const xAOD::JetContainer* a2_jets = 0;
-			EL_RETURN_CHECK("execute()",event->retrieve( a2_jets, "AntiKt2HIJets" ));
-
+			if(cent_bin<30)
+			{
+				EL_RETURN_CHECK("execute()",event->retrieve( a2_jets, "AntiKt2HIJets" ));
+			}
+			else
+			{
+				EL_RETURN_CHECK("execute()",event->retrieve( a2_jets, "DFAntiKt2HIJets" ));
+			}
 			// loop over the jets in the container
 			xAOD::JetContainer::const_iterator a2_jet_itr = a2_jets->begin();
 			xAOD::JetContainer::const_iterator a2_jet_end = a2_jets->end();
@@ -1090,6 +1219,8 @@ EL::StatusCode pPbFragmentation :: execute (){
 				if(!triggered_at_least_once) continue;
 			}
 			
+			if (_doFJR && isFake_vector.at(i)) continue;
+			
 			jet_pt = jet_pt_xcalib_vector.at(i);
 			jet_eta = jet_eta_vector.at(i);		 
 			jet_phi = jet_phi_vector.at(i);
@@ -1113,6 +1244,12 @@ EL::StatusCode pPbFragmentation :: execute (){
 				jet_uJES= jet_uJES_vector.at(i);
 			}			 
 			
+			if(isMC)
+			{
+				int truthindex=truth_jet_indices.at(i);
+				if (truthindex<0) continue; //Matching to truh jets
+				if (!jetcorr->MCJetJERClean(truth_jet_pt_vector.at(truthindex), jet_pt,truth_jet_eta_vector.at(truthindex),cent_bin) ) continue; //cut on JER balance
+			}
 			
 			//10 GeV reco cut
 			if (jet_pt_xcalib<_pTjetCut && !jet_isDummy) continue;
@@ -1145,13 +1282,19 @@ EL::StatusCode pPbFragmentation :: execute (){
 					jet_a2_eta=a2_jet_eta;
 					jet_a2_phi=a2_jet_phi;
 					dR_min = R;
+					
+					jet_eta = jet_a2_eta;
+					jet_phi = jet_a2_phi;
 				}
 			}
 			
+			jet_pt_JER=jetcorr->GetJER(jet_pt,jet_eta,cent_bin_JER);
+			jet_pt_JER2=jetcorr->GetJER(jet_pt,jet_eta,cent_bin_JER2);
 			
 			track_eta.clear();
 			track_phi.clear();
 			track_pt.clear();
+			track_pt_corr.clear();
 			track_vertex_type.clear();
 			track_isMuon.clear();
 			track_multiJetMatch.clear();
@@ -1215,6 +1358,9 @@ EL::StatusCode pPbFragmentation :: execute (){
 					std::bitset < xAOD::NumberOfTrackRecoInfo > author = trk->patternRecoInfo();
 					if(author[xAOD::TRTSeededTrackFinder] || author[xAOD::TRTStandalone]) continue;
 				}
+				
+				float pt_corr=pt;
+				trkcorr->correctChTrackpT(pt_corr, eta, phi, trk->charge());
 				
 				//track parameters
 				int nPixHits = trk->auxdata< unsigned char >("numberOfPixelHits") + trk->auxdata< unsigned char >("numberOfPixelDeadSensors");
@@ -1361,6 +1507,7 @@ EL::StatusCode pPbFragmentation :: execute (){
 					track_eta.push_back(eta);
 					track_phi.push_back(phi);
 					track_pt.push_back(pt);
+					track_pt_corr.push_back(pt_corr);
 					track_vertex_type.push_back(vertex_type);
 					track_isMuon.push_back(isMuon);
 					if(jetMatchCount>=2)
@@ -1520,7 +1667,7 @@ EL::StatusCode pPbFragmentation :: execute (){
 			
 			for( ; truth_itr!=truth_end; ++truth_itr){
 			
-				int ty=getTypeTruth((*truth_itr)->barcode(),(*truth_itr)->pdgId(),(*truth_itr)->status(),(*truth_itr)->charge());
+				int ty=getTypeTruth((*truth_itr)->barcode(),(*truth_itr)->pdgId(), (*truth_itr)->status(), (*truth_itr)->charge());
 				
 				if(ty!=1 && ty!=5) continue;
 				

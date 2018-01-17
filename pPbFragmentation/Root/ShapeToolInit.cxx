@@ -192,7 +192,8 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	uee = new UEEstimator();
 	uee->ptBkgrThreshold = _trkptBkgrThreshold;
 	uee->jetptBkgrThreshold = _jetptBkgrThreshold;
-	
+//	uee->initShapeUE();
+
 	//Uncert tool
 	uncertprovider = new UncertProvider(_uncert_index,_mcProbCut,_cut_level.c_str(), GetCentralityNBins(31)-1, _eff_jety);
 	_mcProbCut = uncertprovider->GetMCProb();

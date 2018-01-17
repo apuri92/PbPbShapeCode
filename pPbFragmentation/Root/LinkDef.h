@@ -6,6 +6,7 @@
 #include <pPbFragmentation/TrackingPerformance.h>
 #include <pPbFragmentation/JetPerformance.h>
 #include <pPbFragmentation/InclusiveJetsEventLoop.h>
+#include <pPbFragmentation/MBUEEstimator.h>
 
 #ifdef __CINT__
 
@@ -28,4 +29,5 @@
 #pragma link C++ class UncertProvider;
 #pragma link C++ class JetCorrector;
 #pragma link C++ class TrackCorrector;
+#pragma link C++ class MBUEEstimator;
 #endif

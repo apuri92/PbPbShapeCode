@@ -448,6 +448,30 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
          value = value + 0.1;
         }
      }
+     if ((scheme==0) && (variable=="eta-trk-fine"))
+     {
+      printf("\n... eta-trk-binning : four simple bins ");
+      num = 100;
+      double value=-2.500;
+      for (int i=0; i<=num; i++)
+        {
+         array[i] = value;
+         printf("%f, ", array[i]);
+         value = value + 0.05;
+        }
+     }
+     if ((scheme==0) && (variable=="phi-trk-fine"))
+     {
+      printf("\n... phi-trk-binning : four simple bins ");
+      num = 128;
+      Float_t value=-TMath::Pi(); 
+      for (int i=0; i<=num; i++)
+        {
+         array[i] = value;
+         printf("%.4f, ", array[i]);
+         value = value + TMath::Pi()*2/num;
+        }
+     }
      if ((scheme==0) && (variable=="density"))
      {
       printf("\n... density-binning : four simple bins ");

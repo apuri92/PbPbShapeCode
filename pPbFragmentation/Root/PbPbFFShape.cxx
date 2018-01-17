@@ -473,6 +473,22 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (jet_pt < _pTjetCut) continue;
 		int y_bin = jetcorr->GetJetYBin(jet_y);
 
+
+
+//		for (int i_dR = 0; i_dR < 13; i_dR++)
+//		{
+//			for (int i_pt = 0; i_pt < 10; i_pt++)
+//			{
+//				int i_dPsi = 0;
+////				double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi);
+//
+//				int trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt);
+//
+//				ChPS_raw_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+//			}
+//		}
+
+
 		if (_data_switch==0)
 		{
 			if (!jet_IsTrig_vector.at(i)) continue;

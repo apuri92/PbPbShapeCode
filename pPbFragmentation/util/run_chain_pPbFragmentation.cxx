@@ -31,6 +31,7 @@
 #include "pPbFragmentation/pPbFragmentation.h"
 #include "pPbFragmentation/PbPbFragmentation.h"
 #include "pPbFragmentation/PbPbFFShape.h"
+#include "pPbFragmentation/MBUEEstimator.h"
 #include "pPbFragmentation/Performance.h"
 #include "pPbFragmentation/TrackingPerformance.h"
 #include "pPbFragmentation/BaseClass.h"
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
 	int jet_radius = 4;
 	int performance_mode;
 	int jet_performance_mode;
+	bool MBUE_mode;
 	int run=218391;
 	int doClusters=0;
 	float trkptBkgrThreshold=6;
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
 		("data_switch",boost::program_options::value<int>(&data_switch)->default_value(0),"MC or data mode")
 		("num_evt,n",boost::program_options::value<int>(&num_evt)->default_value(-1),"number of events, -1 runs all events")
 		("performance_mode",boost::program_options::value<int>(&performance_mode)->default_value(0),"performance mode 0<->FF, 1<->Perf")
+		("MBUE_mode",boost::program_options::value<bool>(&MBUE_mode)->default_value(0),"Run the UE estimate from MB events")
 		("DxAODMode",boost::program_options::value<int>(&DxAODMode)->default_value(0),"PbPb mode 0<->Off, 1<->On (runs on DxAODs")
 		("ff_shape_mode",boost::program_options::value<int>(&ff_shape_mode)->default_value(0),"FF and Jet shape mode 0<->Off, 1<->On (runs on DxAODs)")
 		("trk_perf_mode",boost::program_options::value<int>(&trk_perf_mode)->default_value(0),"Track Performance mode 0<->Off, 1<->On (runs on DxAODs")
@@ -305,6 +308,7 @@ int main(int argc, char *argv[])
 	else if (trk_perf_mode) alg = new TrackingPerformance();
 	else if (jet_performance_mode) alg = new JetPerformance();
 	else if (performance_mode) alg = new Performance();
+	else if (MBUE_mode) alg = new MBUEEstimator();
 	else alg = new pPbFragmentation();
 
 	//TODO write a copy const of base class
@@ -336,7 +340,7 @@ int main(int argc, char *argv[])
 	alg->_doSlimTree=doSlimTree;
 	alg->_doClusters=doClusters;
 	alg->_doForward=doForward;
-	alg->_nTrkSelTools=2; // configure TrackSelectionTools in PbFragmentation::initialize
+	alg->_nTrkSelTools=4; // configure TrackSelectionTools in PbFragmentation::initialize
 	alg->_pt_iso=pt_iso;
 	alg->_JERBalancecut=JERBalancecut;
 	alg->_applyReweighting=applyReweighting;
