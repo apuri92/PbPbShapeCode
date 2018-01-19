@@ -46,10 +46,8 @@ int main()
 	TFile *f_output = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
 	std::string name;
 
-	//	int N_CENT = 6;
-	//remove when rerun is complete
 	int N_Y = 5;
-	n_cent_cuts = 6;
+
 
 	TAxis* dR_binning = (TAxis*)((TH3*)f_mc->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)f_mc->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
@@ -243,10 +241,10 @@ int main()
 
 			RooUnfoldResponse* r_response = (RooUnfoldResponse*)f_mc->Get(Form("ChPS_raw_0_dR%i_cent%i_ChPS_truth_dR%i_cent%i", i_dR, i_cent, i_dR, i_cent));
 
-			RooUnfoldBayes unfold_raw(r_response, h_raw_subtr_unf, n_unfold);
-			unfold_raw.SetVerbose(0);
 			if (h_raw_subtr_unf->GetEntries() != 0)
 			{
+				RooUnfoldBayes unfold_raw(r_response, h_raw_subtr_unf, n_unfold);
+				unfold_raw.SetVerbose(0);
 				h_raw_subtr_unf = (TH2D*)unfold_raw.Hreco(); //errors handled internally
 				name = Form("h_raw_subtr_unf_dR%i_c%i", i_dR, i_cent);
 				h_raw_subtr_unf->SetName(name.c_str());
@@ -254,10 +252,10 @@ int main()
 			}
 
 
-			RooUnfoldBayes unfold_raw_rr(r_response, h_raw_rr_unf, n_unfold);
-			unfold_raw_rr.SetVerbose(0);
 			if (h_raw_rr_unf->GetEntries() !=0)
 			{
+				RooUnfoldBayes unfold_raw_rr(r_response, h_raw_rr_unf, n_unfold);
+				unfold_raw_rr.SetVerbose(0);
 				h_raw_rr_unf = (TH2D*)unfold_raw_rr.Hreco(); //errors handled internally
 				name = Form("h_raw_rr_unf_dR%i_c%i", i_dR, i_cent);
 				h_raw_rr_unf->SetName(name.c_str());
@@ -367,9 +365,9 @@ int main()
 
 					
 					//ChPS_truth
-					double updated_truth = h_raw_rr->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
+					double updated_truth = h_truth->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
 
-					double updated_truth_err = h_raw_rr->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
+					double updated_truth_err = h_truth->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
 
 					h_truth->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_truth);
 					h_truth->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_truth_err);
@@ -532,7 +530,7 @@ int main()
 			h_ChPS_raw_injet->Write(name.c_str());
 			delete h_ChPS_raw_injet;
 
-			name = Form("h_ChPS_raw_subtr_cent%i_jetpt%i", i_cent, i_jet_bin);
+			name = Form("h_ChPS_raw_subtr_injet_cent%i_jetpt%i", i_cent, i_jet_bin);
 			TH1* h_ChPS_raw_subtr_injet = (TH1*)h_raw_subtr_injet->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
 			h_ChPS_raw_subtr_injet->SetTitle(name.c_str());
 			h_ChPS_raw_subtr_injet->Scale(1.,"width");
