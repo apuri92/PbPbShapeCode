@@ -107,28 +107,6 @@ void PlotLabels_AtlasInt_q2_5(double x = 0.2, double y = 0.8, int size = 24, int
 
 }
 
-
-void smallify(TH1* hist)
-{
-	hist->GetXaxis()->SetLabelFont(43);
-	hist->GetYaxis()->SetLabelFont(43);
-	hist->GetXaxis()->SetTitleFont(43);
-	hist->GetYaxis()->SetTitleFont(43);
-
-	hist->GetXaxis()->SetTitleOffset(2.5);
-	hist->GetYaxis()->SetTitleOffset(2.5);
-
-	hist->GetXaxis()->SetTitleSize(16);
-	hist->GetYaxis()->SetTitleSize(16);
-
-	hist->GetXaxis()->SetLabelSize(14);
-	hist->GetYaxis()->SetLabelSize(14);
-
-	hist->SetMarkerSize(0.9);
-
-//	return hist;
-}
-
 TGraphAsymmErrors* smallify(TGraphAsymmErrors* graph)
 {
 	graph->GetXaxis()->SetLabelSize(12);
