@@ -196,7 +196,7 @@ void UEEstimator::initShapeUE()
 		{
 			for (int i_pt = 0; i_pt < 10; i_pt++)
 			{
-				for (int i_cent = 0; i_cent < 5; i_cent++)
+				for (int i_cent = 0; i_cent < 6; i_cent++)
 				{
 					std::string name = Form("h_UE_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
 					h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
