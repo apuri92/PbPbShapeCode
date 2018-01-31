@@ -19,7 +19,6 @@ void get_posCorr()
 
 	name = Form("../raw_results/FF_MC_JZ_comb_out_histo_%s_5p02_r001.root", dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
-	cout << file->GetName() << endl;
 	TFile *output = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
 
 	TAxis* jet_pt_binning = (TAxis*)((TH3*)file->Get("h_reco_jet_spectrum_y0_cent0"))->GetXaxis();
@@ -30,7 +29,6 @@ void get_posCorr()
 	int ptJetBinsN = jet_pt_binning->GetNbins();
 	int ptTrkBinsN = trk_pt_binning->GetNbins();
 	int dRBinsN = dR_binning->GetNbins();
-////    if (dataset_type == "pp") n_cent_cuts = 7;
 
 	TH3* h_dR_change;
 	vector<vector<vector<TH2*>>> h_reco_truth =  vector<vector<vector<TH2*>>> (ptJetBinsN, vector<vector<TH2*>> (n_cent_cuts, vector<TH2*> (ptTrkBinsN)));
@@ -42,7 +40,6 @@ void get_posCorr()
 
 	vector<vector<vector<TH1*>>> h_check =  vector<vector<vector<TH1*>>> (ptJetBinsN, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (dRBinsN)));
 
-	cout << n_cent_cuts << endl;
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
 		for (int i_jetpt = 0; i_jetpt < ptJetBinsN; i_jetpt++)
@@ -401,7 +398,6 @@ void get_posCorr()
 				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.1f < p_{T}^{Jet} < %4.1f",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
 				if (i_cent == 0 && jet_iter == 0) name = "(";
 				else name = "";
-				cout << Form("ShapeResponse2D_%s.pdf%s", dataset_type.c_str(), name.c_str()) << endl;
 				c0->Print(Form("ShapeResponse2D_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));
 			}
 

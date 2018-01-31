@@ -1,0 +1,11 @@
+
+----------
+1/31/2018
+*first changelog
+*PbPbFFShape.cxx now runs over pp data. Trigger PS is 1 for j85, first
+"trigger" is 6. Centbin is set to 5 for pp
+*output_dev/unfold/src/main.cxx - Cleaned up output file names
+*output_dev/unfold/get_posCorr.c - Cleaned up output file names
+*output_dev/unfold/draw_ChPS.c - added plots for UE, injet plots, etc
+
+

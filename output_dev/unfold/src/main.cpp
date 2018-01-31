@@ -43,6 +43,9 @@ int main()
 	TFile *f_mc = new TFile(Form("../raw_results/FF_MC_JZ_comb_out_histo_%s_5p02_r001.root", dataset_type.c_str()));
 	TFile *f_data = new TFile(Form("../raw_results/FF_%s_out_histo_%s_5p02_r001.root", did.c_str(), dataset_type.c_str()));
 	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
+
+	if (isMC) did = "MC";
+	else did = "data";
 	TFile *f_output = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
 	std::string name;
 
