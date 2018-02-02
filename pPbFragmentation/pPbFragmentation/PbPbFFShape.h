@@ -131,6 +131,7 @@ class PbPbFFShape : public BaseClass{
 	vector<vector<TH3D*>> UE_distr; //!
 
 	vector<vector<TH1D*>> h_reco_jet_spectrum; //!
+	vector<vector<TH1D*>> h_reco_jet_spectrum_unW; //!
     vector<vector<TH1D*>> h_true_jet_spectrum; //!
 	vector<vector<TH1D*>> h_true_jet_spectrum_matched; //!
 	vector<vector<TH1D*>> h_reco_jet_spectrum_matched; //!

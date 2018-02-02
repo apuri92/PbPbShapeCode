@@ -25,6 +25,7 @@ void draw_ChPS()
 	//	##############	Config done	##############"
 
 	TFile *f_input = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
+	TFile *f_output = new TFile(Form("final_ChPS_%s_%s.root",did.c_str(), dataset_type.c_str()), "recreate");
 
 	TAxis* dR_binning = (TAxis*)f_input->Get("dR_binning");
 	TAxis* jetpT_binning = (TAxis*)f_input->Get("jetpT_binning");
@@ -128,6 +129,8 @@ void draw_ChPS()
 				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}} (UE)");
 				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				f_output->cd();
+				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 				//truth
 				name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
@@ -136,6 +139,8 @@ void draw_ChPS()
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}} (Truth matched)");
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				f_output->cd();
+				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 				//raw
 				name = Form("h_ChPS_raw_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
@@ -165,6 +170,9 @@ void draw_ChPS()
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}}");
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				f_output->cd();
+				name = Form("h_ChPS_final_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
@@ -206,6 +214,9 @@ void draw_ChPS()
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				f_output->cd();
+				name = Form("h_ChPS_ratio_final_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 				//do injet stuff
 				if (i_dR < 7)
@@ -241,6 +252,14 @@ void draw_ChPS()
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+
+			f_output->cd();
+			name = Form("h_ChPS_final_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_final_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
+			name = Form("h_ChPS_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_truth_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
+			name = Form("h_ChPS_ratio_final_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
 
 
 

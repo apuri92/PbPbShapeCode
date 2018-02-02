@@ -86,7 +86,10 @@ EL::StatusCode PbPbFFShape :: initialize ()
 		TString xfn = gSystem->GetFromPipe("echo $ROOTCOREBIN");
 		f_trigger_RunNumber_prescale = new TFile(xfn + "/../pPbFragmentation/data/TriggerPrescales.root","READ");
 		h2_trigger_RunNumber_prescale = (TH2F*)f_trigger_RunNumber_prescale->Get("h2_Trig_RunNumber_prescale");
-		
+
+		if (_dataset == 4) _first_trigger = 4; //PbPb data
+		if (_dataset == 3) _first_trigger = 6; //pp data
+
 		cout << endl << "Initialize triggers finished" << endl;
 	}
 

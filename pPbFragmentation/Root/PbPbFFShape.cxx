@@ -66,7 +66,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 	if(m_eventCounter%statSize==0) std::cout << "Event: " << m_eventCounter << std::endl;
 	m_eventCounter++;
-//	if (m_eventCounter != 246) return EL::StatusCode::SUCCESS;
+//	if (m_eventCounter != 13372) return EL::StatusCode::SUCCESS;
 //	cout << "Event: " << m_eventCounter << endl;
 	//All events
 	bool keep = true;
@@ -132,7 +132,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		uee->Psi = GetEventPlane(calos);
 	}
 
-	if (cent_bin < 0) {
+	if (cent_bin < 0 || event_weight_fcal == 0) {
 		if(cent_bin==-2) Error("execute()", "Unknown centrality scheme" );
 		h_RejectionHisto->Fill(1.5);
 		keep = false;
@@ -369,7 +369,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (_dataset == 3) // pp: calibrate with sequence set in ShapeToolInit
 		{
 			newjet.setJetP4("JetConstitScaleMomentum",jet_4mom_unsubtr); //Required
-			newjet.setJetP4("JetEMScaleMomentum",jet_4mom_unsubtr); //Required
+			newjet.setJetP4("JetEMScaleMomentum",jet_4mom_subtr); //Required
 			EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) ); //calibrates with sequence EtaJes_Insitu for data, EtaJes for MC
 		}
 
@@ -426,16 +426,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 		{
 			bool is_trig = false;
 			double presc = -1;
-			if (_dataset == 3) _first_trigger = 6;
 			for (int k=_first_trigger;k<_nTriggers;k++)
 			{
 				if(event_isTriggered[k] && (jet_pt > jet_pt_trig[k][0] && jet_pt <= jet_pt_trig[k][1]))
 				{
 					is_trig = true;
-					presc = h2_trigger_RunNumber_prescale->GetBinContent ( h2_trigger_RunNumber_prescale->GetXaxis()->FindBin ( eventInfo->runNumber() ),  k + 2 ); //j40 is bin 3
-					//TODO temporary workaround for j40 trigger:
-					if (k==_first_trigger) presc = 523.453;
-					if (k==_first_trigger && _dataset == 3) presc = 1;
+					if (_dataset == 4) presc = h2_trigger_RunNumber_prescale->GetBinContent ( h2_trigger_RunNumber_prescale->GetXaxis()->FindBin ( eventInfo->runNumber() ),  k + 2 ); //j40 is bin 3
+					if (_dataset == 3) presc = 1;
 					//cout << "trigger_chains: " << trigger_chains.at(k) << " bin: " << k +2 << endl;
 					break;
 				}
@@ -517,6 +514,11 @@ EL::StatusCode PbPbFFShape :: execute (){
 			}
 		}
 		//fill ff normalization histogram
+		h_reco_jet_spectrum_unW.at(y_bin).at(cent_bin)->Fill(jet_pt, jet_weight/event_weight_fcal);
+		h_reco_jet_spectrum_unW.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, jet_weight/event_weight_fcal);
+		h_reco_jet_spectrum_unW.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, jet_weight/event_weight_fcal);
+		h_reco_jet_spectrum_unW.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, jet_weight/event_weight_fcal);
+
 		h_reco_jet_spectrum.at(y_bin).at(cent_bin)->Fill(jet_pt, jet_weight);
 		h_reco_jet_spectrum.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, jet_weight);
         h_reco_jet_spectrum.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);

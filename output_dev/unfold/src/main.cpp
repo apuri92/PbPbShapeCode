@@ -229,6 +229,9 @@ int main()
 					double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
 					double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
 
+//					double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc * n_jets_mc_new/ n_jets_mc;
+//					double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc * n_jets_mc_new/ n_jets_mc;;
+
 					h_UE->SetBinContent(i_trk_bin, i_jet_bin, updated_UE);
 					h_UE->SetBinError(i_trk_bin, i_jet_bin, updated_UE_err); //scaled errors
 				}

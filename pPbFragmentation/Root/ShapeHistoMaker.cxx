@@ -252,6 +252,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 
 	h_reco_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
+	h_reco_jet_spectrum_unW =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 	//in MC only
 	if (_data_switch==1)
 	{
@@ -452,6 +453,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 			h_reco_jet_spectrum.at(i).at(j) = temphist_1D;
 
+			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_unW_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
+			h_reco_jet_spectrum_unW.at(i).at(j) = temphist_1D;
+
 			//TODO to be enabled when needed
 			//temphist_1D = new TH1D(Form("h_reco_jet_spectrum_weighted_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_weighted_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 			//h_reco_jet_spectrum_weighted.at(i).at(j) = temphist_1D;
@@ -459,11 +463,13 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			//h_true_jet_spectrum_weighted.at(i).at(j) = temphist_1D;
 
 			h_reco_jet_spectrum.at(i).at(j)->Sumw2();
+			h_reco_jet_spectrum_unW.at(i).at(j)->Sumw2();
 			//h_reco_jet_spectrum_weighted.at(i).at(j)->Sumw2();
 			//h_true_jet_spectrum_weighted.at(i).at(j)->Sumw2();
 
 
 			wk()->addOutput (h_reco_jet_spectrum.at(i).at(j));
+			wk()->addOutput (h_reco_jet_spectrum_unW.at(i).at(j));
 			//wk()->addOutput (h_reco_jet_spectrum_weighted.at(i).at(j));
 			//wk()->addOutput (h_true_jet_spectrum_weighted.at(i).at(j));
 
