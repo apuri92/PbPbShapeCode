@@ -20,13 +20,16 @@ using std::endl;
 #include "../../functions/global_variables.h"
 #include "TMath.h"
 
-int main()
+int main(int argc, char ** argv)
 {
+	std::string config_file = "ff_config.cfg";
+	if (argc == 2) config_file = argv[1];
+	cout << "Using config file: " << config_file << endl;
 	gErrorIgnoreLevel = 3001;
 	cout << "Unfolding..." << endl;
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
-	m_config->ReadFile("ff_config.cfg", EEnvLevel(1));
+	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
@@ -36,13 +39,14 @@ int main()
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
 
 	std::string did = "data";
-	if (isMC) did = "MC_JZ_comb";
+	if (isMC) did = "MC";
 
 	//	##############	Config done	##############"
 
-	TFile *f_mc = new TFile(Form("../raw_results/FF_MC_JZ_comb_out_histo_%s_5p02_r001.root", dataset_type.c_str()));
+	TFile *f_mc = new TFile(Form("../raw_results/FF_MC_out_histo_%s_5p02_r001.root", dataset_type.c_str()));
 	TFile *f_data = new TFile(Form("../raw_results/FF_%s_out_histo_%s_5p02_r001.root", did.c_str(), dataset_type.c_str()));
 	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
+	TFile *UE_factors = new TFile(Form("UE_factors.root"));
 
 	if (isMC) did = "MC";
 	else did = "data";
@@ -74,6 +78,8 @@ int main()
 		cout << Form("Done cent%i", i_cent) << endl;
 
 		TH1 *h_reco_jet, *h_reco_jet_matched, *h_truth_jet, *h_reco_unfolded, *h_reco_matched_unfolded;
+		if (dataset_type == "PbPb" && i_cent == 6) continue;
+		if (dataset_type == "pp" && i_cent < 6) continue;
 
 		for (int i_y = 0; i_y < N_Y; i_y++)
 		{
@@ -204,8 +210,16 @@ int main()
 			TH2* h_truth = (TH2*)f_mc->Get(Form("ChPS_truth_dR%i_cent%i", i_dR, i_cent));
 			h_truth->Sumw2();
 
-			TH2* h_UE = (TH2*)f_mc->Get(Form("ff_UE_pT_dR%i_cent%i",i_dR, i_cent));
-			h_UE->Sumw2();
+			TH2* h_UE;
+			TH2* h_UE_factors;
+			if (dataset_type == "PbPb")
+			{
+//				h_UE = (TH2*)f_mc->Get(Form("ff_UE_pT_dR%i_cent%i",i_dR, i_cent));
+				h_UE = (TH2*)f_data->Get(Form("ChPS_raw_1_dR%i_cent%i",i_dR, i_cent));
+				h_UE->Sumw2();
+
+				h_UE_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));
+			}
 
 			//normalize UE by # of jets in data/MC
 			TH1* h_reco_mc_jet_spect = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y%i_cent%i", 4, i_cent)))->Clone(Form("norm_reco_mc_jet_y%i_cent%i", 4, i_cent));
@@ -217,29 +231,35 @@ int main()
 			h_reco_mc_jet_spect->Sumw2();
 			h_reco_data_jet_spect->Sumw2();
 
-			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
-			{
-				double n_jets_mc = h_reco_mc_jet_spect->GetBinContent(i_jet_bin);
-				double n_jets_data = h_reco_data_jet_spect->GetBinContent(i_jet_bin);
-
-				if (n_jets_mc == 0) continue;
-
-				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
-				{
-					double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
-					double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
-
-//					double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc * n_jets_mc_new/ n_jets_mc;
-//					double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc * n_jets_mc_new/ n_jets_mc;;
-
-					h_UE->SetBinContent(i_trk_bin, i_jet_bin, updated_UE);
-					h_UE->SetBinError(i_trk_bin, i_jet_bin, updated_UE_err); //scaled errors
-				}
-			}
-
-			//UE subtraction
 			TH2* h_raw_subtr = (TH2*)h_raw->Clone(Form("h_raw_subtr_dR%i_c%i", i_dR, i_cent));
-			h_raw_subtr->Add(h_UE, -1);
+
+
+			//have to use TM method for PbPb MC. some problem with number of jets being screwed up
+			if (dataset_type == "PbPb")
+			{
+				for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
+				{
+//					double n_jets_mc = h_reco_mc_jet_spect->GetBinContent(i_jet_bin);
+//					double n_jets_data = h_reco_data_jet_spect->GetBinContent(i_jet_bin);
+//					if (n_jets_mc == 0) continue;
+
+					for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
+					{
+						double corr_factor = h_UE_factors->GetBinContent(i_trk_bin, i_jet_bin);
+						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * corr_factor;
+						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * corr_factor;
+
+//						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
+//						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
+
+						h_UE->SetBinContent(i_trk_bin, i_jet_bin, updated_UE);
+						h_UE->SetBinError(i_trk_bin, i_jet_bin, updated_UE_err); //scaled errors
+					}
+				}
+
+				//UE subtraction
+				h_raw_subtr->Add(h_UE, -1);
+			} //end if PbPb
 
 			//Unfolding
 			TH2* h_raw_subtr_unf = (TH2*)h_raw_subtr->Clone(Form("h_raw_subtr_unf_dR%i_c%i", i_dR, i_cent));
@@ -369,7 +389,7 @@ int main()
 					h_raw_rr_unf_bbb->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_rr_unf_bbb_err);
 
 
-					
+
 					//ChPS_truth
 					double updated_truth = h_truth->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
 
@@ -379,12 +399,15 @@ int main()
 					h_truth->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_truth_err);
 
 					//UE
-					double updated_UE = h_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+					if (dataset_type == "PbPb")
+					{
+						double updated_UE = h_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						double updated_UE_err = h_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
 
-					double updated_UE_err = h_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						h_UE->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_UE);
+						h_UE->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_UE_err);
+					}
 
-					h_UE->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_UE);
-					h_UE->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_UE_err);
 				}
 			}
 
@@ -399,7 +422,7 @@ int main()
 				h_raw_rr_unf_injet = (TH2*)h_raw_rr_unf->Clone(Form("raw_rr_unf_injet_c%i", i_cent));
 				h_raw_rr_unf_bbb_injet = (TH2*)h_raw_rr_unf_bbb->Clone(Form("raw_rr_unf_bbb_injet_c%i", i_cent));
 
-				h_UE_injet = (TH2*)h_UE->Clone(Form("UE_injet_c%i", i_cent));
+				if (dataset_type == "PbPb") h_UE_injet = (TH2*)h_UE->Clone(Form("UE_injet_c%i", i_cent));
 
 				h_truth_injet = (TH2*)h_truth->Clone(Form("truth_injet_c%i", i_cent));
 			}
@@ -414,7 +437,7 @@ int main()
 				h_raw_rr_unf_injet->Add(h_raw_rr_unf);
 				h_raw_rr_unf_bbb_injet->Add(h_raw_rr_unf_bbb);
 
-				h_UE_injet->Add(h_UE);
+				if (dataset_type == "PbPb") h_UE_injet->Add(h_UE);
 
 				h_truth_injet->Add(h_truth);
 			}
@@ -496,13 +519,16 @@ int main()
 				delete h_ChPS_truth;
 
 				//UE
-				name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
-				TH1* h_ChPS_UE = (TH1*)h_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
-				h_ChPS_UE->SetTitle(name.c_str());
-				h_ChPS_UE->Scale(1.,"width");
-				h_ChPS_UE->Scale(1./area);
-				h_ChPS_UE->Write(name.c_str());
-				delete h_ChPS_UE;
+				if (dataset_type == "PbPb")
+				{
+					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
+					TH1* h_ChPS_UE = (TH1*)h_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+					h_ChPS_UE->SetTitle(name.c_str());
+					h_ChPS_UE->Scale(1.,"width");
+					h_ChPS_UE->Scale(1./area);
+					h_ChPS_UE->Write(name.c_str());
+					delete h_ChPS_UE;
+				}
 			}
 
 			delete h_raw;
@@ -515,7 +541,7 @@ int main()
 			delete h_raw_rr_unf_bbb;
 
 			delete h_truth;
-			delete h_UE;
+			if (dataset_type == "PbPb") delete h_UE;
 
 			delete h_reco_mc_jet_spect;
 			delete h_reco_data_jet_spect;
@@ -595,13 +621,17 @@ int main()
 			delete h_ChPS_truth_injet;
 
 			//UE
-			name = Form("h_ChPS_UE_injet_cent%i_jetpt%i", i_cent, i_jet_bin);
-			TH1* h_ChPS_UE_injet = (TH1*)h_UE_injet->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
-			h_ChPS_UE_injet->SetTitle(name.c_str());
-			h_ChPS_UE_injet->Scale(1.,"width");
-			h_ChPS_UE_injet->Scale(1./area_injet);
-			h_ChPS_UE_injet->Write(name.c_str());
-			delete h_ChPS_UE_injet;
+			if (dataset_type == "PbPb")
+			{
+				name = Form("h_ChPS_UE_injet_cent%i_jetpt%i", i_cent, i_jet_bin);
+				TH1* h_ChPS_UE_injet = (TH1*)h_UE_injet->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+				h_ChPS_UE_injet->SetTitle(name.c_str());
+				h_ChPS_UE_injet->Scale(1.,"width");
+				h_ChPS_UE_injet->Scale(1./area_injet);
+				h_ChPS_UE_injet->Write(name.c_str());
+				delete h_ChPS_UE_injet;
+
+			}
 		}
 
 		delete h_raw_injet;
@@ -613,7 +643,7 @@ int main()
 		delete h_raw_rr_unf_injet;
 		delete h_raw_rr_unf_bbb_injet;
 
-		delete h_UE_injet;
+		if (dataset_type == "PbPb") delete h_UE_injet;
 
 		delete h_truth_injet;
 

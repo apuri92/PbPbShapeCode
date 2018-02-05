@@ -1,6 +1,6 @@
 #include "../functions/global_variables.h"
 
-void get_posCorr()
+void get_posCorr(string config_file = "ff_config.cfg")
 {
 	SetAtlasStyle();
 	string name;
@@ -8,7 +8,7 @@ void get_posCorr()
     
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
-	m_config->ReadFile("ff_config.cfg", EEnvLevel(1));
+	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
@@ -17,7 +17,7 @@ void get_posCorr()
 
 	//	##############	Config done	##############"
 
-	name = Form("../raw_results/FF_MC_JZ_comb_out_histo_%s_5p02_r001.root", dataset_type.c_str());
+	name = Form("../raw_results/FF_MC_out_histo_%s_5p02_r001.root", dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
 	TFile *output = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
 

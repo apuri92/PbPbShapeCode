@@ -2,7 +2,7 @@
 #include "TEnv.h"
 #include "TGaxis.h"
 
-void draw_ChPS()
+void draw_ChPS(string config_file = "ff_config.cfg")
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -10,7 +10,7 @@ void draw_ChPS()
 	cout << "Drawing ChPS..." << endl;
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
-	m_config->ReadFile("ff_config.cfg", EEnvLevel(1));
+	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
@@ -18,7 +18,7 @@ void draw_ChPS()
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
-	bool diagnostic = true; diagnostic = m_config->GetValue("diagnostic_mode", diagnostic);
+	bool diagnostic = false; diagnostic = m_config->GetValue("diagnostic_mode", diagnostic);
 
 	std::string did = "data";
 	if (isMC) did = "MC";
@@ -31,6 +31,12 @@ void draw_ChPS()
 	TAxis* jetpT_binning = (TAxis*)f_input->Get("jetpT_binning");
 	TAxis* trkpT_binning = (TAxis*)f_input->Get("trkpT_binning");
 
+	f_output->cd();
+	dR_binning->Write("dR_binning");
+	jetpT_binning->Write("jetpT_binning");
+	trkpT_binning->Write("trkpT_binning");
+
+
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
@@ -42,6 +48,7 @@ void draw_ChPS()
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	vector<vector<vector<TH1*>>> h_ChPS_final_dR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_noUnf_dR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_UE_dR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	vector<vector<TH1*>> h_ChPS_truth_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
@@ -111,27 +118,38 @@ void draw_ChPS()
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
+			if (dataset_type == "PbPb" && i_cent == 6) continue;
+			if (dataset_type == "pp" && i_cent < 6) continue;
+
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
-				name = Form("h_ChPS_final_dR_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet);
+				name = Form("h_ChPS_final_dR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_final_dR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
-				name = Form("h_ChPS_UE_dR_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet);
-				h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+				name = Form("h_ChPS_noUnf_dR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
+				if (dataset_type == "PbPb")
+				{
+					name = Form("h_ChPS_UE_dR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+					h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+				}
 			}
 
 			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 			{
-				//UE
-				name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}} (UE)");
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-				f_output->cd();
-				h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
+				if (dataset_type == "PbPb")
+				{
+					//UE
+					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}} (UE)");
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+					f_output->cd();
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
+				}
 				//truth
 				name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
@@ -156,6 +174,8 @@ void draw_ChPS()
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}}");
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				name = Form("h_ChPS_noUnf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 				name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
@@ -181,10 +201,18 @@ void draw_ChPS()
 					h_ChPS_final_dR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
 					h_ChPS_final_dR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
 
-					h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-					h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-					h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-					h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
+					h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
+					h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
+					h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
+					h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
+
+					if (dataset_type == "PbPb")
+					{
+						h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
+						h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
+						h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
+						h_ChPS_UE_dR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
+					}
 				}
 
 				//raw_ratios
@@ -223,20 +251,23 @@ void draw_ChPS()
 				{
 					if (i_dR == 0)
 					{
-						name = Form("h_ChPS_truth_inJet_cent%i_jet%i", i_cent, i_jet);
+						name = Form("h_ChPS_truth_inJet_cent%i_jetpt%i", i_cent, i_jet);
 						h_ChPS_truth_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 
-						name = Form("h_ChPS_final_inJet_cent%i_jet%i", i_cent, i_jet);
+						name = Form("h_ChPS_final_inJet_cent%i_jetpt%i", i_cent, i_jet);
 						h_ChPS_final_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 
-						name = Form("h_ChPS_UE_inJet_cent%i_jet%i", i_cent, i_jet);
-						h_ChPS_UE_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
+						if (dataset_type == "PbPb")
+						{
+							name = Form("h_ChPS_UE_inJet_cent%i_jetpt%i", i_cent, i_jet);
+							h_ChPS_UE_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
+						}
 					}
 					else
 					{
 						h_ChPS_truth_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet));
 						h_ChPS_final_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet));
-						h_ChPS_UE_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet));
+						if (dataset_type == "PbPb") h_ChPS_UE_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet));
 					}
 
 				}
@@ -244,7 +275,7 @@ void draw_ChPS()
 
 			}
 
-			name = Form("h_ChPS_ratio_final_truth_inJet_cent%i_jet%i", i_cent, i_jet);
+			name = Form("h_ChPS_ratio_final_truth_inJet_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_inJet.at(i_cent).at(i_jet)->Clone(name.c_str());
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Divide(h_ChPS_truth_inJet.at(i_cent).at(i_jet));
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
@@ -261,6 +292,17 @@ void draw_ChPS()
 			name = Form("h_ChPS_ratio_final_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
 
+
+
+			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+			{
+				name = Form("h_ChPS_final_dR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_final_dR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
+				name = Form("h_ChPS_noUnf_dR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_noUnf_dR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
+			}
 
 
 
@@ -378,7 +420,7 @@ void draw_ChPS()
 				pdf_label = "";
 				if (i_dR == 0 && i_jet == jet_pt_start) pdf_label = "(";
 				if (i_dR == N_dR-1 && i_jet == jet_pt_end-1) pdf_label = ")";
-				c_evol->Print(Form("evol_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i_jet%i", i_dR, i_jet));
+				c_evol->Print(Form("evol_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i_jetpt%i", i_dR, i_jet));
 
 				jet_itr++;
 			} //end jet loop
@@ -579,6 +621,7 @@ void draw_ChPS()
 
 
 	//Draw Final UE plots
+	if (dataset_type == "PbPb")
 	{
 		cout << "Doing Final UE plots in jet pT" << endl;
 
@@ -723,14 +766,16 @@ void draw_ChPS()
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_dR->Print(Form("ChPS_dR_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jet%i", i_jet));
+			c_ChPS_dR->Print(Form("ChPS_dR_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 //
 			jet_itr++;
 
 		} //end jet loop
 	}
 
+
 	//draw UE as function of dR
+	if (dataset_type == "PbPb")
 	{
 		cout << "Doing Final UE plots in dR" << endl;
 
@@ -802,7 +847,7 @@ void draw_ChPS()
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_dR_UE->Print(Form("ChPS_dR_UE_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jet%i", i_jet));
+			c_ChPS_dR_UE->Print(Form("ChPS_dR_UE_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 			//
 			jet_itr++;
 

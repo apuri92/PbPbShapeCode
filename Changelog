@@ -1,3 +1,16 @@
+#TODO
+*need to properly implement MB method UE subtraction for PbPb MC. Some problem
+with weighting
+
+----------
+5/2/2018
+*added ability to run from command line config
+*fixed naming conventions
+*added code to compare PbPb pp data (final and pre-unfolding)
+*new UE subtraction (MB method) implemented for PbPb data
+*added code for correction factors for MB method UE
+*added automated script to run over PbPb, pp (data and MC)
+*added test config file (ff_config)
 ----------
 2/1/2018
 *fixed trigger for PbPbFFShape
