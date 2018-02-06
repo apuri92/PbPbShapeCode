@@ -3,7 +3,12 @@
 with weighting
 
 ----------
-5/2/2018
+2/5/2018
+*added background2signal plots in draw_ChPS
+*fixed UE normalization for PbPb MC
+*minor title fixes
+----------
+2/5/2018
 *added ability to run from command line config
 *fixed naming conventions
 *added code to compare PbPb pp data (final and pre-unfolding)

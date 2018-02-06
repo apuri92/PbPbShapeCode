@@ -59,6 +59,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_subtr_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_unf_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_ratio_B2S (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	vector<vector<vector<TH1*>>> h_ChPS_diff_subtr_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_diff_unf_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -245,6 +246,17 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				f_output->cd();
 				name = Form("h_ChPS_ratio_final_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
+
+				//(B+S/S)
+				name = Form("h_ChPS_ratio_B2S_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet));
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Bkgrd+Signal}{Signal}");
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+
 
 				//do injet stuff
 				if (i_dR < 7)
@@ -854,7 +866,74 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end jet loop
 	}
 	
-	//draw injet stuff, jet spectra closure
+	//background to signal ratio
+//	if (dataset_type == "PbPb")
+	{
+		cout << "Doing background to signal ratio as fn. of jet pt" << endl;
 
+		TCanvas *c_ChPS_B2S = new TCanvas("c_ChPS_B2S","c_ChPS_B2S",900,600);
+		if (dataset_type == "pp") c_ChPS_B2S->SetCanvasSize(600,600);
+		TLegend *legend_ChPS_B2S = new TLegend(0.52, 0.53, 0.85, 0.82, "","brNDC");
+		legend_ChPS_B2S->SetTextFont(43);
+		legend_ChPS_B2S->SetBorderSize(0);
+		if (dataset_type == "pp") legend_ChPS_B2S->SetTextSize(12);
+		if (dataset_type == "PbPb") legend_ChPS_B2S->SetTextSize(14);
+
+		for (int i_dR = 0; i_dR < N_dR; i_dR++)
+		{
+			string dr_label = Form("%1.2f < dR < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+
+			c_ChPS_B2S->cd();
+			c_ChPS_B2S->Clear();
+			if (dataset_type == "PbPb") c_ChPS_B2S->Divide(3,2);
+
+			bool first_pass_cent = true;
+			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
+			{
+				string centrality = num_to_cent(centrality_scheme,i_cent);
+				if (dataset_type == "pp" && i_cent < 6) continue;
+				else if (dataset_type == "PbPb" && i_cent == 6) continue;
+
+				int jet_itr = 0;
+				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+				{
+					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+					SetHStyle_smallify(h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
+					if (i_dR == 0 && first_pass_cent) legend_ChPS_B2S->AddEntry(h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
+
+					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-1, 1E3);
+					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+
+					if (dataset_type == "pp") c_ChPS_B2S->cd();
+					if (dataset_type == "PbPb") c_ChPS_B2S->cd(i_cent+1);
+					if (i_jet == jet_pt_start) h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->Draw("");
+					else h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+
+					gPad->SetLogx();
+					gPad->SetLogy();
+
+					jet_itr++;
+				} // end jet loop
+
+				if (dataset_type == "pp") c_ChPS_B2S->cd();
+				if (dataset_type == "PbPb") c_ChPS_B2S->cd(i_cent+1);
+				ltx->SetTextAlign(32);
+				ltx->SetTextSize(12);
+				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", dr_label.c_str()));
+				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
+				ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
+
+				legend_ChPS_B2S->Draw();
+				first_pass_cent = false;
+			} //end cent loop
+
+			pdf_label = "";
+			if (i_dR == 0) pdf_label = "(";
+			if (i_dR == N_dR-1) pdf_label = ")";
+			c_ChPS_B2S->Print(Form("ChPS_B2S_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+
+		} //end dR loop
+	}
 
 }

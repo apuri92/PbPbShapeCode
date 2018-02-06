@@ -221,44 +221,72 @@ int main(int argc, char ** argv)
 				h_UE_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));
 			}
 
-			//normalize UE by # of jets in data/MC
-			TH1* h_reco_mc_jet_spect = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y%i_cent%i", 4, i_cent)))->Clone(Form("norm_reco_mc_jet_y%i_cent%i", 4, i_cent));
-			h_reco_mc_jet_spect->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
-
-			TH1* h_reco_data_jet_spect = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y%i_cent%i", 4, i_cent)))->Clone(Form("norm_reco_data_jet_y%i_cent%i", 4, i_cent));
-			h_reco_data_jet_spect->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
-
-			h_reco_mc_jet_spect->Sumw2();
-			h_reco_data_jet_spect->Sumw2();
-
 			TH2* h_raw_subtr = (TH2*)h_raw->Clone(Form("h_raw_subtr_dR%i_c%i", i_dR, i_cent));
 
 
-			//have to use TM method for PbPb MC. some problem with number of jets being screwed up
+			//normalize UE by # of jets in data/MC
 			if (dataset_type == "PbPb")
 			{
+				TH1* h_reco_mc_jet_spect = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+				h_reco_mc_jet_spect->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+				h_reco_mc_jet_spect->Sumw2();
+
+				TH1* h_reco_data_jet_spect = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+				h_reco_data_jet_spect->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+				h_reco_data_jet_spect->Sumw2();
+
+				TH1* h_reco_jet_unw = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent)))->Clone(Form("norm_unw_jet_y4_cent%i", i_cent));
+				h_reco_jet_unw->SetName(Form("norm_unw_jet_y4_cent%i", i_cent));
+				h_reco_jet_unw->Sumw2();
+
+				TH1* h_reco_jet_w = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_w_jet_y4_cent%i", i_cent));
+				h_reco_jet_w->SetName(Form("norm_w_jet_y4_cent%i", i_cent));
+				h_reco_jet_w->Sumw2();
+
+
 				for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 				{
 //					double n_jets_mc = h_reco_mc_jet_spect->GetBinContent(i_jet_bin);
 //					double n_jets_data = h_reco_data_jet_spect->GetBinContent(i_jet_bin);
 //					if (n_jets_mc == 0) continue;
 
+					double n_jets_unw = h_reco_jet_unw->GetBinContent(i_jet_bin);
+					double n_jets_w = h_reco_jet_w->GetBinContent(i_jet_bin);
+					if (n_jets_unw == 0) continue;
+
 					for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
 					{
-						double corr_factor = h_UE_factors->GetBinContent(i_trk_bin, i_jet_bin);
-						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * corr_factor;
-						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * corr_factor;
-
 //						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
 //						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
 
+						double corr_jet_unw_w_ratio = 1;
+						if (isMC) corr_jet_unw_w_ratio = n_jets_w/n_jets_unw;
+						double corr_factor = h_UE_factors->GetBinContent(i_trk_bin, i_jet_bin) * corr_jet_unw_w_ratio;
+
+						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * corr_factor;
+						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * corr_factor;
+
+						if (i_trk_bin >= trkpT_binning->FindBin(10.))
+						{
+							updated_UE = 0.;
+							updated_UE_err = 0.;
+						}
 						h_UE->SetBinContent(i_trk_bin, i_jet_bin, updated_UE);
 						h_UE->SetBinError(i_trk_bin, i_jet_bin, updated_UE_err); //scaled errors
+
+
 					}
 				}
 
 				//UE subtraction
 				h_raw_subtr->Add(h_UE, -1);
+
+				delete h_reco_mc_jet_spect;
+				delete h_reco_data_jet_spect;
+
+				delete h_reco_jet_w;
+				delete h_reco_jet_unw;
+
 			} //end if PbPb
 
 			//Unfolding
@@ -542,10 +570,6 @@ int main(int argc, char ** argv)
 
 			delete h_truth;
 			if (dataset_type == "PbPb") delete h_UE;
-
-			delete h_reco_mc_jet_spect;
-			delete h_reco_data_jet_spect;
-
 		}
 
 		//injet ChPS
