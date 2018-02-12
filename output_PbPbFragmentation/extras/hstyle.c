@@ -470,26 +470,26 @@ void pad_eta_labels(double eta_lo, double eta_hi)
 }
 
 
-void smallify(TH1* hist)
-{
-	hist->GetXaxis()->SetLabelFont(43);
-	hist->GetYaxis()->SetLabelFont(43);
-	hist->GetXaxis()->SetTitleFont(43);
-	hist->GetYaxis()->SetTitleFont(43);
-
-	hist->GetXaxis()->SetTitleOffset(2.5);
-	hist->GetYaxis()->SetTitleOffset(2.5);
-
-	hist->GetXaxis()->SetTitleSize(16);
-	hist->GetYaxis()->SetTitleSize(16);
-
-	hist->GetXaxis()->SetLabelSize(14);
-	hist->GetYaxis()->SetLabelSize(14);
-
-	hist->SetMarkerSize(0.9);
-
-//	return hist;
-}
+//void smallify(TH1* hist)
+//{
+//	hist->GetXaxis()->SetLabelFont(43);
+//	hist->GetYaxis()->SetLabelFont(43);
+//	hist->GetXaxis()->SetTitleFont(43);
+//	hist->GetYaxis()->SetTitleFont(43);
+//
+//	hist->GetXaxis()->SetTitleOffset(2.5);
+//	hist->GetYaxis()->SetTitleOffset(2.5);
+//
+//	hist->GetXaxis()->SetTitleSize(16);
+//	hist->GetYaxis()->SetTitleSize(16);
+//
+//	hist->GetXaxis()->SetLabelSize(14);
+//	hist->GetYaxis()->SetLabelSize(14);
+//
+//	hist->SetMarkerSize(0.9);
+//
+////	return hist;
+//}
 
 TGraphAsymmErrors* smallify(TGraphAsymmErrors* graph)
 {

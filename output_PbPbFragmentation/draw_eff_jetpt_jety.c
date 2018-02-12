@@ -200,7 +200,7 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 			string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
 			int start = 7;
-			int end = 13;
+			int end = 11;
 			int canvas_number = 1;
 			for (int i_jetpt_cuts = start; i_jetpt_cuts < end ; i_jetpt_cuts++)
 			{
@@ -224,8 +224,8 @@ void draw_eff_jetpt_jety(string cut = "ppTight")
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetTitle("Efficiency");
 				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetTitle("p_{T}^{trk} [GeV]");
 
-				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetRangeUser(0.2,1.);
-				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetRangeUser(1.,1e3);
+				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetYaxis()->SetRangeUser(0.6,1.);
+				h_efficiency_fit[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetRangeUser(1.,100);
 				h_efficiency[i_cent_cuts][i_eta_cuts][i_jetpt_cuts]->GetXaxis()->SetRangeUser(0.5,1e3);
 
 				canvas1->cd(i_cent_cuts+1);

@@ -28,7 +28,7 @@ void draw_eff_trketa()
     int n_trk_eta_bins_new = trk_eta_binning_new->GetNbins();
 
 
-	TCanvas *canvas1 = new TCanvas("C1", "C1",1200,600);
+	TCanvas *canvas1 = new TCanvas("C1", "C1",800,600);
 
 	TLine *line = new TLine();
 	TLatex *ltx = new TLatex();
@@ -37,11 +37,11 @@ void draw_eff_trketa()
 	ltx->SetTextSize(15);
 	ltx->SetTextAlign(11);
 
-	TLegend *legend = new TLegend(0.25,0.25,0.80,0.80,NULL,"brNDC");
+	TLegend *legend = new TLegend(0.40,0.17,0.80,0.60,NULL,"brNDC");
 	legend->SetBorderSize(0);
 	legend->SetNColumns(1);
 	legend->SetTextFont(43);
-	legend->SetTextSize(14);
+	legend->SetTextSize(12);
 
 
 	vector<vector<TH1*>> h_efficiency(n_cent_cuts, vector<TH1*> (n_trk_eta_bins_new));
@@ -49,11 +49,12 @@ void draw_eff_trketa()
 
 	canvas1->cd();
 	canvas1->Clear();
-	canvas1->Divide(4,2);
+//	canvas1->Divide(3,2);
 
 
 	for (int i_cent_cuts = 0; i_cent_cuts < n_cent_cuts; i_cent_cuts++)
 	{
+		if (i_cent_cuts < 6) continue;
 		string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
 		int style = 0;
@@ -68,8 +69,8 @@ void draw_eff_trketa()
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts) = (TH1*)input_file->Get(name.c_str());
 
 
-            SetHStyle(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++);
-            smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts));
+            SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, 0);
+//            smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts));
 
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.5,1);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,200);
@@ -77,9 +78,10 @@ void draw_eff_trketa()
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetTitle("#it{p}_{T}^{truth} [GeV]");
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));
             
-            if (i_cent_cuts == 0) legend->AddEntry(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),Form("%4.2f < #eta < %4.2f",eta_lo, eta_hi),"lp");
+            if (i_cent_cuts == 6) legend->AddEntry(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),Form("%4.2f < #eta < %4.2f",eta_lo, eta_hi),"lp");
 
-			canvas1->cd(i_cent_cuts+1);
+//			canvas1->cd(i_cent_cuts+1);
+			canvas1->cd();
 			if (style == 0) h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Draw("a p");
             else h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Draw("same p");
             gPad->SetLogx();
@@ -96,7 +98,7 @@ void draw_eff_trketa()
 //        else name = "";
 
 	}
-	canvas1->cd(8);
+	canvas1->cd(1);
 	legend->Draw();
 
 	name = Form("eff_cent_trketa_%s_%s.pdf", dataset_type.c_str(), tracking_cut.c_str());

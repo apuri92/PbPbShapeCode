@@ -508,7 +508,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 				for (int i_pt = 0; i_pt < 10; i_pt++)
 				{
 					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi);
-					int trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
+					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 					ChPS_raw_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight/event_weight_fcal);
 				}
 			}

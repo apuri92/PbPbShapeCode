@@ -25,6 +25,9 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	TAxis* trk_pt_binning = (TAxis*)((TH3*)file->Get("h_dR_change_jetpt0_cent0"))->GetZaxis();
 	TAxis* dR_binning = (TAxis*)((TH3*)file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 
+	bool doSmall;
+	if (dataset_type == "pp") doSmall = false;
+	if (dataset_type == "PbPb") doSmall = true;
 
 	int ptJetBinsN = jet_pt_binning->GetNbins();
 	int ptTrkBinsN = trk_pt_binning->GetNbins();
@@ -244,8 +247,12 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	TCanvas *c5 = new TCanvas("c5","c5",900,600);
 //	c5->cd(); ltx->DrawLatexNDC(0.5,0.5,"RespEfficiency");
 
+	bool first_cent_pass = true;
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
+		if (dataset_type == "PbPb" && i_cent == 6) continue;
+		if (dataset_type == "pp" && i_cent < 6) continue;
+
 		c1->cd();
 		c1->Clear();
 		c1->Divide(3,2);
@@ -296,7 +303,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth dR");
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco dR");
 //					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1e-9,1);
-					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz text");
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
+					ltx->SetTextSize(12);
 					ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
 					line->DrawLine(0,0,1.2,1.2);
 					gPad->SetLogz();
@@ -396,7 +404,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			{
 				c0->cd(1);
 				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.1f < p_{T}^{Jet} < %4.1f",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
-				if (i_cent == 0 && jet_iter == 0) name = "(";
+				if (first_cent_pass && jet_iter == 0) name = "(";
 				else name = "";
 				c0->Print(Form("ShapeResponse2D_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));
 			}
@@ -417,7 +425,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend1->SetY1NDC(0.2);
 			legend1->SetY2NDC(0.4);
 			legend1->Draw();
-			if (i_cent == 0) name = "(";
+			if (first_cent_pass) name = "(";
 			else name = "";
 			c1->Print(Form("RecoProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend1->Clear();
@@ -434,7 +442,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend2->SetY2NDC(0.4);
 			legend2->Draw();
 			name = Form("c%i", i_cent);
-			if (i_cent == 0) name = "(";
+			if (first_cent_pass) name = "(";
 			else name = "";
 			c2->Print(Form("TruthProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend2->Clear();
@@ -451,7 +459,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend3->SetY1NDC(0.2);
 			legend3->SetY2NDC(0.4);
 			legend3->Draw();
-			if (i_cent == 0) name = "(";
+			if (first_cent_pass) name = "(";
 			else name = "";
 			c3->Print(Form("RatioProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend3->Clear();
@@ -467,7 +475,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend4->SetY1NDC(0.20);
 			legend4->SetY2NDC(0.55);
 			legend4->Draw();
-			if (i_cent == 0) name = "(";
+			if (first_cent_pass) name = "(";
 			else name = "";
 			c4->Print(Form("RespPurity_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend4->Clear();
@@ -483,12 +491,13 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend5->SetY1NDC(0.20);
 			legend5->SetY2NDC(0.55);
 			legend5->Draw();
-			if (i_cent == 0) name = "(";
+			if (first_cent_pass) name = "(";
 			else name = "";
 			c5->Print(Form("RespEfficiency_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend5->Clear();
 		}
 
+		first_cent_pass = false;
 	} //End centrality loop
 
 	c0->Clear();
@@ -508,30 +517,40 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 
 	TCanvas *c6 = new TCanvas("c6","c6",900,600);
+	if (dataset_type == "pp") c6->SetCanvasSize(800,600);
+
 	c6->cd(); ltx->DrawLatexNDC(0.5,0.5,"Test");
 
 	TLegend *legend6 = new TLegend();
+
 //	legend6->SetNColumns(2);
 	legend6->SetBorderSize(0);
 	legend6->SetTextFont(43);
 	legend6->SetTextSize(9);
-	ltx->SetTextSize(16);
+	ltx->SetTextSize(12);
+	if (dataset_type == "pp") ltx->SetTextSize(16);
+
+	if (dataset_type == "pp") legend6->SetTextSize(16);
+	if (dataset_type == "PbPb") legend6->SetTextSize(8);
 
 
 	for (int i_dR = 0; i_dR < dRBinsN; i_dR++)
 	{
 		c6->cd();
 		c6->Clear();
-		c6->Divide(4,2);
+		if (dataset_type == "PbPb") c6->Divide(3,2);
 
 		double dR_lo = dR_binning->GetBinLowEdge(i_dR+1);
 		double dR_hi = dR_binning->GetBinUpEdge(i_dR+1);
 
+		bool first_cent_pass = true;
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			c6->cd(i_cent+1);
-			gPad->SetTopMargin(0.07);
-			gPad->SetRightMargin(0);
+			if (dataset_type == "pp") c6->cd();
+			if (dataset_type == "PbPb") c6->cd(i_cent+1);
+//			c6->cd(i_cent+1);
+//			gPad->SetTopMargin(0.07);
+//			gPad->SetRightMargin(0);
 
 			int jet_iter = 0;
 			for (int i_jetpt = 0; i_jetpt < ptJetBinsN; i_jetpt++)
@@ -542,10 +561,14 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				if (pt_jet_hi < 127. ||
 					pt_jet_lo> 315.) continue;
 
-				if (i_cent == 0) legend6->AddEntry(h_check.at(i_jetpt).at(i_cent).at(i_dR), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+				if (first_cent_pass) legend6->AddEntry(h_check.at(i_jetpt).at(i_cent).at(i_dR), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
 				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetYaxis()->SetRangeUser(0,2);
-				SetHStyle(h_check.at(i_jetpt).at(i_cent).at(i_dR),jet_iter);
-				smallify(h_check.at(i_jetpt).at(i_cent).at(i_dR));
+				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetXaxis()->SetRangeUser(1,100);
+
+				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetYaxis()->SetTitle("Correction Factors");
+				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+				SetHStyle_smallify(h_check.at(i_jetpt).at(i_cent).at(i_dR),jet_iter, doSmall);
+//				smallify(h_check.at(i_jetpt).at(i_cent).at(i_dR));
 				if (jet_iter == 0) h_check.at(i_jetpt).at(i_cent).at(i_dR)->Draw("p");
 				else h_check.at(i_jetpt).at(i_cent).at(i_dR)->Draw("same p");
 				gPad->SetLogx();
@@ -555,12 +578,17 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 			c6->cd(i_cent+1);
 			ltx->SetTextAlign(32);
-			ltx->DrawLatexNDC(1,0.96,num_to_cent(31, i_cent).c_str());
+			ltx->DrawLatexNDC(0.95,0.97,num_to_cent(31, i_cent).c_str());
+			first_cent_pass = false;
+
+			if (dataset_type == "pp") c6->cd();
+			if (dataset_type == "PbPb") c6->cd(i_cent+1);
+			ltx->SetTextAlign(12);
+			ltx->DrawLatexNDC(0.19,0.97,Form("%4.2f < dR < %4.2f", dR_lo, dR_hi));
+
+
 		} //End cent loop
 
-		c6->cd(1);
-		ltx->SetTextAlign(12);
-		ltx->DrawLatexNDC(0.19,0.96,Form("%4.2f < dR < %4.2f", dR_lo, dR_hi));
 
 		c6->cd(1);
 		legend6->SetX1NDC(0.18);
@@ -569,14 +597,18 @@ void get_posCorr(string config_file = "ff_config.cfg")
 		legend6->SetY2NDC(0.90);
 		legend6->Draw();
 
-		if (i_dR == 0) c6->Print("pos_corr_factors.pdf(",Form("Title: dR%i",i_dR));
-		else c6->Print("pos_corr_factors.pdf",Form("Title: dR%i",i_dR));
+
+		if (i_dR == 0) name = "(";
+		else name = "";
+		c6->Print(Form("pos_corr_factors_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: dR%i",i_dR));
+
 
 		legend6->Clear();
 	} //End dr loop
 
 	c6->Clear();
-	c6->Print("pos_corr_factors.pdf)",Form("Title: End"));
+	name = ")";
+	c6->Print(Form("pos_corr_factors_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: End"));
 
 
 

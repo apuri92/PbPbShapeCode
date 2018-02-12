@@ -109,6 +109,11 @@ int main(int argc, char ** argv)
 			name = Form("h_reco_jet_spectrum_y%i_cent%i_h_true_jet_spectrum_y%i_cent%i",i_y, i_cent, i_y, i_cent);
 			RooUnfoldResponse* r_response = (RooUnfoldResponse*)f_mc->Get(name.c_str());
 
+			TH2* h_response_matrix = r_response->Hresponse();
+			name = Form("h_response_matrix_jet_y%i_c%i", i_y, i_cent);
+			h_response_matrix->SetTitle(name.c_str());
+			h_response_matrix->Write(name.c_str());
+
 			RooUnfoldBayes unfold(r_response, h_reco_jet_y_c,4);
 			unfold.SetVerbose(0);
 			if (h_reco_jet_y_c->GetEntries() != 0)
@@ -294,6 +299,10 @@ int main(int argc, char ** argv)
 			TH2* h_raw_rr_unf = (TH2*)h_raw_rr->Clone(Form("h_raw_subtr_unf_dR%i_c%i", i_dR, i_cent));
 
 			RooUnfoldResponse* r_response = (RooUnfoldResponse*)f_mc->Get(Form("ChPS_raw_0_dR%i_cent%i_ChPS_truth_dR%i_cent%i", i_dR, i_cent, i_dR, i_cent));
+			TH2* h_response_matrix = r_response->Hresponse();
+			name = Form("h_ChPS_response_matrix_jet_dR%i_cent%i", i_dR, i_cent);
+			h_response_matrix->SetTitle(name.c_str());
+			h_response_matrix->Write(name.c_str());
 
 			if (h_raw_subtr_unf->GetEntries() != 0)
 			{

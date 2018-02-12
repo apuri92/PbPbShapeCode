@@ -1,7 +1,13 @@
 #TODO
-*need to properly implement MB method UE subtraction for PbPb MC. Some problem
-with weighting
+--------
 
+
+---------
+2/12/2018
+*added plots for internal note, fixed ranges, labellings
+*redid comp_chps from beginning to compare different spectra
+*DONE: need to properly implement MB method UE subtraction for PbPb MC. Some problem
+with weighting
 ----------
 2/5/2018
 *added background2signal plots in draw_ChPS
