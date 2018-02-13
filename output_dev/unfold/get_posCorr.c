@@ -300,8 +300,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				//Drawing 2D response plots, each page is a centrality and jet pt bin, with each pad being a trk bin
 				{
 					c0->cd(trk_iter+1);
-					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth dR");
-					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco dR");
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth r");
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco r");
 //					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1e-9,1);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
 					ltx->SetTextSize(12);
@@ -584,7 +584,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			if (dataset_type == "pp") c6->cd();
 			if (dataset_type == "PbPb") c6->cd(i_cent+1);
 			ltx->SetTextAlign(12);
-			ltx->DrawLatexNDC(0.19,0.97,Form("%4.2f < dR < %4.2f", dR_lo, dR_hi));
+			ltx->DrawLatexNDC(0.19,0.97,Form("%1.2f < r < %1.2f", dR_lo, dR_hi));
 
 
 		} //End cent loop

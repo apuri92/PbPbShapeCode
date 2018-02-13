@@ -27,7 +27,7 @@ void UE_factors()
 
 	for (int i_dR = 0; i_dR < 13; i_dR++)
 	{
-		string dr_label = Form("%1.2f < dR < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+		string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
 
 		c1->Clear();
 		c1->Divide(3,2);
