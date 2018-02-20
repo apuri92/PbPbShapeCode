@@ -47,9 +47,6 @@ int main(int argc, char ** argv)
 	TFile *f_data = new TFile(Form("../raw_results/FF_%s_out_histo_%s_5p02_r001.root", did.c_str(), dataset_type.c_str()));
 	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
 	TFile *UE_factors = new TFile(Form("UE_factors.root"));
-
-	if (isMC) did = "MC";
-	else did = "data";
 	TFile *f_output = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
 	std::string name;
 
@@ -77,7 +74,7 @@ int main(int argc, char ** argv)
 	{
 		cout << Form("Done cent%i", i_cent) << endl;
 
-		TH1 *h_reco_jet, *h_reco_jet_matched, *h_truth_jet, *h_reco_unfolded, *h_reco_matched_unfolded;
+		TH1 *h_reco_jet, *h_reco_jet_unw, *h_reco_jet_matched, *h_truth_jet, *h_reco_unfolded, *h_reco_matched_unfolded;
 		if (dataset_type == "PbPb" && i_cent == 6) continue;
 		if (dataset_type == "pp" && i_cent < 6) continue;
 
@@ -86,6 +83,10 @@ int main(int argc, char ** argv)
 			name = Form("h_reco_jet_spectrum_y%i_cent%i",i_y, i_cent);
 			TH1* h_reco_jet_y_c = (TH1*)((TH1*)f_data->Get(name.c_str()))->Clone(Form("reco_jet_y%i_c%i",i_y, i_cent));
 			h_reco_jet_y_c->Sumw2();
+
+			name = Form("h_reco_jet_spectrum_unW_y%i_cent%i",i_y, i_cent);
+			TH1* h_reco_jet_unw_y_c = (TH1*)((TH1*)f_data->Get(name.c_str()))->Clone(Form("reco_jet_y%i_c%i",i_y, i_cent));
+			h_reco_jet_unw_y_c->Sumw2();
 
 			name = Form("h_reco_jet_spectrum_matched_y%i_cent%i",i_y, i_cent);
 			TH1* h_reco_jet_matched_y_c = (TH1*)((TH1*)f_mc->Get(name.c_str()))->Clone(Form("reco_jet_matched_y%i_c%i",i_y, i_cent));
@@ -141,6 +142,9 @@ int main(int argc, char ** argv)
 			{
 				h_reco_jet = (TH1*)h_reco_jet_y_c->Clone(Form("h_inc_reco_jet_y%i_c%i",i_y, i_cent));
 				h_reco_jet->Sumw2();
+
+				h_reco_jet_unw = (TH1*)h_reco_jet_unw_y_c->Clone(Form("h_inc_reco_jet_unw_y%i_c%i",i_y, i_cent));
+				h_reco_jet_unw->Sumw2();
 
 				h_reco_jet_matched = (TH1*)h_reco_jet_matched_y_c->Clone(Form("h_inc_reco_matched_jet_y%i_c%i",i_y, i_cent));
 				h_reco_jet_matched->Sumw2();
@@ -215,84 +219,116 @@ int main(int argc, char ** argv)
 			TH2* h_truth = (TH2*)f_mc->Get(Form("ChPS_truth_dR%i_cent%i", i_dR, i_cent));
 			h_truth->Sumw2();
 
-			TH2* h_UE;
-			TH2* h_UE_factors;
-			if (dataset_type == "PbPb")
-			{
-//				h_UE = (TH2*)f_mc->Get(Form("ff_UE_pT_dR%i_cent%i",i_dR, i_cent));
-				h_UE = (TH2*)f_data->Get(Form("ChPS_raw_1_dR%i_cent%i",i_dR, i_cent));
-				h_UE->Sumw2();
+			//setup UE/fakes
+			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_raw_1_dR%i_cent%i",i_dR, i_cent));;
+			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ff_UE_pT_dR%i_cent%i",i_dR, i_cent));;
+			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
+			h_final_UE->Reset();
+			h_final_UE->Sumw2();
 
-				h_UE_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));
+			TH2* h_final_fake = (TH2*)h_UE_MB->Clone(Form("final_fake_%i_cent%i",i_dR, i_cent));;
+			h_final_fake->Reset();
+			h_final_fake->Sumw2();
+
+			TH2* h_UE_corr_factors;
+			if (dataset_type == "PbPb") h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
+
+			double n_jets_w = 1, n_jets_unw = 1, n_jets_data = 1, n_jets_mc = 1;
+
+			TH1* h_reco_jet_spect_mc = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_mc->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+
+			TH1* h_reco_jet_spect_data = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_data->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+
+			TH1* h_reco_jet_spect_unw = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent)))->Clone(Form("norm_unw_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_unw->SetName(Form("norm_unw_jet_y4_cent%i", i_cent));
+
+			TH1* h_reco_jet_spect_w = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_w_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_w->SetName(Form("norm_w_jet_y4_cent%i", i_cent));
+
+			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
+			{
+				n_jets_mc = h_reco_jet_spect_mc->GetBinContent(i_jet_bin);
+				n_jets_data = h_reco_jet_spect_data->GetBinContent(i_jet_bin);
+
+				n_jets_unw = h_reco_jet_spect_unw->GetBinContent(i_jet_bin);
+				n_jets_w = h_reco_jet_spect_w->GetBinContent(i_jet_bin);
+
+				if (n_jets_mc == 0 || n_jets_unw == 0) continue;
+
+
+				//if pp. Subtract only fakes (UE_TM|MC) for all pT. Need to normalize n_jets_data / n_jets_mc. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
+				//if PbPb
+				//	if < 10 GeV: Subtract (UE_MB|data). Need to normalize n_jecs_w / n_jets_unw. This correction is 1 if running on data since UE_MB uses unw spectra, which is same as w spectra in data. Is not 1 for MC
+				//	if >= 10 GeV: Subtract (UE_TM|MC). Need to normalize n_jets_data / n_jets_mv. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
+
+				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
+				{
+					double UE = 0, UE_err = 0, fake = 0, fake_err = 0, corrections = 1;
+
+					if (dataset_type == "pp")
+					{
+						UE = 0;
+						UE_err = 0;
+
+						fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
+						fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+						corrections = n_jets_data / n_jets_mc;
+					}
+
+					if (dataset_type == "PbPb")
+					{
+						if (i_trk_bin < trkpT_binning->FindBin(10.))
+						{
+							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
+							UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
+
+							fake = 0; //taken care of as part of UE
+							fake_err = 0;
+
+							corrections = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_w / n_jets_unw;
+						}
+						else
+						{
+							UE = 0; //UE = 0 above 10 GeV by definition
+							UE_err = 0;
+
+							fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
+							fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+							corrections = n_jets_data / n_jets_mc;
+						}
+					}
+
+					UE = UE * corrections;
+					UE_err = UE_err * corrections;
+
+					fake = fake * corrections;
+					fake_err = fake_err * corrections;
+
+					h_final_UE->SetBinContent(i_trk_bin, i_jet_bin, UE);
+					h_final_UE->SetBinError(i_trk_bin, i_jet_bin, UE_err);
+
+					h_final_fake->SetBinContent(i_trk_bin, i_jet_bin, fake);
+					h_final_fake->SetBinError(i_trk_bin, i_jet_bin, fake_err);
+
+				}
 			}
 
 			TH2* h_raw_subtr = (TH2*)h_raw->Clone(Form("h_raw_subtr_dR%i_c%i", i_dR, i_cent));
+			h_raw_subtr->Add(h_final_UE, -1);
+			h_raw_subtr->Add(h_final_fake, -1);
+
+			delete h_reco_jet_spect_mc;
+			delete h_reco_jet_spect_data;
+
+			delete h_reco_jet_spect_w;
+			delete h_reco_jet_spect_unw;
 
 
-			//normalize UE by # of jets in data/MC
-			if (dataset_type == "PbPb")
-			{
-				TH1* h_reco_mc_jet_spect = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
-				h_reco_mc_jet_spect->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
-				h_reco_mc_jet_spect->Sumw2();
 
-				TH1* h_reco_data_jet_spect = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
-				h_reco_data_jet_spect->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
-				h_reco_data_jet_spect->Sumw2();
-
-				TH1* h_reco_jet_unw = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent)))->Clone(Form("norm_unw_jet_y4_cent%i", i_cent));
-				h_reco_jet_unw->SetName(Form("norm_unw_jet_y4_cent%i", i_cent));
-				h_reco_jet_unw->Sumw2();
-
-				TH1* h_reco_jet_w = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_w_jet_y4_cent%i", i_cent));
-				h_reco_jet_w->SetName(Form("norm_w_jet_y4_cent%i", i_cent));
-				h_reco_jet_w->Sumw2();
-
-
-				for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
-				{
-//					double n_jets_mc = h_reco_mc_jet_spect->GetBinContent(i_jet_bin);
-//					double n_jets_data = h_reco_data_jet_spect->GetBinContent(i_jet_bin);
-//					if (n_jets_mc == 0) continue;
-
-					double n_jets_unw = h_reco_jet_unw->GetBinContent(i_jet_bin);
-					double n_jets_w = h_reco_jet_w->GetBinContent(i_jet_bin);
-					if (n_jets_unw == 0) continue;
-
-					for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
-					{
-//						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
-//						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data / n_jets_mc;
-
-						double corr_jet_unw_w_ratio = 1;
-						if (isMC) corr_jet_unw_w_ratio = n_jets_w/n_jets_unw;
-						double corr_factor = h_UE_factors->GetBinContent(i_trk_bin, i_jet_bin) * corr_jet_unw_w_ratio;
-
-						double updated_UE = h_UE->GetBinContent(i_trk_bin, i_jet_bin) * corr_factor;
-						double updated_UE_err = h_UE->GetBinError(i_trk_bin, i_jet_bin) * corr_factor;
-
-						if (i_trk_bin >= trkpT_binning->FindBin(10.))
-						{
-							updated_UE = 0.;
-							updated_UE_err = 0.;
-						}
-						h_UE->SetBinContent(i_trk_bin, i_jet_bin, updated_UE);
-						h_UE->SetBinError(i_trk_bin, i_jet_bin, updated_UE_err); //scaled errors
-
-
-					}
-				}
-
-				//UE subtraction
-				h_raw_subtr->Add(h_UE, -1);
-
-				delete h_reco_mc_jet_spect;
-				delete h_reco_data_jet_spect;
-
-				delete h_reco_jet_w;
-				delete h_reco_jet_unw;
-
-			} //end if PbPb
 
 			//Unfolding
 			TH2* h_raw_subtr_unf = (TH2*)h_raw_subtr->Clone(Form("h_raw_subtr_unf_dR%i_c%i", i_dR, i_cent));
@@ -373,6 +409,7 @@ int main(int argc, char ** argv)
 			for (int i_jet_bin = 0; i_jet_bin < N_jetpt; i_jet_bin++)
 			{
 				double n_jets_raw = h_reco_jet->GetBinContent(i_jet_bin+1);
+				double n_jets_raw_unw = h_reco_jet_unw->GetBinContent(i_jet_bin+1);
 				double n_jets_unf = h_reco_unfolded->GetBinContent(i_jet_bin+1);
 
 				double n_jets_raw_rr = h_reco_jet_matched->GetBinContent(i_jet_bin+1);
@@ -380,7 +417,7 @@ int main(int argc, char ** argv)
 
 				double n_jets_tru = h_truth_jet->GetBinContent(i_jet_bin+1);
 
-				if (n_jets_raw == 0 || n_jets_unf == 0 ||
+				if (n_jets_raw == 0 || n_jets_raw_unw == 0 || n_jets_unf == 0 ||
 					n_jets_raw_rr == 0 || n_jets_unf_rr == 0 ||
 					n_jets_tru == 0) continue;
 
@@ -436,14 +473,11 @@ int main(int argc, char ** argv)
 					h_truth->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_truth_err);
 
 					//UE
-					if (dataset_type == "PbPb")
-					{
-						double updated_UE = h_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-						double updated_UE_err = h_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+					double updated_UE = h_final_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw_unw;
+					double updated_UE_err = h_final_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw_unw;
 
-						h_UE->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_UE);
-						h_UE->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_UE_err);
-					}
+					h_final_UE->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_UE);
+					h_final_UE->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_UE_err);
 
 				}
 			}
@@ -459,7 +493,7 @@ int main(int argc, char ** argv)
 				h_raw_rr_unf_injet = (TH2*)h_raw_rr_unf->Clone(Form("raw_rr_unf_injet_c%i", i_cent));
 				h_raw_rr_unf_bbb_injet = (TH2*)h_raw_rr_unf_bbb->Clone(Form("raw_rr_unf_bbb_injet_c%i", i_cent));
 
-				if (dataset_type == "PbPb") h_UE_injet = (TH2*)h_UE->Clone(Form("UE_injet_c%i", i_cent));
+				if (dataset_type == "PbPb") h_UE_injet = (TH2*)h_final_UE->Clone(Form("UE_injet_c%i", i_cent));
 
 				h_truth_injet = (TH2*)h_truth->Clone(Form("truth_injet_c%i", i_cent));
 			}
@@ -474,7 +508,7 @@ int main(int argc, char ** argv)
 				h_raw_rr_unf_injet->Add(h_raw_rr_unf);
 				h_raw_rr_unf_bbb_injet->Add(h_raw_rr_unf_bbb);
 
-				if (dataset_type == "PbPb") h_UE_injet->Add(h_UE);
+				if (dataset_type == "PbPb") h_UE_injet->Add(h_final_UE);
 
 				h_truth_injet->Add(h_truth);
 			}
@@ -559,7 +593,7 @@ int main(int argc, char ** argv)
 				if (dataset_type == "PbPb")
 				{
 					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
-					TH1* h_ChPS_UE = (TH1*)h_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+					TH1* h_ChPS_UE = (TH1*)h_final_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
 					h_ChPS_UE->SetTitle(name.c_str());
 					h_ChPS_UE->Scale(1.,"width");
 					h_ChPS_UE->Scale(1./area);
@@ -578,7 +612,9 @@ int main(int argc, char ** argv)
 			delete h_raw_rr_unf_bbb;
 
 			delete h_truth;
-			if (dataset_type == "PbPb") delete h_UE;
+			delete h_final_UE;
+			delete h_final_fake;
+
 		}
 
 		//injet ChPS
@@ -681,6 +717,7 @@ int main(int argc, char ** argv)
 		delete h_truth_injet;
 
 		delete h_reco_jet;
+		delete h_reco_jet_unw;
 		delete h_reco_jet_matched;
 		delete h_truth_jet;
 		delete h_reco_unfolded;

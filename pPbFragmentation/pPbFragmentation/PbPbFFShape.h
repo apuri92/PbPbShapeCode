@@ -114,6 +114,7 @@ class PbPbFFShape : public BaseClass{
 	//Raw disitrbutions from random cones
 	vector<vector<TH2D*>> ff_raw_UE; //!
 	vector<vector<TH2D*>> ChPS_raw_UE; //!	
+	vector<vector<TH2D*>> ChPS_raw_UE_truthjet; //!
 
 	//Truth distributions
 	vector<vector<TH2D*>> ff_truth; //!  

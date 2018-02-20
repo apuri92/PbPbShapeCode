@@ -1,39 +1,41 @@
 #TODO
 --------
-
-
+2/20/2018
+* Updated UE subtraction (using MB method for < 10 GeV PbPb, TM for > 10 GeV PbPb and all pp) in main and draw_ChPS
+* fixed cent_bin_fine (using cent_scheme 30 instead of 31) and alignment fix bug (to make sure overlay tracks also have the corrected charged trk pt) and added jet cleaning for pp in PbPbFFShape
+* Added histograms for checking UE (truth jet pT and reco trk pT)
 ---------
 2/12/2018
-*added plots for internal note, fixed ranges, labellings
-*redid comp_chps from beginning to compare different spectra
-*DONE: need to properly implement MB method UE subtraction for PbPb MC. Some problem
+* added plots for internal note, fixed ranges, labellings
+* redid comp_chps from beginning to compare different spectra
+* DONE: need to properly implement MB method UE subtraction for PbPb MC. Some problem
 with weighting
 ----------
 2/5/2018
-*added background2signal plots in draw_ChPS
-*fixed UE normalization for PbPb MC
-*minor title fixes
+* added background2signal plots in draw_ChPS
+* fixed UE normalization for PbPb MC
+* minor title fixes
 ----------
 2/5/2018
-*added ability to run from command line config
-*fixed naming conventions
-*added code to compare PbPb pp data (final and pre-unfolding)
-*new UE subtraction (MB method) implemented for PbPb data
-*added code for correction factors for MB method UE
-*added automated script to run over PbPb, pp (data and MC)
-*added test config file (ff_config)
+* added ability to run from command line config
+* fixed naming conventions
+* added code to compare PbPb pp data (final and pre-unfolding)
+* new UE subtraction (MB method) implemented for PbPb data
+* added code for correction factors for MB method UE
+* added automated script to run over PbPb, pp (data and MC)
+* added test config file (ff_config)
 ----------
 2/1/2018
-*fixed trigger for PbPbFFShape
-*fixed calibration for pp in PbPbFFShape
-*minor changes to offline code
+* fixed trigger for PbPbFFShape
+* fixed calibration for pp in PbPbFFShape
+* minor changes to offline code
 ----------
 1/31/2018
-*first changelog
-*PbPbFFShape.cxx now runs over pp data. Trigger PS is 1 for j85, first
+* first changelog
+* PbPbFFShape.cxx now runs over pp data. Trigger PS is 1 for j85, first
 "trigger" is 6. Centbin is set to 5 for pp
-*output_dev/unfold/src/main.cxx - Cleaned up output file names
-*output_dev/unfold/get_posCorr.c - Cleaned up output file names
-*output_dev/unfold/draw_ChPS.c - added plots for UE, injet plots, etc
+* output_dev/unfold/src/main.cxx - Cleaned up output file names
+* output_dev/unfold/get_posCorr.c - Cleaned up output file names
+* output_dev/unfold/draw_ChPS.c - added plots for UE, injet plots, etc
 
 

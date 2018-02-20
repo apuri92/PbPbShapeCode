@@ -119,7 +119,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		EL_RETURN_CHECK("execute",event->retrieve( calos, "CaloSums"));
 		FCalEt=calos->at(5)->et()*1e-6;
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING );
-		cent_bin_fine = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING ); //Need for some tools
+		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
 		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
 		h_centrality->Fill(cent_bin,event_weight_fcal);
@@ -341,6 +341,9 @@ EL::StatusCode PbPbFFShape :: execute (){
 		xAOD::Jet newjet;
 		newjet.makePrivateStore( **jet_itr );
 
+		//jet cleaning
+		if (_dataset == 3) if( !m_jetCleaning->accept( **jet_itr )) continue;
+
 		const xAOD::JetFourMom_t jet_4mom_def = newjet.jetP4();
 		const xAOD::JetFourMom_t jet_4mom_subtr = newjet.jetP4("JetSubtractedScaleMomentum");
 		const xAOD::JetFourMom_t jet_4mom_unsubtr = newjet.jetP4("JetUnsubtractedScaleMomentum");
@@ -407,11 +410,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 		if (fabs(jet_eta)> (2.5 - _dR_max)) continue;
 		if (jet_pt <= _pTjetCut) continue;
-
-		//TODO: jet cleaning
-		//		//Jet quality moment
-		//		if( !m_jetCleaning->accept( **jet_itr )) Is_jet_Good.push_back(0);
-		//		else Is_jet_Good.push_back(1);
 
 		jet_pt_xcalib_vector.push_back(jet_pt);
 		jet_phi_vector.push_back(jet_phi);
@@ -567,7 +565,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 			float pt = trk->pt()/1000.;
 			float eta = trk->eta();
 			float phi = trk->phi();
-			if (_correctTrackpT && !isMC) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
+			bool isMatchedToTruthParticle = false;
+			if (isMC) {
+				ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");
+				float mcprob =trk->auxdata<float>("truthMatchProbability");
+				if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
+			}
+			if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
 			if (fabs(eta) >= 2.5) continue;
 			//Moving track pt in systematic variation  if needed
 			if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue;
@@ -628,11 +632,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 
 				bool isFake=true;
+				bool isSecondary=false;
 				ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");
 				float mcprob =trk->auxdata<float>("truthMatchProbability");
 				if(truthLink.isValid() && mcprob > _mcProbCut)
 				{
 					int trktype = getTypeReco((*truthLink)->barcode(),(*truthLink)->pdgId(),(*truthLink)->status(),(*truthLink)->charge(),mcprob,_mcProbCut);
+					if (trktype == 2) isSecondary = true;
 					if ( trktype == 1  || trktype == 5 )
 					{
 						float track_mc_pt=(*truthLink)->pt()*0.001; //bring into GeV
@@ -726,7 +732,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 						h_dR_binning->Fill(R_reco_reco);
 					}
 
-				} //end truthlinked trk loop
+				} //end truthlinked if
 				  //Fake/UE tracks
 				if (isFake)
 				{
@@ -742,6 +748,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 						int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)reco_posRes_ChPS.at(0).at(0)->GetYaxis());
 						UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
                         UE_distr.at(jetpt_bin).at(n_cent_bins-1)->Fill(R, pt, eta, jet_weight*eff_weight);
+
+//						if (!isSecondary)
+						{
+							ChPS_raw_UE_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_UE_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						}
+
 					}
 				}
 			}

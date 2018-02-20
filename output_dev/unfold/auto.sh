@@ -6,7 +6,7 @@ function auto {
 		./analysis auto.cfg
 	fi
 	root -b -q "draw_ChPS.c(\"auto.cfg\")"
-	root -b -q "draw_spectra.c(\"auto.cfg\")"
+	# root -b -q "draw_spectra.c(\"auto.cfg\")"
 	rm auto.cfg
 }
 
@@ -17,5 +17,5 @@ auto PbPb 0
 auto pp 1
 auto pp 0
 
-# root -b -q "comp_ChPS.c(1)"
-# root -b -q "comp_ChPS.c(0)"
+root -b -q "comp_ChPS.c(1)"
+root -b -q "comp_ChPS.c(0)"

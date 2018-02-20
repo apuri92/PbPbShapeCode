@@ -979,10 +979,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		TCanvas *c_ChPS_B2S = new TCanvas("c_ChPS_B2S","c_ChPS_B2S",900,600);
 		if (dataset_type == "pp") c_ChPS_B2S->SetCanvasSize(600,600);
-		TLegend *legend_ChPS_B2S = new TLegend(0.52, 0.53, 0.85, 0.82, "","brNDC");
+		TLegend *legend_ChPS_B2S = new TLegend(0.35, 0.7, 0.7, 0.84, "","brNDC");
 		legend_ChPS_B2S->SetTextFont(43);
 		legend_ChPS_B2S->SetBorderSize(0);
-		if (dataset_type == "pp") legend_ChPS_B2S->SetTextSize(12);
+		if (dataset_type == "pp") legend_ChPS_B2S->SetTextSize(16);
 		if (dataset_type == "PbPb") legend_ChPS_B2S->SetTextSize(14);
 
 		for (int i_dR = 0; i_dR < N_dR; i_dR++)
@@ -1008,8 +1008,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					SetHStyle_smallify(h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
 					if (i_dR == 0 && first_pass_cent) legend_ChPS_B2S->AddEntry(h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
 
-					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(1.,10.);
-					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.8, 800);
+					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(1.,120.);
+					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45,1.55);
+					if (dataset_type == "PbPb") h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.8,800);
 					h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 
 					if (dataset_type == "pp") c_ChPS_B2S->cd();
@@ -1018,7 +1019,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					else h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 
 					gPad->SetLogx();
-					gPad->SetLogy();
+					if (dataset_type == "PbPb") gPad->SetLogy();
 					jet_itr++;
 				} // end jet loop
 
@@ -1029,7 +1030,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", dr_label.c_str()));
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
-				line->DrawLine(1, 1, 10., 1);
+				line->DrawLine(1, 1, 120., 1);
 
 				legend_ChPS_B2S->Draw();
 				first_pass_cent = false;
