@@ -29,5 +29,6 @@ namespace MTCorrector
 	double GetZ(double track_pt, double track_eta, double track_phi, double jet_pt, double jet_eta, double jet_phi, bool UseAltzDef);
 	bool GetFJR(float jetEta, float jetPhi, const xAOD::JetContainer* track_jets);
 	bool GetFJR(xAOD::Jet* jet, InDet::InDetTrackSelectionTool *m_track_selection_tool);
+	int GetRunNumberBin(int RunNumber);
 };
 #endif

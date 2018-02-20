@@ -4,6 +4,7 @@
 * Updated UE subtraction (using MB method for < 10 GeV PbPb, TM for > 10 GeV PbPb and all pp) in main and draw_ChPS
 * fixed cent_bin_fine (using cent_scheme 30 instead of 31) and alignment fix bug (to make sure overlay tracks also have the corrected charged trk pt) and added jet cleaning for pp in PbPbFFShape
 * Added histograms for checking UE (truth jet pT and reco trk pT)
+* Brought up to svn version
 ---------
 2/12/2018
 * added plots for internal note, fixed ranges, labellings

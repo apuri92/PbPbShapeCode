@@ -659,6 +659,21 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
 		cout << " ... " << num << endl;
 
 	}
+	
+	if ((scheme==0) && (variable=="PbPb_runs"))
+	{
+
+		num = 31;
+		double bins[32] = {286711, 286717, 286748, 286767, 286834, 286854, 286908, 286990, 287038, 287044, 287068, 287222, 287224, 287259, 287270, 287281, 287321, 287330, 287334, 287378, 287380, 287382, 287560, 287594, 287632, 287706, 287728, 287827, 287843, 287866, 287924, 287931};
+
+		printf("\n... Runs  : ");
+		for (int i=0; i<=num; i++)
+		{
+			array[i]=bins[i];
+			printf("%.2f, ", array[i]);
+		}
+		cout << " ... " << num << endl;
+	}
 
 
 }
@@ -676,4 +691,12 @@ int MTCorrector::GetTrkpTBin(float pt){
 	if (pt>0.2) return 0;
 	
 	return 0;
+}
+
+int MTCorrector::GetRunNumberBin(int RunNumber){
+	int num = 32;
+	int bins[32] = {286711, 286717, 286748, 286767, 286834, 286854, 286908, 286990, 287038, 287044, 287068, 287222, 287224, 287259, 287270, 287281, 287321, 287330, 287334, 287378, 287380, 287382, 287560, 287594, 287632, 287706, 287728, 287827, 287843, 287866, 287924, 287931};
+	for (int i=0;i<num;i++){
+		if (bins[i]==RunNumber) return i;
+	}
 }

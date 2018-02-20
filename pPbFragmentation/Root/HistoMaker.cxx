@@ -11,8 +11,8 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 {
 	cout << " Setting  histograms" << endl;
 	
-	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, ptTrkBinsFineN, ptTrkBinsSumN , etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, RdRBinsN;
-	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], ptTrkBinsFine[1000], ptTrkBinsSum[1000], RdRBins[20], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], finehitsBins[1000];
+	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, ptTrkBinsFineN, ptTrkBinsSumN , etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, RdRBinsN, RunBinsN;
+	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], ptTrkBinsFine[1000], ptTrkBinsSum[1000], RdRBins[20], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], RunBins[50], finehitsBins[1000];
 
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
@@ -28,11 +28,11 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 	SetupBinning(0, "resp", respBins, respBinsN);
 	SetupBinning(0, "hits_fine", finehitsBins, finehitsBinsN);
 	SetupBinning(0, "dR-RdR", RdRBins, RdRBinsN);
+	SetupBinning(0, "PbPb_runs", RunBins, RunBinsN);
 	
 	//Track corrector
 	int _nCentbins = GetCentralityNBins(_centrality_scheme);
-	trkcorr = new TrackCorrector(_cut_level.c_str(),GetCentralityNBins(31)-1,_eff_jety);
-	for (int i = 0; i < ptTrkBinsN-1; i++){ 
+	trkcorr = new TrackCorrector(_cut_level.c_str(),GetCentralityNBins(31)-1,_eff_jety);	for (int i = 0; i < ptTrkBinsN-1; i++){ 
 		if (ptTrkBins[i]<_pTtrkCut && _pTtrkCut < ptTrkBins[i+1]) {trkcorr->trkpTThreshold = ptTrkBins[i]; break;}
 	}
 	
@@ -63,9 +63,21 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 	
 	h_centrality = new TH1D("Centrality","Centrality",10,0,10);
 	h_centrality->Sumw2();
+	
+	h_Njets_v_Run = new TH1D("Njets_v_Run","Njets_v_Run",RunBinsN,0,RunBinsN);
+	h_Njets_v_Run->Sumw2();
+	
+	h_FF_v_Run = new TH1D("FF_v_Run","FF_v_Run",RunBinsN,0,RunBinsN);
+	h_FF_v_Run->Sumw2();
+
+	for (int i = 0; i<RunBinsN; i++){
+		h_Njets_v_Run->GetXaxis()->SetBinLabel(i+1,Form("%i",(int)RunBins[i]));
+		h_FF_v_Run->GetXaxis()->SetBinLabel(i+1,Form("%i",(int)RunBins[i]));
+	}
 
 	hET_ETsub = new TH3D("hET_ETsub","hET_ETsub",200,0,200,100,-5,5,200,-50,50);
 	hET_ETsub->Sumw2();
+	
 	
 	//deriv_val = new TH3F("deriv_val","deriv_val;p_{T} [GeV];RunNumber;lbn",10,0,10,1225,286710,287935,200,0,1000);
 	//deriv_val->Sumw2();
@@ -86,8 +98,14 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 	wk()->addOutput (h_reco_trk_map);
 	wk()->addOutput (h_reco_trk_map_nocuts);
 	wk()->addOutput (h_centrality);
+	wk()->addOutput (h_Njets_v_Run);
+	wk()->addOutput (h_FF_v_Run);
 	//wk()->addOutput (deriv_val);
-
+	
+	//Jet helper histogram
+	h_event_jet_counts = new TH1D("h_event_jet_counts","h_event_jet_counts",ptJetBinsN, ptJetBins);
+	h_event_jet_counts->Sumw2();
+	
 	TH3D* temphist_3D = nullptr;
 	TH2D* temphist_2D = nullptr;
 	TH1D* temphist_1D = nullptr;
@@ -192,6 +210,7 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
     	ff_UE_pT_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     	ff_UE_pT_fine_response =  vector<vector<TH3D*> > (_nJetYBins, vector<TH3D*>(_nCentbins));
     	ff_truth_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
+    	//ff_truth_alt_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     	ChPS_truth_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     	
     	
@@ -321,6 +340,8 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 				
 				temphist_2D = new TH2D(Form("ff_truth_fine_%i_cent%i",i,j),Form("ff_truth_fine_%i_cent%i",i,j),zBinsFineN, zBinsFine, ptJetBinsN, ptJetBins);
 				ff_truth_fine.at(i).at(j) = temphist_2D;
+				//temphist_2D = new TH2D(Form("ff_truth_alt_fine_%i_cent%i",i,j),Form("ff_truth_alt_fine_%i_cent%i",i,j),zBinsFineN, zBinsFine, ptJetBinsN, ptJetBins);
+				//ff_truth_alt_fine.at(i).at(j) = temphist_2D;
 				temphist_2D = new TH2D(Form("ChPS_truth_fine_%i_cent%i",i,j),Form("ChPS_truth_fine_%i_cent%i",i,j),ptTrkBinsFineN, ptTrkBinsFine, ptJetBinsN, ptJetBins);
 				ChPS_truth_fine.at(i).at(j) = temphist_2D;
 			
@@ -363,6 +384,7 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 		        ff_UE_pT_fine_response.at(i).at(j)->Sumw2();
 		        UE_pT_Mcorrelation_v_response_fine.at(i).at(j)->Sumw2();
 		        ff_truth_fine.at(i).at(j)->Sumw2();
+		        //ff_truth_alt_fine.at(i).at(j)->Sumw2();
 		        ChPS_truth_fine.at(i).at(j)->Sumw2();
 		        
 		        h_true_jet_spectrum.at(i).at(j)->Sumw2();
@@ -382,6 +404,7 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 		        wk()->addOutput (ff_UE_pT_fine_response.at(i).at(j));
 		        wk()->addOutput (UE_pT_Mcorrelation_v_response_fine.at(i).at(j));
 		        wk()->addOutput (ff_truth_fine.at(i).at(j));
+		        //wk()->addOutput (ff_truth_alt_fine.at(i).at(j));
 		        wk()->addOutput (ChPS_truth_fine.at(i).at(j));
 		        
 		        wk()->addOutput (h_true_jet_spectrum.at(i).at(j));

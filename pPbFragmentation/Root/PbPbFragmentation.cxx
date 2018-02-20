@@ -247,8 +247,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
 	EL_RETURN_CHECK("execute",event->retrieve( recoTracks, "InDetTrackParticles"));
-	
-	
+		
 	//TODO	electrons
 //	const xAOD::ElectronContainer* electrons = 0;
 //	EL_RETURN_CHECK("execute()",event->retrieve( electrons, "Electrons" ));
@@ -557,6 +556,11 @@ EL::StatusCode PbPbFragmentation :: execute (){
 			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin);
 		}
 		
+		//Run-by-run stability
+		if (jet_pt > 126 && jet_pt < 158){
+			h_Njets_v_Run->Fill(GetRunNumberBin(eventInfo->runNumber())+0.5,jet_weight);	
+		}
+		
 		for(unsigned int j=0; j<jet_pt_xcalib_vector.size(); j++)
 		{
 			if (j==i) continue;
@@ -664,6 +668,11 @@ EL::StatusCode PbPbFragmentation :: execute (){
 				ff_raw.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
 				ChPS_raw.at(y_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
 				ChPS_raw.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
+				
+				//Run-by-run stability
+				if ((jet_pt > 126 && jet_pt < 158) && (z > 0.1 && z<0.2 )){
+					h_FF_v_Run->Fill(GetRunNumberBin(eventInfo->runNumber())+0.5,jet_weight*eff_weight);	
+				}
 
 				ff_raw_fine.at(y_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
 				ff_raw_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
@@ -850,6 +859,24 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		EL_RETURN_CHECK("execute",event->retrieve( particles, "TruthParticles"));
 
 
+		//Count truth jets for alternative FF evaluation
+		/*
+		for(unsigned int i=0; i<truth_jet_pt_vector.size(); i++)
+		{
+			float jet_weight = 1.;		
+		    jet_weight *=event_weight;
+
+			truth_jet_pt = truth_jet_pt_vector.at(i);
+			truth_jet_y = truth_jet_y_vector.at(i);
+			truth_jet_eta = truth_jet_eta_vector.at(i);
+			
+			if (truth_jet_pt< _truthpTjetCut) continue;
+			if (fabs(truth_jet_eta)>2.1) continue;
+			if (fabs(truth_jet_y)>2.1) continue; //cut on rapidity (simultaniously with 2.1 on pseudorapidity)
+			if(!truth_jet_isolated_vector.at(i)) continue;
+			h_event_jet_counts->Fill(truth_jet_pt, jet_weight);		
+		}	
+		*/
 		for(unsigned int i=0; i<truth_jet_pt_vector.size(); i++)
 		{
 
@@ -908,6 +935,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 			    
 			    ff_truth_fine.at(y_bin).at(cent_bin)->Fill(truth_z,truth_jet_pt, jet_weight);
 				ff_truth_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(truth_z,truth_jet_pt, jet_weight);
+				//ff_truth_alt_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(truth_z,truth_jet_pt, jet_weight/h_event_jet_counts->GetBinContent(h_event_jet_counts->FindBin(truth_jet_pt)));
 			    ChPS_truth_fine.at(y_bin).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
 			    ChPS_truth_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
 			    
@@ -967,6 +995,8 @@ EL::StatusCode PbPbFragmentation :: execute (){
 	antikt2_pt.shrink_to_fit();
 	antikt2_eta.shrink_to_fit();
 	antikt2_phi.shrink_to_fit();
+	
+	//h_event_jet_counts->Reset();
 	
 	return EL::StatusCode::SUCCESS;
 }

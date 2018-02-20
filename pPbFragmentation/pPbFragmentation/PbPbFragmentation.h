@@ -81,6 +81,9 @@ class PbPbFragmentation : public BaseClass{
 	//TH3F *deriv_val; //!
 	
 	TH1D * h_centrality; //!
+	TH1D * h_Njets_v_Run; //!
+	TH1D * h_FF_v_Run; //!
+	TH1D * h_event_jet_counts; //!
 	
 	HI::HIPileupTool                      *m_hiPileup;    //!
 	ZDC::ZdcAnalysisTool *m_zdcTools; //!
@@ -100,7 +103,8 @@ class PbPbFragmentation : public BaseClass{
 	//Truth distributions
 	vector<vector<TH2D*>> ff_truth; //!  
 	vector<vector<TH2D*>> ChPS_truth; //!
-	vector<vector<TH2D*>> ff_truth_fine; //!  
+	vector<vector<TH2D*>> ff_truth_fine; //! 
+	vector<vector<TH2D*>> ff_truth_alt_fine; //!  
 	vector<vector<TH2D*>> ChPS_truth_fine; //!
 	//Truth matched distributions
 	//vector<vector<TH2D*>> ff_truth_matched; //!  

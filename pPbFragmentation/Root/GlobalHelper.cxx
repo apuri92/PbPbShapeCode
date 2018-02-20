@@ -208,6 +208,23 @@ int GetGlobalBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 		
 		return -1;
 	}
+	else if (centralityScheme==35) // Pb+Pb 2015, coarse bins for test of y dependence
+	{
+		if ( 2.98931 	<=centrality && centrality< 6.00  ) return 0;		// 0-10%
+		if ( 2.04651	<=centrality && centrality< 2.98931  ) return 0;	// 10-20%
+		if ( 1.36875	<=centrality && centrality< 2.04651  ) return 0;	// 20-30%
+		if ( 0.87541	<=centrality && centrality< 1.36875  ) return 1;	// 30-40%
+		if ( 0.525092	<=centrality && centrality< 0.87541  ) return 1;	// 40-50%
+		if ( 0.289595	<=centrality && centrality< 0.525092 ) return 1;	// 50-60%
+		if ( 0.14414	<=centrality && centrality< 0.289595 ) return 1;	// 60-70%
+		if ( 0.063719	<=centrality && centrality< 0.14414 ) return 1;	// 70-80%
+		
+		// Hijing doesn't have the same FCal distribution as data, let's keep everything
+		if(isMC && centrality>= 6.0) return 0;
+		if(isMC && 0.0<=centrality && centrality<0.063719) return 1;
+		
+		return -1;
+	}
 	else if (centralityScheme==20)	// p+Pb centrality
 	{
 		centrality = FCal_Et;
@@ -253,6 +270,7 @@ int GetCentralityNBins(Int_t centralityScheme)
 	if (centralityScheme==32) return 8;
 	if (centralityScheme==33) return 8;
 	if (centralityScheme==34) return 9;
+	if (centralityScheme==35) return 3;
 	if (centralityScheme==40) return 8;
 	
 	else return 1;
