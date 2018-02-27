@@ -115,6 +115,8 @@ class PbPbFFShape : public BaseClass{
 	vector<vector<TH2D*>> ff_raw_UE; //!
 	vector<vector<TH2D*>> ChPS_raw_UE; //!	
 	vector<vector<TH2D*>> ChPS_raw_UE_truthjet; //!
+	vector<vector<TH2D*>> ChPS_raw_UE_truthjet_noSec; //!
+	
 	//Truth distributions
 	vector<vector<TH2D*>> ff_truth; //!  
 	vector<vector<TH2D*>> ChPS_truth; //!

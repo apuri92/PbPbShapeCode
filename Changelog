@@ -1,5 +1,15 @@
 #TODO
 --------
+2/27/2018
+* src/main - cleaned up UE/fake subtraction
+* draw_ChPS - fixed injet histograms
+* comp_ChPS - added injet comparison to FF with fit quality
+* pPbFragmentation package:
+   added Pythia powheg scheme
+   fixed jet corrector, Pythia and pythiapowheg now handled at analysis code level
+   Added fake with and without secondary (truth jet pT) histograms
+   
+--------
 2/20/2018
 * Updated UE subtraction (using MB method for < 10 GeV PbPb, TM for > 10 GeV PbPb and all pp) in main and draw_ChPS
 * fixed cent_bin_fine (using cent_scheme 30 instead of 31) and alignment fix bug (to make sure overlay tracks also have the corrected charged trk pt) and added jet cleaning for pp in PbPbFFShape

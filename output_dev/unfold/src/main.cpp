@@ -231,7 +231,7 @@ int main(int argc, char ** argv)
 			h_final_fake->Sumw2();
 
 			TH2* h_UE_corr_factors;
-			if (dataset_type == "PbPb") h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
+			h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
 
 			double n_jets_w = 1, n_jets_unw = 1, n_jets_data = 1, n_jets_mc = 1;
 
@@ -493,7 +493,7 @@ int main(int argc, char ** argv)
 				h_raw_rr_unf_injet = (TH2*)h_raw_rr_unf->Clone(Form("raw_rr_unf_injet_c%i", i_cent));
 				h_raw_rr_unf_bbb_injet = (TH2*)h_raw_rr_unf_bbb->Clone(Form("raw_rr_unf_bbb_injet_c%i", i_cent));
 
-				if (dataset_type == "PbPb") h_UE_injet = (TH2*)h_final_UE->Clone(Form("UE_injet_c%i", i_cent));
+				h_UE_injet = (TH2*)h_final_UE->Clone(Form("UE_injet_c%i", i_cent));
 
 				h_truth_injet = (TH2*)h_truth->Clone(Form("truth_injet_c%i", i_cent));
 			}
@@ -508,7 +508,7 @@ int main(int argc, char ** argv)
 				h_raw_rr_unf_injet->Add(h_raw_rr_unf);
 				h_raw_rr_unf_bbb_injet->Add(h_raw_rr_unf_bbb);
 
-				if (dataset_type == "PbPb") h_UE_injet->Add(h_final_UE);
+				h_UE_injet->Add(h_final_UE);
 
 				h_truth_injet->Add(h_truth);
 			}
@@ -590,16 +590,13 @@ int main(int argc, char ** argv)
 				delete h_ChPS_truth;
 
 				//UE
-				if (dataset_type == "PbPb")
-				{
-					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
-					TH1* h_ChPS_UE = (TH1*)h_final_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
-					h_ChPS_UE->SetTitle(name.c_str());
-					h_ChPS_UE->Scale(1.,"width");
-					h_ChPS_UE->Scale(1./area);
-					h_ChPS_UE->Write(name.c_str());
-					delete h_ChPS_UE;
-				}
+				name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
+				TH1* h_ChPS_UE = (TH1*)h_final_UE->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+				h_ChPS_UE->SetTitle(name.c_str());
+				h_ChPS_UE->Scale(1.,"width");
+				h_ChPS_UE->Scale(1./area);
+				h_ChPS_UE->Write(name.c_str());
+				delete h_ChPS_UE;
 			}
 
 			delete h_raw;
@@ -690,17 +687,13 @@ int main(int argc, char ** argv)
 			delete h_ChPS_truth_injet;
 
 			//UE
-			if (dataset_type == "PbPb")
-			{
-				name = Form("h_ChPS_UE_injet_cent%i_jetpt%i", i_cent, i_jet_bin);
-				TH1* h_ChPS_UE_injet = (TH1*)h_UE_injet->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
-				h_ChPS_UE_injet->SetTitle(name.c_str());
-				h_ChPS_UE_injet->Scale(1.,"width");
-				h_ChPS_UE_injet->Scale(1./area_injet);
-				h_ChPS_UE_injet->Write(name.c_str());
-				delete h_ChPS_UE_injet;
-
-			}
+			name = Form("h_ChPS_UE_injet_cent%i_jetpt%i", i_cent, i_jet_bin);
+			TH1* h_ChPS_UE_injet = (TH1*)h_UE_injet->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+			h_ChPS_UE_injet->SetTitle(name.c_str());
+			h_ChPS_UE_injet->Scale(1.,"width");
+			h_ChPS_UE_injet->Scale(1./area_injet);
+			h_ChPS_UE_injet->Write(name.c_str());
+			delete h_ChPS_UE_injet;
 		}
 
 		delete h_raw_injet;
@@ -712,7 +705,7 @@ int main(int argc, char ** argv)
 		delete h_raw_rr_unf_injet;
 		delete h_raw_rr_unf_bbb_injet;
 
-		if (dataset_type == "PbPb") delete h_UE_injet;
+		delete h_UE_injet;
 
 		delete h_truth_injet;
 

@@ -44,57 +44,43 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	//response matrix
 	vector<vector<TH1*>> h_ChPS_response_matrix (N_dR, vector<TH1*> (n_cent_cuts));
 
-	//raw_0
+
+	//wrt trk pt: raw_0
 	vector<vector<vector<TH1*>>> h_ChPS_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_truth_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_UE_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-
-	vector<vector<TH1*>> h_ChPS_truth_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_ChPS_final_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_ChPS_ratio_final_truth_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_ChPS_UE_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
-
+	//wrt trk pt: truth
+	vector<vector<vector<TH1*>>> h_ChPS_truth (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	//wrt trk pt: UE
+	vector<vector<vector<TH1*>>> h_ChPS_UE (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	//other
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_subtr_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_unf_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_B2S (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
-	vector<vector<vector<TH1*>>> h_ChPS_diff_subtr_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_diff_unf_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_diff_closure (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	//raw_rr
-	vector<vector<vector<TH1*>>> h_ChPS_raw_rr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_rr_unf (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_rr_unf_bbb (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_unf_raw_rr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_rr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	vector<vector<vector<TH1*>>> h_ChPS_diff_unf_raw_rr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_diff_closure_rr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	//truth
-	vector<vector<vector<TH1*>>> h_ChPS_truth (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	//UE
-	vector<vector<vector<TH1*>>> h_ChPS_UE (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 
-	/**/
+	//wrt r: raw_0
+	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	//wrt r: truth
+	vector<vector<vector<TH1*>>> h_ChPS_truth_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	//wrt r: UE
+	vector<vector<vector<TH1*>>> h_ChPS_UE_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	//wrt r: other
+	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
-	//	vector<vector<TH1*>> h_ChPS_raw_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
-	//	vector<vector<TH1*>> h_ChPS_UE_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
-	//	vector<vector<TH1*>> h_ChPS_UE_SB_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
+
+	//wrt trk pt, injet: raw_0
+	vector<vector<TH1*>> h_ChPS_raw_subtr_unf_bbb_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
+	vector<vector<TH1*>> h_ChPS_truth_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
+	vector<vector<TH1*>> h_ChPS_UE_inJet (n_cent_cuts, vector<TH1*> (N_jetpt));
+	vector<vector<TH1*>> h_ChPS_ratio_closure_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
+
+
 
 	string name;
 	string pdf_label;
@@ -129,7 +115,36 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
+			//injet
 
+			name = Form("h_ChPS_raw_subtr_unf_bbb_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (r < 0.4)");
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+			f_output->cd();
+			name = Form("h_ChPS_final_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Write(name.c_str());
+
+			name = Form("h_ChPS_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_truth_injet.at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
+			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (r < 0.4)");
+			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+
+			name = Form("h_ChPS_ratio_closure_injet_cent%i_jetpt%i", i_cent, i_jet);
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Clone(name.c_str());
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Divide(h_ChPS_truth_injet.at(i_cent).at(i_jet));
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Unfolded}{Truth}");
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
+			h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+
+
+			//wrt r
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
 				name = Form("h_ChPS_raw_subtr_unf_bbb_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
@@ -154,6 +169,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				}
 			}
 
+			//wrt trkpt
 			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 			{
 
@@ -176,6 +192,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					f_output->cd();
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 				}
+
 				//truth
 				name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
@@ -305,55 +322,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
 					}
 				}
-
-
-				//do injet stuff
-				if (i_dR < 7)
-				{
-					if (i_dR == 0)
-					{
-						name = Form("h_ChPS_truth_inJet_cent%i_jetpt%i", i_cent, i_jet);
-						h_ChPS_truth_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-
-						name = Form("h_ChPS_final_inJet_cent%i_jetpt%i", i_cent, i_jet);
-						h_ChPS_final_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-
-						if (dataset_type == "PbPb")
-						{
-							name = Form("h_ChPS_UE_inJet_cent%i_jetpt%i", i_cent, i_jet);
-							h_ChPS_UE_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-						}
-					}
-					else
-					{
-						h_ChPS_truth_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet));
-						h_ChPS_final_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet));
-						if (dataset_type == "PbPb") h_ChPS_UE_inJet.at(i_cent).at(i_jet)->Add(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet));
-					}
-
-				}
-
-
 			}
-
-			name = Form("h_ChPS_ratio_final_truth_inJet_cent%i_jetpt%i", i_cent, i_jet);
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_inJet.at(i_cent).at(i_jet)->Clone(name.c_str());
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Divide(h_ChPS_truth_inJet.at(i_cent).at(i_jet));
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Unfolded/Truth");
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-
-			f_output->cd();
-			name = Form("h_ChPS_final_injet_cent%i_jetpt%i", i_cent, i_jet);
-			h_ChPS_final_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
-			name = Form("h_ChPS_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
-			h_ChPS_truth_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
-			name = Form("h_ChPS_ratio_final_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
-			h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Write(name.c_str());
-
-
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
@@ -649,24 +618,24 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			{
 				string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
-				SetHStyle_smallify(h_ChPS_final_inJet.at(i_cent).at(i_jet), jet_itr, doSmall);
-				SetHStyle_smallify(h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet), jet_itr, doSmall);
+				SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet), jet_itr, doSmall);
+				SetHStyle_smallify(h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet), jet_itr, doSmall);
 
-				if (first_pass_cent) legend_ChPS_final_inJet->AddEntry(h_ChPS_final_inJet.at(i_cent).at(i_jet),jet_label.c_str(),"lp");
+				if (first_pass_cent) legend_ChPS_final_inJet->AddEntry(h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet),jet_label.c_str(),"lp");
 
 				if (dataset_type == "pp") c_ChPS_final_inJet->cd(1);
 				if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(1);
-				if (i_jet == jet_pt_start) h_ChPS_final_inJet.at(i_cent).at(i_jet)->Draw("");
-				else h_ChPS_final_inJet.at(i_cent).at(i_jet)->Draw("same");
+				if (i_jet == jet_pt_start) h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Draw("");
+				else h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Draw("same");
 				gPad->SetLogx();
 				gPad->SetLogy();
 
 				if (dataset_type == "pp") c_ChPS_final_inJet->cd(2);
 				if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(2);
-				if (i_jet == jet_pt_start) h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Draw("");
-				else h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->Draw("same");
-				if (dataset_type == "pp") h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-				if (dataset_type == "PbPb") h_ChPS_ratio_final_truth_inJet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
+				if (i_jet == jet_pt_start) h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("");
+				else h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("same");
+				if (dataset_type == "pp") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+				if (dataset_type == "PbPb") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
 
 				line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
 				gPad->SetLogx();

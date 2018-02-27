@@ -85,6 +85,7 @@ BaseClass :: BaseClass (const BaseClass& base)  {
 	_doFJR=base._doFJR;
 	_maxjetdeltaR=base._maxjetdeltaR;
 	_doJPRCorrection=base._doJPRCorrection;
+	_PythiaPowheg = base._PythiaPowheg;
 }
 
 

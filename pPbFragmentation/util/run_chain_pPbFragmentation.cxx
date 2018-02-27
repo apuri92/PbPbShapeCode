@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
 	bool doFJR;
 	float maxjetdeltaR;
 	bool doJPRCorrection;
+	int PythiaPowheg = 0;
 
 	//Boost configuration
 	//1) command line only: options can only be given on command line, not in config file
@@ -162,6 +163,7 @@ int main(int argc, char *argv[])
 		("doFJR",boost::program_options::value<bool>(&doFJR)->default_value(0),"do fake jet rejection")
 		("UEmaxjetdeltaR",boost::program_options::value<float>(&maxjetdeltaR)->default_value(0.8),"maximum distance of another jet to the random cone")
 		("doJPRCorrection",boost::program_options::value<bool>(&doJPRCorrection)->default_value(1),"Improve the jet position resolution by R=0.2 jets")
+		("PythiaPowheg,u",boost::program_options::value<int>(&PythiaPowheg)->default_value(0),"PythiaPowheg or Pythia")
 		;
 	 
 	if (1<=dataset && dataset<=3) centrality_scheme = 1;
@@ -218,7 +220,8 @@ int main(int argc, char *argv[])
 	if (dataset==2 && isHerwig) {cout << "Using 5.02 TeV Herwig setup" << endl;}
 	if (truth_only && isHerwig) {cout << "Using 5.02 TeV Herwig setup" << endl;}
 	
-	if (dataset==3) {cout << "Using p+p 5.02 TeV setup" << endl;}
+	if (dataset==3 && PythiaPowheg) {cout << "Using p+p 5.02 TeV Pythia PowHeg" << endl;}
+	if (dataset==3 && !PythiaPowheg) {cout << "Using p+p 5.02 TeV Pythia" << endl;}
 	if (dataset==4) {cout << "Using Pb+Pb 5.02 TeV setup" << endl;}
 	
 	if (isMB==0) {cout << "Using HP data" << endl;}
@@ -352,6 +355,7 @@ int main(int argc, char *argv[])
 	alg->_doFJR=doFJR;
 	alg->_maxjetdeltaR=maxjetdeltaR;
 	alg->_doJPRCorrection=doJPRCorrection;
+	alg->_PythiaPowheg=PythiaPowheg;
 
 	//Initialzie trigger
 	alg->SetTrigger_chains();

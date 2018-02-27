@@ -103,6 +103,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",140,0,7);
 	h_FCal_Et->Sumw2();
 
+	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",140,0,7);
+	h_FCal_Et_unw->Sumw2();
+
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
 
@@ -126,6 +129,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_reco_trk_map_nocuts->Sumw2();
 
 	wk()->addOutput (h_FCal_Et);
+	wk()->addOutput (h_FCal_Et_unw);
 	wk()->addOutput (h_RejectionHisto);
 	wk()->addOutput (hET_ETsub);
 	wk()->addOutput (h_triggercounter);
@@ -248,6 +252,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	ChPS_raw_tt_mod =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_raw_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_raw_UE_truthjet =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
+	ChPS_raw_UE_truthjet_noSec =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	h_dR_change =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
 	UE_distr =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
 
@@ -337,6 +342,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_2D = new TH2D(Form("ChPS_raw_2_dR%i_cent%i",i,j),Form("ChPS_raw_2_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_raw_UE_truthjet.at(i).at(j) = temphist_2D;
 
+			temphist_2D = new TH2D(Form("ChPS_raw_2_noSec_dR%i_cent%i",i,j),Form("ChPS_raw_2_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_raw_UE_truthjet_noSec.at(i).at(j) = temphist_2D;
+
 			temphist_2D = new TH2D(Form("ChPS_raw_tt_mod_dR%i_cent%i",i,j),Form("ChPS_raw_tt_mod_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_raw_tt_mod.at(i).at(j) = temphist_2D;
 
@@ -353,6 +361,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			ChPS_raw_tt_mod.at(i).at(j)->Sumw2();
 			ChPS_raw_UE.at(i).at(j)->Sumw2();
 			ChPS_raw_UE_truthjet.at(i).at(j)->Sumw2();
+			ChPS_raw_UE_truthjet_noSec.at(i).at(j)->Sumw2();
 
 			wk()->addOutput (ff_raw.at(i).at(j));
 			wk()->addOutput (ff_raw_UE.at(i).at(j));
@@ -366,6 +375,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			wk()->addOutput (ChPS_raw_tt_mod.at(i).at(j));
 			wk()->addOutput (ChPS_raw_UE.at(i).at(j));
 			wk()->addOutput (ChPS_raw_UE_truthjet.at(i).at(j));
+			wk()->addOutput (ChPS_raw_UE_truthjet_noSec.at(i).at(j));
 
 			if (_data_switch==1)
 			{

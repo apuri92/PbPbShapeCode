@@ -43,8 +43,6 @@ Int_t JetCorrector::GetJetpTBin(float pt, TAxis* pt_bins) {
 
 float JetCorrector::GetJetWeight(double pt, double eta, double phi)
 {
-	if (is_pp) return 1.0; //is using pp MC so no weighting required
-
 	int xb=event_weight_histo->GetXaxis()->FindBin(pt);
 	int yb=event_weight_histo->GetYaxis()->FindBin(eta);
 	int zb=event_weight_histo->GetZaxis()->FindBin(phi);
@@ -56,8 +54,6 @@ float JetCorrector::GetJetWeight(double pt, double eta, double phi)
 
 
 float JetCorrector::GetFCalWeight(float FCalEt) {
-	
-    if (is_pp) return 1.0; //is using pp MC so no weighting required
 
     int centile = -1;
 	float event_weight_fcal=1;

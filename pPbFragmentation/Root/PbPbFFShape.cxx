@@ -122,6 +122,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
 		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
+		if (_dataset == 3) event_weight_fcal = 1;
 		h_centrality->Fill(cent_bin,event_weight_fcal);
 		h_centrality->Fill(n_cent_bins-1,event_weight_fcal);
 
@@ -244,6 +245,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
+	h_FCal_Et_unw->Fill(FCalEt); //no weighting
 
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
@@ -295,6 +297,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (pt>max_pt) 	//event weight from leading truth jet
 			{
 				event_weight = jetcorr->GetJetWeight(pt, eta, phi);
+				if (_dataset == 3 && !_PythiaPowheg) event_weight = 1;
 				max_pt = pt;
 			}
 
@@ -749,10 +752,18 @@ EL::StatusCode PbPbFFShape :: execute (){
 						UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
                         UE_distr.at(jetpt_bin).at(n_cent_bins-1)->Fill(R, pt, eta, jet_weight*eff_weight);
 
-//						if (!isSecondary)
+
+						float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
+						int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
+
+
+						ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+
+						if (!isSecondary)
 						{
-							ChPS_raw_UE_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-							ChPS_raw_UE_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+							ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
 						}
 
 					}

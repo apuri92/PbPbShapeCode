@@ -106,7 +106,7 @@ class BaseClass : public EL::Algorithm
 	bool _doFJR;
 	float _maxjetdeltaR;
 	bool _doJPRCorrection;
-    
+	int _PythiaPowheg; //
 	
 	bool event_isTriggered[10]; //!	//TODO
 	bool trigger[10]; //!	//TODO
@@ -129,7 +129,8 @@ class BaseClass : public EL::Algorithm
 	TH1D *h_RejectionHisto; //!
 	TH2D *h_triggercounter; //!
 	TH1D *h_FCal_Et; //!
-	
+	TH1D *h_FCal_Et_unw; //!
+
 	TH3D* h_reco_trk_map; //!
 	TH3D* h_reco_trk_map_nocuts; //!
 	
