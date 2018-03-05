@@ -106,8 +106,10 @@ class BaseClass : public EL::Algorithm
 	bool _doFJR;
 	float _maxjetdeltaR;
 	bool _doJPRCorrection;
-	int _PythiaPowheg; //
-	
+	float _jet_y_cut;
+	bool _doCoarsTrackpT;
+	int _PythiaPowheg;
+
 	bool event_isTriggered[10]; //!	//TODO
 	bool trigger[10]; //!	//TODO
 	int jet_isTriggered[10]; //! //TODO

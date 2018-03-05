@@ -21,6 +21,8 @@ class JetCorrector
     TH3D *event_weight_histo;
 	TH1D *cent_weight_histo;
 	TH1D* FCal_HP_v_MB_weights_histo;
+	TH1D* FCal_HP_v_MBOV_weights_histo;
+	TH1D* FCal_MBOV_v_MB_weights_histo;
 	vector<double> range_lo;
 	vector<double> range_hi;
 	vector<int> centiles;
@@ -102,7 +104,9 @@ class JetCorrector
 		weight_file = new TFile(event_weight_file.Data());
 		event_weight_histo = (TH3D*)weight_file->Get("h3_pT_y_phi_rw");
 		cent_weight_histo = (TH1D*)weight_file->Get("h1_cent_rw");
-		FCal_HP_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MB_weights");
+		FCal_HP_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MBv2_weights");
+		FCal_HP_v_MBOV_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MBOV_weights");
+		FCal_MBOV_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_MC_v_MBv2_weights");
 
 		std::ifstream ifs (fcal_weight_file.Data(), std::ifstream::in);
 		if(!ifs)
@@ -123,7 +127,8 @@ class JetCorrector
      }// end of constructor
 		
 	float GetFCalWeight(float FCalEt);
-	float GetFCalHPWeight(float FCalEt);
+	float GetFCalWeight(float FCalEt, int sample=1);
+	//float GetFCalHPWeight(float FCalEt);
 	float GetJetWeight(double pt, double eta, double phi);
 	int GetJetYBin(float y);
 	int GetJetpTBin(float pT, TAxis* pt_bins);

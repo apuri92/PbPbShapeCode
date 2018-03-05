@@ -122,13 +122,13 @@ void comp_ChPS(bool isMC = 0)
 				if (i_cent == 0) //get the pp plots from cent6
 				{
 					name = Form("h_ChPS_raw_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
-					h_ChPS_raw_subtr_pp_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_raw_subtr_pp_indR.at(i_trk).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 					name = Form("h_ChPS_raw_subtr_unf_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
-					h_ChPS_raw_subtr_unf_pp_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_raw_subtr_unf_pp_indR.at(i_trk).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 					name = Form("h_ChPS_raw_subtr_unf_bbb_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
-					h_ChPS_final_pp_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_final_pp_indR.at(i_trk).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 
 				}
@@ -146,17 +146,17 @@ void comp_ChPS(bool isMC = 0)
 				//Ratios
 				name = Form("h_ChPS_raw_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_PbPb_indR.at(i_trk).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_pp_indR.at(i_trk).at(i_cent).at(i_jet));
+				h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_pp_indR.at(i_trk).at(6).at(i_jet));
 				h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
 
 				name = Form("h_ChPS_raw_subtr_unf_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_PbPb_indR.at(i_trk).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_unf_pp_indR.at(i_trk).at(i_cent).at(i_jet));
+				h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_unf_pp_indR.at(i_trk).at(6).at(i_jet));
 				h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr+Unf #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
 
 				name = Form("h_ChPS_final_ratio_PbPb_pp_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb_indR.at(i_trk).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_indR.at(i_trk).at(i_cent).at(i_jet));
+				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_indR.at(i_trk).at(6).at(i_jet));
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T}, r)}");
 			}
 
@@ -164,15 +164,15 @@ void comp_ChPS(bool isMC = 0)
 			if (i_cent == 0)
 			{
 				name = Form("h_dpt_pp_%i", i_jet);
-				h_FF_final_pp_injet.at(i_cent).at(i_jet) = (TH1*)f_FF_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
-				g_FF_final_pp_injet.at(i_cent).at(i_jet) = new TGraphErrors(h_FF_final_pp_injet.at(i_cent).at(i_jet));
+				h_FF_final_pp_injet.at(6).at(i_jet) = (TH1*)f_FF_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+				g_FF_final_pp_injet.at(6).at(i_jet) = new TGraphErrors(h_FF_final_pp_injet.at(6).at(i_jet));
 				name = Form("g_dpt_pp_uncert_%i", i_jet);
-				g_FF_final_pp_sys_injet.at(i_cent).at(i_jet) = (TGraphAsymmErrors*)f_FF_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+				g_FF_final_pp_sys_injet.at(6).at(i_jet) = (TGraphAsymmErrors*)f_FF_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 				name = Form("h_ChPS_final_injet_cent%i_jetpt%i", 6, i_jet);
-				h_ChPS_final_pp_injet.at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
-				h_ChPS_final_pp_injet.at(i_cent).at(i_jet)->Scale(area_injet);
-				g_ChPS_final_pp_injet.at(i_cent).at(i_jet) = new TGraphErrors(h_ChPS_final_pp_injet.at(i_cent).at(i_jet));
+				h_ChPS_final_pp_injet.at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+				h_ChPS_final_pp_injet.at(6).at(i_jet)->Scale(area_injet);
+				g_ChPS_final_pp_injet.at(6).at(i_jet) = new TGraphErrors(h_ChPS_final_pp_injet.at(6).at(i_jet));
 
 			}
 
@@ -181,10 +181,9 @@ void comp_ChPS(bool isMC = 0)
 			h_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->Scale(area_injet);
 			g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet) = new TGraphErrors(h_ChPS_final_PbPb_injet.at(i_cent).at(i_jet));
 
-
 			name = Form("h_ChPS_final_ratio_PbPb_pp_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->Clone(name.c_str());
-			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_injet.at(i_cent).at(i_jet));
+			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_injet.at(6).at(i_jet));
 			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T},r)} (r < 0.4)");
 			g_ChPS_final_ratio_injet.at(i_cent).at(i_jet) = new TGraphErrors(h_ChPS_final_ratio_injet.at(i_cent).at(i_jet));
 
@@ -205,16 +204,16 @@ void comp_ChPS(bool isMC = 0)
 				if (i_cent == 0) //get the pp plots from cent6
 				{
 					name = Form("h_ChPS_raw_subtr_dR%i_cent%i_jetpt%i", i_dR, 6, i_jet);
-					h_ChPS_raw_subtr_pp.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_raw_subtr_pp.at(i_dR).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 					name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, 6, i_jet);
-					h_ChPS_raw_subtr_unf_pp.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_raw_subtr_unf_pp.at(i_dR).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 					name = Form("h_ChPS_raw_subtr_unf_bbb_dR%i_cent%i_jetpt%i", i_dR, 6, i_jet);
-					h_ChPS_final_pp.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_final_pp.at(i_dR).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 					name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, 6, i_jet);
-					h_ChPS_truth_pp.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
+					h_ChPS_truth_pp.at(i_dR).at(6).at(i_jet) = (TH1*)f_pp->Get(name.c_str())->Clone(Form("pp_%s",name.c_str()));
 
 				}
 
@@ -234,22 +233,22 @@ void comp_ChPS(bool isMC = 0)
 				//Ratios
 				name = Form("h_ChPS_raw_subtr_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_pp.at(i_dR).at(i_cent).at(i_jet));
+				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
 
 				name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_unf_pp.at(i_dR).at(i_cent).at(i_jet));
+				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_unf_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr+Unf #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
 
 				name = Form("h_ChPS_final_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(i_cent).at(i_jet));
+				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T}, r)}");
 
 				name = Form("h_ChPS_truth_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(i_cent).at(i_jet));
+				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Truth R_{D (p_{T}, r)}");
 
 			}
@@ -441,16 +440,6 @@ void comp_ChPS(bool isMC = 0)
 			{
 				string centrality = num_to_cent(31,i_cent);
 
-				SetHStyle_graph_smallify(g_ChPS_final_ratio_injet.at(i_cent).at(i_jet), 0, 1);
-				SetHStyle_graph_smallify(g_FF_final_ratio_injet.at(i_cent).at(i_jet), 1, 1);
-				SetHStyle_graph_smallify(g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet), 1, 2);
-
-				SetHStyle_graph_smallify(g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet), 0, 1);
-				SetHStyle_graph_smallify(g_FF_final_PbPb_injet.at(i_cent).at(i_jet), 1, 1);
-				SetHStyle_graph_smallify(g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet), 1, 2);
-
-
-
 				if (first_pass_cent && jet_itr == 0)
 				{
 					legend_ChPS_final_injet->AddEntry(g_ChPS_final_ratio_injet.at(i_cent).at(i_jet),"Trk jet correlations","lp");
@@ -541,6 +530,18 @@ void comp_ChPS(bool isMC = 0)
 				g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-7,1E2);
 				fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45,1.55);
 
+
+				SetHStyle_graph_smallify(g_ChPS_final_ratio_injet.at(i_cent).at(i_jet), 0, 1);
+				SetHStyle_graph_smallify(g_FF_final_ratio_injet.at(i_cent).at(i_jet), 1, 1);
+				SetHStyle_graph_smallify(g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet), 1, 1);
+
+				SetHStyle_graph_smallify(g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet), 0, 1);
+				SetHStyle_graph_smallify(g_FF_final_PbPb_injet.at(i_cent).at(i_jet), 1, 1);
+				SetHStyle_graph_smallify(g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet), 1, 1);
+
+				SetHStyle_graph_smallify(fit_quality_ChPS_PbPb_injet.at(i_cent).at(i_jet), 0, 1);
+				SetHStyle_graph_smallify(fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet), 1, 1);
+
 				c_ChPS_final_PbPb_injet->cd(i_cent+1);
 				gPad->Divide(1,2);
 				gPad->cd(1);
@@ -576,54 +577,54 @@ void comp_ChPS(bool isMC = 0)
 				if (i_cent == 0)
 				{
 
-					SetHStyle_graph_smallify(g_ChPS_final_pp_injet.at(i_cent).at(i_jet), 0, 1);
-					SetHStyle_graph_smallify(g_FF_final_pp_injet.at(i_cent).at(i_jet), 1, 1);
-					SetHStyle_graph_smallify(g_FF_final_pp_sys_injet.at(i_cent).at(i_jet), 1, 1);
+					SetHStyle_graph_smallify(g_ChPS_final_pp_injet.at(6).at(i_jet), 0, 1);
+					SetHStyle_graph_smallify(g_FF_final_pp_injet.at(6).at(i_jet), 1, 1);
+					SetHStyle_graph_smallify(g_FF_final_pp_sys_injet.at(6).at(i_jet), 1, 1);
 
 					if (first_pass_cent && jet_itr == 0)
 					{
-						legend_ChPS_final_pp_injet->AddEntry(g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet),"Trk jet correlations","lp");
-						legend_ChPS_final_pp_injet->AddEntry(g_FF_final_PbPb_injet.at(i_cent).at(i_jet),"FF Analysis","lp");
+						legend_ChPS_final_pp_injet->AddEntry(g_ChPS_final_pp_injet.at(6).at(i_jet),"Trk jet correlations","lp");
+						legend_ChPS_final_pp_injet->AddEntry(g_FF_final_pp_injet.at(6).at(i_jet),"FF Analysis","lp");
 					}
 					par[0] = 3.394202; par[1] = 97.809290; par[2] = 1.702168; par[3] = -0.001209; par[4] = 0.295487; par[5] = -0.095548;
 
-					name = Form("fit_FF_final_pp_injet_cent%i_jet%i", i_cent, i_jet);
-					fit_FF_final_pp_injet.at(i_cent).at(i_jet) = new TF1(name.c_str(),"[0] * (pow((1+[3]*x),[1]) / pow((1+[4]*x),[2])) * exp(-[5]*x)");
-					fit_FF_final_pp_injet.at(i_cent).at(i_jet)->SetRange(1,200);
-					fit_FF_final_pp_injet.at(i_cent).at(i_jet)->SetParameters(par);
-					g_FF_final_pp_injet.at(i_cent).at(i_jet)->Fit(fit_FF_final_pp_injet.at(i_cent).at(i_jet),"RQ0","");
-					fit_FF_final_pp_injet.at(i_cent).at(i_jet)->SetLineColor(g_FF_final_pp_injet.at(i_cent).at(i_jet)->GetMarkerColor());
+					name = Form("fit_FF_final_pp_injet_cent%i_jet%i", 6, i_jet);
+					fit_FF_final_pp_injet.at(6).at(i_jet) = new TF1(name.c_str(),"[0] * (pow((1+[3]*x),[1]) / pow((1+[4]*x),[2])) * exp(-[5]*x)");
+					fit_FF_final_pp_injet.at(6).at(i_jet)->SetRange(1,200);
+					fit_FF_final_pp_injet.at(6).at(i_jet)->SetParameters(par);
+					g_FF_final_pp_injet.at(6).at(i_jet)->Fit(fit_FF_final_pp_injet.at(6).at(i_jet),"RQ0","");
+					fit_FF_final_pp_injet.at(6).at(i_jet)->SetLineColor(g_FF_final_pp_injet.at(6).at(i_jet)->GetMarkerColor());
 
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet) = (TGraphErrors*)g_FF_final_pp_injet.at(i_cent).at(i_jet)->Clone(Form("fit_qual_FF_pp_injet_cent%i_jet%i", i_cent, i_jet));
-					for (int i = 0; i < g_FF_final_pp_injet.at(i_cent).at(i_jet)->GetN(); i++)
+					fit_quality_FF_pp_injet.at(6).at(i_jet) = (TGraphErrors*)g_FF_final_pp_injet.at(6).at(i_jet)->Clone(Form("fit_qual_FF_pp_injet_cent%i_jet%i", 6, i_jet));
+					for (int i = 0; i < g_FF_final_pp_injet.at(6).at(i_jet)->GetN(); i++)
 					{
 						double x, y, fit;
-						g_FF_final_pp_injet.at(i_cent).at(i_jet)->GetPoint(i, x, y);
-						fit = fit_FF_final_pp_injet.at(i_cent).at(i_jet)->Eval(x);
-						fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->SetPoint(i, x, y/fit);
+						g_FF_final_pp_injet.at(6).at(i_jet)->GetPoint(i, x, y);
+						fit = fit_FF_final_pp_injet.at(6).at(i_jet)->Eval(x);
+						fit_quality_FF_pp_injet.at(6).at(i_jet)->SetPoint(i, x, y/fit);
 					}
 
-					fit_quality_ChPS_pp_injet.at(i_cent).at(i_jet) = (TGraphErrors*)g_ChPS_final_pp_injet.at(i_cent).at(i_jet)->Clone(Form("fit_qual_ChPS_pp_injet_cent%i_jet%i", i_cent, i_jet));
-					for (int i = 0; i < g_ChPS_final_pp_injet.at(i_cent).at(i_jet)->GetN(); i++)
+					fit_quality_ChPS_pp_injet.at(6).at(i_jet) = (TGraphErrors*)g_ChPS_final_pp_injet.at(6).at(i_jet)->Clone(Form("fit_qual_ChPS_pp_injet_cent%i_jet%i", 6, i_jet));
+					for (int i = 0; i < g_ChPS_final_pp_injet.at(6).at(i_jet)->GetN(); i++)
 					{
 						double x, y, fit;
-						g_ChPS_final_pp_injet.at(i_cent).at(i_jet)->GetPoint(i, x, y);
-						fit = fit_FF_final_pp_injet.at(i_cent).at(i_jet)->Eval(x);
-						fit_quality_ChPS_pp_injet.at(i_cent).at(i_jet)->SetPoint(i, x, y/fit);
+						g_ChPS_final_pp_injet.at(6).at(i_jet)->GetPoint(i, x, y);
+						fit = fit_FF_final_pp_injet.at(6).at(i_jet)->Eval(x);
+						fit_quality_ChPS_pp_injet.at(6).at(i_jet)->SetPoint(i, x, y/fit);
 					}
 
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T},r #leq 0.4) _{PbPb}");
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetTitle("D (p_{T},r #leq 0.4) _{PbPb}");
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
 
 
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetLimits(1,400);
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->GetXaxis()->SetLimits(1,400);
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-7,1E2);
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45,1.55);
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetLimits(1,400);
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->GetXaxis()->SetLimits(1,400);
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetNdivisions(504);
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->GetYaxis()->SetNdivisions(504);
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetRangeUser(1E-7,1E2);
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->GetYaxis()->SetRangeUser(0.45,1.55);
 
 
 
@@ -632,10 +633,10 @@ void comp_ChPS(bool isMC = 0)
 					gPad->SetTopMargin(0.05);
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
-					g_FF_final_pp_sys_injet.at(i_cent).at(i_jet)->Draw("a PE2");
-					g_FF_final_pp_injet.at(i_cent).at(i_jet)->Draw("p same");
-					fit_FF_final_pp_injet.at(i_cent).at(i_jet)->Draw("p same");
-					g_ChPS_final_pp_injet.at(i_cent).at(i_jet)->Draw("p same");
+					g_FF_final_pp_sys_injet.at(6).at(i_jet)->Draw("a PE2");
+					g_FF_final_pp_injet.at(6).at(i_jet)->Draw("p same");
+					fit_FF_final_pp_injet.at(6).at(i_jet)->Draw("p same");
+					g_ChPS_final_pp_injet.at(6).at(i_jet)->Draw("p same");
 					gPad->SetLogx();
 					gPad->SetLogy();
 
@@ -650,8 +651,8 @@ void comp_ChPS(bool isMC = 0)
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
-					fit_quality_FF_pp_injet.at(i_cent).at(i_jet)->Draw("ap");
-					fit_quality_ChPS_pp_injet.at(i_cent).at(i_jet)->Draw("p same");
+					fit_quality_FF_pp_injet.at(6).at(i_jet)->Draw("ap");
+					fit_quality_ChPS_pp_injet.at(6).at(i_jet)->Draw("p same");
 					gPad->SetLogx();
 					line->DrawLine(1, 1, 400, 1);
 
@@ -665,9 +666,9 @@ void comp_ChPS(bool isMC = 0)
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
 
-			c_ChPS_final_injet->Print(Form("ChPS_final_injet_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()));
-			c_ChPS_final_PbPb_injet->Print(Form("ChPS_final_injet_PbPb_%s.pdf%s", did.c_str(), pdf_label.c_str()));
-			c_ChPS_final_pp_injet->Print(Form("ChPS_final_injet_pp_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_injet->Print(Form("ChPS_FF_final_injet_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_PbPb_injet->Print(Form("ChPS_FF_final_injet_PbPb_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_pp_injet->Print(Form("ChPS_FF_final_injet_pp_%s.pdf%s", did.c_str(), pdf_label.c_str()));
 			jet_itr++;
 
 		} //end jet loop

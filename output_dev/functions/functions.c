@@ -3,28 +3,28 @@ void get_weights(std::string dataset_type, double *FilterEff, double *CrossSec, 
 
 	double CS[5], FE[5], SUM_JET_WEIGHT[5];
 
-	if (dataset_type == "pp") //5p02 TeV pp MC Pythia8
-	{
-		CS[0]=6.7890E+07;
-		CS[1]=6.3997E+05;
-		CS[2]=4.7194E+03;
-		CS[3]=2.6602E+01;
-		CS[4]=2.2476E-01;
-
-		FE[0]=2.8320E-03;
-		FE[1]=4.2765E-03;
-		FE[2]=5.2883E-03;
-		FE[3]=4.5858E-03;
-		FE[4]=2.1831E-03;
-
-		SUM_JET_WEIGHT[0]=1;
-		SUM_JET_WEIGHT[1]=1;
-		SUM_JET_WEIGHT[2]=1;
-		SUM_JET_WEIGHT[3]=1;
-		SUM_JET_WEIGHT[4]=1;
-	}
-
-	if (dataset_type == "PbPb") //5p02 TeV PbPb MC Pythia8Powheg Overlay
+//	if (dataset_type == "pp") //5p02 TeV pp MC Pythia8
+//	{
+//		CS[0]=6.7890E+07;
+//		CS[1]=6.3997E+05;
+//		CS[2]=4.7194E+03;
+//		CS[3]=2.6602E+01;
+//		CS[4]=2.2476E-01;
+//
+//		FE[0]=2.8320E-03;
+//		FE[1]=4.2765E-03;
+//		FE[2]=5.2883E-03;
+//		FE[3]=4.5858E-03;
+//		FE[4]=2.1831E-03;
+//
+//		SUM_JET_WEIGHT[0]=1;
+//		SUM_JET_WEIGHT[1]=1;
+//		SUM_JET_WEIGHT[2]=1;
+//		SUM_JET_WEIGHT[3]=1;
+//		SUM_JET_WEIGHT[4]=1;
+//	}
+//
+//	if (dataset_type == "PbPb") //5p02 TeV PbPb MC Pythia8Powheg Overlay
 	{
 		CS[0]=1.2794E+08;
 		CS[1]=1.9648E+07;

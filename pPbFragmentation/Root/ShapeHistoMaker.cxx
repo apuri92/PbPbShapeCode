@@ -179,9 +179,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		h_jetpT_v_multiplicity.push_back(temphist_3D);
 		h_jetpT_v_multiplicity.at(i)->Sumw2();
 
-		//temphist_3D = new TH3D(Form("h_BL_cent%i",i),"h_BL;BL_{x};BL_{y};BL_{z}",200,-1,1,200,-1,1,200,-10,10);
-		//h_BL.push_back(temphist_3D);
-
 		temphist_2D = new TH2D(Form("h_R2vR4_cent%i",i),Form("h_R2vR4_cent%i",i),40,100,500,80,-0.4,0.4);
 		temphist_2D->Sumw2();
 		h_R2vR4.push_back(temphist_2D);
@@ -460,11 +457,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		for (int i=0;i<_nJetYBins;i++)
 		{
 
-			//temphist_2D = new TH2D(Form("ff_truth_matched_y%i_cent%i",i,j),Form("ff_truth_matched_y%i_cent%i",i,j),zBinsN, zBins, ptJetBinsN, ptJetBins);
-			//ff_truth_matched.at(i).at(j) = temphist_2D;
-			//temphist_2D = new TH2D(Form("ChPS_matched_truth_y%i_cent%i",i,j),Form("ChPS_matched_truth_y%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			//ChPS_truth_matched.at(i).at(j) = temphist_2D;
-
 			//Jet spectra
 			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 			h_reco_jet_spectrum.at(i).at(j) = temphist_1D;
@@ -472,22 +464,13 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_unW_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 			h_reco_jet_spectrum_unW.at(i).at(j) = temphist_1D;
 
-			//TODO to be enabled when needed
-			//temphist_1D = new TH1D(Form("h_reco_jet_spectrum_weighted_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_weighted_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-			//h_reco_jet_spectrum_weighted.at(i).at(j) = temphist_1D;
-			//temphist_1D = new TH1D(Form("h_true_jet_spectrum_weighted_y%i_cent%i",i,j),Form("h_true_jet_spectrum_weighted_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-			//h_true_jet_spectrum_weighted.at(i).at(j) = temphist_1D;
 
 			h_reco_jet_spectrum.at(i).at(j)->Sumw2();
 			h_reco_jet_spectrum_unW.at(i).at(j)->Sumw2();
-			//h_reco_jet_spectrum_weighted.at(i).at(j)->Sumw2();
-			//h_true_jet_spectrum_weighted.at(i).at(j)->Sumw2();
 
 
 			wk()->addOutput (h_reco_jet_spectrum.at(i).at(j));
 			wk()->addOutput (h_reco_jet_spectrum_unW.at(i).at(j));
-			//wk()->addOutput (h_reco_jet_spectrum_weighted.at(i).at(j));
-			//wk()->addOutput (h_true_jet_spectrum_weighted.at(i).at(j));
 
 
 			//MC only
@@ -525,16 +508,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			}
 
 		}
-		
-//		temphist_1D = new TH1D(Form("h_reco_jet_spectrum_fine_cent%i",j),Form("h_reco_jet_spectrum_fine_cent%i",j),50,40,140);
-//		h_reco_jet_spectrum_fine.push_back(temphist_1D);
-//		wk()->addOutput (h_reco_jet_spectrum_fine.at(j));
-
-//		if (_data_switch==1){
-//			temphist_1D = new TH1D(Form("h_true_jet_spectrum_fine_cent%i",j),Form("h_true_jet_spectrum_fine_cent%i",j),50,40,140);
-//			h_true_jet_spectrum_fine.push_back(temphist_1D);
-//			wk()->addOutput (h_true_jet_spectrum_fine.at(j));
-//		}
 	}
 
 	cout << " Histograms ready" << endl;

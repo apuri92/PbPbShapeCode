@@ -94,6 +94,8 @@ int main(int argc, char *argv[])
 	bool doFJR;
 	float maxjetdeltaR;
 	bool doJPRCorrection;
+	float jet_y_cut;
+	bool doCoarsTrackpT;
 	int PythiaPowheg = 0;
 
 	//Boost configuration
@@ -163,6 +165,8 @@ int main(int argc, char *argv[])
 		("doFJR",boost::program_options::value<bool>(&doFJR)->default_value(0),"do fake jet rejection")
 		("UEmaxjetdeltaR",boost::program_options::value<float>(&maxjetdeltaR)->default_value(0.8),"maximum distance of another jet to the random cone")
 		("doJPRCorrection",boost::program_options::value<bool>(&doJPRCorrection)->default_value(1),"Improve the jet position resolution by R=0.2 jets")
+		("jet_y_cut",boost::program_options::value<float>(&jet_y_cut)->default_value(2.1),"max jet rapidity")
+		("doCoarsTrackpT",boost::program_options::value<bool>(&doCoarsTrackpT)->default_value(0),"Use coars binning from the shape analysis")
 		("PythiaPowheg,u",boost::program_options::value<int>(&PythiaPowheg)->default_value(0),"PythiaPowheg or Pythia")
 		;
 	 
@@ -355,6 +359,8 @@ int main(int argc, char *argv[])
 	alg->_doFJR=doFJR;
 	alg->_maxjetdeltaR=maxjetdeltaR;
 	alg->_doJPRCorrection=doJPRCorrection;
+	alg->_jet_y_cut=jet_y_cut;
+	alg->_doCoarsTrackpT=doCoarsTrackpT;
 	alg->_PythiaPowheg=PythiaPowheg;
 
 	//Initialzie trigger

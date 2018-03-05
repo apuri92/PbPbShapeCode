@@ -1,7 +1,6 @@
 //Takes in 5 jz samples and combines them to give weighted_output.
 
 #include "functions/global_variables.h"
-//#include "combine_eff_jetpt_jety.c"
 #include "combine_eff_trketa.c"
 
 
@@ -48,10 +47,6 @@ void combine_samples()
 		}
 	}
 
-	if (eff_jetpt_jety) cout << 1 << endl;
-	if (eff_trketa) cout << 2 << endl;
-
-//	if (eff_jetpt_jety) combine_eff_jetpt_jety(theFiles, weights);
 	if (eff_trketa) combine_eff_trketa(theFiles, weights);
 
 

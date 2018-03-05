@@ -630,6 +630,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				gPad->SetLogx();
 				gPad->SetLogy();
 
+				h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.88,1.12);
+
 				if (dataset_type == "pp") c_ChPS_final_inJet->cd(2);
 				if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(2);
 				if (i_jet == jet_pt_start) h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("");

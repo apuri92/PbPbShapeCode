@@ -66,11 +66,24 @@ float JetCorrector::GetFCalWeight(float FCalEt) {
 	return event_weight_fcal;			
 }
 
+float JetCorrector::GetFCalWeight(float FCalEt, int sample) {
+	if (is_pp) return 1.0; //is using pp MC so no weighting required
+	
+	if (FCalEt>4.9) FCalEt=4.9;
+	//MC+MB (overlay)->HP
+	if (sample == 1) return FCal_HP_v_MBOV_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	//MB->HP
+	else if (sample == 2) return FCal_HP_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	//MB->MC + MB (Overlya)
+	else if (sample == 3) return FCal_MBOV_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+}
+
+/*
 float JetCorrector::GetFCalHPWeight(float FCalEt) {
 	float event_weight_fcal= FCal_HP_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
 	return event_weight_fcal;			
 }
-
+*/
 bool JetCorrector::MCJetJERClean(float truth_jet_pt,float reco_jet_pt, float truth_jet_eta, int cent){
 	bool pass = true;
 	float JER =  GetJER(truth_jet_pt, truth_jet_eta, cent);

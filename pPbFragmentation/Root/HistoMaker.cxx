@@ -17,7 +17,12 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
 	SetupBinning(0, "phi-trk", phiJetBins, phiJetBinsN);
-	SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
+	if(_doCoarsTrackpT){	
+		SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
+	}
+	else {	
+		SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
+	}	
 	SetupBinning(0, "pt-trk", ptTrkBinsFine, ptTrkBinsFineN);
 	SetupBinning(0, "pt-trk-sum", ptTrkBinsSum, ptTrkBinsSumN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);

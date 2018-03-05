@@ -28,7 +28,7 @@ void draw_eff_trketa()
     int n_trk_eta_bins_new = trk_eta_binning_new->GetNbins();
 
 
-	TCanvas *canvas1 = new TCanvas("C1", "C1",800,600);
+	TCanvas *canvas1 = new TCanvas("C1", "C1",900,600);
 
 	TLine *line = new TLine();
 	TLatex *ltx = new TLatex();
@@ -49,12 +49,12 @@ void draw_eff_trketa()
 
 	canvas1->cd();
 	canvas1->Clear();
-//	canvas1->Divide(3,2);
+	canvas1->Divide(3,2);
 
 
 	for (int i_cent_cuts = 0; i_cent_cuts < n_cent_cuts; i_cent_cuts++)
 	{
-		if (i_cent_cuts < 6) continue;
+		if (i_cent_cuts == 6) continue;
 		string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
 		int style = 0;
@@ -63,14 +63,13 @@ void draw_eff_trketa()
 			double eta_lo = trk_eta_binning_new->GetBinLowEdge(i_eta_cuts+1);
 			double eta_hi = trk_eta_binning_new->GetBinUpEdge(i_eta_cuts+1);
 
-			if (eta_hi < -1.0 || eta_lo > 1.0) continue;
+			if (eta_hi < -1.0 || eta_lo > +1.0) continue;
 
 			name = Form("histo_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts) = (TH1*)input_file->Get(name.c_str());
 
 
-            SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, 0);
-//            smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts));
+            SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, 1);
 
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.5,1);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,200);
@@ -78,10 +77,10 @@ void draw_eff_trketa()
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetTitle("#it{p}_{T}^{truth} [GeV]");
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));
             
-            if (i_cent_cuts == 6) legend->AddEntry(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),Form("%4.2f < #eta < %4.2f",eta_lo, eta_hi),"lp");
+            if (i_cent_cuts == 0) legend->AddEntry(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),Form("%4.2f < #eta < %4.2f",eta_lo, eta_hi),"lp");
 
-//			canvas1->cd(i_cent_cuts+1);
-			canvas1->cd();
+			canvas1->cd(i_cent_cuts+1);
+//			canvas1->cd();
 			if (style == 0) h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Draw("a p");
             else h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Draw("same p");
             gPad->SetLogx();

@@ -66,11 +66,15 @@ class MBUEEstimator : public BaseClass{
 
 	
 	//vector<vector<TH3D*>> h_trk_dNdEtadPhidpT; //!
-	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT; //!
-	vector<TH1D*> h_jet_v_Psi; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_HP; //!
+	vector<TH1D*> h_jet_v_Psi_HP; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC; //!
+	vector<TH1D*> h_jet_v_Psi_MC; //!
 	
-	TH1D * h_centrality; //!
-	TH1D * h_FCal_Et_w; //!
+	TH1D * h_centrality_HP; //!
+	TH1D * h_FCal_Et_HP; //!
+	TH1D * h_centrality_MC; //!
+	TH1D * h_FCal_Et_MC; //!
 	
 	HI::HIPileupTool                      *m_hiPileup;    //!
 	ZDC::ZdcAnalysisTool *m_zdcTools; //!

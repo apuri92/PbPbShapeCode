@@ -479,11 +479,11 @@ EL::StatusCode TrackingPerformance :: execute (){
 		EL_RETURN_CHECK("execute",event->retrieve( calos, "CaloSums"));
 		FCalEt=calos->at(5)->et()*1e-6;
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt, isHIJING);
-		cent_bin_fine = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING ); //Need for some tools
-//		event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
-
-//		if (isMC && isHIJING) event_weight_fcal = 1;
-//		cout << event_weight_fcal << endl;
+		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
+		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
+		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
+		if (_dataset == 3) event_weight_fcal = 1;
+		if (isMC && isHIJING) event_weight_fcal = 1;
 		h_centrality->Fill(cent_bin,event_weight_fcal);
 		h_centrality->Fill(nCentBins-1,event_weight_fcal);
 }

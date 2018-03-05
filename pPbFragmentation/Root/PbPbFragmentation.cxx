@@ -121,7 +121,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING );
 		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
 		cent_bin_corse = GetCentralityBin(31, FCalEt,  isHIJING ); //Need for some tools
-		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt);
+		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt,1);
 		h_centrality->Fill(cent_bin,event_weight_fcal);
 		
 		//Get HI clusters for flow
@@ -534,12 +534,12 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		jet_y = jet_y_vector.at(i);
 		jet_phi = jet_phi_vector.at(i);
 		
-		if (fabs(jet_eta)>2.1) continue;
+		if (fabs(jet_eta)>_jet_y_cut) continue;
 		if (jet_pt < _pTjetCut) continue;
 		
 		//if (fabs(jet_eta) > 2.) cout << "diff " << jet_y-jet_eta << " jet_y " << jet_y << " jet_eta " << jet_eta << " pt " << jet_pt << endl;
 		
-		if (fabs(jet_y)>2.1) continue; //cut on rapidity (simultaniously with 2.1 on pseudorapidity)
+		if (fabs(jet_y)>_jet_y_cut) continue; //cut on rapidity (simultaniously with 2.1 on pseudorapidity)
 		if (_doFJR && isFake_vector.at(i)) continue;
 				
 		if (_data_switch==0)
@@ -594,7 +594,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		if (_data_switch==1) {
 			bool passed_truth_cut = true;
 			if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) passed_truth_cut = false;
-			if (fabs(truth_jet_eta_vector.at(TruthJetIndex.at(i)))>2.1) passed_truth_cut = false;
+			if (fabs(truth_jet_eta_vector.at(TruthJetIndex.at(i)))>_jet_y_cut) passed_truth_cut = false;
 			if (passed_truth_cut)  {
 				ff_jetResponse.at(y_bin).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
 				ff_jetResponse.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
@@ -728,7 +728,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 				//Only truth jets > 40 GeV and <2.1 in responses 
 				bool passed_truth_cut = true;
 				if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) passed_truth_cut = false;
-				if (fabs(truth_jet_eta_vector.at(TruthJetIndex.at(i)))>2.1) passed_truth_cut = false;
+				if (fabs(truth_jet_eta_vector.at(TruthJetIndex.at(i)))>_jet_y_cut) passed_truth_cut = false;
 				if (!passed_truth_cut)  continue;
 				
 				bool isFake=true;
@@ -890,9 +890,9 @@ EL::StatusCode PbPbFragmentation :: execute (){
 			int y_bin = jetcorr->GetJetYBin(truth_jet_y);
 			
 			if (truth_jet_pt< _truthpTjetCut) continue;
-			if (fabs(truth_jet_eta)>2.1) continue;
-			if (fabs(truth_jet_y)>2.1) continue; //cut on rapidity (simultaniously with 2.1 on pseudorapidity)
-			if(!truth_jet_isolated_vector.at(i)) continue;
+			//if (fabs(truth_jet_eta)>_jet_y_cut) continue;
+			if (fabs(truth_jet_y)>_jet_y_cut) continue; //cut on rapidity (simultaniously with 2.1 on pseudorapidity)
+			//if(!truth_jet_isolated_vector.at(i)) continue;
 			
 			//TODO do we want to reweigth also truth spectrum?
 			//if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt,truth_jet_eta,cent_bin);

@@ -113,7 +113,7 @@ class UEEstimator
     void FindCone(float trk_pt,float trk_eta,float trk_phi);
     Float_t CalculateEtaWeight(float trk_pT, float trk_eta, float jet_eta, Int_t icent);
     Float_t CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
-    void initShapeUE();
+    void initShapeUE(bool isMC);
     double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi);
     Int_t GetTrackpTBin(float pt) {
     	Int_t bin=-1;
