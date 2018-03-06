@@ -2,13 +2,23 @@ function auto {
 	echo "dataset_type: $1" > auto.cfg
 	echo "isMC: $2" >> auto.cfg
 	echo "diagnostic_mode: true" >> auto.cfg
+	echo "getting UE and posCorr factors"
 	if [[ $mode == "unfold" ]]; then
+
+		root -b -q "get_posCorr.c(\"auto.cfg\")" 
+		
+		if [[ $dataset_type=="PbPb" ]]; then
+			root -b -q UE_factors.c
+		fi
+
 		./analysis auto.cfg
+
 	fi
 	root -b -q "draw_ChPS.c(\"auto.cfg\")"
 	root -b -q "draw_spectra.c(\"auto.cfg\")"
 	rm auto.cfg
 }
+
 
 mode=$1 #if running full unfolding as well
 

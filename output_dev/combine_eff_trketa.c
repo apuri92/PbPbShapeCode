@@ -6,7 +6,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 	SetAtlasStyle();
 	std::string name;
 	int nFiles = theFiles.size();
-
+	
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile("perf_config.cfg", EEnvLevel(1));

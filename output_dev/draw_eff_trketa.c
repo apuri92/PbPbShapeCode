@@ -51,10 +51,15 @@ void draw_eff_trketa()
 	canvas1->Clear();
 	canvas1->Divide(3,2);
 
+	bool doSmall;
+	if (dataset_type == "pp") doSmall = false;
+	if (dataset_type == "PbPb") doSmall = true;
 
 	for (int i_cent_cuts = 0; i_cent_cuts < n_cent_cuts; i_cent_cuts++)
 	{
-		if (i_cent_cuts == 6) continue;
+		if (dataset_type == "PbPb" && i_cent == 6) continue;
+		if (dataset_type == "pp" && i_cent < 6) continue;
+
 		string centrality = num_to_cent(centrality_scheme,i_cent_cuts);
 
 		int style = 0;
@@ -69,7 +74,7 @@ void draw_eff_trketa()
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts) = (TH1*)input_file->Get(name.c_str());
 
 
-            SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, 1);
+            SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, doSmall);
 
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.5,1);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,200);
