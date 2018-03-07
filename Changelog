@@ -1,4 +1,10 @@
 #TODO
+--------
+3/7/2018
+*changed UE_check structure
+*bug fix for PbPbFFShape FNS histo
+*updated to latest svn
+--------
 3/6/2018
 *Fixed date for previous commit
 *added UE_check.c

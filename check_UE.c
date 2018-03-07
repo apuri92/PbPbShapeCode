@@ -225,343 +225,420 @@ void check_UE()
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-
+/*
 	//drawing 2D histo
-//	{
-//		cout << "drawing 2D histo" << endl;
-//		TCanvas *c_TM_MB_2D = new TCanvas("c_TM_MB_2D","c_TM_MB_2D",900,600);
-//		TCanvas *c_FS_MB_2D = new TCanvas("c_FS_MB_2D","c_FS_MB_2D",900,600);
-//		TCanvas *c_FNS_MB_2D = new TCanvas("c_FNS_MB_2D","c_FNS_MB_2D",900,600);
-//
-//		for (int i_dR = 0; i_dR < N_dR; i_dR++)
-//		{
-//			string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
-//			
-//			c_TM_MB_2D->Clear(); c_TM_MB_2D->Divide(3,2);
-//			c_FS_MB_2D->Clear(); c_FS_MB_2D->Divide(3,2);
-//			c_FNS_MB_2D->Clear(); c_FNS_MB_2D->Divide(3,2);
-//
-//			for (int i_cent = 0; i_cent < 6; i_cent++)
-//			{
-//				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
-//				h_FS_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
-//				h_FNS_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
-//
-//				h_TM_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
-//				h_FS_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
-//				h_FNS_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
-//
-//				h_TM_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//				h_FS_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//				h_FNS_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//
-//				double low_range = 126;
-//				double hi_range = 316;
-//
-//				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//				h_FS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//				h_FNS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//
-//				h_TM_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
-//				h_FS_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
-//				h_FNS_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
-//
-//
-//				c_TM_MB_2D->cd(i_cent+1);
-//				h_TM_MB_2D[i_dR][i_cent]->Draw("colz text");
-//
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				gPad->SetLogx();
-//				gPad->SetLogy(0);
-//
-//				c_FS_MB_2D->cd(i_cent+1);
-//				h_FS_MB_2D[i_dR][i_cent]->Draw("colz text");
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				gPad->SetLogx();
-//				gPad->SetLogy(0);
-//
-//				c_FNS_MB_2D->cd(i_cent+1);
-//				h_FNS_MB_2D[i_dR][i_cent]->Draw("colz text");
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				gPad->SetLogx();
-//				gPad->SetLogy(0);
-//			}
-//
-//			if (i_dR == 0) name = "(";
-//			else if (i_dR == 12) name = ")";
-//			else name = "";
-//			c_TM_MB_2D->Print(Form("UE_TM_MB_2D_up.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//			c_FS_MB_2D->Print(Form("UE_FS_MB_2D_up.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D_up.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//		}
-//	}
+	{
+		cout << "drawing 2D histo" << endl;
+		TCanvas *c_TM_MB_2D = new TCanvas("c_TM_MB_2D","c_TM_MB_2D",900,600);
+		TCanvas *c_FS_MB_2D = new TCanvas("c_FS_MB_2D","c_FS_MB_2D",900,600);
+		TCanvas *c_FNS_MB_2D = new TCanvas("c_FNS_MB_2D","c_FNS_MB_2D",900,600);
 
-//	{
-//		//projecting over track pT
-//		cout << "projecting over track pT" << endl;
-//
-//		TCanvas *c_TM_MB_1D = new TCanvas("c_TM_MB_1D","c_TM_MB_1D",900,600);
-//		TCanvas *c_FS_MB_1D = new TCanvas("c_FS_MB_1D","c_FS_MB_1D",900,600);
-//		TCanvas *c_FNS_MB_1D = new TCanvas("c_FNS_MB_1D","c_FNS_MB_1D",900,600);
-//
-//		TLegend *legend_TM_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-//		legend_TM_MB->SetTextFont(43);
-//		legend_TM_MB->SetBorderSize(0);
-//		legend_TM_MB->SetTextSize(10);
-//
-//		TLegend *legend_FS_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-//		legend_FS_MB->SetTextFont(43);
-//		legend_FS_MB->SetBorderSize(0);
-//		legend_FS_MB->SetTextSize(10);
-//
-//		TLegend *legend_FNS_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-//		legend_FNS_MB->SetTextFont(43);
-//		legend_FNS_MB->SetBorderSize(0);
-//		legend_FNS_MB->SetTextSize(10);
-//
-//
-//		for (int i_dR = 0; i_dR < N_dR; i_dR++)
-//		{
-//			string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
-//
-//			c_TM_MB_1D->Clear();
-//			c_TM_MB_1D->Divide(3,2);
-//
-//			c_FS_MB_1D->Clear();
-//			c_FS_MB_1D->Divide(3,2);
-//
-//			c_FNS_MB_1D->Clear();
-//			c_FNS_MB_1D->Divide(3,2);
-//
-//			for (int i_cent = 0; i_cent < 6; i_cent++)
-//			{
-//
-//				int jet_itr = 0;
-//
-//				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-//				{
-//					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-//
-//
-//					SetHStyle_smallify(h_TM_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
-//					SetHStyle_smallify(h_FS_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
-//					SetHStyle_smallify(h_FNS_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
-//
-//
-//					if (i_cent == 0 && i_dR == 0) legend_TM_MB->AddEntry(h_TM_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
-//					if (i_cent == 0 && i_dR == 0) legend_FS_MB->AddEntry(h_FS_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
-//					if (i_cent == 0 && i_dR == 0) legend_FNS_MB->AddEntry(h_FNS_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
-//
-//
-//					h_TM_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//					h_FS_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//					h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
-//
-//					double low_range = 0.5;
-//					double hi_range = 1.5;
-//					h_TM_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//					h_FS_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//					h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-//
-//
-//					c_TM_MB_1D->cd(i_cent+1);
-//					if (i_jet == 7) h_TM_MB_1D[i_jet][i_dR][i_cent]->Draw("");
-//					else h_TM_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
-//					gPad->SetLogx();
-//
-//					c_FS_MB_1D->cd(i_cent+1);
-//					if (i_jet == 7) h_FS_MB_1D[i_jet][i_dR][i_cent]->Draw("");
-//					else h_FS_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
-//					gPad->SetLogx();
-//
-//					c_FNS_MB_1D->cd(i_cent+1);
-//					if (i_jet == 7) h_FNS_MB_1D[i_jet][i_dR][i_cent]->Draw("");
-//					else h_FNS_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
-//					gPad->SetLogx();
-//
-//					jet_itr++;
-//				}
-//
-//				c_TM_MB_1D->cd(i_cent+1);
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				legend_TM_MB->Draw();
-//
-//				c_FS_MB_1D->cd(i_cent+1);
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				legend_FS_MB->Draw();
-//
-//				c_FNS_MB_1D->cd(i_cent+1);
-//				ltx->SetTextAlign(12);
-//				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
-//				ltx->SetTextAlign(32);
-//				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-//				legend_FNS_MB->Draw();
-//			}
-//			if (i_dR == 0) name = "(";
-//			else if (i_dR == 12) name = ")";
-//			else name = "";
-//			c_TM_MB_1D->Print(Form("c_TM_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//			c_FS_MB_1D->Print(Form("c_FS_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//			c_FNS_MB_1D->Print(Form("c_FNS_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-//		}
-//	}
+		for (int i_dR = 0; i_dR < N_dR; i_dR++)
+		{
+			string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+
+			c_TM_MB_2D->Clear(); c_TM_MB_2D->Divide(3,2);
+			c_FS_MB_2D->Clear(); c_FS_MB_2D->Divide(3,2);
+			c_FNS_MB_2D->Clear(); c_FNS_MB_2D->Divide(3,2);
+
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
+				h_FS_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
+				h_FNS_MB_2D[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
+
+				h_TM_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
+				h_FS_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
+				h_FNS_MB_2D[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
+
+				h_TM_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+				h_FS_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+				h_FNS_MB_2D[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+
+				double low_range = 126;
+				double hi_range = 316;
+
+				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+				h_FS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+				h_FNS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+
+				h_TM_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
+				h_FS_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
+				h_FNS_MB_2D[i_dR][i_cent]->GetZaxis()->SetRangeUser(0,2);
+
+
+				c_TM_MB_2D->cd(i_cent+1);
+				h_TM_MB_2D[i_dR][i_cent]->Draw("colz text");
+
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				gPad->SetLogx();
+				gPad->SetLogy(0);
+
+				c_FS_MB_2D->cd(i_cent+1);
+				h_FS_MB_2D[i_dR][i_cent]->Draw("colz text");
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				gPad->SetLogx();
+				gPad->SetLogy(0);
+
+				c_FNS_MB_2D->cd(i_cent+1);
+				h_FNS_MB_2D[i_dR][i_cent]->Draw("colz text");
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				gPad->SetLogx();
+				gPad->SetLogy(0);
+			}
+
+			if (i_dR == 0) name = "(";
+			else if (i_dR == 12) name = ")";
+			else name = "";
+			c_TM_MB_2D->Print(Form("UE_TM_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+			c_FS_MB_2D->Print(Form("UE_FS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+		}
+	}
+
+	{
+		//projecting over track pT
+		cout << "projecting over track pT" << endl;
+
+		TCanvas *c_TM_MB_1D = new TCanvas("c_TM_MB_1D","c_TM_MB_1D",900,600);
+		TCanvas *c_FS_MB_1D = new TCanvas("c_FS_MB_1D","c_FS_MB_1D",900,600);
+		TCanvas *c_FNS_MB_1D = new TCanvas("c_FNS_MB_1D","c_FNS_MB_1D",900,600);
+
+		TLegend *legend_TM_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_TM_MB->SetTextFont(43);
+		legend_TM_MB->SetBorderSize(0);
+		legend_TM_MB->SetTextSize(10);
+
+		TLegend *legend_FS_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_FS_MB->SetTextFont(43);
+		legend_FS_MB->SetBorderSize(0);
+		legend_FS_MB->SetTextSize(10);
+
+		TLegend *legend_FNS_MB = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_FNS_MB->SetTextFont(43);
+		legend_FNS_MB->SetBorderSize(0);
+		legend_FNS_MB->SetTextSize(10);
+
+
+		for (int i_dR = 0; i_dR < N_dR; i_dR++)
+		{
+			string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+
+			c_TM_MB_1D->Clear();
+			c_TM_MB_1D->Divide(3,2);
+
+			c_FS_MB_1D->Clear();
+			c_FS_MB_1D->Divide(3,2);
+
+			c_FNS_MB_1D->Clear();
+			c_FNS_MB_1D->Divide(3,2);
+
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+
+				int jet_itr = 0;
+
+				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+				{
+					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+
+					SetHStyle_smallify(h_TM_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
+					SetHStyle_smallify(h_FS_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
+					SetHStyle_smallify(h_FNS_MB_1D[i_jet][i_dR][i_cent], jet_itr, 1);
+
+
+					if (i_cent == 0 && i_dR == 0) legend_TM_MB->AddEntry(h_TM_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
+					if (i_cent == 0 && i_dR == 0) legend_FS_MB->AddEntry(h_FS_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
+					if (i_cent == 0 && i_dR == 0) legend_FNS_MB->AddEntry(h_FNS_MB_1D[i_jet][i_dR][i_cent],jet_label.c_str(),"lp");
+
+
+					h_TM_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+					h_FS_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+					h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
+
+					double low_range = 0.5;
+					double hi_range = 1.5;
+					h_TM_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					h_FS_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+
+
+					c_TM_MB_1D->cd(i_cent+1);
+					if (i_jet == 7) h_TM_MB_1D[i_jet][i_dR][i_cent]->Draw("");
+					else h_TM_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
+					gPad->SetLogx();
+
+					c_FS_MB_1D->cd(i_cent+1);
+					if (i_jet == 7) h_FS_MB_1D[i_jet][i_dR][i_cent]->Draw("");
+					else h_FS_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
+					gPad->SetLogx();
+
+					c_FNS_MB_1D->cd(i_cent+1);
+					if (i_jet == 7) h_FNS_MB_1D[i_jet][i_dR][i_cent]->Draw("");
+					else h_FNS_MB_1D[i_jet][i_dR][i_cent]->Draw("same");
+					gPad->SetLogx();
+
+					jet_itr++;
+				}
+
+				c_TM_MB_1D->cd(i_cent+1);
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				legend_TM_MB->Draw();
+
+				c_FS_MB_1D->cd(i_cent+1);
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				legend_FS_MB->Draw();
+
+				c_FNS_MB_1D->cd(i_cent+1);
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,dr_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				legend_FNS_MB->Draw();
+			}
+			if (i_dR == 0) name = "(";
+			else if (i_dR == 12) name = ")";
+			else name = "";
+			c_TM_MB_1D->Print(Form("UE_TM_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+			c_FS_MB_1D->Print(Form("UE_FS_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+			c_FNS_MB_1D->Print(Form("UE_FNS_MB_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+		}
+	}
 
 	{
 		//as function of r
 		cout << "Function of R" << endl;
-		TCanvas *c_TM_MB_r_1D = new TCanvas("c_TM_MB_r_1D","c_TM_MB_r_1D",900,600);
-		TCanvas *c_FS_MB_r_1D = new TCanvas("c_FS_MB_r_1D","c_FS_MB_r_1D",900,600);
-		TCanvas *c_FNS_MB_r_1D = new TCanvas("c_FNS_MB_r_1D","c_FNS_MB_r_1D",900,600);
+		TCanvas *c_MB_r_1D = new TCanvas("c_MB_r_1D","c_MB_r_1D",900,600);
+		TCanvas *c_TM_r_1D = new TCanvas("c_TM_r_1D","c_TM_r_1D",900,600);
+		TCanvas *c_FS_r_1D = new TCanvas("c_FS_r_1D","c_FS_r_1D",900,600);
+		TCanvas *c_FNS_r_1D = new TCanvas("c_FNS_r_1D","c_FNS_r_1D",900,600);
 
-		TLegend *legend_TM_MB_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-		legend_TM_MB_r->SetTextFont(43);
-		legend_TM_MB_r->SetBorderSize(0);
-		legend_TM_MB_r->SetTextSize(10);
+		TLegend *legend_MB_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_MB_r->SetTextFont(43);
+		legend_MB_r->SetBorderSize(0);
+		legend_MB_r->SetTextSize(10);
 
-		TLegend *legend_FS_MB_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-		legend_FS_MB_r->SetTextFont(43);
-		legend_FS_MB_r->SetBorderSize(0);
-		legend_FS_MB_r->SetTextSize(10);
+		TLegend *legend_TM_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_TM_r->SetTextFont(43);
+		legend_TM_r->SetBorderSize(0);
+		legend_TM_r->SetTextSize(10);
 
-		TLegend *legend_FNS_MB_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
-		legend_FNS_MB_r->SetTextFont(43);
-		legend_FNS_MB_r->SetBorderSize(0);
-		legend_FNS_MB_r->SetTextSize(10);
+		TLegend *legend_FS_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_FS_r->SetTextFont(43);
+		legend_FS_r->SetBorderSize(0);
+		legend_FS_r->SetTextSize(10);
 
-		//	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		TLegend *legend_FNS_r = new TLegend(0.19, 0.70, 0.40, 0.92, "","brNDC");
+		legend_FNS_r->SetTextFont(43);
+		legend_FNS_r->SetBorderSize(0);
+		legend_FNS_r->SetTextSize(10);
+
 		for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 		{
-			//		string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-			string jet_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+			if (i_trk < 2 || i_trk > 6) continue;
 
-			c_TM_MB_r_1D->Clear();
-			c_TM_MB_r_1D->Divide(3,2);
+			string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
-			c_FS_MB_r_1D->Clear();
-			c_FS_MB_r_1D->Divide(3,2);
+			c_MB_r_1D->Clear();
+			c_MB_r_1D->Divide(3,2);
 
-			c_FNS_MB_r_1D->Clear();
-			c_FNS_MB_r_1D->Divide(3,2);
+			c_TM_r_1D->Clear();
+			c_TM_r_1D->Divide(3,2);
+
+			c_FS_r_1D->Clear();
+			c_FS_r_1D->Divide(3,2);
+
+			c_FNS_r_1D->Clear();
+			c_FNS_r_1D->Divide(3,2);
 
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
-				int trk_itr = 0;
+				int jet_itr = 0;
 
-
-				//			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 				{
-					if (i_trk < 2 || i_trk > 6) continue;
+					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
+					SetHStyle_smallify(h_MB_r_1D[i_jet][i_trk][i_cent], jet_itr, 1);
+					SetHStyle_smallify(h_TM_r_1D[i_jet][i_trk][i_cent], jet_itr, 1);
+					SetHStyle_smallify(h_FS_r_1D[i_jet][i_trk][i_cent], jet_itr, 1);
+					SetHStyle_smallify(h_FNS_r_1D[i_jet][i_trk][i_cent], jet_itr, 1);
 
-					//				string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-					string trk_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+					if (i_cent == 0 && i_trk == 2) legend_MB_r->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],jet_label.c_str(),"lp");
+					if (i_cent == 0 && i_trk == 2) legend_TM_r->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],jet_label.c_str(),"lp");
+					if (i_cent == 0 && i_trk == 2) legend_FS_r->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],jet_label.c_str(),"lp");
+					if (i_cent == 0 && i_trk == 2) legend_FNS_r->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],jet_label.c_str(),"lp");
 
-					SetHStyle_smallify(h_TM_MB_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
-					SetHStyle_smallify(h_FS_MB_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
-					SetHStyle_smallify(h_FNS_MB_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
+					double avg, low_range, hi_range;
 
-					SetHStyle_smallify(h_TM_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
-					SetHStyle_smallify(h_FS_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
-					SetHStyle_smallify(h_FNS_r_1D[i_jet][i_trk][i_cent], trk_itr, 1);
+					avg = (h_MB_r_1D[i_jet][i_trk][i_cent]->GetMaximum() + h_MB_r_1D[i_jet][i_trk][i_cent]->GetMinimum())/2;
+					low_range = avg * 0.90; hi_range = avg * 1.10;
 
-
-					if (i_cent == 0 && i_trk == 2) legend_TM_MB_r->AddEntry(h_TM_MB_r_1D[i_jet][i_trk][i_cent],trk_label.c_str(),"lp");
-					if (i_cent == 0 && i_trk == 2) legend_FS_MB_r->AddEntry(h_FS_MB_r_1D[i_jet][i_trk][i_cent],trk_label.c_str(),"lp");
-					if (i_cent == 0 && i_trk == 2) legend_FNS_MB_r->AddEntry(h_FNS_MB_r_1D[i_jet][i_trk][i_cent],trk_label.c_str(),"lp");
-
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0,1.2);
-					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0,1.2);
-					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0,1.2);
-
-					//				double low_range = 0.5;
-					//				double hi_range = 1.5;
-					//				h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-					//				h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-					//				h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-
-					//				c_TM_MB_r_1D->cd(i_cent+1);
-					//				if (trk_itr == 0) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					//				else h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					//
-					//				c_FS_MB_r_1D->cd(i_cent+1);
-					//				if (trk_itr == 0) h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					//				else h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					//
-					//				c_FNS_MB_r_1D->cd(i_cent+1);
-					//				if (trk_itr == 0) h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					//				else h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-
-
-
-					double low_range = 1E-2;
-					double hi_range = 1E2;
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_FS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
-					c_TM_MB_r_1D->cd(i_cent+1);
-					if (trk_itr == 0) h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+					h_FS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+					h_FNS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+
+					c_MB_r_1D->cd(i_cent+1);
+					if (jet_itr == 0) h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					else h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					gPad->SetLogy();
+
+					c_TM_r_1D->cd(i_cent+1);
+					if (jet_itr == 0) h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
 					else h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					gPad->SetLogy();
+//					gPad->SetLogy();
 
-					c_FS_MB_r_1D->cd(i_cent+1);
-					if (trk_itr == 0) h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					c_FS_r_1D->cd(i_cent+1);
+					if (jet_itr == 0) h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("");
 					else h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					gPad->SetLogy();
+//					gPad->SetLogy();
 
-					c_FNS_MB_r_1D->cd(i_cent+1);
-					if (trk_itr == 0) h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					c_FNS_r_1D->cd(i_cent+1);
+					if (jet_itr == 0) h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("");
 					else h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					gPad->SetLogy();
+//					gPad->SetLogy();
 
-					trk_itr++;
+					jet_itr++;
 				}
 
-				c_TM_MB_r_1D->cd(i_cent+1);
+				c_MB_r_1D->cd(i_cent+1);
 				ltx->SetTextAlign(12);
-				ltx->DrawLatexNDC(0.19,0.98,jet_label.c_str());
+				ltx->DrawLatexNDC(0.19,0.98,trk_label.c_str());
 				ltx->SetTextAlign(32);
 				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-				legend_TM_MB_r->Draw();
+				legend_MB_r->Draw();
 
-				c_FS_MB_r_1D->cd(i_cent+1);
+				c_TM_r_1D->cd(i_cent+1);
 				ltx->SetTextAlign(12);
-				ltx->DrawLatexNDC(0.19,0.98,jet_label.c_str());
+				ltx->DrawLatexNDC(0.19,0.98,trk_label.c_str());
 				ltx->SetTextAlign(32);
 				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-				legend_FS_MB_r->Draw();
+				legend_TM_r->Draw();
 
-				c_FNS_MB_r_1D->cd(i_cent+1);
+				c_FS_r_1D->cd(i_cent+1);
 				ltx->SetTextAlign(12);
-				ltx->DrawLatexNDC(0.19,0.98,jet_label.c_str());
+				ltx->DrawLatexNDC(0.19,0.98,trk_label.c_str());
 				ltx->SetTextAlign(32);
 				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
-				legend_FNS_MB_r->Draw();
+				legend_FS_r->Draw();
+
+				c_FNS_r_1D->cd(i_cent+1);
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19,0.98,trk_label.c_str());
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+				legend_FNS_r->Draw();
 			}
 			if (i_trk == 2) name = "(";
-			else if (i_trk == 5) name = ")";
+			else if (i_trk == 6) name = ")";
 			else name = "";
-			c_TM_MB_r_1D->Print(Form("c_TM_MB_r_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_trk, jet_label.c_str()));
-			c_FS_MB_r_1D->Print(Form("c_FS_MB_r_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_trk, jet_label.c_str()));
-			c_FNS_MB_r_1D->Print(Form("c_FNS_MB_r_1D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_trk, jet_label.c_str()));
+			c_MB_r_1D->Print(Form("UE_MB_r_1D.pdf%s", name.c_str()), Form("Title: trk%i - %s", i_trk, trk_label.c_str()));
+			c_TM_r_1D->Print(Form("UE_TM_r_1D.pdf%s", name.c_str()), Form("Title: trk%i - %s", i_trk, trk_label.c_str()));
+			c_FS_r_1D->Print(Form("UE_FS_r_1D.pdf%s", name.c_str()), Form("Title: trk%i - %s", i_trk, trk_label.c_str()));
+			c_FNS_r_1D->Print(Form("UE_FNS_r_1D.pdf%s", name.c_str()), Form("Title: trk%i - %s", i_trk, trk_label.c_str()));
 		}
 	}
+*/
+	{
+		//as function of r
+		cout << "Function of R" << endl;
+		TCanvas *c_x = new TCanvas("c_x","c_x",900,600);
 
+		TLegend *legend_x = new TLegend(0.80, 0.60, 0.90, 0.80, "","brNDC");
+		legend_x->SetTextFont(43);
+		legend_x->SetBorderSize(0);
+		legend_x->SetTextSize(10);
+
+
+		for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+		{
+			if (i_trk < 2 || i_trk > 6) continue;
+
+			string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+			c_x->Clear();
+			c_x->Divide(3,2);
+
+			int jet_itr = 0;
+			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+			{
+				string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+				for (int i_cent = 0; i_cent < 6; i_cent++)
+				{
+					c_x->cd(i_cent+1);
+
+					SetHStyle_smallify(h_MB_r_1D[i_jet][i_trk][i_cent], 0, 1);
+					SetHStyle_smallify(h_TM_r_1D[i_jet][i_trk][i_cent], 1, 1);
+					SetHStyle_smallify(h_FS_r_1D[i_jet][i_trk][i_cent], 2, 1);
+					SetHStyle_smallify(h_FNS_r_1D[i_jet][i_trk][i_cent], 3, 1);
+
+//					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(1E-4,1E2);
+
+					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
+					{
+						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
+						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
+						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
+						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
+					}
+
+					double avg, low_range, hi_range;
+					avg = (h_MB_r_1D[i_jet][i_trk][i_cent]->GetMaximum() + h_MB_r_1D[i_jet][i_trk][i_cent]->GetMinimum())/2;
+					low_range = avg * 0.70; hi_range = avg * 1.30;
+
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+
+					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
+					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+
+					legend_x->Draw();
+
+//					gPad->SetLogy();
+
+					c_x->cd(i_cent+1);
+					ltx->SetTextAlign(32);
+					ltx->DrawLatexNDC(0.90,0.84,trk_label.c_str());
+					ltx->DrawLatexNDC(0.90,0.90,jet_label.c_str());
+					ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
+
+				}
+
+				jet_itr++;
+
+				if (i_trk == 2 && i_jet == jet_pt_start) name = "(";
+				else if (i_trk == 6 && i_jet == jet_pt_end - 1) name = ")";
+				else name = "";
+				c_x->Print(Form("UE_x.pdf%s", name.c_str()), Form("Title: trk%i_jet%i", i_trk, i_jet));
+
+			}
+
+		}
+	}
 
 }

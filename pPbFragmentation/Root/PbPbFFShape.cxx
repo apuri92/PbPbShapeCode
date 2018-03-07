@@ -765,21 +765,21 @@ EL::StatusCode PbPbFFShape :: execute (){
 							UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
 							UE_distr.at(jetpt_bin).at(n_cent_bins-1)->Fill(R, pt, eta, jet_weight*eff_weight);
 						}
-
-						float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
-						int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
-
-
-						ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-						ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-
-						if (!isSecondary)
-						{
-							ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-							ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-						}
-
 					}
+
+
+					float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
+					int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
+
+					ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+					ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+
+					if (!isSecondary)
+					{
+						ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+					}
+
 				}
 			}
 		} // end reco track loop

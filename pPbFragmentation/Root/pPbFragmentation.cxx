@@ -1122,7 +1122,7 @@ EL::StatusCode pPbFragmentation :: execute (){
 		if (_data_switch==0){	
 			
 			for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++){
-				
+			
 				jet_pt = jet_pt_xcalib_vector.at(i);			 
 				jet_eta = jet_eta_vector.at(i);
 				jet_phi = jet_phi_vector.at(i);
@@ -1244,7 +1244,7 @@ EL::StatusCode pPbFragmentation :: execute (){
 				jet_uJES= jet_uJES_vector.at(i);
 			}			 
 			
-			if(isMC)
+			if(isMC && !jet_isDummy)
 			{
 				int truthindex=truth_jet_indices.at(i);
 				if (truthindex<0) continue; //Matching to truh jets
@@ -1606,7 +1606,6 @@ EL::StatusCode pPbFragmentation :: execute (){
 				}
 				
 			} // end reco track loop
-			
 			
 			tree_ff->Fill();
 			
