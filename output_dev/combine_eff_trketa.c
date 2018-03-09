@@ -18,7 +18,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 
 	//output root file
 	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
-	TFile *output_file = new TFile(name.c_str(),"recreate");
+	TFile *output_file = new TFile(Form("output_rootfiles/%s",name.c_str(),"recreate");
 	cout << Form("Efficiency root file: %s", output_file->GetName()) << endl;
 
     //setting up fine eta for eff_trketa corrections
@@ -265,7 +265,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 
 			output_file->cd();
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));
-			name = Form("histo_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
+			name = Form("hist_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
 
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetName(name.c_str());
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Write(name.c_str());

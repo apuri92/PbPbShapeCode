@@ -225,7 +225,7 @@ void check_UE()
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-/*
+
 	//drawing 2D histo
 	{
 		cout << "drawing 2D histo" << endl;
@@ -560,7 +560,7 @@ void check_UE()
 			c_FNS_r_1D->Print(Form("UE_FNS_r_1D.pdf%s", name.c_str()), Form("Title: trk%i - %s", i_trk, trk_label.c_str()));
 		}
 	}
-*/
+
 	{
 		//as function of r
 		cout << "Function of R" << endl;
@@ -607,7 +607,7 @@ void check_UE()
 
 					double avg, low_range, hi_range;
 					avg = (h_MB_r_1D[i_jet][i_trk][i_cent]->GetMaximum() + h_MB_r_1D[i_jet][i_trk][i_cent]->GetMinimum())/2;
-					low_range = avg * 0.70; hi_range = avg * 1.30;
+					low_range = avg * 0.50; hi_range = avg * 1.50;
 
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);

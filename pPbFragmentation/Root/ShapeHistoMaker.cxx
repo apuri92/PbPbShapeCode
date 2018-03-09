@@ -100,10 +100,10 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	}
 
 	//Basic histograms
-	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",140,0,7);
+	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et->Sumw2();
 
-	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",140,0,7);
+	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et_unw->Sumw2();
 
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);

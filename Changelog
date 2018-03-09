@@ -1,5 +1,10 @@
 #TODO
 --------
+9/7/2018
+*drawing updates across all macros
+*new fcal et binning for finer reweighting factors
+*new efficiency corrections 
+--------
 3/7/2018
 *changed UE_check structure
 *bug fix for PbPbFFShape FNS histo

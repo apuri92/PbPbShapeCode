@@ -132,19 +132,22 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				if (dataset_type == "pp") c_spect_closure->Divide(1,2);
 				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->Divide(1,2);
 
-				if (dataset_type == "pp") c_spect_closure->cd(1);
-				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(1);
-				gPad->SetPad(0,0.40,0.95,0.95);
-				gPad->SetTopMargin(0.05);
-				gPad->SetBottomMargin(0);
-				gPad->SetRightMargin(0);
+				if (isMC)
+				{
+					if (dataset_type == "pp") c_spect_closure->cd(1);
+					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(1);
+					gPad->SetPad(0,0.40,0.95,0.95);
+					gPad->SetTopMargin(0.05);
+					gPad->SetBottomMargin(0);
+					gPad->SetRightMargin(0);
 
-				if (dataset_type == "pp") c_spect_closure->cd(2);
-				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
-				gPad->SetPad(0,0.0,0.95,0.40);
-				gPad->SetTopMargin(0);
-				gPad->SetBottomMargin(0.35);
-				gPad->SetRightMargin(0);
+					if (dataset_type == "pp") c_spect_closure->cd(2);
+					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
+					gPad->SetPad(0,0.0,0.95,0.40);
+					gPad->SetTopMargin(0);
+					gPad->SetBottomMargin(0.35);
+					gPad->SetRightMargin(0);
+				}
 
 				SetHStyle_smallify(h_raw.at(i_cent).at(i_y), 0, doSmall);
 				SetHStyle_smallify(h_unfolded.at(i_cent).at(i_y), 1, doSmall);
@@ -163,11 +166,13 @@ void draw_spectra(string config_file = "ff_config.cfg")
 
 				h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitle("Normalized counts [GeV^{-1}]");
 				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitle("MC Closure");
+
 				if (doSmall)
 				{
 					h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(12);
 					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(12);
 				}
+
 				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitle("p_{T}^{Jet} [GeV]");
 
 				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.85, 1.15);
@@ -182,28 +187,44 @@ void draw_spectra(string config_file = "ff_config.cfg")
 					legend_spect_closure->AddEntry(h_closure.at(i_cent).at(i_y),"Closure","lp");
 				}
 
-				if (dataset_type == "pp") c_spect_closure->cd(1);
-				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(1);
+				if (isMC)
+				{
+					if (dataset_type == "pp") c_spect_closure->cd(1);
+					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(1);
+				}
+				else
+				{
+					if (dataset_type == "pp") c_spect_closure->cd();
+					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1);
+				}
+
+				h_true.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(1E2,5E2);
 				h_true.at(i_cent).at(i_y)->Draw("");
 				h_raw.at(i_cent).at(i_y)->Draw("same");
 				h_unfolded.at(i_cent).at(i_y)->Draw("same");
-				gPad->SetLogx(0);
+				gPad->SetLogx();
 				gPad->SetLogy();
 
-				if (dataset_type == "pp") c_spect_closure->cd(2);
-				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
-				h_closure.at(i_cent).at(i_y)->Draw("");
-				if (dataset_type == "pp") h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
-				if (dataset_type == "PbPb")
+				if (isMC)
 				{
-					h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(5);
-					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
-					h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
+					if (dataset_type == "pp") c_spect_closure->cd(2);
+					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
+					h_closure.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(1E2,5E2);
+					h_closure.at(i_cent).at(i_y)->Draw("");
+					if (dataset_type == "pp") h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
+					if (dataset_type == "PbPb")
+					{
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(5);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
+
+					}
+					line->DrawLine(1e2, 1, 1e3, 1);
+					gPad->SetLogx();
+					gPad->SetLogy(0);
 
 				}
-				line->DrawLine(1e2, 1, 1e3, 1);
-				gPad->SetLogx(0);
-				gPad->SetLogy(0);
+
 
 				if (dataset_type == "pp") c_spect_closure->cd();
 				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1);
@@ -223,7 +244,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				if (dataset_type == "PbPb") c_resp_matrix->cd(i_cent+1);
 				h_response_matrix.at(i_cent).at(i_y)->GetXaxis()->SetTitle("p_{T}^{reco jet}");
 				h_response_matrix.at(i_cent).at(i_y)->GetYaxis()->SetTitle("p_{T}^{truth jet}");
-				h_response_matrix.at(i_cent).at(i_y)->GetZaxis()->SetRangeUser(1e-10, 1e1);
+//				h_response_matrix.at(i_cent).at(i_y)->GetZaxis()->SetRangeUser(1e-10, 1e1);
 
 				h_response_matrix.at(i_cent).at(i_y)->Draw("colz");
 				gPad->SetLogx();
