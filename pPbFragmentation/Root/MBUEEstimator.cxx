@@ -268,8 +268,10 @@ EL::StatusCode MBUEEstimator :: execute (){
 		double power=std::floor(log10(m_eventCounter));
 		statSize=(int)std::pow(10.,power);
 	}
-	if(m_eventCounter%statSize==0) std::cout << "Event: " << m_eventCounter << std::endl;
+	if(m_eventCounter%statSize==0) std::cout << "Event: " << m_eventCounter << std::endl;  
 	m_eventCounter++;
+	//if (m_eventCounter < 1916) return EL::StatusCode::SUCCESS; 
+ 	//std::cout << "Event: " << m_eventCounter << std::endl;
 
 	//All events
 	bool keep = true;
@@ -446,6 +448,7 @@ EL::StatusCode MBUEEstimator :: execute (){
 	float event_weight = 1;
 	double max_pt = 1;
 	
+	
 	//Loop over tracks to exclude UE cones
 	for (const auto& trk : *recoTracks) {
 			//get the tracks....
@@ -479,7 +482,6 @@ EL::StatusCode MBUEEstimator :: execute (){
 			
 			//h_trk_dNdEtadPhidpT.at(dPsi_bin).at(cent_bin)->Fill(pt,eta,phi,event_weight_fcal*eff_weight);
 			
-			
 			for (int dRbin = 0; dRbin<13;dRbin++){		
 				for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
 					float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
@@ -492,6 +494,7 @@ EL::StatusCode MBUEEstimator :: execute (){
 						if (dR>=dRbins[dRbin+1] || dR<dRbins[dRbin]) continue;
 						
 						float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
+						//cout << " jet_phi " << jet_phi << " Psi " << Psi << "dPsi " << DeltaPsi(jet_phi,Psi) << " bin " <<  jet_dPsi_bin << endl;
 						h_UE_dNdEtadPhidpT_HP.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_2*eff_weight);
 						h_UE_dNdEtadPhidpT_MC.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_3*eff_weight);
 					}

@@ -263,8 +263,8 @@ void draw_spectra(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_y == 0) pdf_label = "(";
 			if (i_y == N_JET_Y) pdf_label = ")";
-			c_spect_closure->Print(Form("spect_closure_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
-			c_resp_matrix->Print(Form("resp_matrix_jet_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
+			c_spect_closure->Print(Form("output_pdf/%s/spect_closure_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
+			c_resp_matrix->Print(Form("output_pdf/%s/resp_matrix_jet_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 
 		} //end dR loop
 	}

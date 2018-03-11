@@ -18,13 +18,13 @@ void draw_eff_trketa()
 
 
 	//reading from raw efficiency file
-	name = Form("output_rootfiles/mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
+	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
 	TFile *input_file = new TFile(name.c_str());
 
-	TAxis* trk_pt_binning = (TAxis*)input_file->Get("trk_pt_binning");
-	TAxis* trk_eta_binning_new = (TAxis*)input_file->Get("trk_eta_binning_new");
+//	TAxis* trk_pt_binning = (TAxis*)input_file->Get("trk_pt_binning");
+	TAxis* trk_eta_binning_new = (TAxis*)input_file->Get("new_trk_eta_binning");
 
-    int n_trk_pt_bins = trk_pt_binning->GetNbins();
+//    int n_trk_pt_bins = trk_pt_binning->GetNbins();
     int n_trk_eta_bins_new = trk_eta_binning_new->GetNbins();
 
 

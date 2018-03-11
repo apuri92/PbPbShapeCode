@@ -77,8 +77,9 @@ Float_t GetAveragePsi(Float_t psi1, Float_t psi2)
 
 Int_t GetPsiBin(Float_t psi)
 {
-   int bin = -1;
-   for (float dPsi=0.;dPsi<TMath::Pi();dPsi=dPsi+0.1){
+   int bin = 0;
+   for (float dPsi=0.1;dPsi<=TMath::Pi();dPsi=dPsi+0.1){
+   		//cout << "psi " << psi << " dPsi " << dPsi << endl;
    		if (psi<=dPsi) return bin;
    		bin++;
    }

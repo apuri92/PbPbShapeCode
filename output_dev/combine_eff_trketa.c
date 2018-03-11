@@ -18,7 +18,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 
 	//output root file
 	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
-	TFile *output_file = new TFile(Form("output_rootfiles/%s",name.c_str(),"recreate");
+	TFile *output_file = new TFile(Form("%s",name.c_str()),"recreate");
 	cout << Form("Efficiency root file: %s", output_file->GetName()) << endl;
 
     //setting up fine eta for eff_trketa corrections
@@ -45,8 +45,8 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 
 
 	output_file->cd();
-	trk_pt_binning->Write("trk_pt_binning");
-    trk_eta_binning_new->Write("trk_eta_binning_new");
+//	trk_pt_binning->Write("trk_pt_binning");
+    trk_eta_binning_new->Write("new_trk_eta_binning");
 
 	TCanvas *canvas1 = new TCanvas("C1", "C1",0.,0.,800,400);
 	TLine *line = new TLine();
@@ -179,7 +179,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 					if (i_eta_cuts == 0 && i_cent_cuts == 0 && i_files == 0) name = "(";
                     else if (i_eta_cuts == n_trk_eta_bins_new - 1  && i_cent_cuts == n_cent_cuts - 1 && i_files == nFiles - 1) name = ")";
 					else name = "";
-					canvas1->Print(Form("raw_eff_cent_trketa_%s_%s.pdf%s",dataset_type.c_str(), tracking_cut.c_str(), name.c_str()),Form("Title: eff_c%i_e%i_f%i", i_cent_cuts,i_eta_cuts,i_files));
+					canvas1->Print(Form("output_pdf/raw_eff_cent_trketa_%s_%s.pdf%s", dataset_type.c_str(), tracking_cut.c_str(), name.c_str()),Form("Title: eff_c%i_e%i_f%i", i_cent_cuts,i_eta_cuts,i_files));
                     canvas1->Clear();
 				}
 
@@ -264,17 +264,19 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 			vec_hi_e.clear();
 
 			output_file->cd();
-			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));
-			name = Form("hist_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
-
-			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetName(name.c_str());
-			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Write(name.c_str());
 
 			g_efficiency.at(i_cent_cuts).at(i_eta_cuts) = new TGraphAsymmErrors(h_efficiency.at(i_cent_cuts).at(i_eta_cuts));
+			name = Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi);
+			g_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(name.c_str());
+
 			name = Form("graph_eff_eta%i_cent%i",i_eta_cuts,i_cent_cuts);
 			g_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetName(name.c_str());
 			g_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Write(name.c_str());
 
+			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));
+			name = Form("hist_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
+			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetName(name.c_str());
+			h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->Write(name.c_str());
 		}
 	}
 

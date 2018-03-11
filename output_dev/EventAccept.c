@@ -28,8 +28,8 @@ void EventAccept()
 	h_accept_pp->GetXaxis()->LabelsOption("u");
 	gPad->SetLogy();
 
-	c_PbPb->Print("EventAccept_PbPb.pdf");
-	c_pp->Print("EventAccept_pp.pdf");
+	c_PbPb->Print("output_pdf/EventAccept_PbPb.pdf");
+	c_pp->Print("output_pdf/EventAccept_pp.pdf");
 
 
 

@@ -351,7 +351,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		}
 	}
-/*
+
 	if (1)
 	{
 		cout << "Doing Evolution plots" << endl;
@@ -474,14 +474,14 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (i_dR == 0 && i_jet == jet_pt_start) pdf_label = "(";
 				if (i_dR == N_dR-1 && i_jet == jet_pt_end-1) pdf_label = ")";
-				c_evol->Print(Form("evol_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i_jetpt%i", i_dR, i_jet));
+				c_evol->Print(Form("output_pdf/%s/evol_%s_%s.pdf%s",dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i_jetpt%i", i_dR, i_jet));
 
 				jet_itr++;
 			} //end jet loop
 		} //end dR loop
 	} //end diagnostic
 
- */
+
 
 
 	//Draw Final ChPS plots
@@ -594,12 +594,12 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_final->Print(Form("ChPS_final_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_final->Print(Form("output_pdf/%s/ChPS_final_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 		} //end dR loop
 	}
 
-/*
+
 	//Draw Final ChPS plots in jet
 	{
 		cout << "Doing Final ChPS plots in jet pT for R < 0.4" << endl;
@@ -710,7 +710,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end cent loop
 
 		pdf_label = "";
-		c_ChPS_final_inJet->Print(Form("ChPS_final_inJet_%s_%s.pdf", dataset_type.c_str(), did.c_str()), Form("Title:InJet"));
+		c_ChPS_final_inJet->Print(Form("output_pdf/%s/ChPS_final_inJet_%s_%s.pdf", dataset_type.c_str(), dataset_type.c_str(), did.c_str()), Form("Title:InJet"));
 
 	}
 
@@ -784,11 +784,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_UE->Print(Form("ChPS_UE_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_UE->Print(Form("output_pdf/%s/ChPS_UE_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 		} //end dR loop
 	}
-*/
 
 	//draw as function of dR
 	{
@@ -914,14 +913,14 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_dR->Print(Form("ChPS_dR_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_dR->Print(Form("output_pdf/%s/ChPS_dR_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 			//
 			jet_itr++;
 
 		} //end jet loop
 	}
 
-/*
+
 	//draw UE as function of dR
 	if (dataset_type == "PbPb")
 	{
@@ -996,7 +995,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_dR_UE->Print(Form("ChPS_dR_UE_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_dR_UE->Print(Form("output_pdf/%s/ChPS_dR_UE_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 			//
 			jet_itr++;
 
@@ -1071,7 +1070,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_B2S->Print(Form("ChPS_B2S_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_B2S->Print(Form("output_pdf/%s/ChPS_B2S_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 		} //end dR loop
 	}
@@ -1121,7 +1120,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_resp_matrix->Print(Form("resp_matrix_ChPS_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_resp_matrix->Print(Form("output_pdf/%s/resp_matrix_ChPS_%s_%s.pdf%s",dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 		} //end dR loop
 	}
@@ -1174,9 +1173,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					SetHStyle_smallify(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),3, doSmall);
 					SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),4, doSmall);
 
-//					SetHStyle_smallify(h_ChPS_ratio_subtr_raw.at(i_trk).at(i_cent).at(i_jet),5, doSmall);
-//					SetHStyle_smallify(h_ChPS_ratio_unf_subtr.at(i_trk).at(i_cent).at(i_jet),6, doSmall);
-//					SetHStyle_smallify(h_ChPS_ratio_closure.at(i_trk).at(i_cent).at(i_jet),7, doSmall);
+					SetHStyle_smallify(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),5, doSmall);
 
 					if (i_jet == jet_pt_start && trk_itr == 0 && first_pass)
 					{
@@ -1190,16 +1187,13 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
 							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
 
-//							legend_evol_dR->AddEntry(h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet),"Subtr/Raw", "lp");
-//							legend_evol_dR->AddEntry(h_ChPS_ratio_unf_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Unf/Subtr", "lp");
-//							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unf/Truth", "lp");
+							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unf/Truth", "lp");
 						}
 						else
 						{
 							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Unf","lp");
 							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Unf+BbB","lp");
-//							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unfolded/Truth", "lp");
-//							legend_evol_dR->AddEntry(h_ChPS_ratio_unf_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Unfolded/Raw", "lp");
+							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unfolded/Truth", "lp");
 						}
 					}
 
@@ -1242,8 +1236,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					if (isMC) h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-//					gPad->SetLogx();
-//					gPad->SetLogy();
+					gPad->SetLogx(0);
+					gPad->SetLogy(0);
 					line->DrawLine(0, 0, 1.2, 0);
 
 
@@ -1251,16 +1245,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					{
 						if (dataset_type == "pp") c_evol_dR->cd(2);
 						if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(2);
+						if (isMC) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 
-//						h_ChPS_ratio_unf_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-//						if (isMC) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-//						if (dataset_type == "PbPb") h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-//
-//						if (dataset_type == "pp") h_ChPS_ratio_unf_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-//						if (dataset_type == "PbPb") h_ChPS_ratio_unf_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-
-						gPad->SetLogx();
-						line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
+						gPad->SetLogx(0);
+						line->DrawLine(0, 1, 1.2, 1);
 					}
 
 
@@ -1281,8 +1269,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (trk_itr == 0 && i_jet == jet_pt_start) pdf_label = "(";
 				if (trk_itr == 3 && i_jet == jet_pt_end-1) pdf_label = ")";
-				cout << pdf_label << endl;
-				c_evol_dR->Print(Form("evol_dR_%s_%s.pdf%s", dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
+
+				c_evol_dR->Print(Form("output_pdf/%s/evol_dR_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
 
 				trk_itr++;
 			} //end trk loop
@@ -1291,5 +1279,4 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end jet loop
 	}
 
-*/
 }

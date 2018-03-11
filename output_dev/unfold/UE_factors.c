@@ -97,7 +97,7 @@ void UE_factors()
 		if (i_dR == 0) name = "(";
 		else if (i_dR == 12) name = ")";
 		else name = "";
-		c1->Print(Form("UE_factors.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+		c1->Print(Form("output_pdf/PbPb/UE_factors.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 	}
 
 }

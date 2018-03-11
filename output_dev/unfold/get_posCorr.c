@@ -406,7 +406,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.1f < p_{T}^{Jet} < %4.1f",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
 				if (first_cent_pass && jet_iter == 0) name = "(";
 				else name = "";
-				c0->Print(Form("ShapeResponse2D_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));
+				c0->Print(Form("output_pdf/%s/ShapeResponse2D_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));
 			}
 
 
@@ -427,7 +427,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend1->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";
-			c1->Print(Form("RecoProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
+			c1->Print(Form("output_pdf/%s/RecoProj_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend1->Clear();
 		}
 		// Truth projection
@@ -444,7 +444,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			name = Form("c%i", i_cent);
 			if (first_cent_pass) name = "(";
 			else name = "";
-			c2->Print(Form("TruthProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
+			c2->Print(Form("output_pdf/%s/TruthProj_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend2->Clear();
 		}
 
@@ -461,7 +461,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend3->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";
-			c3->Print(Form("RatioProj_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
+			c3->Print(Form("output_pdf/%s/RatioProj_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend3->Clear();
 		}
 
@@ -477,7 +477,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend4->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";
-			c4->Print(Form("RespPurity_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
+			c4->Print(Form("output_pdf/%s/RespPurity_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend4->Clear();
 		}
 
@@ -493,7 +493,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			legend5->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";
-			c5->Print(Form("RespEfficiency_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
+			c5->Print(Form("output_pdf/%s/RespEfficiency_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i", i_cent));
 			legend5->Clear();
 		}
 
@@ -507,12 +507,12 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	c4->Clear();
 	c5->Clear();
 
-	c0->Print(Form("ShapeResponse2D_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c1->Print(Form("RecoProj_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c2->Print(Form("TruthProj_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c3->Print(Form("RatioProj_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c4->Print(Form("RespPurity_%s.pdf)", dataset_type.c_str()),"Title: End");
-	c5->Print(Form("RespEfficiency_%s.pdf)", dataset_type.c_str()),"Title: End");
+	c0->Print(Form("output_pdf/%s/ShapeResponse2D_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
+	c1->Print(Form("output_pdf/%s/RecoProj_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
+	c2->Print(Form("output_pdf/%s/TruthProj_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
+	c3->Print(Form("output_pdf/%s/RatioProj_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
+	c4->Print(Form("output_pdf/%s/RespPurity_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
+	c5->Print(Form("output_pdf/%s/RespEfficiency_%s.pdf)", dataset_type.c_str(), dataset_type.c_str()),"Title: End");
 
 
 
@@ -600,7 +600,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 		if (i_dR == 0) name = "(";
 		else name = "";
-		c6->Print(Form("pos_corr_factors_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: dR%i",i_dR));
+		c6->Print(Form("output_pdf/%s/pos_corr_factors_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: dR%i",i_dR));
 
 
 		legend6->Clear();
@@ -608,7 +608,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 	c6->Clear();
 	name = ")";
-	c6->Print(Form("pos_corr_factors_%s.pdf%s", dataset_type.c_str(), name.c_str()),Form("Title: End"));
+	c6->Print(Form("output_pdf/%s/pos_corr_factors_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: End"));
 
 
 

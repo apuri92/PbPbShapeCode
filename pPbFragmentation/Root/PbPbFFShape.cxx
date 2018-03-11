@@ -198,7 +198,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 
 	//Pileup
-	if (_doPileupRejection){
+	if (_doPileupRejection && _dataset == 4){
 		bool m_is_pileup = false;
 		if (!isMC) {
 			const xAOD::ZdcModuleContainer* zdcMod = 0;
@@ -587,7 +587,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (pt < _pTtrkCut) continue; //min pT cut
 
 			float R = DeltaR(phi,eta,jet_phi,jet_eta);
-			if (R > 2.0) continue; //broad cut on dR to remove unecessary effcorr warnings for tracks too far from the jet anwyay
+			if (R > 1.5) continue; //broad cut on dR to remove unecessary effcorr warnings for tracks too far from the jet anwyay
 
 			//Tracking validation histograms
 			if (jet_pt>80. && jet_pt<110. && R < _dR_max) {
@@ -614,6 +614,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			float eff_uncertainty = 0;
 			if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(pt,eta, R, cent_bin);
 			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+
 			double z = cos(R)*pt / jet_pt;
 
 			//required to be within jet, need to be separated for UEEstimator
@@ -688,27 +689,27 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 						float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
 
-							if (R_truth_truth < _dR_max)
-							{
-								int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(track_mc_eta,truth_jet_eta_vector.at(TruthJetIndex.at(i)))));
-								ChPS_raw_tt_deta.at(deta_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-								ChPS_raw_tt_deta.at(deta_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-
-								int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(track_mc_phi,truth_jet_phi_vector.at(TruthJetIndex.at(i)))));
-								ChPS_raw_tt_dphi.at(dphi_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-								ChPS_raw_tt_dphi.at(dphi_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-
-								ChPS_raw_tt.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
-								ChPS_raw_tt.at(dr_bin_truth_truth).at(n_cent_bins-1)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
-
-							}
-
-							if (R_reco_truth < _dR_max) ChPS_raw_rt.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt, matched_truth_jet_pt, jet_weight*eff_weight);
-							if (R_truth_reco < _dR_max && pass_reco_pt_cut) ChPS_raw_tr.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, jet_pt, jet_weight);
-							if (R_reco_reco < _dR_max && pass_reco_pt_cut)
-							{
-								ChPS_raw_rr.at(dr_bin_reco_reco).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight);
-								ChPS_raw_rr.at(dr_bin_reco_reco).at(n_cent_bins-1)->Fill(pt, jet_pt, jet_weight*eff_weight);
+						if (R_truth_truth < _dR_max)
+						{
+							int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(track_mc_eta,truth_jet_eta_vector.at(TruthJetIndex.at(i)))));
+							ChPS_raw_tt_deta.at(deta_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
+							ChPS_raw_tt_deta.at(deta_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
+							
+							int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(track_mc_phi,truth_jet_phi_vector.at(TruthJetIndex.at(i)))));
+							ChPS_raw_tt_dphi.at(dphi_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
+							ChPS_raw_tt_dphi.at(dphi_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
+							
+							ChPS_raw_tt.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
+							ChPS_raw_tt.at(dr_bin_truth_truth).at(n_cent_bins-1)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
+							
+						}
+						
+						if (R_reco_truth < _dR_max) ChPS_raw_rt.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt, matched_truth_jet_pt, jet_weight*eff_weight);
+						if (R_truth_reco < _dR_max && pass_reco_pt_cut) ChPS_raw_tr.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, jet_pt, jet_weight);
+						if (R_reco_reco < _dR_max && pass_reco_pt_cut)
+						{
+							ChPS_raw_rr.at(dr_bin_reco_reco).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight);
+							ChPS_raw_rr.at(dr_bin_reco_reco).at(n_cent_bins-1)->Fill(pt, jet_pt, jet_weight*eff_weight);
 							}
 
 							if (R_truth_truth < _dR_max) ChPS_raw_tt_mod.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);

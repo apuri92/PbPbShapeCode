@@ -387,9 +387,9 @@ void comp_ChPS(bool isMC = 0)
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_raw_subtr_indR->Print(Form("ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-			c_ChPS_raw_subtr_unf_indR->Print(Form("ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-			c_ChPS_final_indR->Print(Form("ChPS_final_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_raw_subtr_indR->Print(Form("output_pdf/ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_final_indR->Print(Form("output_pdf/ChPS_final_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 			jet_itr++;
 		} //end jet loop
@@ -666,9 +666,9 @@ void comp_ChPS(bool isMC = 0)
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
 
-			c_ChPS_final_injet->Print(Form("ChPS_FF_final_injet_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()));
-			c_ChPS_final_PbPb_injet->Print(Form("ChPS_FF_final_injet_PbPb_%s.pdf%s", did.c_str(), pdf_label.c_str()));
-			c_ChPS_final_pp_injet->Print(Form("ChPS_FF_final_injet_pp_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_injet->Print(Form("output_pdf/ChPS_FF_final_injet_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_PbPb_injet->Print(Form("output_pdf/PbPb/ChPS_FF_final_injet_PbPb_%s.pdf%s", did.c_str(), pdf_label.c_str()));
+			c_ChPS_final_pp_injet->Print(Form("output_pdf/pp/ChPS_FF_final_injet_pp_%s.pdf%s", did.c_str(), pdf_label.c_str()));
 			jet_itr++;
 
 		} //end jet loop
@@ -805,9 +805,9 @@ void comp_ChPS(bool isMC = 0)
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_raw_subtr->Print(Form("ChPS_raw_subtr_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-			c_ChPS_raw_subtr_unf->Print(Form("ChPS_raw_subtr_unf_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-			c_ChPS_final->Print(Form("ChPS_final_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_raw_subtr->Print(Form("output_pdf/ChPS_raw_subtr_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_raw_subtr_unf->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+			c_ChPS_final->Print(Form("output_pdf/ChPS_final_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 		} //end dr loop
 	}
 
