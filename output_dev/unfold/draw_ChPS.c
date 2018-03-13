@@ -310,6 +310,24 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
 					h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
 
+					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+					string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+					string centrality = num_to_cent(31,i_cent);
+					string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+
+					if (h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1) < 0)
+					{
+						string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+						string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+						string centrality = num_to_cent(31,i_cent);
+						string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+
+						cout << trk_label << endl;
+						cout << jet_label << endl;
+						cout << dr_label << endl;
+						cout << centrality << endl << endl;
+
+					}
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
@@ -433,13 +451,14 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					gPad->SetTopMargin(0.05);
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
+					h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-5,20);
 					h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("");
 					if (dataset_type == "PbPb") h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					if (isMC) h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					gPad->SetLogx();
-					gPad->SetLogy();
+					gPad->SetLogy(0);
 
 					if (dataset_type == "pp") c_evol->cd()->cd(2);
 					if (dataset_type == "PbPb") c_evol->cd(i_cent+1)->cd(2);
@@ -447,6 +466,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
+					h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-0.5,1.2);
 					h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->Draw("");
 					if (isMC) h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					if (dataset_type == "PbPb") h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
@@ -456,6 +476,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					gPad->SetLogx();
 					line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
+					line->DrawLine(trk_pt_lo, 0, trk_pt_hi, 0);
 
 					if (dataset_type == "pp") c_evol->cd();
 					if (dataset_type == "PbPb") c_evol->cd(i_cent+1);
@@ -1130,7 +1151,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		cout << "Doing evol_dRution plots" << endl;
 		TCanvas *c_evol_dR = new TCanvas("c_evol_dR","c_evol_dR",900,600);
 		if (dataset_type == "pp") c_evol_dR->SetCanvasSize(600,600);
-		TLegend *legend_evol_dR = new TLegend(0.60, 0.7, 0.80, 0.80, "","brNDC");
+		TLegend *legend_evol_dR = new TLegend(0.20, 0.2, 0.50, 0.50, "","brNDC");
 		legend_evol_dR->SetTextFont(43);
 		legend_evol_dR->SetBorderSize(0);
 		if (dataset_type == "pp") legend_evol_dR->SetTextSize(12);
@@ -1147,10 +1168,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			int trk_itr = 0;
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
-				if (i_trk != 2 &&
-					i_trk != 3 &&
-					i_trk != 4 &&
-					i_trk != 5) continue;
+				if (i_trk < 2 || i_trk > 8) continue;
 
 				string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
@@ -1229,8 +1247,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1);
 					}
 
-					h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-5,100);
-
+					h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-10,2);
 					h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 					if (dataset_type == "PbPb") h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
@@ -1267,8 +1284,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				} // end cent loop
 
 				pdf_label = "";
-				if (trk_itr == 0 && i_jet == jet_pt_start) pdf_label = "(";
-				if (trk_itr == 3 && i_jet == jet_pt_end-1) pdf_label = ")";
+				if (i_trk == 2 && i_jet == jet_pt_start) pdf_label = "(";
+				if (i_trk == 8 && i_jet == jet_pt_end-1) pdf_label = ")";
 
 				c_evol_dR->Print(Form("output_pdf/%s/evol_dR_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
 

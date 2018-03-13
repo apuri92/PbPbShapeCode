@@ -75,6 +75,11 @@ class MBUEEstimator : public BaseClass{
 	TH1D * h_FCal_Et_HP; //!
 	TH1D * h_centrality_MC; //!
 	TH1D * h_FCal_Et_MC; //!
+	TH1D * h_dPsi; //!
+	TH1D * h_Psi; //!
+	TH1D * h_jet_phi; //!
+	TH2D * h_jet_phi_v_dPsi; //!
+	TH2D * h_jet_phi_v_Psi; //!
 	
 	HI::HIPileupTool                      *m_hiPileup;    //!
 	ZDC::ZdcAnalysisTool *m_zdcTools; //!
@@ -87,6 +92,8 @@ class MBUEEstimator : public BaseClass{
 	float trig_prescale[10]; //!
 	
 	float FCalEt;
+	
+	bool FCal_only;
 
 	
 	

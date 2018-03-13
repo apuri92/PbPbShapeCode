@@ -124,7 +124,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
 		if (_dataset == 3) event_weight_fcal = 1;
 		h_centrality->Fill(cent_bin,event_weight_fcal);
-		h_centrality->Fill(n_cent_bins-1,event_weight_fcal);
 
 		//Get HI clusters for flow
 		//const xAOD::CaloClusterContainer *hiclus(0);

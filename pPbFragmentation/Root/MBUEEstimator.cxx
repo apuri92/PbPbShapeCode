@@ -161,6 +161,8 @@ EL::StatusCode MBUEEstimator :: initialize ()
 
 EL::StatusCode MBUEEstimator :: histInitialize ()
 {
+	
+	FCal_only = false;
 	cout << " Setting  histograms" << endl;
 	
 	int ptTrkBinsN, etaTrkBinsN, phiTrkBinsN;
@@ -182,13 +184,25 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	
 	//Basic histograms
 
-	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",140,0,7);
+	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et->Sumw2();
-	h_FCal_Et_HP = new TH1D("h_FCal_Et_HP",";FCal E_{T};N",140,0,7);
+	h_FCal_Et_HP = new TH1D("h_FCal_Et_HP",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et_HP->Sumw2();
-	h_FCal_Et_MC = new TH1D("h_FCal_Et_MC",";FCal E_{T};N",140,0,7);
+	h_FCal_Et_MC = new TH1D("h_FCal_Et_MC",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et_MC->Sumw2();
-
+	
+	h_dPsi = new TH1D("h_dPsi","h_dPsi",32,-TMath::Pi(),TMath::Pi());
+	h_Psi = new TH1D("h_Psi","h_Psi",32,-TMath::Pi(),TMath::Pi());
+	h_jet_phi = new TH1D("h_jet_phi","h_jet_hi",32,-TMath::Pi(),TMath::Pi());
+	h_jet_phi_v_Psi = new TH2D("h_jet_phi_v_Psi","h_jet_v_Psi",32,-TMath::Pi(),TMath::Pi(),32,-TMath::Pi(),TMath::Pi());
+	h_jet_phi_v_dPsi = new TH2D("h_jet_phi_v_dPsi","h_jet_v_dPsi",32,-TMath::Pi(),TMath::Pi(),32,-TMath::Pi(),TMath::Pi());
+	
+	wk()->addOutput (h_dPsi);
+	wk()->addOutput (h_Psi);
+	wk()->addOutput (h_jet_phi);
+	wk()->addOutput (h_jet_phi_v_Psi);
+	wk()->addOutput (h_jet_phi_v_dPsi);
+	
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
 	
@@ -207,6 +221,8 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	wk()->addOutput (h_triggercounter);
 	wk()->addOutput (h_centrality_HP);
 	wk()->addOutput (h_centrality_MC);
+	
+	if (FCal_only) return EL::StatusCode::SUCCESS;
 	
 	TH3D* temphist_3D = nullptr;
 	TH1D* temphist_1D = nullptr;
@@ -259,7 +275,6 @@ EL::StatusCode MBUEEstimator :: execute (){
 	//cout << "test" << endl;
 	
 	float dRbins[14]={0. , 0.05 , 0.1 , 0.15 , 0.2 , 0.25 , 0.3 , 0.4 , 0.5 , 0.6 , 0.7 , 0.8 , 1.0 , 1.2 };
-	
 	// Event counter
 	int statSize=1;
 	
@@ -418,6 +433,7 @@ EL::StatusCode MBUEEstimator :: execute (){
 	h_RejectionHisto->Fill(7.5);
 
 	// trigger
+	double trigger_prescale = 1.;
 	if (_data_switch==0)
 	{
 		int event_passed_trigger=0;
@@ -428,18 +444,23 @@ EL::StatusCode MBUEEstimator :: execute (){
 
 			event_isTriggered[i] =  _chainGroup.at(i)->isPassed();
 			h_triggercounter->Fill(i, (Double_t) event_isTriggered[i]);
-			if(event_isTriggered[i]) event_passed_trigger=1;
+			if(event_isTriggered[i]) {
+				event_passed_trigger=1;
+				trigger_prescale=trigger_PS.at(i); 
+			}	
 		}
 
 		if(!event_passed_trigger) return EL::StatusCode::SUCCESS; // go to next event
 		else h_RejectionHisto->Fill(8.5);
 	}
 
-	h_FCal_Et_HP->Fill(FCalEt, event_weight_fcal_2);
-	h_FCal_Et_MC->Fill(FCalEt, event_weight_fcal_3);
-	h_FCal_Et->Fill(FCalEt);
-	h_centrality_HP->Fill(cent_bin,event_weight_fcal_2);
-	h_centrality_MC->Fill(cent_bin,event_weight_fcal_3);
+	h_FCal_Et_HP->Fill(FCalEt, event_weight_fcal_2*trigger_prescale);
+	h_FCal_Et_MC->Fill(FCalEt, event_weight_fcal_3*trigger_prescale);
+	h_FCal_Et->Fill(FCalEt,trigger_prescale);
+	h_centrality_HP->Fill(cent_bin,event_weight_fcal_2*trigger_prescale);
+	h_centrality_MC->Fill(cent_bin,event_weight_fcal_3*trigger_prescale);
+	
+	if (FCal_only) return EL::StatusCode::SUCCESS;
 
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
@@ -448,58 +469,60 @@ EL::StatusCode MBUEEstimator :: execute (){
 	float event_weight = 1;
 	double max_pt = 1;
 	
+	//cout << "Psi " << Psi << endl;
 	
-	//Loop over tracks to exclude UE cones
-	for (const auto& trk : *recoTracks) {
-			//get the tracks....
-			float pt = trk->pt()/1000.;
-			float eta = trk->eta();
-			float phi = trk->phi();
-			//correct the alignement
-			bool isMatchedToTruthParticle = false;
-			if (isMC) {
-				ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");				   
-				float mcprob =trk->auxdata<float>("truthMatchProbability");
-				if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
-			}
-			if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
-			if (fabs(eta) > 2.5) continue;
-			//Charge cut
-			if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue; 
-			if (isMC && uncertprovider->uncert_class==5) uncertprovider->UncerTrackMomentum(pt, eta, phi, trk->charge() );
-			if (pt < _pTtrkCut) continue; //min pT cut
-			double d0 = trk->d0();
-			double d0_cut = f_d0_cut->Eval(pt);
-			if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
-			if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
-			
-			dPsi_bin = GetPsiBin(DeltaPsi(phi,Psi));
-			//cout << "dPsi " << DeltaPsi(phi,Psi) << " bin " <<  dPsi_bin << endl;
-			float eff_uncertainty = 0;
-			if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(pt,eta, 1.0, cent_bin_corse); 
-			//float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, eff_uncertainty, 10, 0., 1.0); 
-			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, 0, _dataset);
-			
-			//h_trk_dNdEtadPhidpT.at(dPsi_bin).at(cent_bin)->Fill(pt,eta,phi,event_weight_fcal*eff_weight);
-			
-			for (int dRbin = 0; dRbin<13;dRbin++){		
-				for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
-					float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
-					if (fabs(jet_eta)>1.3) continue;
-					if (fabs(jet_eta-eta)>dRbins[dRbin+1]) continue;
-					for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){
-						float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
+	h_Psi->Fill(Psi);
+	
+	for (int dRbin = 0; dRbin<13;dRbin++){		
+		for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){	
+			float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
+			float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
+			h_dPsi->Fill(DeltaPsi(jet_phi,Psi));
+			h_jet_phi->Fill(jet_phi);
+			h_jet_phi_v_Psi->Fill(jet_phi,Psi);
+			h_jet_phi_v_dPsi->Fill(jet_phi,DeltaPsi(jet_phi,Psi));
+			for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
+				float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
+				if (fabs(jet_eta)>1.3) continue;
+				for (const auto& trk : *recoTracks) {
+					float eta = trk->eta();
+					float phi = trk->phi();
+					float dR = DeltaR(jet_phi, jet_eta, phi, eta);
+					if (dR>=dRbins[dRbin+1] || dR<dRbins[dRbin]) continue;
+					float pt = trk->pt()/1000.;
+					//if (fabs(jet_eta-eta)>dRbins[dRbin+1]) continue;
 						
-						float dR = DeltaR(jet_phi, jet_eta, phi, eta);
-						if (dR>=dRbins[dRbin+1] || dR<dRbins[dRbin]) continue;
-						
-						float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
-						//cout << " jet_phi " << jet_phi << " Psi " << Psi << "dPsi " << DeltaPsi(jet_phi,Psi) << " bin " <<  jet_dPsi_bin << endl;
-						h_UE_dNdEtadPhidpT_HP.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_2*eff_weight);
-						h_UE_dNdEtadPhidpT_MC.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_3*eff_weight);
+					//correct the alignement
+					bool isMatchedToTruthParticle = false;
+					if (isMC) {
+						ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");				   
+						float mcprob =trk->auxdata<float>("truthMatchProbability");
+						if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
 					}
+					if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
+					if (fabs(eta) > 2.5) continue;
+					//Charge cut
+					if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue; 
+					if (isMC && uncertprovider->uncert_class==5) uncertprovider->UncerTrackMomentum(pt, eta, phi, trk->charge() );
+					if (pt < _pTtrkCut) continue; //min pT cut
+					double d0 = trk->d0();
+					double d0_cut = f_d0_cut->Eval(pt);
+					if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
+					if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
+			
+					
+					float eff_uncertainty = 0;
+					if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(pt,eta, 1.0, cent_bin_corse); 
+					//float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, eff_uncertainty, 10, 0., 1.0); 
+					float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, 0, _dataset);
+			
+					//h_trk_dNdEtadPhidpT.at(dPsi_bin).at(cent_bin)->Fill(pt,eta,phi,event_weight_fcal*eff_weight);
+					//cout << " jet_phi " << jet_phi << " Psi " << Psi << "dPsi " << DeltaPsi(jet_phi,Psi) << " bin " <<  jet_dPsi_bin << endl;
+					h_UE_dNdEtadPhidpT_HP.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_2*eff_weight*trigger_prescale);
+					h_UE_dNdEtadPhidpT_MC.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_3*eff_weight*trigger_prescale);
 				}
 			}
+		}
 			
 	}
 	
@@ -507,8 +530,8 @@ EL::StatusCode MBUEEstimator :: execute (){
 	for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){
 		float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
 		float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
-		h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_2/h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins());
-		h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_3/h_UE_dNdEtadPhidpT_MC.at(0).at(0).at(0)->GetZaxis()->GetNbins());
+		h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_2/h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins()*trigger_prescale);
+		h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_3/h_UE_dNdEtadPhidpT_MC.at(0).at(0).at(0)->GetZaxis()->GetNbins()*trigger_prescale);
 	}
 
 		

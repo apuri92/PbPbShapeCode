@@ -71,16 +71,17 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	cout << " Setting  histograms" << endl;
 	
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",100,0,5);
-	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",7,0,7);
+	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
 	h_DAQErrors= new TH1D("DAQErrors","DAQErrors",4,0,4);
 	
-	Double_t ptTrkBins[1000], etaTrkBins[1000], phiTrkBins[1000],finehitsBins[1000],d0z0Bins[1000];
-	Int_t ptTrkBinsN = 35, etaTrkBinsN = 50, phiTrkBinsN = 100, finehitsBinsN = 100, d0z0BinsN=600;
+	Double_t ptTrkBins[100], etaTrkBins[100], phiTrkBins[100],finehitsBins[1000],d0z0Bins[1000],ptJetBins[100],mJetBins[100];
+	Int_t ptTrkBinsN = 35, etaTrkBinsN = 50, phiTrkBinsN = 100, finehitsBinsN = 100, d0z0BinsN=600, ptJetBinsN, mJetBinsN;
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
    
-   
+    SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
+    SetupBinning(0, "m-jet", mJetBins, mJetBinsN);
 	SetupBinning(0, "pt-trk", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk", phiTrkBins, phiTrkBinsN);
@@ -138,6 +139,24 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		wk()->addOutput (hjetpt_trig.at(i));
 	}
 	
+	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)
+	{	
+		temphist_2D = new TH2D(Form("h_jet_v_mass_cent%i",i),Form("h_jet_v_mass_cent%i",i),ptJetBinsN, ptJetBins,mJetBinsN, mJetBins);
+		h_jet_v_mass.push_back(temphist_2D);
+		h_jet_v_mass.at(i)->Sumw2();
+		wk()->addOutput (h_jet_v_mass.at(i));
+		//in MC only
+		if (_data_switch==1){
+			temphist_2D = new TH2D(Form("h_truth_jet_v_mass_cent%i",i),Form("h_truth_jet_v_mass_cent%i",i),ptJetBinsN, ptJetBins,mJetBinsN, mJetBins);
+			h_truth_jet_v_mass.push_back(temphist_2D);
+			h_truth_jet_v_mass.at(i)->Sumw2();
+			wk()->addOutput (h_truth_jet_v_mass.at(i));
+		}
+		
+	}
+	
+	
+	
 	cout << " Histograms  ready, now setting tree" << endl;
 	TFile *outputFile = wk()->getOutputFile (_outputName);
 	tree_performance = new TTree ("tree_performance", "Performance tree"); // TODO - track charge
@@ -147,6 +166,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	tree_performance->Branch("run_n",&run_n,"run_n/I");
 	tree_performance->Branch("lbn_n",&lbn_n,"lbn_n/I");
 	tree_performance->Branch("FCalEt",&FCalEt,"FCalEt/F");
+	tree_performance->Branch("weight",&weight,"weight/F");
 	
 	for (int i=0;i<_nTriggers;i++){
 		tree_performance->Branch(Form("event_isTriggered_%i",i),&event_isTriggered[i],Form("event_isTriggered_%i/O",i));
@@ -156,8 +176,8 @@ EL::StatusCode JetPerformance :: histInitialize ()
 
 	tree_performance->Branch("jet_pt_EM",&jet_pt_EM,"jet_pt_EM/F");
 	tree_performance->Branch("jet_pt_xcalib",&jet_pt_xcalib,"jet_pt_xcalib/F");
-	tree_performance->Branch("jet_pt_prexcalib",&jet_pt_prexcalib,"jet_pt_prexcalib/F");
-	tree_performance->Branch("jet_pt_seb",&jet_pt_seb,"jet_pt_seb/F");
+	//tree_performance->Branch("jet_pt_prexcalib",&jet_pt_prexcalib,"jet_pt_prexcalib/F");
+	//tree_performance->Branch("jet_pt_seb",&jet_pt_seb,"jet_pt_seb/F");
 	tree_performance->Branch("jet_pt_unsubtracted",&jet_pt_unsubtracted,"jet_pt_unsubtracted/F");
 	tree_performance->Branch("jet_pt",&jet_pt,"jet_pt/F");
 	tree_performance->Branch("jet_phi",&jet_phi,"jet_phi/F");
@@ -165,10 +185,12 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	tree_performance->Branch("jet_m",&jet_m,"jet_m/F");
 	tree_performance->Branch("jet_nConst",&jet_nConst,"jet_nConst/I");
 	tree_performance->Branch("jet_isGood",&jet_isGood,"jet_isGood/I");
-	tree_performance->Branch("jet_NBJ_pT",&jet_NBJ_pT,"jet_NBJ_pT/F");
+	//tree_performance->Branch("jet_NBJ_pT",&jet_NBJ_pT,"jet_NBJ_pT/F");
 	tree_performance->Branch("jet_isMuonIsolated",&jet_isMuonIsolated,"jet_isMuonIsolated/I");
 	tree_performance->Branch("jet_centrality",&jet_centrality,"jet_centrality/I");
 	
+
+	/*
 	tree_performance->Branch("jet_jetQuality",&jet_jetQuality,"jet_jetQuality/F");
 	tree_performance->Branch("jet_jetTime",&jet_jetTime,"jet_jetTime/F");
 	tree_performance->Branch("jet_jethecq",&jet_jethecq,"jet_jethecq/F");
@@ -188,7 +210,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		tree_performance->Branch("test_jet_m",&test_jet_m,"test_jet_m/F");
 		tree_performance->Branch("test_jet_isGood",&test_jet_isGood,"test_jet_isGood/I");
 	}
-
+	
 	tree_performance->Branch("jet_ClSub_et",&jet_ClSub_et,"jet_ClSub_et/F");
  	tree_performance->Branch("jet_ClUnsub_et",&jet_ClUnsub_et,"jet_ClUnsub_et/F");
 	tree_performance->Branch("jet_Clneg_et",&jet_Clneg_et,"jet_Clneg_et/F");
@@ -196,14 +218,27 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	tree_performance->Branch("ClUnsub_et",&ClUnsub_et);
 	tree_performance->Branch("ClUnsub_eta",&ClUnsub_eta);
 	tree_performance->Branch("ClUnsub_phi",&ClUnsub_phi);
-
+	*/
 	if(_data_switch==1){
 		tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
 		tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
 		tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
 		tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
 		tree_performance->Branch("truth_reco_jet_dR",&truth_reco_jet_dR,"truth_reco_jet_dR/F");
-		tree_performance->Branch("truth_jet_NBJ_pT",&truth_jet_NBJ_pT,"truth_jet_NBJ_pT/F");
+		//tree_performance->Branch("truth_jet_NBJ_pT",&truth_jet_NBJ_pT,"truth_jet_NBJ_pT/F");
+	}
+	
+	truth_tree_performance = new TTree ("truth_tree_performance", "Performance tree"); // TODO - track charge
+	truth_tree_performance->SetDirectory (outputFile);
+
+	if(_data_switch==1){
+		truth_tree_performance->Branch("event_n",&event_n,"event_n/I");
+		truth_tree_performance->Branch("run_n",&run_n,"run_n/I");
+		truth_tree_performance->Branch("FCalEt",&FCalEt,"FCalEt/F");
+		truth_tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
+		truth_tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
+		truth_tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
+		truth_tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
 	}
 		
 	cout << " tree  ready" << endl; 
@@ -268,18 +303,26 @@ EL::StatusCode JetPerformance :: initialize ()
 	EL_RETURN_CHECK("initialize()",m_grl->setProperty("PassThrough", false)); // if true (default) will ignore result of GRL and will just pass all events
 	EL_RETURN_CHECK("initialize()",m_grl->initialize());
 	
-	//Calibration   
-    const std::string name = "pPbFragmentation"; //string describing the current thread, for logging
-    TString jetAlgo = "AntiKt4HI"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
-    TString config = "JES_MC15CHI_042316.config"; //Path to global config used to initialize the tool (see below)
-    TString calibSeq = "EtaJES_DEV"; //String describing the calibration sequence to apply (see below)
-    bool isData = false; //bool describing if the events are data or from simulation
-	
+	//Calibration
+	const std::string name = "PbPbFragmentation"; //string describing the current thread, for logging
+	TString jetAlgo = "AntiKt4HI"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
+	TString config = "JES_MC15CHI_060316.config"; //Path to global config used to initialize the tool (see below)
+	TString calibSeq = "EtaJES_DEV"; //String describing the calibration sequence to apply (see below)
+									 //bool isData = false; -- not used //bool describing if the events are data or from simulation
+
+	//insitu calibration
+	TString jetAlgo_insitu = "AntiKt4EMTopo"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
+	TString config_insitu = "JES_2015dataset_recommendation_Feb2016.config"; //Path to global config used to initialize the tool (see below)
+	const std::string name_insitu = "insitu"; //string describing the current thread, for logging
+	TString calibSeq_insitu = "Insitu_DEV"; //String describing the calibration sequence to apply (see below)
+
 	//Call the constructor. The default constructor can also be used if the arguments are set with python configuration instead
-	m_jetCalibration = new JetCalibrationTool(name, jetAlgo, config, calibSeq, isData);
-	
+	m_jetCalibration = new JetCalibrationTool(name, jetAlgo, config, calibSeq, true);
+	m_jetCalibration_insitu = new JetCalibrationTool(name_insitu, jetAlgo_insitu, config_insitu, calibSeq_insitu, true);
+
 	//Initialize the tool
 	EL_RETURN_CHECK("initialize()",m_jetCalibration->initializeTool(name));
+	EL_RETURN_CHECK("initialize()",m_jetCalibration_insitu->initializeTool(name_insitu));
 	
 	//Jet Cleaning
 	// initialize and configure the jet cleaning tool
@@ -288,6 +331,9 @@ EL::StatusCode JetPerformance :: initialize ()
 	EL_RETURN_CHECK("initialize()",m_jetCleaning->setProperty( "CutLevel", "LooseBad"));
 	EL_RETURN_CHECK("initialize()",m_jetCleaning->setProperty("DoUgly", false));
 	EL_RETURN_CHECK("initialize()",m_jetCleaning->initialize());
+	
+	//JetCorrector
+	jetcorr = new JetCorrector();
 
 	cout << " Initialization done" << endl;
 	return EL::StatusCode::SUCCESS;
@@ -323,10 +369,11 @@ EL::StatusCode JetPerformance :: execute (){
 	run_n = eventInfo->runNumber();
 	lbn_n = eventInfo->lumiBlock();
 	
-	if(m_eventCounter%statSize==0) cout << "EventNumber " << event_n << endl;
+	//if(m_eventCounter%statSize==0) cout << "EventNumber " << event_n << endl;
 		
 	double FCal_Et = 0;
 	int cent_bin=0;
+	//TODO FCAl weights if needed
 	if (_centrality_scheme>1) {
 		//Centrality
 		const xAOD::HIEventShapeContainer* calos = 0;
@@ -352,13 +399,28 @@ EL::StatusCode JetPerformance :: execute (){
 		
 	// check if the event is data or MC
 	bool isMC = false;
+	bool isHIJING = false; //For centrality
 	// check if the event is MC
-	if(eventInfo->eventType( xAOD::EventInfo::IS_SIMULATION ) ){
+	if(eventInfo->eventType( xAOD::EventInfo::IS_SIMULATION ) )
+	{
 		isMC = true;
-		_data_switch=1; 
+		isHIJING = true;
+		_data_switch=1;
 	}
-	else{
-		_data_switch=0;
+	else
+	{
+		const xAOD::TruthParticleContainer * particles = 0;
+		if( event->xAOD::TVirtualEvent::retrieve(particles, "TruthParticles", true) )
+		{
+			// this is overlay
+			isMC = true;
+			isHIJING = false;
+			_data_switch=1;
+		}
+		else
+		{
+			_data_switch=0;
+		}
 	} 
 	  
 	// GRL
@@ -393,54 +455,35 @@ EL::StatusCode JetPerformance :: execute (){
 		}
 	}
 	
-	//One evnt only
-	//if (1585081075!=event_n) return EL::StatusCode::SUCCESS;
+
 	
-	//TODO vertex position?
-	
-	//TODO rapidity gap?
-	
-	//DAQ errors 
-        /*
-        @MS 20160511: failing on compile => commented out, please fix
+	//DAQ errors
 	if(!isMC){
 		if(   (eventInfo->errorState(xAOD::EventInfo::LAr)==xAOD::EventInfo::Error ) || (eventInfo->errorState(xAOD::EventInfo::Tile)==xAOD::EventInfo::Error ) || (eventInfo->errorState(xAOD::EventInfo::SCT)==xAOD::EventInfo::Error ) || (eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18) ) ){
 			h_RejectionHisto->Fill(4.5);
-			if(   eventInfo->errorState(xAOD::EventInfo::LAr)==xAOD::EventInfo::Error ) h_DAQErrors->Fill(0.5); if(   eventInfo->errorState(xAOD::EventInfo::Tile)==xAOD::EventInfo::Error ) h_DAQErrors->Fill(1.5); if(   eventInfo->errorState(xAOD::EventInfo::SCT)==xAOD::EventInfo::Error ) h_DAQErrors->Fill(2.5); if(   eventInfo->isEventFlagBitSet(xAOD::EventInfo::Core, 18) ) h_DAQErrors->Fill(3.5);
-			//return EL::StatusCode::SUCCESS; // go to the next event
+			return EL::StatusCode::SUCCESS; // go to next event
 		}
 	}
-        */
  	 
 	h_RejectionHisto->Fill(5.5);
 	
 	// trigger
-	
-	
-	if (_truth_only==0) {
-		
+	if (_data_switch==0)
+	{
+		int event_passed_trigger=0;
+
 		for (int i=0;i<_nTriggers;i++){
-			trig_prescale[i] = 1.0;
+
 			event_isTriggered[i] = false;
-			jet_isTriggered[i] = 0;
+			event_isTriggered[i] =  _chainGroup.at(i)->isPassed();
+			trig_prescale[i] =  _chainGroup.at(i)->getPrescale();
+			h_triggercounter->Fill(i, (Double_t) event_isTriggered[i]);
+			if(event_isTriggered[i]) event_passed_trigger=1;
 		}
 
-		if (_data_switch==0){
-			
-			int event_passed_trigger=0;
-			
-			for (int i=0;i<_nTriggers;i++){
-				event_isTriggered[i] =  _chainGroup.at(i)->isPassed();
-				trig_prescale[i] =  _chainGroup.at(i)->getPrescale();
-				h_triggercounter->Fill(i, (Double_t) event_isTriggered[i]);
-				if(event_isTriggered[i]) event_passed_trigger=1;
-			}
-			
-			if(!event_passed_trigger) return EL::StatusCode::SUCCESS; // go to next event
-			else h_RejectionHisto->Fill(6.5);
-		}
-	}  
-	
+		if(!event_passed_trigger) return EL::StatusCode::SUCCESS; // go to next event
+		else h_RejectionHisto->Fill(8.5);
+	}
 	
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
@@ -450,6 +493,10 @@ EL::StatusCode JetPerformance :: execute (){
 	}
 	
 	
+	float event_weight = 1;
+	double max_pt = 1;
+	TLorentzVector jet4vector;
+	
 	//----------------------------
     // Container with clusters
     //--------------------------- 
@@ -458,12 +505,12 @@ EL::StatusCode JetPerformance :: execute (){
 	
 	//Jet vectors
 	vector<float> jet_pt_EM_vector, test_jet_pt_EM_vector, jet_pt_unsubtracted_vector, jet_pt_SEB_vector,jet_pt_prexcalib_vector,jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector,jet_m_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector;
-	vector<int> Is_jet_Good, Is_test_jet_Good, Is_dummyJet;
-	vector<float> truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector;
+	vector<int> Is_jet_Good, Is_test_jet_Good, Is_dummyJet,jet_IsTrig_vector;
+	vector<float> truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector, truth_jet_y_vector;
 	vector<int> truth_jet_indices, truth_jet_isDummy_vector,jet_nConst_vector;
 	vector<int> hasTruth,jet_jetLArBadHVNCell_vector;
 	vector<int> isTriggered[_nTriggers];
-	vector<float> jet_NBJ_pT_vector,truth_jet_NBJ_pT_vector;
+	vector<float> jet_NBJ_pT_vector,truth_jet_NBJ_pT_vector,jet_TrigPresc_vector;
 	vector<float> trig_EF_jet_pt, trig_EF_jet_phi, trig_EF_jet_eta;
 	vector<float> antikt2_pt,antikt2_phi,antikt2_eta;
 	vector<float> jet_jetQuality_vector,jet_jetTime_vector,jet_jethecq_vector,jet_jetnegE_vector,jet_jetemf_vector,jet_jethecf_vector,jet_jetchf_vector,jet_jetfracSamplingMax_vector,jet_jetLArBadHVEnergyFrac_vector,jet_jetBchCorrCell_vector;
@@ -476,6 +523,7 @@ EL::StatusCode JetPerformance :: execute (){
 	truth_jet_eta_vector.clear();
 	truth_jet_phi_vector.clear();
 	truth_jet_m_vector.clear();
+	truth_jet_y_vector.clear();
 	
 	jet_pt_EM_vector.clear();
 	jet_pt_unsubtracted_vector.clear();
@@ -498,58 +546,60 @@ EL::StatusCode JetPerformance :: execute (){
 	jet_jetBchCorrCell_vector.clear();
 	jet_jetLArBadHVEnergyFrac_vector.clear();
 	jet_jetLArBadHVNCell_vector.clear();
+	
+	jet_IsTrig_vector.clear();
+	jet_TrigPresc_vector.clear();
 		
 	for (int j=0;j<_nTriggers;j++){
 		isTriggered[j].clear();
 	}
-	
-	
 		
-	//***** HLT Jets *****
-	
-	
-	if(_data_switch==0 && !_isMB) {   
-		const xAOD::JetContainer * hlt_jet = 0;
-		string trigger_container="HLT_xAOD__JetContainer_" + _trigger_collection;
-		  
-		if( ! event->retrieve( hlt_jet, trigger_container.c_str()).isSuccess() ) {
-			Error("execute()", Form("failed to retrieve %s", trigger_container.c_str()));
-		}
-		
-		const xAOD::Jet *hlt_jet_obj = 0;
-		//cout << "n HLT jets: " << hlt_jet->size() << endl;
-		for(unsigned int HLTjet_itr = 0; HLTjet_itr < hlt_jet->size(); ++HLTjet_itr) {
-			hlt_jet_obj = hlt_jet->at(HLTjet_itr);
-			trig_EF_jet_pt.push_back(  hlt_jet_obj->pt() );
-			trig_EF_jet_phi.push_back( hlt_jet_obj->phi() );
-			trig_EF_jet_eta.push_back( hlt_jet_obj->eta() );
-			h3_HLT_jet_spect->Fill(hlt_jet_obj->pt() * 0.001  , hlt_jet_obj->eta(), hlt_jet_obj->phi());   
-		}
-	}
-	
-	
 	//***** TRUTH JETS *****
 	 
+	// ---- GETTING TRUTH JETS ----
 	std::vector<float> JetTruthPt, JetTruthPhi, JetTruthEta;
 	const xAOD::JetContainer * jet_truth = 0;
-	if(isMC) { 
-		if( ! event->retrieve( jet_truth, _truth_jet_collection.c_str()).isSuccess() ) {
-			Error("execute()", Form("failed to retrieve %s", _truth_jet_collection.c_str()));
+	if(_data_switch == 1)
+	{
+		EL_RETURN_CHECK("execute()",event->retrieve( jet_truth, _truth_jet_collection.c_str() ));
+
+		truth_jet_pt_vector.clear(); truth_jet_phi_vector.clear(); truth_jet_eta_vector.clear();;
+
+		xAOD::JetContainer::const_iterator jet_itr = jet_truth->begin();
+		xAOD::JetContainer::const_iterator jet_end = jet_truth->end();
+		for( ; jet_itr != jet_end; ++jet_itr )
+		{
+			xAOD::JetFourMom_t jet_truth_4mom = (*jet_itr)->jetP4();
+
+			truth_jet_pt    = (jet_truth_4mom.pt() * 0.001 );
+			truth_jet_eta    = (jet_truth_4mom.eta());
+			truth_jet_phi    = (jet_truth_4mom.phi());
+			truth_jet_m   = (jet_truth_4mom.M()*0.001);
+
+			if (truth_jet_pt>max_pt) 	//event weight from leading truth jet
+			{
+				event_weight = jetcorr->GetJetWeight(truth_jet_pt, truth_jet_eta, truth_jet_phi);
+				max_pt = truth_jet_pt;
+			}
+			weight=event_weight;
+
+			//if (pt < _truthpTjetCut) continue;
+			//if (fabs(eta)>2.1) continue;
+
+			//filling truth pt/eta/phi vectors
+			truth_jet_pt_vector.push_back(truth_jet_pt);
+			truth_jet_m_vector.push_back(truth_jet_m);
+			truth_jet_phi_vector.push_back(truth_jet_phi);
+			truth_jet_eta_vector.push_back(truth_jet_eta);
+			////Get rapidity
+			jet4vector.SetPtEtaPhiM(truth_jet_pt, truth_jet_eta, truth_jet_phi, truth_jet_m);
+			truth_jet_y_vector.push_back(jet4vector.Rapidity());
+			
+			if (fabs(truth_jet_eta)>2.1) continue;
+			h_truth_jet_v_mass.at(cent_bin)->Fill(truth_jet_pt,truth_jet_m,event_weight);
+			if (truth_jet_pt < _pTjetCut) continue;
+			truth_tree_performance->Fill();
 		}
-		
-		truth_jet_pt_vector.clear(); truth_jet_phi_vector.clear(); truth_jet_eta_vector.clear();truth_jet_m_vector.clear();
-		
-		const xAOD::Jet *truth_jet_obj = 0;
-		for(unsigned int jet_itr = 0; jet_itr < jet_truth->size(); ++jet_itr) {
-			truth_jet_obj = jet_truth->at(jet_itr);
-		
-			truth_jet_pt_vector.push_back(  truth_jet_obj->pt() * 0.001 );
-			truth_jet_phi_vector.push_back( truth_jet_obj->phi() );
-			truth_jet_eta_vector.push_back( truth_jet_obj->eta() );
-			truth_jet_m_vector.push_back( truth_jet_obj->m() );  
-			truth_jet_isDummy_vector.push_back(0);
-		}
-		truth_jet_NBJ_pT_vector = MTCorrector::GetIsolation(truth_jet_pt_vector,truth_jet_eta_vector,truth_jet_phi_vector,_jet_radius);
 	}
 	
 	
@@ -569,57 +619,53 @@ EL::StatusCode JetPerformance :: execute (){
 		
 	int jet_counter=0;
 	for( ; jet_itr != jet_end; ++jet_itr ) {
-		jet_counter++;
-		xAOD::Jet* newjet = new xAOD::Jet();
-		newjet->makePrivateStore( **jet_itr );
-		updatedjets->push_back( newjet );	
 		
-		const xAOD::JetFourMom_t jet_4mom_def = newjet->jetP4();
-		const xAOD::JetFourMom_t jet_4mom = newjet->jetP4("JetEMScaleMomentum");
+		xAOD::Jet newjet;// = new xAOD::Jet();
+		newjet.makePrivateStore( **jet_itr );
+
+		const xAOD::JetFourMom_t jet_4mom_def = newjet.jetP4();
 		float def_jet_pt  = (jet_4mom_def.pt() * 0.001);
-		float unsubtracted_jet_pt  = (jet_4mom.pt() * 0.001);  
+		
+		//cout << " Def:  " << def_jet_pt << endl;
+
+		xAOD::JetFourMom_t jet_4mom = newjet.jetP4("JetSubtractedScaleMomentum"); //getting SubtractedScale instead of EMScale because EMScale is not in DFAntiKt4HI
 		float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+
+		const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet.jetP4("JetUnsubtractedScaleMomentum");
+		float unsubtracted_jet_pt  = (jet_4mom_unsubtracted.pt() * 0.001);
+
+		hET_ETsub->Fill(def_jet_pt,jet_4mom_def.eta(),unsubtracted_jet_pt-uncalib_jet_pt);
+
+		//newjet.setJetP4("JetPileupScaleMomentum",jet_4mom); //Setting PileupScale and ConstitScale because they are not in DFAntiKt4HI
+		newjet.setJetP4("JetConstitScaleMomentum",jet_4mom_unsubtracted); //Required
+		//EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) );
 		
-		if (_reco_jet_collection.find("HI") != std::string::npos) {
-			const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet->jetP4("JetUnsubtractedScaleMomentum");
-			unsubtracted_jet_pt  = (jet_4mom_unsubtracted.pt() * 0.001);   
-		}
+		//cout << " Calib " << (newjet.pt() * 0.001);
 		
-		newjet->setJetP4("JetPileupScaleMomentum", jet_4mom);	
-		
-		EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( *newjet ) );
-		
-		if (_reco_jet_collection.find("HI") != std::string::npos) {
-			jet_pt  = (newjet->pt() * 0.001);
-			jet_eta = newjet->eta();
-			jet_phi = newjet->phi();
-			jet_m   = newjet->m()*0.001;
-		}
-		else{
-			jet_pt  = (jet_4mom_def.pt() * 0.001);
-			jet_eta = jet_4mom_def.eta();
-			jet_phi = jet_4mom_def.phi();
-			jet_m   = jet_4mom_def.M()*0.001;
-		}
+		const xAOD::JetFourMom_t jet_4mom_xcalib = newjet.jetP4();
+		newjet.setJetP4("JetGSCScaleMomentum", jet_4mom_xcalib);
+
+		//Cross-calibration
+		if (_data_switch==0) EL_RETURN_CHECK("execute()", m_jetCalibration_insitu->applyCalibration( newjet ) );
 		
 		//Jet quality moment
-		if( !m_jetCleaning->accept( **jet_itr )) Is_jet_Good.push_back(0);
+		if(_dataset==3 && !m_jetCleaning->accept( **jet_itr )) Is_jet_Good.push_back(0);
 		else Is_jet_Good.push_back(1);
 		
 		jet_nConst = (*jet_itr)->numConstituents();
+		jet_pt  = (newjet.pt() * 0.001);
+		jet_eta = newjet.eta();
+		jet_phi = newjet.phi();
+		jet_m = newjet.m()*0.001;
 		
 		jet_pt_EM_vector.push_back(uncalib_jet_pt);
 		jet_pt_unsubtracted_vector.push_back(unsubtracted_jet_pt);
-		jet_pt_SEB_vector.push_back(jet_pt);
-		jet_pt_prexcalib_vector.push_back(jet_4mom_def.pt() * 0.001); //TODO right now is default
 		jet_pt_xcalib_vector.push_back(jet_pt);
 		
 		jet_phi_vector.push_back(jet_phi);
 		jet_eta_vector.push_back(jet_eta);
 		jet_m_vector.push_back(jet_m);
 		jet_nConst_vector.push_back(jet_nConst);
-		
-		//cout << "EM " << uncalib_jet_pt << " def " << jet_4mom_def.pt() * 0.001 << " calib " << jet_pt << " eta " << jet_eta << " phi " << jet_phi << endl; 
 		
 		//jet quality
 
@@ -650,9 +696,39 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_jetchf_vector.push_back(chf);
 		jet_jetBchCorrCell_vector.push_back(BchCorrCell);
 		jet_jetLArBadHVEnergyFrac_vector.push_back(LArBadHVEnergyFrac);
-		jet_jetLArBadHVNCell_vector.push_back(LArBadHVNCell);    
+		jet_jetLArBadHVNCell_vector.push_back(LArBadHVNCell);
+		
+		if (_data_switch==0) //is data, so need prescales and trigger decisions (at jet level)
+		{
+			bool is_trig = false;
+			double presc = -1;
 
+			for (int k=0;k<_nTriggers;k++)
+			{
+				if(event_isTriggered[k] && (jet_pt > jet_pt_trig[k][0] && jet_pt <= jet_pt_trig[k][1]))
+				{
+					is_trig = true;
+					presc =  trig_prescale[k];
+					break;
+				}
+			}
+			jet_TrigPresc_vector.push_back(presc);
+			jet_IsTrig_vector.push_back(is_trig);		
+		}
+		
+		//Get mass
+		/*
+		const xAOD::JetConstituentVector constituents = (*jet_itr)->getConstituents();
+		int iterator=0;
+		for (xAOD::JetConstituentVector::iterator itr = constituents.begin(); itr != constituents.end(); ++itr){ 
+			iterator++; 
+			const xAOD::CaloCluster* cl=static_cast<const xAOD::CaloCluster*>(itr->rawConstituent());
+			float sumET= cl->rawE() * 0.001 / std::cosh( cl->rawEta() ); 
+		}
+		*/
+		
 	}
+	
 	
 	//Test jet loop
 	if (strcmp (_test_reco_jet_collection.c_str(),"none") != 0){	
@@ -681,69 +757,7 @@ EL::StatusCode JetPerformance :: execute (){
 			test_jet_m_vector.push_back(jet_m);
 		}
 	}
-	//TODO isolation after calibration
-	//test_jet_NBJ_pT_vector = MTCorrector::GetIsolation(jet_pt_xcalib_vector,jet_eta_vector,jet_phi_vector,_jet_radius);
 	
-	//Trigger handeling, Data only
-	
-	if (_data_switch==0){	
-		
-		for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++){
-			
-			jet_pt = jet_pt_xcalib_vector.at(i);			 
-			jet_eta = jet_eta_vector.at(i);
-			jet_phi = jet_phi_vector.at(i);
-			
-			for (int j=0;j<_nTriggers;j++){
-				trigger[j] = false;
-			}
-			//Only for HP
-			if (_isMB==0){
-				//matching to trigger jets
-				
-				for(unsigned int j=0; j<trig_EF_jet_pt.size(); j++){	 
-					float trig_jet_eta = trig_EF_jet_eta.at(j);
-					float trig_jet_phi = trig_EF_jet_phi.at(j);
-					float trig_jet_pt = trig_EF_jet_pt.at(j) / 1000.0;
-					
-					for (int k=0;k<_nTriggers;k++){			 
-						if(event_isTriggered[k] && trig_jet_pt > trigger_thresholds.at(k)){
-							if(jet_pt > jet_pt_trig[k][0] && jet_pt < jet_pt_trig[k][1]) {				 
-								float R = DeltaR(trig_jet_phi,trig_jet_eta,jet_phi,jet_eta);
-								if(R < 0.4) {trigger[k] = true; htrig_reco_pt->Fill(jet_pt,trig_jet_pt);}	
-							}					
-						}
-					}	
-				}
-				
-				//No matching tro trigger jets
-				for (int k=0;k<_nTriggers;k++){			 
-					if(event_isTriggered[k]){
-						if(jet_pt > jet_pt_trig[k][0] && jet_pt < jet_pt_trig[k][1]) //comment to match Yakov analysis 
-							{				 
-							trigger[k] = true; 	
-						}					
-					}
-				}
-			}
-			for (int j=0;j<_nTriggers;j++){			 	
-				if (trigger[j] && _isMB==0){
-					isTriggered[j].push_back(1);
-					hjetpt_trig[j]->Fill(jet_pt,_chainGroup[j]->getPrescale());		 	
-				}
-				else
-				{
-					if(_isMB==1 && event_isTriggered[j]) {
-						isTriggered[j].push_back(1);
-						if(!Is_dummyJet.at(i)) hjetpt_trig[j]->Fill(jet_pt,_chainGroup[j]->getPrescale());
-					}
-					else isTriggered[j].push_back(0);
-				}
-			}	
-		}	
-	}
-		
-		
 	//Truh matching, MC only	  
 	if(_data_switch == 1){ 
 		for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++){
@@ -756,6 +770,7 @@ EL::StatusCode JetPerformance :: execute (){
 			float dR_min=999.;
 			for(unsigned int j=0; j<truth_jet_pt_vector.size(); j++){
 				truth_jet_pt = truth_jet_pt_vector.at(j);
+				truth_jet_m = truth_jet_m_vector.at(j);
 				truth_jet_eta = truth_jet_eta_vector.at(j);
 				truth_jet_phi = truth_jet_phi_vector.at(j);
 				float R = DeltaR(truth_jet_phi,truth_jet_eta,jet_phi,jet_eta);
@@ -772,19 +787,14 @@ EL::StatusCode JetPerformance :: execute (){
 	}
 	
 	//Here is the analysis code
-	
 	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++){
 			
-		int triggered_at_least_once=0;
-		if (_data_switch==0){
-			for (int j=0;j<_nTriggers;j++){
-				jet_isTriggered[j] = isTriggered[j].at(i);
-				if(jet_isTriggered[j]){
-					triggered_at_least_once=1;
-				}
-			}			
-			//skip ther rest
-			if(!triggered_at_least_once) continue;
+		float jet_weight =1.;		
+		jet_weight *=event_weight;
+		if (_data_switch==0)
+		{
+			if (!jet_IsTrig_vector.at(i)) continue;
+			jet_weight = jet_TrigPresc_vector.at(i);
 		}
 		
 		jet_pt = jet_pt_xcalib_vector.at(i);
@@ -794,16 +804,13 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_Et = sqrt(pow(jet_pt,2)+pow(jet_m,2));
 		jet_pt_EM = jet_pt_EM_vector.at(i);
 		jet_pt_unsubtracted = jet_pt_unsubtracted_vector.at(i);
-		jet_pt_seb = jet_pt_SEB_vector.at(i);
-		jet_pt_prexcalib = jet_pt_prexcalib_vector.at(i);
+		//jet_pt_seb = jet_pt_SEB_vector.at(i);
+		//jet_pt_prexcalib = jet_pt_prexcalib_vector.at(i);
 		jet_pt_xcalib = jet_pt_xcalib_vector.at(i);
 		jet_nConst = jet_nConst_vector.at(i);
 		jet_isGood = Is_jet_Good.at(i);
-		//jet_NBJ_pT = jet_NBJ_pT_vector.at(i);
-		//jet_isMuonIsolated = Is_muon_Isolated.at(i); //TODO if needed
 		jet_isMuonIsolated = true;
 		jet_centrality=cent_bin;
-		
 		
 		jet_jetQuality = jet_jetQuality_vector.at(i);
 		jet_jetTime = jet_jetTime_vector.at(i);
@@ -815,26 +822,30 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_jetchf = jet_jetchf_vector.at(i);
 		jet_jetBchCorrCell = jet_jetBchCorrCell_vector.at(i);
 		jet_jetLArBadHVEnergyFrac = jet_jetLArBadHVEnergyFrac_vector.at(i);
-		jet_jetLArBadHVNCell = jet_jetLArBadHVNCell_vector.at(i);		 
-			
-		//10 GeV reco cut
+		jet_jetLArBadHVNCell = jet_jetLArBadHVNCell_vector.at(i);
+		weight=jet_weight;		 
 		
+		//10 GeV reco cut
 		if (jet_pt_xcalib<10.) continue;
 		
 		if(_data_switch == 1){
+			//cout << hasTruth.size() << endl;
 			jet_hasTruth = hasTruth.at(i);
+			
 			if (jet_hasTruth){
 				truth_jet_eta = truth_jet_eta_vector.at(truth_jet_indices[i]);
 				truth_jet_phi = truth_jet_phi_vector.at(truth_jet_indices[i]);
 				truth_jet_pt = truth_jet_pt_vector.at(truth_jet_indices[i]);
 				truth_jet_m = truth_jet_m_vector.at(truth_jet_indices[i]);
-				truth_jet_NBJ_pT = truth_jet_NBJ_pT_vector.at(truth_jet_indices[i]);
+				truth_reco_jet_dR = DeltaR(truth_jet_phi,truth_jet_eta,jet_phi,jet_eta);
+				//truth_jet_NBJ_pT = truth_jet_NBJ_pT_vector.at(truth_jet_indices[i]);
 			}
 			else{
 				truth_jet_eta = -100.;
 				truth_jet_phi = -100.;
 				truth_jet_pt = 0;
 			}
+			
 		}
 		
 		//test jets
@@ -868,8 +879,10 @@ EL::StatusCode JetPerformance :: execute (){
 					hET_ETsub_v_dEta->Fill(jet_pt_xcalib_vector.at(j),jet_eta-jet_eta_vector.at(j),jet_pt_unsubtracted-jet_pt_EM);
 				}	
 			}
+			if (fabs(jet_eta)<=2.1) h_jet_v_mass.at(cent_bin)->Fill(jet_pt,jet_m,jet_weight);
 		}
 		if (_doClusters) {
+		   
 		   ClUnsub_et.clear();
 		   ClUnsub_eta.clear();
 		   ClUnsub_phi.clear();
@@ -907,7 +920,9 @@ EL::StatusCode JetPerformance :: execute (){
 		   jet_Clneg_et = et_neg;
 		   jet_Clpost_et = et_pos;
 		   
+		
        } // doClusters
+       if (jet_pt < _pTjetCut) continue;
        tree_performance->Fill();
 		
 	}

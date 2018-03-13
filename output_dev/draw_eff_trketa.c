@@ -69,7 +69,7 @@ void draw_eff_trketa()
 			double eta_lo = trk_eta_binning_new->GetBinLowEdge(i_eta_cuts+1);
 			double eta_hi = trk_eta_binning_new->GetBinUpEdge(i_eta_cuts+1);
 
-			if ((eta_hi < -1.0 || eta_lo > +1.0)) continue;
+			if ((eta_hi < -1. || eta_lo > 1.)) continue;
 
 			name = Form("hist_eff_eta%i_cent%i", i_eta_cuts, i_cent_cuts);
 			h_efficiency.at(i_cent_cuts).at(i_eta_cuts) = (TH1*)input_file->Get(name.c_str());
@@ -78,7 +78,7 @@ void draw_eff_trketa()
             SetHStyle_smallify(h_efficiency.at(i_cent_cuts).at(i_eta_cuts),style++, doSmall);
 
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetRangeUser(0.5,1);
-            h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,100);
+            h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetRangeUser(1,200);
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetYaxis()->SetTitle("Efficiency");
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetXaxis()->SetTitle("#it{p}_{T}^{truth} [GeV]");
             h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->SetTitle(Form("Efficiency: %s, %4.2f < #eta < %4.2f",centrality.c_str(), eta_lo, eta_hi));

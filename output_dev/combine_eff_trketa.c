@@ -189,7 +189,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 					double tmp_b = h_total_1d->GetBinContent(i_bin+1);
                     int entries = h_entries_1d->GetBinContent(i_bin+1);
 
-					if (entries < 50) continue;
+					if (entries < 5) continue;
 //					if (tmp_a > tmp_b) continue;
 
 					vec_e.at(i_files).at(i_bin) = h_ratio->GetBinContent(i_bin+1);

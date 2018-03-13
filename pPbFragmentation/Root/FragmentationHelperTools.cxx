@@ -347,6 +347,21 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
 		}
 		cout << " ... " << num << endl;
 	}
+	
+	if ((scheme==0) && (variable=="m-jet"))
+	{num = 12;
+		double bins[13] = { -50, -30,-10,0,10,20,30,40,50,75,100,200,300};
+		printf("... m-jet-binning : ");
+		//num = 100;
+		Float_t value=0;
+		for (int i=0; i<=num; i++)
+		{
+			array[i]=bins[i];
+			//value = value + 2;
+			printf("%.0f, ", array[i]);
+		}
+		cout << " ... " << num << endl;
+	}
 
 	if ((scheme==0) && (variable=="z-rebin"))
 	{ num = 19;
@@ -451,25 +466,25 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      if ((scheme==0) && (variable=="eta-trk-coars"))
      {
       printf("\n... eta-trk-binning : four simple bins ");
-      num = 26;
+      num = 13;
       double value=-1.3;
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
          printf("%f, ", array[i]);
-         value = value + 0.100;
+         value = value + 0.200;
         }
      }
      if ((scheme==0) && (variable=="phi-trk-coars"))
      {
       printf("\n... phi-trk-binning : four simple bins ");
-      num = 64;
+      num = 32;
       Float_t value=-TMath::Pi(); 
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
          printf("%.4f, ", array[i]);
-         value = value + TMath::Pi()/32.;
+         value = value + TMath::Pi()/16.;
         }
      }
      if ((scheme==0) && (variable=="eta-trk-fine"))

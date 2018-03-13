@@ -25,6 +25,7 @@
 #include "JetSelectorTools/JetCleaningTool.h"
 #include "xAODTracking/TrackParticleContainer.h"
 #include "xAODTracking/VertexContainer.h"
+#include "pPbFragmentation/JetCorrector.h"
 
 #define private public
 #include "xAODHIEvent/HIEventShapeAuxContainer.h"
@@ -53,6 +54,7 @@ class JetPerformance : public BaseClass{
 	
 	//Output tree
 	TTree *tree_performance; //!
+	TTree *truth_tree_performance; //!
 	
 				
 	//Basic histograms
@@ -69,12 +71,15 @@ class JetPerformance : public BaseClass{
     TH2D * h2_JetCl_PtNconst2; //!
 	TH3D * h3_JetCl_NegEt; //!
 	TH3D * h3_HLT_jet_spect; //!
-	
+
 	TH1D * h_DAQErrors; //!
 	
-	vector<TH1D*> hjetpt_trig;
-	vector<TH2D*> hjetz_trig;
-	vector<TH2D*> hjetz_UE_trig;
+	vector<TH1D*> hjetpt_trig; //!
+	vector<TH2D*> hjetz_trig; //!
+	vector<TH2D*> hjetz_UE_trig; //!
+	
+	vector<TH2D*> h_jet_v_mass; //!
+	vector<TH2D*> h_truth_jet_v_mass; //!
 	
 	bool event_isTriggered[10]; //!
 	bool trigger[10]; //!
@@ -91,9 +96,11 @@ class JetPerformance : public BaseClass{
 	
 	int jet_isGood,test_jet_isGood,jet_isMuonIsolated,jet_isDummy,jet_hasTruth,jet_centrality,jet_flavour,jet_jetLArBadHVNCell; //!
 	float test_jet_eta, test_jet_phi,test_jet_m, test_jet_pt_EM; //!
-	float jet_jetQuality,jet_jetTime,jet_jethecq,jet_jetnegE,jet_jetemf,jet_jethecf,jet_jetfracSamplingMax,jet_jetchf,jet_jetBchCorrCell,jet_jetLArBadHVEnergyFrac; //!
+	float jet_jetQuality,jet_jetTime,jet_jethecq,jet_jetnegE,jet_jetemf,jet_jethecf,jet_jetfracSamplingMax,jet_jetchf,jet_jetBchCorrCell,jet_jetLArBadHVEnergyFrac,weight; //!
 	
 	vector<float> ClUnsub_et, ClUnsub_eta, ClUnsub_phi; //!
+	
+	JetCorrector* jetcorr; //!
 	
 	// this is a standard constructor
 	JetPerformance ();

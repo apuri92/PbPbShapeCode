@@ -92,6 +92,7 @@ class BaseClass : public EL::Algorithm
 	//trigger
 	string _trigger_collection; //
 	vector <string> trigger_chains; //TODO
+	vector <float> trigger_PS; //TODO
 	vector <float> trigger_thresholds; //TODO
 	vector <vector<float>> jet_pt_trig; //TODO
 	int _nTriggers; //

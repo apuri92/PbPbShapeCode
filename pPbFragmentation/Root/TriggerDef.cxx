@@ -98,6 +98,9 @@ void BaseClass::SetTrigger_chains(){
 			trigger_thresholds.push_back(0);
 			trigger_thresholds.push_back(0);
 			
+			trigger_PS.push_back(21.857);
+			trigger_PS.push_back(21.51);
+			
 			jet_pt_trig.resize(_nTriggers);
 			(jet_pt_trig[0]).push_back(0); (jet_pt_trig[0]).push_back(10000.);
 			(jet_pt_trig[1]).push_back(0); (jet_pt_trig[1]).push_back(10000.);
