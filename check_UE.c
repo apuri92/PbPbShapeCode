@@ -5,8 +5,8 @@ void check_UE()
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *input_file = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
-	//	TFile *input_file = new TFile("hist-local_mc.root");
+//	TFile *input_file = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
+	TFile *input_file = new TFile("hist-local_mc.root");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
@@ -105,15 +105,16 @@ void check_UE()
 			TH1* h_true_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("true_jet_y4_c%i", i_cent));
 			h_true_jet_spectra->Sumw2();
 
-			name = Form("ChPS_raw_1_dR%i_cent%i", i_dR, i_cent);
+			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			h_MB_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
-			name = Form("ff_UE_pT_dR%i_cent%i", i_dR, i_cent);
+
+			name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
 			h_TM_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
-			name = Form("ChPS_raw_2_dR%i_cent%i",i_dR,i_cent);
+			name = Form("ChPS_FS_UE_dR%i_cent%i",i_dR,i_cent);
 			h_FS_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
-			name = Form("ChPS_raw_2_noSec_dR%i_cent%i",i_dR,i_cent);
+			name = Form("ChPS_FNS_UE_dR%i_cent%i",i_dR,i_cent);
 			h_FNS_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
 
@@ -125,6 +126,7 @@ void check_UE()
 				double n_jets_true = h_true_jet_spectra->GetBinContent(i_jet);
 
 				if (n_jets == 0) continue;
+				
 
 				for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
 				{
@@ -176,6 +178,11 @@ void check_UE()
 				h_TM_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_2D[i_dR][i_cent]->ProjectionX(Form("TM_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_2D[i_dR][i_cent]->ProjectionX(Form("FS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FNS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_2D[i_dR][i_cent]->ProjectionX(Form("FNS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+
+				h_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+				h_TM_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+				h_FS_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+				h_FNS_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 
 				h_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 				h_TM_1D[i_jet][i_dR][i_cent]->Scale(1./area);
@@ -664,6 +671,7 @@ void check_UE()
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.9, 1.1);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");

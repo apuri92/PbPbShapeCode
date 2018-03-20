@@ -33,14 +33,14 @@ void UE_factors()
 		c1->Divide(3,2);
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
-			name = Form("ChPS_raw_1_dR%i_cent%i", i_dR, i_cent);
+			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_MB_method = (TH2*)input_file->Get(name.c_str());
 			name = Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent);
 			TH1* h_jet_spectra_unW = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_uw_jet_y4_c%i", i_cent));
 			h_jet_spectra_unW->Sumw2();
 
 
-			name = Form("ff_UE_pT_dR%i_cent%i", i_dR, i_cent);
+			name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_TM_method = (TH2*)input_file->Get(name.c_str());
 			name = Form("h_reco_jet_spectrum_y4_cent%i", i_cent);
 			TH1* h_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_w_jet_y4_c%i", i_cent));

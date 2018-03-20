@@ -123,7 +123,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
 		if (_dataset == 3) event_weight_fcal = 1;
-		h_centrality->Fill(cent_bin,event_weight_fcal);
+		h_centrality->Fill(cent_bin);
 
 		//Get HI clusters for flow
 		//const xAOD::CaloClusterContainer *hiclus(0);
@@ -509,7 +509,11 @@ EL::StatusCode PbPbFFShape :: execute (){
 				{
 					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi);
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
-					if (pass_reco_pt_cut) ChPS_raw_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+					if (pass_reco_pt_cut) ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+
+					//for reco tracks in truth jet
+					if (pass_reco_pt_cut && _data_switch) ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight);
+
 				}
 			}
 		}
@@ -627,6 +631,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 					ChPS_raw.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
 					ChPS_raw.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
+
+					if (_data_switch==1)
+					{
+						ChPS_raw_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+						ChPS_raw_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+					}
 
 					//Tracking validation histograms
 					if (jet_pt>80. && jet_pt<110.) h_reco_trk_map->Fill(pt,eta,phi);
@@ -755,11 +765,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 					{
 						if (pass_reco_pt_cut)
 						{
-							ff_UE_z.at(dr_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
-							ff_UE_pT.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
-
-							ff_UE_z.at(dr_bin).at(n_cent_bins-1)->Fill(z,jet_pt, jet_weight*eff_weight);
-							ff_UE_pT.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
+							ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
+							ChPS_TM_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
 
 							int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)reco_posRes_ChPS.at(0).at(0)->GetYaxis());
 							UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
@@ -771,13 +778,17 @@ EL::StatusCode PbPbFFShape :: execute (){
 					float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 					int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
 
-					ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-					ChPS_raw_UE_truthjet.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+//					ChPS_FS_UE.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+//					ChPS_FS_UE.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+					ChPS_FS_UE.at(dr_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+					ChPS_FS_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
 
 					if (!isSecondary)
 					{
-						ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-						ChPS_raw_UE_truthjet_noSec.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+//						ChPS_FNS_UE.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+//						ChPS_FNS_UE.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_FNS_UE.at(dr_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_FNS_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
 					}
 
 				}
@@ -1037,3 +1048,4 @@ EL::StatusCode PbPbFFShape :: histFinalize (){
 	cout<<"Events = "<< m_eventCounter<<endl;
 	return EL::StatusCode::SUCCESS;
 }
+

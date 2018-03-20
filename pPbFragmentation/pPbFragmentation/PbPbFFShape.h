@@ -103,6 +103,7 @@ class PbPbFFShape : public BaseClass{
 	//Raw disitrbutions
 	vector<vector<TH2D*>> ff_raw; //!  
 	vector<vector<TH2D*>> ChPS_raw; //!
+	vector<vector<TH2D*>> ChPS_raw_truthjet; //!
 	vector<vector<TH2D*>> ChPS_raw_rr; //!
 	vector<vector<TH2D*>> ChPS_raw_rt; //!
 	vector<vector<TH2D*>> ChPS_raw_tr; //!
@@ -113,9 +114,10 @@ class PbPbFFShape : public BaseClass{
 
 	//Raw disitrbutions from random cones
 	vector<vector<TH2D*>> ff_raw_UE; //!
-	vector<vector<TH2D*>> ChPS_raw_UE; //!	
-	vector<vector<TH2D*>> ChPS_raw_UE_truthjet; //!
-	vector<vector<TH2D*>> ChPS_raw_UE_truthjet_noSec; //!
+	vector<vector<TH2D*>> ChPS_MB_UE; //!
+	vector<vector<TH2D*>> ChPS_MB_UE_truthjet; //!
+	vector<vector<TH2D*>> ChPS_FS_UE; //!
+	vector<vector<TH2D*>> ChPS_FNS_UE; //!
 	
 	//Truth distributions
 	vector<vector<TH2D*>> ff_truth; //!  
@@ -128,8 +130,7 @@ class PbPbFFShape : public BaseClass{
 	//vector<vector<TH2D*>> ChPS_truth_matched; //!
 	
 	//UE unmatched disitrbution
-	vector<vector<TH2D*>> ff_UE_z; //!
-	vector<vector<TH2D*>> ff_UE_pT; //!
+	vector<vector<TH2D*>> ChPS_TM_UE; //!
 	vector<vector<TH3D*>> UE_distr; //!
 
 	vector<vector<TH1D*>> h_reco_jet_spectrum; //!
