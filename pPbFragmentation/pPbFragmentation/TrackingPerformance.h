@@ -40,6 +40,10 @@
 #include "xAODTruth/TruthVertexContainer.h"
 #include "pPbFragmentation/TrackCorrector.h"
 #include "pPbFragmentation/JetCorrector.h"
+
+#include "HIEventUtils/HIPileupTool.h"
+#include "ZdcAnalysis/ZdcAnalysisTool.h"
+
 #include <iostream>
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -94,6 +98,8 @@ class TrackingPerformance : public BaseClass{
 
 	TrackCorrector* trkcorr; //!
 	JetCorrector* jetcorr; //!
+	HI::HIPileupTool *m_hiPileup;    //!
+	ZDC::ZdcAnalysisTool *m_zdcTools; //!
 
 
 //	TH1 *h_z0pvs_before; //!
