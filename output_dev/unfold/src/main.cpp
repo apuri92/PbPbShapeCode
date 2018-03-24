@@ -219,18 +219,22 @@ int main(int argc, char ** argv)
 			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_MB_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_MB_truthjet = (TH2*)f_data->Get(Form("ChPS_MB_UE_truthjet_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
+			TH2* h_UE_TM_truthjet = (TH2*)f_mc->Get(Form("ChPS_TM_UE_truthjet_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_FS = (TH2*)f_mc->Get(Form("ChPS_FS_UE_dR%i_cent%i",i_dR,i_cent));;
+
 			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
 			h_final_UE->Reset();
 			h_final_UE->Sumw2();
+			TH2* h_final_fake = (TH2*)h_UE_MB->Clone(Form("final_fake_%i_cent%i",i_dR, i_cent));;
+			h_final_fake->Reset();
+			h_final_fake->Sumw2();
 
 			TH2* h_final_UE_truthjet = (TH2*)h_UE_MB->Clone(Form("final_UE_truthjet_%i_cent%i",i_dR, i_cent));;
 			h_final_UE_truthjet->Reset();
 			h_final_UE_truthjet->Sumw2();
-
-			TH2* h_final_fake = (TH2*)h_UE_MB->Clone(Form("final_fake_%i_cent%i",i_dR, i_cent));;
-			h_final_fake->Reset();
-			h_final_fake->Sumw2();
+			TH2* h_final_fake_truthjet = (TH2*)h_UE_MB->Clone(Form("final_fake_%i_cent%i",i_dR, i_cent));;
+			h_final_fake_truthjet->Reset();
+			h_final_fake_truthjet->Sumw2();
 
 			TH2* h_UE_corr_factors;
 			h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
@@ -262,12 +266,13 @@ int main(int argc, char ** argv)
 
 				//if pp. Subtract only fakes (UE_TM|MC) for all pT. Need to normalize n_jets_data / n_jets_mc. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
 				//if PbPb
-				//	if < 10 GeV: Subtract (UE_MB|data). Need to normalize n_jecs_w / n_jets_unw. This correction is 1 if running on data since UE_MB uses unw spectra, which is same as w spectra in data. Is not 1 for MC
+				//	if < 10 GeV: Subtract (UE_MB|data). No Need to normalize n_jecs_w / n_jets_unw.
 				//	if >= 10 GeV: Subtract (UE_TM|MC). Need to normalize n_jets_data / n_jets_mv. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
 
 				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
 				{
-					double UE = 0, UE_err = 0, UE_truthjet = 0, UE_truthjet_err = 0, fake = 0, fake_err = 0, corrections = 1;
+					double UE = 0, UE_err = 0, fake = 0, fake_err = 0, corrections = 1;
+					double UE_truthjet = 0, UE_truthjet_err = 0, fake_truthjet = 0, fake_truthjet_err = 0;
 
 					if (dataset_type == "pp")
 					{
@@ -287,11 +292,15 @@ int main(int argc, char ** argv)
 							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
 							UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
 
-							UE_truthjet = h_UE_MB_truthjet->GetBinContent(i_trk_bin, i_jet_bin);
-							UE_truthjet_err = h_UE_MB_truthjet->GetBinError(i_trk_bin, i_jet_bin);
-
 							fake = 0; //taken care of as part of UE
 							fake_err = 0;
+
+							//pick what method to subtract here. h_UE_FS or h_UE_MB_truthjet
+							UE_truthjet = h_UE_FS->GetBinContent(i_trk_bin, i_jet_bin);
+							UE_truthjet_err = h_UE_FS->GetBinError(i_trk_bin, i_jet_bin);
+
+							fake_truthjet = 0;
+							fake_truthjet_err = 0;
 
 							corrections = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_w / n_jets_unw;
 						}
@@ -302,6 +311,12 @@ int main(int argc, char ** argv)
 
 							fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
 							fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+							UE_truthjet = 0; //UE = 0 above 10 GeV by definition
+							UE_truthjet_err = 0;
+
+							fake_truthjet = h_UE_TM_truthjet->GetBinContent(i_trk_bin, i_jet_bin);
+							fake_truthjet_err = h_UE_TM_truthjet->GetBinError(i_trk_bin, i_jet_bin);
 
 							corrections = n_jets_data / n_jets_mc;
 						}
@@ -316,12 +331,14 @@ int main(int argc, char ** argv)
 					h_final_UE->SetBinContent(i_trk_bin, i_jet_bin, UE);
 					h_final_UE->SetBinError(i_trk_bin, i_jet_bin, UE_err);
 
-					h_final_UE_truthjet->SetBinContent(i_trk_bin, i_jet_bin, UE_truthjet);
-					h_final_UE_truthjet->SetBinError(i_trk_bin, i_jet_bin, UE_truthjet_err);
-
 					h_final_fake->SetBinContent(i_trk_bin, i_jet_bin, fake);
 					h_final_fake->SetBinError(i_trk_bin, i_jet_bin, fake_err);
 
+					h_final_UE_truthjet->SetBinContent(i_trk_bin, i_jet_bin, UE_truthjet);
+					h_final_UE_truthjet->SetBinError(i_trk_bin, i_jet_bin, UE_truthjet_err);
+
+					h_final_fake_truthjet->SetBinContent(i_trk_bin, i_jet_bin, fake_truthjet);
+					h_final_fake_truthjet->SetBinError(i_trk_bin, i_jet_bin, fake_truthjet_err);
 				}
 			}
 
@@ -331,7 +348,7 @@ int main(int argc, char ** argv)
 
 			TH2* h_raw_truthjet_subtr = (TH2*)h_raw_truthjet->Clone(Form("h_raw_truthjet_subtr_dR%i_c%i", i_dR, i_cent));
 			h_raw_truthjet_subtr->Add(h_final_UE_truthjet, -1.);
-			h_raw_truthjet_subtr->Add(h_final_fake, -1.);
+			h_raw_truthjet_subtr->Add(h_final_fake_truthjet, -1.);
 
 			delete h_reco_jet_spect_mc;
 			delete h_reco_jet_spect_data;
@@ -556,12 +573,21 @@ int main(int argc, char ** argv)
 				h_ChPS_UE->Scale(1./area);
 				h_ChPS_UE->Write(name.c_str());
 
+				//Fake
+				name = Form("h_ChPS_UE_TM_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
+				TH1* h_ChPS_TM_UE = (TH1*)h_final_fake->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+				h_ChPS_TM_UE->SetTitle(name.c_str());
+				h_ChPS_TM_UE->Scale(1.,"width");
+				h_ChPS_TM_UE->Scale(1./area);
+				h_ChPS_TM_UE->Write(name.c_str());
+
 
 				delete h_ChPS_raw;
 				delete h_ChPS_raw_subtr;
 				delete h_ChPS_raw_subtr_unf;
 				delete h_ChPS_raw_subtr_unf_bbb;
 				delete h_ChPS_UE;
+				delete h_ChPS_TM_UE;
 
 				//raw_truthjet
 				name = Form("h_ChPS_raw_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
@@ -592,19 +618,6 @@ int main(int argc, char ** argv)
 				h_ChPS_UE_truthjet->Scale(1.,"width");
 				h_ChPS_UE_truthjet->Scale(1./area);
 				h_ChPS_UE_truthjet->Write(name.c_str());
-
-
-				if (i_cent == 0 && i_dR == 0 && i_jet_bin == 7)
-				{
-					cout << "FINAL" << endl;
-					cout << h_ChPS_raw_truthjet->GetBinContent(3) << endl;
-					cout << h_ChPS_UE_truthjet->GetBinContent(3) << endl;
-					cout << h_ChPS_raw_truthjet_subtr->GetBinContent(3) << endl;
-
-//					h_ChPS_raw->Print("all");
-//					h_ChPS_UE->Print("all");
-//					h_ChPS_raw_subtr->Print("all");
-				}
 
 
 				delete h_ChPS_raw_truthjet;

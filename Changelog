@@ -1,5 +1,13 @@
 #TODO
 --------
+23/7/2018
+*cleaned up draw_ChPS
+*updates to main (added ChPS_truthjet UE/fake histo
+*fixed bugs in PbPbFFShape (fixed reco jet pT cut for ChPS_truthjet histograms, moved truth jet pt cuts to proper place)
+*added UE/fake for ChPS_truthjet
+*made ChPS_test_xx_xx for closure testing
+*UEEstimator now gives error as well
+--------
 20/7/2018
 *updated to svn version
 *new trk eff corr, fcal weights, UEmaps

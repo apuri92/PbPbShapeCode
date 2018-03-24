@@ -202,7 +202,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				h_true.at(i_cent).at(i_y)->Draw("");
 				h_raw.at(i_cent).at(i_y)->Draw("same");
 				h_unfolded.at(i_cent).at(i_y)->Draw("same");
-				gPad->SetLogx();
+				gPad->SetLogx(0);
 				gPad->SetLogy();
 
 				if (isMC)
@@ -220,7 +220,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 
 					}
 					line->DrawLine(1e2, 1, 1e3, 1);
-					gPad->SetLogx();
+					gPad->SetLogx(0);
 					gPad->SetLogy(0);
 
 				}
