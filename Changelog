@@ -1,4 +1,13 @@
 #TODO
+
+
+--------
+29/3/2018
+*updated to new svn
+*added MBov and MBtj to the check_UE code
+*getting efficiency in terms of r and eta
+*Removing events with jets in forward region
+*changed binning for trackingperf trk pt, added eff in terms of r
 --------
 23/7/2018
 *cleaned up draw_ChPS

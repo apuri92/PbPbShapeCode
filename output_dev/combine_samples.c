@@ -2,6 +2,7 @@
 
 #include "functions/global_variables.h"
 #include "combine_eff_trketa.c"
+#include "combine_eff_dr.c"
 
 
 void combine_samples()
@@ -47,7 +48,8 @@ void combine_samples()
 		}
 	}
 
-	if (eff_trketa) combine_eff_trketa(theFiles, weights);
+	if (0) combine_eff_trketa(theFiles, weights);
+	if (1) combine_eff_dr(theFiles, weights);
 
 
 

@@ -69,13 +69,17 @@ float JetCorrector::GetFCalWeight(float FCalEt) {
 float JetCorrector::GetFCalWeight(float FCalEt, int sample) {
 	if (is_pp) return 1.0; //is using pp MC so no weighting required
 	
-	if (FCalEt>4.9) FCalEt=4.9;
+	if (FCalEt>5.0) FCalEt=5.0;
 	//MC+MB (overlay)->HP
-	if (sample == 1) return FCal_HP_v_MBOV_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	if (sample == 1) return FCal_HP_v_MCOV_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
 	//MB->HP
 	else if (sample == 2) return FCal_HP_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
-	//MB->MC + MB (Overlya)
-	else if (sample == 3) return FCal_MBOV_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	//MB->MC + MB (Overlay)
+	else if (sample == 3) return FCal_MCOV_v_MB_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	//MBOV->HP
+	else if (sample == 4) return FCal_HP_v_MBOV_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
+	//MBOV->MC + MB (Overlay)
+	else if (sample == 5) return FCal_MCOV_v_MBOV_weights_histo->GetBinContent(FCal_HP_v_MB_weights_histo->GetXaxis()->FindBin(FCalEt));
 }
 
 /*
@@ -104,27 +108,35 @@ float JetCorrector::GetJetReweightingFactor(double pt, double eta, int cent){
 	return jet_spectra_weight[jet_eta_bin][cent]->Eval(pt);
 }
 
-float JetCorrector::GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent){
+float JetCorrector::GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine){
 	//int jet_eta_bin = GetJetYBin(jet_eta);
 	int jet_eta_bin = 4;
-	double z_loc = z;
-	if (z>1.) z_loc = 1.;
+	double z_loc = z; 
+	if (z>1.) z_loc = 0.95;
 	if (z<0.00221) z_loc = 0.00221;
 	if (jet_pt < min_jet_pt) jet_pt = min_jet_pt; //Minimum reco pT
 	if (jet_pt > max_jet_pt) jet_pt = max_jet_pt; //Maximum reco pT  
 	int jet_pt_bin = jet_pt_binning->FindBin(jet_pt);
-	int z_bin = FF_weight[jet_eta_bin][cent][jet_pt_bin]->FindBin(z_loc);
+	//Use rebinned version in the last two fine bins
+	if (isFine && z_loc>=FF_weight[jet_eta_bin][cent][jet_pt_bin]->GetXaxis()->GetBinLowEdge(16)) isFine = false;
+	int z_bin;
+	if (isFine) z_bin = FF_weight_fine[jet_eta_bin][cent][jet_pt_bin]->FindBin(z_loc);
+	else z_bin = FF_weight[jet_eta_bin][cent][jet_pt_bin]->FindBin(z_loc);
 	//if ( cent ==5 ) cout << " FF w: " << FF_weight[7][cent][jet_pt_bin]->GetBinContent(z_bin) << " z " << z <<" jet pt: " << jet_pt << " cent: " << cent << endl;
-	return FF_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(z_bin);
+	if (isFine) return FF_weight_fine[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(z_bin);
+	else return FF_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(z_bin);
 }
 
-float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent){
+float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent, bool isFine){
 	//int jet_eta_bin = GetJetYBin(jet_eta);
 	int jet_eta_bin = 4;
 	if (jet_pt < min_jet_pt) jet_pt = min_jet_pt; //Minimum reco pT
 	if (jet_pt > max_jet_pt) jet_pt = max_jet_pt; //Maximum reco pT
 	int jet_pt_bin = jet_pt_binning->FindBin(jet_pt);
-	int pt_bin = CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->FindBin(pt);
+	int pt_bin;
+	if (isFine) pt_bin = CHPS_weight_fine[jet_eta_bin][cent][jet_pt_bin]->FindBin(pt);
+	else pt_bin = CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->FindBin(pt);
 	//cout << " CHPS w: " << CHPS_weight[7][cent][jet_pt_bin]->GetBinContent(pt_bin) << " jet pt: " << jet_pt << " cent: " << cent << endl;
-	return CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
+	if (isFine) return CHPS_weight_fine[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
+	else return CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
 }

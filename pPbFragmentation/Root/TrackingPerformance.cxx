@@ -72,7 +72,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
 	SetupBinning(0, "phi-trk", phiJetBins, phiJetBinsN);
-	SetupBinning(0, "pt-trk", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk", phiTrkBins, phiTrkBinsN);
 	SetupBinning(0, "d0z0", d0z0Bins, d0z0BinsN);
@@ -90,6 +90,9 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",100,0,5);
 	h_FCal_Et->Sumw2();
+
+	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",100,0,5);
+	h_FCal_Et_unw->Sumw2();
 
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
@@ -113,6 +116,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 
 	wk()->addOutput (h_FCal_Et);
+	wk()->addOutput (h_FCal_Et_unw);
 	wk()->addOutput (h_centrality);
 	wk()->addOutput (h_RejectionHisto);
 	wk()->addOutput (h_trk_resolution);
@@ -141,6 +145,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 	h_eff_dR_matched =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
 	h_eff_dR =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
+	h_eff_dR_entries =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
 	h_eff_deta_matched =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
 	h_eff_deta =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
 	h_eff_dphi_matched =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(nCentBins));
@@ -183,6 +188,16 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 		temphist_3D = new TH3D(Form("h_trk_foreff_entries_cent%i",i),Form("h_trk_foreff_entries_cent%i",i), phiTrkBinsN, phiTrkBins, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
 		h_trk_foreff_entries.push_back(temphist_3D);
+
+		temphist_3D = new TH3D(Form("h_trk_foreff_r_full_cent%i",i),Form("h_trk_foreff_r_full_cent%i",i), _ndRBins-1,trkcorr->dRrange, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
+		h_trk_foreff_r_full.push_back(temphist_3D);
+
+		temphist_3D = new TH3D(Form("h_trk_foreff_r_matched_cent%i",i),Form("h_trk_foreff_r_matched_cent%i",i), _ndRBins-1,trkcorr->dRrange, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
+		h_trk_foreff_r_matched.push_back(temphist_3D);
+
+		temphist_3D = new TH3D(Form("h_trk_foreff_r_entries_cent%i",i),Form("h_trk_foreff_r_entries_cent%i",i), _ndRBins-1,trkcorr->dRrange, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
+		h_trk_foreff_r_entries.push_back(temphist_3D);
+
 
 		temphist_3D = new TH3D(Form("h_fake_v_jet_cent%i",i),Form("h_fake_v_jet_cent%i",i),ptJetBinsN,ptJetBins,ptTrkBinsN, ptTrkBins,etaFineBinsN,etaFineBins);
 		h_fake_v_jet.push_back(temphist_3D);
@@ -230,6 +245,9 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 			temphist_3D = new TH3D(Form("h_eff_dR%i_cent%i",j,i),Form("h_eff_dR%i_cent%i",j,i),ptJetBinsN,ptJetBins,ptTrkBinsN, ptTrkBins,etaFineBinsN,etaFineBins);
 			h_eff_dR.at(j).at(i) = temphist_3D;
 
+			temphist_3D = new TH3D(Form("h_eff_entries_dR%i_cent%i",j,i),Form("h_eff_entries_dR%i_cent%i",j,i),ptJetBinsN,ptJetBins,ptTrkBinsN, ptTrkBins,etaFineBinsN,etaFineBins);
+			h_eff_dR_entries.at(j).at(i) = temphist_3D;
+
 			temphist_3D = new TH3D(Form("h_eff_matched_deta%i_cent%i",j,i),Form("h_eff_matched_deta%i_cent%i",j,i),ptJetBinsN,ptJetBins,ptTrkBinsN, ptTrkBins,etaFineBinsN,etaFineBins);
 			h_eff_deta_matched.at(j).at(i) = temphist_3D;
 
@@ -244,6 +262,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 			h_eff_dR_matched.at(j).at(i)->Sumw2();
 			h_eff_dR.at(j).at(i)->Sumw2();
+			h_eff_dR_entries.at(j).at(i)->Sumw2();
 			h_eff_deta_matched.at(j).at(i)->Sumw2();
 			h_eff_deta.at(j).at(i)->Sumw2();
 			h_eff_dphi_matched.at(j).at(i)->Sumw2();
@@ -251,6 +270,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 
 			wk()->addOutput (h_eff_dR_matched.at(j).at(i));
 			wk()->addOutput (h_eff_dR.at(j).at(i));
+			wk()->addOutput (h_eff_dR_entries.at(j).at(i));
 			wk()->addOutput (h_eff_deta_matched.at(j).at(i));
 			wk()->addOutput (h_eff_deta.at(j).at(i));
 			wk()->addOutput (h_eff_dphi_matched.at(j).at(i));
@@ -283,6 +303,9 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 		wk()->addOutput (h_trk_foreff_entries.at(i));
 		wk()->addOutput (h_trk_foreff_matched.at(i));
 		wk()->addOutput (h_trk_foreff_full.at(i));
+		wk()->addOutput (h_trk_foreff_r_entries.at(i));
+		wk()->addOutput (h_trk_foreff_r_matched.at(i));
+		wk()->addOutput (h_trk_foreff_r_full.at(i));
 		wk()->addOutput (h_fake_v_jet.at(i));
 		wk()->addOutput (h_fake_v_jet_PV.at(i));
 		wk()->addOutput (h_trk_scale.at(i));
@@ -567,6 +590,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 
 
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
+	h_FCal_Et_unw->Fill(FCalEt);
 
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
@@ -1077,8 +1101,14 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_dphi_matched.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dR_bin = trkcorr->GetdRBin(R);
-			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
-			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+//			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+//			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
+			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+
+			h_trk_foreff_r_matched[cent_bin]->Fill(R, pt, eta, event_weight);
+			h_trk_foreff_r_matched[nCentBins-1]->Fill(R, pt, eta, event_weight);
+
 
 			h_eff_matched.at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
 			h_eff_matched.at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
@@ -1131,8 +1161,18 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_dphi.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dR_bin = trkcorr->GetdRBin(R);
-			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
-			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+//			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+//			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
+
+			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
+			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+
+			h_trk_foreff_r_full[cent_bin]->Fill(R, pt, eta, event_weight);
+			h_trk_foreff_r_full[nCentBins-1]->Fill(R, pt, eta, event_weight);
+
+			h_trk_foreff_r_entries[cent_bin]->Fill(dR_bin, pt, eta);
+			h_trk_foreff_r_entries[nCentBins-1]->Fill(dR_bin, pt, eta);
+
 
 			h_eff_total.at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
 			h_eff_total.at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);

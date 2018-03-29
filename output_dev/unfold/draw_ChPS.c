@@ -119,14 +119,14 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 	double trk_pt_lo = 1.;
 	double trk_pt_hi = 150.;
-	double ratio_lo = 0.5;
-	double ratio_hi = 1.5;
+	double ratio_lo = 0;
+	double ratio_hi = 2;
 
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
 
 	int trk_pt_start = 2;
-	int trk_pt_end = 7;
+	int trk_pt_end = 9;
 
 	bool doSmall;
 	if (dataset_type == "pp") doSmall = false;
@@ -506,7 +506,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		}
 	}
-
+/*
 
 	{
 		cout << "Doing full analysis evolution plots" << endl;
@@ -1373,7 +1373,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			jet_itr++;
 		} //end jet loop
 	}
-
+*/
 	//Draw evol_dRution plots
 	{
 		cout << "Doing evolution (as function of r) for tracks in truth jet" << endl;
@@ -1426,7 +1426,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							legend_evol_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr_{TJ}","lp");
 							legend_evol_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+BbB_{TJ}","lp");
 
-							if (isMC) legend_evol_truthjet_dR->AddEntry(h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),"BbB/Truth", "lp");
+							if (isMC) legend_evol_truthjet_dR->AddEntry(h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),"Final/Truth", "lp");
 						}
 
 					}
@@ -1435,27 +1435,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->Divide(1,2);
 
 					if (isMC) setup_canvas(c_evol_truthjet_dR, dataset_type, i_cent);
-
-//					{
-////						if (dataset_type == "pp") c_evol_truthjet_dR->Divide(1,2);
-////						if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->Divide(1,2);
-//
-//
-//						if (dataset_type == "pp") c_evol_truthjet_dR->cd()->cd(1);
-//						if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->cd(1);
-//						gPad->SetPad(0,0.40,0.95,0.95);
-//						gPad->SetTopMargin(0.05);
-//						gPad->SetBottomMargin(0);
-//						gPad->SetRightMargin(0);
-//
-//
-//						if (dataset_type == "pp") c_evol_truthjet_dR->cd()->cd(2);
-//						if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->cd(2);
-//						gPad->SetPad(0,0.0,0.95,0.40);
-//						gPad->SetTopMargin(0);
-//						gPad->SetBottomMargin(0.30);
-//						gPad->SetRightMargin(0);
-//					}
 
 					if (isMC && dataset_type == "pp") c_evol_truthjet_dR->cd(1);
 					if (isMC && dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->cd(1);
@@ -1471,6 +1450,14 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					gPad->SetLogx(0);
 					gPad->SetLogy();
 					line->DrawLine(0, 0, 1.2, 0);
+
+					if (i_trk == 2 && i_jet == 7 && i_cent == 0)
+					{
+//						h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
+//						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
+//						h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
+//						h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
+					}
 
 					if (isMC)
 					{
@@ -1510,7 +1497,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end jet loop
 	}
 
-
+/*
 
 	//Draw Final ChPS_truthjet plots
 	{
@@ -1600,5 +1587,5 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end dR loop
 	}
 
-
+*/
 }

@@ -90,20 +90,46 @@ void BaseClass::SetTrigger_chains(){
 		
 		if(_isMB)
 		{
-			_nTriggers=2;
-			_trigger_collection="a4ionemsubjesFS";
-			trigger_chains.push_back("HLT_noalg_mb_L1TE50");
-			trigger_chains.push_back("HLT_mb_sptrk_ion_L1ZDC_A_C_VTE50");
+			if(_isOverlay){
+				_nTriggers=4;
+				_trigger_collection="a4ionemsubjesFS";
+				trigger_chains.push_back("HLT_mb_sptrk_ion_L1ZDC_A_C_VTE50_OVERLAY");
+				trigger_chains.push_back("HLT_noalg_L1TE50_OVERLAY");
+				trigger_chains.push_back("HLT_noalg_mb_L1TE1500.0ETA49_OVERLAY");
+				trigger_chains.push_back("HLT_noalg_mb_L1TE6500.0ETA49_OVERLAY");
 					
-			trigger_thresholds.push_back(0);
-			trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
 			
-			trigger_PS.push_back(21.857);
-			trigger_PS.push_back(21.51);
+				trigger_PS.push_back(1.);
+				trigger_PS.push_back(1.);
+				trigger_PS.push_back(1.);
+				trigger_PS.push_back(1.);
 			
-			jet_pt_trig.resize(_nTriggers);
-			(jet_pt_trig[0]).push_back(0); (jet_pt_trig[0]).push_back(10000.);
-			(jet_pt_trig[1]).push_back(0); (jet_pt_trig[1]).push_back(10000.);
+				jet_pt_trig.resize(_nTriggers);
+				(jet_pt_trig[0]).push_back(0); (jet_pt_trig[0]).push_back(10000.);
+				(jet_pt_trig[1]).push_back(0); (jet_pt_trig[1]).push_back(10000.);
+				(jet_pt_trig[2]).push_back(0); (jet_pt_trig[2]).push_back(10000.);
+				(jet_pt_trig[3]).push_back(0); (jet_pt_trig[3]).push_back(10000.);
+			}
+			else{	
+				_nTriggers=2;
+				_trigger_collection="a4ionemsubjesFS";
+				trigger_chains.push_back("HLT_noalg_mb_L1TE50");
+				trigger_chains.push_back("HLT_mb_sptrk_ion_L1ZDC_A_C_VTE50");
+					
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+			
+				trigger_PS.push_back(21.857);
+				trigger_PS.push_back(21.51);
+			
+				jet_pt_trig.resize(_nTriggers);
+				(jet_pt_trig[0]).push_back(0); (jet_pt_trig[0]).push_back(10000.);
+				(jet_pt_trig[1]).push_back(0); (jet_pt_trig[1]).push_back(10000.);
+			}	
 		}
 		else
 		{

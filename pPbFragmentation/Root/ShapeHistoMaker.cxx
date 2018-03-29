@@ -106,6 +106,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et_unw->Sumw2();
 
+	h_FCal_Et_restr = new TH1D("h_FCal_Et_restr",";FCal E_{T};N",1200,0.,6.);
+	h_FCal_Et_restr->Sumw2();
+
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
 	SetRejectionHistogram(h_RejectionHisto);
 
@@ -130,6 +133,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 	wk()->addOutput (h_FCal_Et);
 	wk()->addOutput (h_FCal_Et_unw);
+	wk()->addOutput (h_FCal_Et_restr);
 	wk()->addOutput (h_RejectionHisto);
 	wk()->addOutput (hET_ETsub);
 	wk()->addOutput (h_triggercounter);

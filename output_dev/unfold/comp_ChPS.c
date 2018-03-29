@@ -1,7 +1,7 @@
 #include "../functions/global_variables.h"
 #include "TEnv.h"
 
-void comp_ChPS(bool isMC = 0)
+void comp_ChPS(bool isMC = 1)
 {
 
 	SetAtlasStyle();

@@ -88,6 +88,7 @@ BaseClass :: BaseClass (const BaseClass& base)  {
 	_jet_y_cut=base._jet_y_cut;
 	_doCoarsTrackpT=base._doCoarsTrackpT;
 	_PythiaPowheg = base._PythiaPowheg;
+	_isOverlay = base._isOverlay;
 }
 
 

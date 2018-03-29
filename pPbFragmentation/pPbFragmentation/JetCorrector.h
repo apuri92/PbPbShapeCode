@@ -22,7 +22,9 @@ class JetCorrector
 	TH1D *cent_weight_histo;
 	TH1D* FCal_HP_v_MB_weights_histo;
 	TH1D* FCal_HP_v_MBOV_weights_histo;
-	TH1D* FCal_MBOV_v_MB_weights_histo;
+	TH1D* FCal_HP_v_MCOV_weights_histo;
+	TH1D* FCal_MCOV_v_MB_weights_histo;
+	TH1D* FCal_MCOV_v_MBOV_weights_histo;
 	vector<double> range_lo;
 	vector<double> range_hi;
 	vector<int> centiles;
@@ -38,6 +40,8 @@ class JetCorrector
     TF1 *jet_spectra_weight[8][8];
 	TH1D *FF_weight[8][8][20];
 	TH1D *CHPS_weight[8][8][20];
+	TH1D *FF_weight_fine[8][8][20];
+	TH1D *CHPS_weight_fine[8][8][20];
 	int etabin;
 	TFile * HP_v_MB_FCAl_weight_file;
 	
@@ -87,6 +91,8 @@ class JetCorrector
 					//FF weights
 					FF_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 					CHPS_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+					FF_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+					CHPS_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 				}
 			}				
 		 //}
@@ -104,9 +110,11 @@ class JetCorrector
 		weight_file = new TFile(event_weight_file.Data());
 		event_weight_histo = (TH3D*)weight_file->Get("h3_pT_y_phi_rw");
 		cent_weight_histo = (TH1D*)weight_file->Get("h1_cent_rw");
-		FCal_HP_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MBv2_weights");
+		FCal_HP_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MB_v2_weights");
 		FCal_HP_v_MBOV_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MBOV_weights");
-		FCal_MBOV_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_MC_v_MBv2_weights");
+		FCal_HP_v_MCOV_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_HP_v_MCOV_weights");
+		FCal_MCOV_v_MB_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_MCOV_v_MB_weights");
+		FCal_MCOV_v_MBOV_weights_histo = (TH1D*)HP_v_MB_FCAl_weight_file->Get("FCal_MCOV_v_MBOV_weights");
 
 		std::ifstream ifs (fcal_weight_file.Data(), std::ifstream::in);
 		if(!ifs)
@@ -136,8 +144,8 @@ class JetCorrector
 	bool MCJetJERClean(float truth_jet_pt,float reco_jet_pt, float truth_jet_eta, int cent);
 	float GetJER(float truth_jet_pt, float truth_jet_eta, int cent);
 	float GetJetReweightingFactor(double pt, double eta, int cent);
-	float GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent);
-	float GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent);
+	float GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine);
+	float GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent, bool isFine);
     ~JetCorrector() {}
 };
 

@@ -246,6 +246,31 @@ EL::StatusCode PbPbFFShape :: execute (){
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
 	h_FCal_Et_unw->Fill(FCalEt); //no weighting
 
+	if(_data_switch == 1)
+	{
+		const xAOD::JetContainer * truthjets = 0;
+
+		bool skip_event = false;
+		EL_RETURN_CHECK("execute()",event->retrieve( truthjets, _truth_jet_collection.c_str() ));
+
+		xAOD::JetContainer::const_iterator jet_itr = truthjets->begin();
+		xAOD::JetContainer::const_iterator jet_end = truthjets->end();
+		for( ; jet_itr != jet_end; ++jet_itr )
+		{
+			xAOD::JetFourMom_t jet_truth_4mom = (*jet_itr)->jetP4();
+			double pt    = (jet_truth_4mom.pt() * 0.001 );
+			double eta    = (jet_truth_4mom.eta());
+
+			if (pt > 20. && fabs(eta) > 3. ) skip_event = true;
+		}
+
+		if (skip_event)
+		{
+			h_FCal_Et_restr->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
+			return EL::StatusCode::SUCCESS;
+		}
+	}
+
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
 	EL_RETURN_CHECK("execute",event->retrieve( recoTracks, "InDetTrackParticles"));
@@ -687,8 +712,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 						float z_weight =1.;
 						if (_applyReweighting)
 						{
-							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine); //TODO cent_bin_fine -> cent_bin when available
-							z_weight = jetcorr->GetFFReweightingFactor(z_truth, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine); //TODO cent_bin_fine -> cent_bin when available
+							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
+							z_weight = jetcorr->GetFFReweightingFactor(z_truth, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
 						}
 
 						//R_trk_jet
@@ -784,8 +809,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 					}
 
 
-					ChPS_TM_UE_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_phi_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-					ChPS_TM_UE_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_phi_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+					ChPS_TM_UE_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+					ChPS_TM_UE_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
 
 
 					float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );

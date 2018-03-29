@@ -173,6 +173,13 @@ EL::StatusCode TrackHelperTools::SetCutLevel(InDet::InDetTrackSelectionTool *tra
 		return EL::StatusCode::SUCCESS;
 	}
 	
+	else if (!cutlevel.std::string::compare("HILoose"))
+	{
+		EL_RETURN_CHECK("initialize()",trackSelectionTool->setProperty("CutLevel","HILoose"));
+		EL_RETURN_CHECK("initialize()",trackSelectionTool->setProperty("minPt",500.));
+		return EL::StatusCode::SUCCESS;
+	}
+	
 	else if (!cutlevel.std::string::compare("FJR"))
 	{
 		EL_RETURN_CHECK("initialize()",trackSelectionTool->setProperty("CutLevel","HILoose"));

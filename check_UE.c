@@ -6,6 +6,7 @@ void check_UE()
 	gErrorIgnoreLevel = 3001;
 
 	TFile *input_file = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
+	TFile *input_file_MBov = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
@@ -21,30 +22,42 @@ void check_UE()
 	int N_trkpt = trkpT_binning->GetNbins();
 
 	vector<vector<TH2*>> h_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
+	vector<vector<TH2*>> h_MBov_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
+	vector<vector<TH2*>> h_MB_tj_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_TM_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FS_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FNS_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 
 	vector<vector<vector<TH1*>>> h_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MBov_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MB_tj_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 
 	vector<vector<vector<TH1*>>> h_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MBov_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MB_tj_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 
 
+	vector<vector<TH2*>> h_MB_tj_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
+	vector<vector<TH2*>> h_MBov_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_TM_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FNS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 
+	vector<vector<vector<TH1*>>> h_MB_tj_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MBov_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 
 	vector<vector<vector<TH1*>>> h_TM_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MBov_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_MB_tj_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 
@@ -64,6 +77,12 @@ void check_UE()
 				name = Form("h_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
+				name = Form("h_MBov_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_MBov_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
+				name = Form("h_MB_tj_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_MB_tj_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
 				name = Form("h_TM_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_TM_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
@@ -74,6 +93,12 @@ void check_UE()
 				h_FNS_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
 
+
+				name = Form("h_MB_tj_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_MB_tj_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
+				name = Form("h_MBov_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_MBov_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
 				name = Form("h_TM_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_TM_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
@@ -107,6 +132,12 @@ void check_UE()
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			h_MB_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
+			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
+			h_MBov_2D[i_dR][i_cent] = (TH2*)(TH2*)input_file_MBov->Get(name.c_str())->Clone(Form("ChPS_MBov_UE_dR%i_cent%i", i_dR, i_cent));
+
+			name = Form("ChPS_MB_UE_truthjet_dR%i_cent%i", i_dR, i_cent);
+			h_MB_tj_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
+
 			name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
 			h_TM_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
@@ -130,21 +161,29 @@ void check_UE()
 				for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
 				{
 					double updated_UE_MB = h_MB_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_unw;
+					double updated_UE_MBov = h_MBov_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_unw;
+					double updated_UE_MB_tj = h_MB_tj_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 					double updated_UE_TM = h_TM_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets;
 					double updated_UE_FS = h_FS_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 					double updated_UE_FNS = h_FNS_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 
 					double updated_UE_MB_err = h_MB_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_unw;
+					double updated_UE_MBov_err = h_MBov_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_unw;
+					double updated_UE_MB_tj_err = h_MB_tj_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_true;
 					double updated_UE_TM_err = h_TM_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets;
 					double updated_UE_FS_err = h_FS_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_true;
 					double updated_UE_FNS_err = h_FNS_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_true;
 
 					h_MB_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_MB);
+					h_MBov_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_MBov);
+					h_MB_tj_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_MB_tj);
 					h_TM_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_TM);
 					h_FS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_FS);
 					h_FNS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_FNS);
 
 					h_MB_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_MB_err);
+					h_MBov_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_MBov_err);
+					h_MB_tj_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_MB_tj_err);
 					h_TM_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_TM_err);
 					h_FS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_FS_err);
 					h_FNS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_FNS_err);
@@ -153,6 +192,14 @@ void check_UE()
 
 
 			//compare to MB
+			name = Form("ratio_MBov_MB_dR%i_cent%i", i_dR, i_cent);
+			h_MBov_MB_2D[i_dR][i_cent] = (TH2*)h_MBov_2D[i_dR][i_cent]->Clone(name.c_str());
+			h_MBov_MB_2D[i_dR][i_cent]->Divide(h_MB_2D[i_dR][i_cent]);
+
+			name = Form("ratio_MB_tj_MB_dR%i_cent%i", i_dR, i_cent);
+			h_MB_tj_MB_2D[i_dR][i_cent] = (TH2*)h_MB_tj_2D[i_dR][i_cent]->Clone(name.c_str());
+			h_MB_tj_MB_2D[i_dR][i_cent]->Divide(h_MB_2D[i_dR][i_cent]);
+
 			name = Form("ratio_TM_MB_dR%i_cent%i", i_dR, i_cent);
 			h_TM_MB_2D[i_dR][i_cent] = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(name.c_str());
 			h_TM_MB_2D[i_dR][i_cent]->Divide(h_MB_2D[i_dR][i_cent]);
@@ -174,22 +221,30 @@ void check_UE()
 			for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 			{
 				h_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MBov_1D[i_jet][i_dR][i_cent] = (TH1*)h_MBov_2D[i_dR][i_cent]->ProjectionX(Form("MBov_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MB_tj_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_tj_2D[i_dR][i_cent]->ProjectionX(Form("MB_tj_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_TM_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_2D[i_dR][i_cent]->ProjectionX(Form("TM_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_2D[i_dR][i_cent]->ProjectionX(Form("FS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FNS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_2D[i_dR][i_cent]->ProjectionX(Form("FNS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 
 				h_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+				h_MBov_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+				h_MB_tj_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 				h_TM_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 				h_FS_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 				h_FNS_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 
 				h_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
+				h_MBov_1D[i_jet][i_dR][i_cent]->Scale(1./area);
+				h_MB_tj_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 				h_TM_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 				h_FS_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 				h_FNS_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 
 
 				//dont scale ratios
+				h_MBov_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MBov_MB_2D[i_dR][i_cent]->ProjectionX(Form("MBov_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MB_tj_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_tj_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_tj_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_TM_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_MB_2D[i_dR][i_cent]->ProjectionX(Form("TM_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_MB_2D[i_dR][i_cent]->ProjectionX(Form("TFS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FNS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FNS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
@@ -205,39 +260,55 @@ void check_UE()
 				for (int i_dR = 0; i_dR < N_dR; i_dR++)
 				{
 					h_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
+					h_MBov_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MBov_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
+					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MB_tj_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_TM_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_TM_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FS_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FS_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FNS_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 
 					h_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
+					h_MBov_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MBov_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
+					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MB_tj_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_TM_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_TM_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FS_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FS_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FNS_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
+					h_MBov_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
+					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
+					h_MBov_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
+					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("D_{p_{T}} [UE]");
 
 
 					//ratios
+					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MBov_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
+					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MB_tj_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_TM_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FS_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 
+					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MBov_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
+					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MB_tj_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_TM_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FS_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 
+					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
+					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 
+					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
+					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
@@ -624,16 +695,22 @@ void check_UE()
 					SetHStyle_smallify(h_TM_r_1D[i_jet][i_trk][i_cent], 1, 1);
 					SetHStyle_smallify(h_FS_r_1D[i_jet][i_trk][i_cent], 2, 1);
 					SetHStyle_smallify(h_FNS_r_1D[i_jet][i_trk][i_cent], 3, 1);
+					SetHStyle_smallify(h_MB_tj_r_1D[i_jet][i_trk][i_cent], 4, 1);
+					SetHStyle_smallify(h_MBov_r_1D[i_jet][i_trk][i_cent], 5, 1);
 
 					SetHStyle_smallify(h_TM_MB_r_1D[i_jet][i_trk][i_cent], 1, 1);
 					SetHStyle_smallify(h_FS_MB_r_1D[i_jet][i_trk][i_cent], 2, 1);
 					SetHStyle_smallify(h_FNS_MB_r_1D[i_jet][i_trk][i_cent], 3, 1);
+					SetHStyle_smallify(h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent], 4, 1);
+					SetHStyle_smallify(h_MBov_MB_r_1D[i_jet][i_trk][i_cent], 5, 1);
 
 //					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(1E-4,1E2);
 
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
+						legend_x->AddEntry(h_MBov_r_1D[i_jet][i_trk][i_cent],"MBov","lp");
+						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
 						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
@@ -646,8 +723,6 @@ void check_UE()
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.85,1.15);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 
 					c_x->cd(i_cent+1);
 					gPad->Divide(1,2);
@@ -658,6 +733,8 @@ void check_UE()
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
+					h_MBov_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -670,12 +747,20 @@ void check_UE()
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.9, 1.1);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.95, 1.05);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
+					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					line->DrawLine(0, 1, 1.2, 1);
 
+					if (i_trk == 2 && i_jet == 7 && i_cent == 0)
+					{
+//						h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Print("all");
+//						h_FS_r_1D[i_jet][i_trk][i_cent]->Print("all");
+					}
 
 
 					c_x->cd(i_cent+1);

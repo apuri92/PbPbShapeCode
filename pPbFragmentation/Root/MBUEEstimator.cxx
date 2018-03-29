@@ -341,8 +341,14 @@ EL::StatusCode MBUEEstimator :: execute (){
 		FCalEt=calos->at(5)->et()*1e-6;
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING );
 		cent_bin_corse = GetCentralityBin(31, FCalEt,  isHIJING ); //Need for some tools
-		event_weight_fcal_2 = jetcorr->GetFCalWeight(FCalEt,2);
-		event_weight_fcal_3 = jetcorr->GetFCalWeight(FCalEt,3);
+		if (!_isOverlay){	
+			event_weight_fcal_2 = jetcorr->GetFCalWeight(FCalEt,2);
+			event_weight_fcal_3 = jetcorr->GetFCalWeight(FCalEt,3);
+		}	 	
+		else {
+			event_weight_fcal_2 = jetcorr->GetFCalWeight(FCalEt,4);
+			event_weight_fcal_3 = jetcorr->GetFCalWeight(FCalEt,5);
+		}	
 		Psi = GetEventPlane(calos);
 	}
 

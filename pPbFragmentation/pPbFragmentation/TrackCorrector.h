@@ -112,20 +112,24 @@ public:
 				}
 			}
 		}
-
-		//trk pt, trk eta based correction
-		cout << "Using: " << _f_eff_trketa->GetName() << endl;
-        cout << "Using: " << _f_eff_trketa_pp->GetName() << endl;
-		new_trk_eta_binning = (TAxis*)_f_eff_trketa->Get("new_trk_eta_binning");
-		int n_trketa_bins = new_trk_eta_binning->GetNbins();
-		for(int cent=0;cent<_nCent;cent++)
-		{
-			for(int e=0;e<n_trketa_bins;e++)
+		
+		//Used only for Shape analysis, currently tight version does not existence
+		if (_f_eff_trketa->IsZombie() || _f_eff_trketa_pp->IsZombie()) cout << "Using: " << _f_eff_trketa->GetName() << " or " << _f_eff_trketa_pp->GetName() << " does not exist, they are needed for shape study only." << endl;
+		else {
+			//trk pt, trk eta based correction
+			cout << "Using: " << _f_eff_trketa->GetName() << endl;
+		    cout << "Using: " << _f_eff_trketa_pp->GetName() << endl;
+			new_trk_eta_binning = (TAxis*)_f_eff_trketa->Get("new_trk_eta_binning");
+			int n_trketa_bins = new_trk_eta_binning->GetNbins();
+			for(int cent=0;cent<_nCent;cent++)
 			{
-				_h_eff_trketa[e][cent]=(TH1*)_f_eff_trketa->Get(Form("hist_eff_eta%i_cent%i",e,cent));
-                _h_eff_trketa_pp[e][cent]=(TH1*)_f_eff_trketa_pp->Get(Form("hist_eff_eta%i_cent%i",e,cent));
+				for(int e=0;e<n_trketa_bins;e++)
+				{
+					_h_eff_trketa[e][cent]=(TH1*)_f_eff_trketa->Get(Form("hist_eff_eta%i_cent%i",e,cent));
+		            _h_eff_trketa_pp[e][cent]=(TH1*)_f_eff_trketa_pp->Get(Form("hist_eff_eta%i_cent%i",e,cent));
+				}
 			}
-		}
+		}	
 		//Residual eta correction to the efficiency
 		_f_eff_eta = new TFile(xfn + "/../pPbFragmentation/data/eta_corr_" + _cutlevel + ".root","read");
 		//trkpt_bins=(TAxis*)_f_eff_eta->Get("trk_pt_binning");

@@ -80,6 +80,7 @@ class PbPbFFShape : public BaseClass{
 
 	//Basic histograms
 	TH3D *hET_ETsub; //!
+	TH1D *h_FCal_Et_restr; //!
 	//TH3F *deriv_val; //!
 	
 	TH1D * h_centrality; //!

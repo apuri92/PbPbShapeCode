@@ -298,6 +298,8 @@ int main(int argc, char ** argv)
 							//pick what method to subtract here. h_UE_FS or h_UE_MB_truthjet
 							UE_truthjet = h_UE_FS->GetBinContent(i_trk_bin, i_jet_bin);
 							UE_truthjet_err = h_UE_FS->GetBinError(i_trk_bin, i_jet_bin);
+//							UE_truthjet = h_UE_MB_truthjet->GetBinContent(i_trk_bin, i_jet_bin);
+//							UE_truthjet_err = h_UE_MB_truthjet->GetBinError(i_trk_bin, i_jet_bin);
 
 							fake_truthjet = 0;
 							fake_truthjet_err = 0;
@@ -650,6 +652,7 @@ int main(int argc, char ** argv)
 			delete h_final_UE;
 			delete h_final_UE_truthjet;
 			delete h_final_fake;
+			delete h_final_fake_truthjet;
 
 		}
 

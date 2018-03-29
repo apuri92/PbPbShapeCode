@@ -239,7 +239,7 @@ int GetGlobalBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 
 		return -1;
 	}
-	else if (centralityScheme==40)	// p+Pb, 2016, 8.16eV centrality
+	else if (centralityScheme==40)	// p+Pb, 2016, 8.16GeV centrality
 	{
 		centrality = FCal_Et;
 		
@@ -251,6 +251,23 @@ int GetGlobalBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 		if (13.41 <= centrality && centrality < 24.10) return 4; //40-60%
 		if (5.585 <= centrality && centrality < 13.41) return 5; //60-90%
 		if (0.000 <= centrality && centrality < 5.585) return 6; //90-100%
+		
+		return -1;
+	}
+	else if (centralityScheme==50)	// XeXe, 2017, 5.44TeV centrality
+	{
+		centrality = FCal_Et;
+		
+		// this is stolen from p+Pb 2013 and basically crap, need to be changed for any real analysis
+		if (1.88743 <= centrality && centrality < 10e9 ) return 0; //0-10%
+		if (1.30248 <= centrality && centrality < 1.88743) return 1; //10-20%
+		if (0.88055 <= centrality && centrality < 1.30248) return 2; //20-30%
+		if (0.57184 <= centrality && centrality < 0.88055) return 3; //30-40%
+		if (0.35113 <= centrality && centrality < 0.57184) return 4; //40-50%
+		if (0.20038 <= centrality && centrality < 0.35113) return 5; //50-60%
+		if (0.10461 <= centrality && centrality < 0.20038) return 6; //60-70%
+		if (0.04900 <= centrality && centrality < 0.10461) return 7; //70-80%
+		if (0.000 <= centrality && centrality < 0.04900) return 8; //80-100%
 		
 		return -1;
 	}
@@ -273,6 +290,7 @@ int GetCentralityNBins(Int_t centralityScheme)
 	if (centralityScheme==34) return 9;
 	if (centralityScheme==35) return 3;
 	if (centralityScheme==40) return 8;
+	if (centralityScheme==50) return 9;
 	
 	else return 1;
 }

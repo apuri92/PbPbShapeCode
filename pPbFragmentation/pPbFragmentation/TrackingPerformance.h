@@ -65,6 +65,7 @@ class TrackingPerformance : public BaseClass{
 	vector<TH3D*> h_eff_Injet_matched; //!
 	vector<vector<TH3D*>> h_eff_dR_matched; //!
 	vector<vector<TH3D*>> h_eff_dR; //!
+	vector<vector<TH3D*>> h_eff_dR_entries; //!
 	vector<vector<TH3D*>> h_eff_deta_matched; //!
 	vector<vector<TH3D*>> h_eff_deta; //!
 	vector<vector<TH3D*>> h_eff_dphi_matched; //!
@@ -79,6 +80,9 @@ class TrackingPerformance : public BaseClass{
 	vector<TH3D*> h_trk_foreff_matched; //!
 	vector<TH3D*> h_trk_foreff_full; //!
     vector<TH3D*> h_trk_foreff_entries; //!
+	vector<TH3D*> h_trk_foreff_r_matched; //!
+	vector<TH3D*> h_trk_foreff_r_full; //!
+	vector<TH3D*> h_trk_foreff_r_entries; //!
     vector<TH3D*> h_fake_v_jet; //!
 	vector<TH3D*> h_fake_v_jet_PV; //!
 	vector<TH3D*> h_trk_scale; //!

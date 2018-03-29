@@ -752,9 +752,13 @@ EL::StatusCode PbPbFragmentation :: execute (){
 						
 						float dpT_weight =1.;
 						float z_weight =1.;
+						float dpT_weight_fine =1.;
+						float z_weight_fine =1.;
 						if (_applyReweighting) {	
-							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin); 
-							z_weight = jetcorr->GetFFReweightingFactor(z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin);
+							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin,0); 
+							z_weight = jetcorr->GetFFReweightingFactor(z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin,0);
+							dpT_weight_fine = jetcorr->GetCHPSReweightingFactor(track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin,1); 
+							z_weight_fine = jetcorr->GetFFReweightingFactor(z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin,1);
 							if ((isnan(z_weight) || isnan(dpT_weight) ) || (z_weight!=z_weight) || (z_weight< 0.4 || z_weight > 2.)) cout << endl << endl << "WARNING: reweighting factor is NaN or strange size of " << z_weight << endl << endl;
 							if ((isnan((float)z) || isnan((float)z_truth) ) || ((z!=z) || (z_truth!=z_truth)) || (z< 0. || z > 2.) || (z_truth< 0. || z_truth > 2.)) cout << endl << endl << "WARNING: potentional problem with z "  << endl << endl;
 						}
@@ -778,11 +782,11 @@ EL::StatusCode PbPbFragmentation :: execute (){
 						response_FF.at(y_bin).at(cent_bin)->Fill(z, jet_pt , z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight );
 						response_FF.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(z, jet_pt, z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight );
 						
-						response_ChPS_fine.at(y_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*dpT_weight );
-						response_ChPS_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt , truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*dpT_weight );
+						response_ChPS_fine.at(y_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*dpT_weight_fine );
+						response_ChPS_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt , truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*dpT_weight_fine );
 						
-						response_FF_fine.at(y_bin).at(cent_bin)->Fill(z, jet_pt , z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight );
-						response_FF_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(z, jet_pt, z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight );
+						response_FF_fine.at(y_bin).at(cent_bin)->Fill(z, jet_pt , z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight_fine );
+						response_FF_fine.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(z, jet_pt, z_truth, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight*z_weight_fine );
 												
 						//Counts for truncation
 						response_ChPS.at(y_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)));

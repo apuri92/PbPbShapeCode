@@ -110,6 +110,7 @@ class BaseClass : public EL::Algorithm
 	float _jet_y_cut;
 	bool _doCoarsTrackpT;
 	int _PythiaPowheg;
+	bool _isOverlay;
 
 	bool event_isTriggered[10]; //!	//TODO
 	bool trigger[10]; //!	//TODO
