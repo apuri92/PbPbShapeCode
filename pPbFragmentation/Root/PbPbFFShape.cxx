@@ -534,7 +534,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
 			for (int i_dR = 0; i_dR < 13; i_dR++)
 			{
-				for (int i_pt = 0; i_pt < 10; i_pt++)
+				for (int i_pt = 0; i_pt < 11; i_pt++)
 				{
 					double UE_err = -1;
 					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);

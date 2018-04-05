@@ -197,6 +197,8 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
     ChPS_raw =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     ChPS_raw_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     ChPS_raw_UE =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
+    ChPS_MB_raw_UE =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
+    ChPS_MB_raw_UE_err =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     ChPS_raw_UE_fine =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
     ChPS_raw_UE_fine_response =  vector<vector<TH3D*> > (_nJetYBins, vector<TH3D*>(_nCentbins));
     h_reco_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
@@ -263,7 +265,12 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
 			temphist_2D = new TH2D(Form("ChPS_raw_fine_1_%i_cent%i",i,j),Form("ChPS_raw_fine_1_%i_cent%i",i,j),ptTrkBinsFineN, ptTrkBinsFine, ptJetBinsN, ptJetBins);
 			ChPS_raw_UE_fine.at(i).at(j) = temphist_2D;
 			temphist_3D = new TH3D(Form("ChPS_raw_fine_1_%i_cent%i_response",i,j),Form("ChPS_raw_fine_1_%i_cent%i_response",i,j),ptTrkBinsSumN, ptTrkBinsSum, ptJetBinsN, ptJetBins,respBinsN,respBins);
-			ChPS_raw_UE_fine_response.at(i).at(j) = temphist_3D;	
+			ChPS_raw_UE_fine_response.at(i).at(j) = temphist_3D;
+			
+			temphist_2D = new TH2D(Form("ChPS_MB_raw_UE_%i_cent%i",i,j),Form("ChPS_MB_raw_UE_%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_MB_raw_UE.at(i).at(j) = temphist_2D;
+			temphist_2D = new TH2D(Form("ChPS_MB_raw_UE_err_%i_cent%i",i,j),Form("ChPS_MB_raw_UE_err_%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_MB_raw_UE_err.at(i).at(j) = temphist_2D;	
 			
 			//temphist_2D = new TH2D(Form("ff_truth_matched_%i_cent%i",i,j),Form("ff_truth_matched_%i_cent%i",i,j),zBinsN, zBins, ptJetBinsN, ptJetBins);
 			//ff_truth_matched.at(i).at(j) = temphist_2D;
@@ -293,6 +300,8 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
             ChPS_raw.at(i).at(j)->Sumw2();
             ChPS_raw_fine.at(i).at(j)->Sumw2();
             ChPS_raw_UE.at(i).at(j)->Sumw2();
+            ChPS_MB_raw_UE.at(i).at(j)->Sumw2();
+            ChPS_MB_raw_UE_err.at(i).at(j)->Sumw2();
             ChPS_raw_UE_fine.at(i).at(j)->Sumw2();
             ChPS_raw_UE_fine_response.at(i).at(j)->Sumw2();
             h_reco_jet_spectrum.at(i).at(j)->Sumw2();
@@ -309,6 +318,8 @@ EL::StatusCode PbPbFragmentation :: histInitialize ()
             wk()->addOutput (ChPS_raw.at(i).at(j));
             wk()->addOutput (ChPS_raw_fine.at(i).at(j));
             wk()->addOutput (ChPS_raw_UE.at(i).at(j));
+            wk()->addOutput (ChPS_MB_raw_UE.at(i).at(j));
+            wk()->addOutput (ChPS_MB_raw_UE_err.at(i).at(j));
             wk()->addOutput (ChPS_raw_UE_fine.at(i).at(j));
             wk()->addOutput (ChPS_raw_UE_fine_response.at(i).at(j));
             

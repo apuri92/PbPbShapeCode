@@ -48,7 +48,33 @@ void BaseClass::SetTrigger_chains(){
 			(jet_pt_trig[3]).push_back(59.0); (jet_pt_trig[3]).push_back(70.0);
 			(jet_pt_trig[4]).push_back(70.0); (jet_pt_trig[4]).push_back(79.0);
 			(jet_pt_trig[5]).push_back(79.0); (jet_pt_trig[5]).push_back(89.0);
-			(jet_pt_trig[6]).push_back(89.0); (jet_pt_trig[6]).push_back(10000.);	
+			(jet_pt_trig[6]).push_back(89.0); (jet_pt_trig[6]).push_back(10000.);
+			
+			if (_addmuons){
+			    _nTriggers=13;
+				trigger_chains.push_back("HLT_mu4");
+				trigger_chains.push_back("HLT_mu4_mu4noL1");
+				trigger_chains.push_back("HLT_mu4noL1");
+				trigger_chains.push_back("HLT_mu6");
+				trigger_chains.push_back("HLT_mu8");
+				trigger_chains.push_back("HLT_mu14");
+				
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+						
+				jet_pt_trig.resize(_nTriggers);
+				(jet_pt_trig[7]).push_back(0); (jet_pt_trig[7]).push_back(10000.);
+				(jet_pt_trig[8]).push_back(0); (jet_pt_trig[8]).push_back(10000.);
+				(jet_pt_trig[9]).push_back(0); (jet_pt_trig[9]).push_back(10000.);
+				(jet_pt_trig[10]).push_back(0); (jet_pt_trig[10]).push_back(10000.);
+				(jet_pt_trig[11]).push_back(0); (jet_pt_trig[11]).push_back(10000.);
+				(jet_pt_trig[12]).push_back(0); (jet_pt_trig[12]).push_back(10000.);
+				
+			}	
 		}
 		else
 		{
@@ -157,6 +183,29 @@ void BaseClass::SetTrigger_chains(){
 			(jet_pt_trig[3]).push_back(82); (jet_pt_trig[3]).push_back(91); 
 			(jet_pt_trig[4]).push_back(91); (jet_pt_trig[4]).push_back(10000.);
 			//(jet_pt_trig[5]).push_back(116.); (jet_pt_trig[5]).push_back(10000.);
+			
+			if (_addmuons){
+				_nTriggers=10;
+				trigger_chains.push_back("HLT_mu4");
+				trigger_chains.push_back("HLT_mu4_mu4noL1");
+				trigger_chains.push_back("HLT_mu4noL1");
+				trigger_chains.push_back("HLT_mu6");
+				trigger_chains.push_back("HLT_mu8");
+				
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+				trigger_thresholds.push_back(0);
+						
+				jet_pt_trig.resize(_nTriggers);
+				(jet_pt_trig[5]).push_back(0); (jet_pt_trig[5]).push_back(10000.);
+				(jet_pt_trig[6]).push_back(0); (jet_pt_trig[6]).push_back(10000.);
+				(jet_pt_trig[7]).push_back(0); (jet_pt_trig[7]).push_back(10000.);
+				(jet_pt_trig[8]).push_back(0); (jet_pt_trig[8]).push_back(10000.);
+				(jet_pt_trig[9]).push_back(0); (jet_pt_trig[9]).push_back(10000.);
+				
+			}
 		}
 	}
 	

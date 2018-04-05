@@ -66,7 +66,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 	}
 	if(m_eventCounter%statSize==0) std::cout << "Event: " << m_eventCounter << std::endl;
 	m_eventCounter++;
-	//if (m_eventCounter < 14902) return EL::StatusCode::SUCCESS;
+	//if (m_eventCounter < 7000) return EL::StatusCode::SUCCESS;
 	//std::cout << "Event: " << m_eventCounter << std::endl;
 
 	//All events
@@ -128,7 +128,8 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		//const xAOD::CaloClusterContainer *hiclus(0);
 		//EL_RETURN_CHECK("execute",event->retrieve(hiclus,"HIClusters") );
 		//cout << "Psi 1: " << GetEventPlane(hiclus) << " Psi 2: " << GetEventPlane(calos) << endl;
-		uee->Psi = GetEventPlane(calos); 
+		uee->Psi = GetEventPlane(calos);
+		uee->Psi3 = GetEventPlane(calos,3); 
 	}
 
 	if (cent_bin < 0) {
@@ -695,10 +696,13 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		           
 		           //cout << " max pt " << maxpT <<  " deltaRBkgr " << deltaRBkgr << " ConeIndex " << ConeIndex << endl;
 		           
-		           float w_eta  = uee->CalculateEtaWeight(pt,eta,jet_eta,cent_bin_fine); //TODO correction down to 1 GeV
+		           float w_eta  = uee->CalculateEtaWeight(pt,eta,jet_eta,cent_bin_fine);
 				   float w_ncones = uee->GetNConesWeight();
 				   float w_flow=1;
-				   if (_dataset==4) w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
+				   if (_dataset==4) {
+				   	w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
+				   	w_flow = w_flow * uee->CalculateV3Weight( pt, eta, phi, jet_phi,  FCalEt );
+				   }
 				   float w_bkgr = w_eta * w_ncones * w_flow;
 		    		
 		           float EtaBkgr = uee->GetetaOfConeAxis();
@@ -828,6 +832,24 @@ EL::StatusCode PbPbFragmentation :: execute (){
 			}
 
 		} // end reco track loop
+		//Alternative UE
+		int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
+		for (int i_dR = 0; i_dR < 7; i_dR++) //Up to 0.4
+		{
+			for (int i_pt = 0; i_pt < 7; i_pt++)
+			{
+				double UE_err = -1;
+				double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+				double trk_bin_center = ChPS_MB_raw_UE.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
+				//cout << " c" << cent_bin <<" dr " << i_dR << " i_dPsi " << i_dPsi << " i_pt " << i_pt << " trk_bin_center " << trk_bin_center << " jet_eta " << jet_eta << " jet_phi " << jet_phi << " UE " << UE_val << endl;
+				ChPS_MB_raw_UE.at(y_bin).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+				ChPS_MB_raw_UE.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+				ChPS_MB_raw_UE_err.at(y_bin).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
+				ChPS_MB_raw_UE_err.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
+			}
+		}
+		
+		
 		//JES plots
 		if(_data_switch==1) {
 			ff_UE_pT_fine_response.at(y_bin).at(cent_bin)->Fill(altUE_sum,jet_pt, (jet_pt - truth_jet_pt_vector.at(TruthJetIndex.at(i))) /truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight);

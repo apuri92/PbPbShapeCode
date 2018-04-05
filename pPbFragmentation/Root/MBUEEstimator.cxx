@@ -165,10 +165,12 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	FCal_only = false;
 	cout << " Setting  histograms" << endl;
 	
-	int ptTrkBinsN, etaTrkBinsN, phiTrkBinsN;
-	double ptTrkBins[1000],  etaTrkBins[1000], phiTrkBins[1000];
+	int ptTrkBinsN, etaTrkBinsN, phiTrkBinsN,ptTrkBinsFineN;
+	double ptTrkBins[1000],  etaTrkBins[1000], phiTrkBins[1000],ptTrkBinsFine[1000];
 
 	SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk", ptTrkBinsFine, ptTrkBinsFineN);
 	SetupBinning(0, "eta-trk-coars", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk-coars", phiTrkBins, phiTrkBinsN);
 	
@@ -225,22 +227,25 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	if (FCal_only) return EL::StatusCode::SUCCESS;
 	
 	TH3D* temphist_3D = nullptr;
+	TH2D* temphist_2D = nullptr;
 	TH1D* temphist_1D = nullptr;
 	
 	int ndPsibins = 16;
 	int ndRbins = 13;
 	//h_trk_dNdEtadPhidpT =  vector<vector<TH3D*> > (ndPsibins, vector<TH3D*>(_nCentbins));
 	h_UE_dNdEtadPhidpT_HP =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
-	h_jet_v_Psi_HP =  vector<TH1D*>(_nCentbins);
+	h_UE_dNdEtadPhidpT_HP_fine =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
+	h_jet_v_Psi_HP =  vector<TH2D*>(_nCentbins);
 	h_UE_dNdEtadPhidpT_MC =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
-	h_jet_v_Psi_MC =  vector<TH1D*>(_nCentbins);
+	h_UE_dNdEtadPhidpT_MC_fine =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
+	h_jet_v_Psi_MC =  vector<TH2D*>(_nCentbins);
 	for (int j=0;j<_nCentbins;j++){
-		temphist_1D = new TH1D(Form("h_jet_v_Psi_HP_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16);
-		h_jet_v_Psi_HP.at(j) = temphist_1D;
+		temphist_2D = new TH2D(Form("h_jet_v_Psi_HP_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16,32,-TMath::Pi(),TMath::Pi());
+		h_jet_v_Psi_HP.at(j) = temphist_2D;
 		h_jet_v_Psi_HP.at(j)->Sumw2();
 		wk()->addOutput (h_jet_v_Psi_HP.at(j));
-		temphist_1D = new TH1D(Form("h_jet_v_Psi_MC_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16);
-		h_jet_v_Psi_MC.at(j) = temphist_1D;
+		temphist_2D = new TH2D(Form("h_jet_v_Psi_MC_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16,32,-TMath::Pi(),TMath::Pi());
+		h_jet_v_Psi_MC.at(j) = temphist_2D;
 		h_jet_v_Psi_MC.at(j)->Sumw2();
 		wk()->addOutput (h_jet_v_Psi_MC.at(j));
 		for (int i=0;i<ndPsibins;i++){
@@ -260,6 +265,16 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 				h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k) = temphist_3D;			        
 		        h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k)->Sumw2();
 		        wk()->addOutput (h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k));
+		        
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+				h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k) = temphist_3D;			        
+		        h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k)->Sumw2();
+		        wk()->addOutput (h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k));
+		        
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+				h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k) = temphist_3D;			        
+		        h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k)->Sumw2();
+		        wk()->addOutput (h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k));
 		    }    
 		}	
 	}
@@ -489,7 +504,7 @@ EL::StatusCode MBUEEstimator :: execute (){
 			h_jet_phi_v_dPsi->Fill(jet_phi,DeltaPsi(jet_phi,Psi));
 			for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
 				float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
-				if (fabs(jet_eta)>1.3) continue;
+				//if (fabs(jet_eta)>1.3) continue;
 				for (const auto& trk : *recoTracks) {
 					float eta = trk->eta();
 					float phi = trk->phi();
@@ -519,13 +534,15 @@ EL::StatusCode MBUEEstimator :: execute (){
 					
 					float eff_uncertainty = 0;
 					if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(pt,eta, 1.0, cent_bin_corse); 
-					//float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, eff_uncertainty, 10, 0., 1.0); 
-					float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, 0, _dataset);
+					float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, eff_uncertainty, 10, jet_eta, 1.0);
+					//float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin_corse, 0, _dataset); //Akshat
 			
 					//h_trk_dNdEtadPhidpT.at(dPsi_bin).at(cent_bin)->Fill(pt,eta,phi,event_weight_fcal*eff_weight);
 					//cout << " jet_phi " << jet_phi << " Psi " << Psi << "dPsi " << DeltaPsi(jet_phi,Psi) << " bin " <<  jet_dPsi_bin << endl;
 					h_UE_dNdEtadPhidpT_HP.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_2*eff_weight*trigger_prescale);
 					h_UE_dNdEtadPhidpT_MC.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_3*eff_weight*trigger_prescale);
+					h_UE_dNdEtadPhidpT_HP_fine.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_2*eff_weight*trigger_prescale);
+					h_UE_dNdEtadPhidpT_MC_fine.at(jet_dPsi_bin).at(cent_bin).at(dRbin)->Fill(pt,jet_eta,jet_phi,event_weight_fcal_3*eff_weight*trigger_prescale);
 				}
 			}
 		}
@@ -536,8 +553,8 @@ EL::StatusCode MBUEEstimator :: execute (){
 	for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){
 		float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
 		float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
-		h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_2/h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins()*trigger_prescale);
-		h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,event_weight_fcal_3/h_UE_dNdEtadPhidpT_MC.at(0).at(0).at(0)->GetZaxis()->GetNbins()*trigger_prescale);
+		h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,jet_phi,event_weight_fcal_2*trigger_prescale);
+		h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,jet_phi,event_weight_fcal_3*trigger_prescale);
 	}
 
 		

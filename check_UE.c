@@ -5,7 +5,8 @@ void check_UE()
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *input_file = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
+	TFile *input_file = new TFile("hist-local_mc.root");
+//	TFile *input_file = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
 	TFile *input_file_MBov = new TFile("output_dev/raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
@@ -662,6 +663,7 @@ void check_UE()
 		}
 	}
 */
+
 	{
 		//as function of r
 		cout << "Function of R" << endl;
@@ -709,8 +711,8 @@ void check_UE()
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
-						legend_x->AddEntry(h_MBov_r_1D[i_jet][i_trk][i_cent],"MBov","lp");
-						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
+//						legend_x->AddEntry(h_MBov_r_1D[i_jet][i_trk][i_cent],"MBov","lp");
+//						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
 						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
@@ -733,8 +735,8 @@ void check_UE()
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-					h_MBov_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MBov_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -747,18 +749,18 @@ void check_UE()
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.95, 1.05);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.9, 1.1);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MBov_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					line->DrawLine(0, 1, 1.2, 1);
 
 					if (i_trk == 2 && i_jet == 7 && i_cent == 0)
 					{
-//						h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Print("all");
+//						h_MBov_r_1D[i_jet][i_trk][i_cent]->Print("all");
 //						h_FS_r_1D[i_jet][i_trk][i_cent]->Print("all");
 					}
 
@@ -783,4 +785,71 @@ void check_UE()
 		}
 	}
 
+/*
+	{
+		//as function of r
+		cout << "Function of R" << endl;
+		TCanvas *c_x = new TCanvas("c_x","c_x",900,600);
+
+		TLegend *legend_x = new TLegend(0.20, 0.10, 0.50, 0.40, "","brNDC");
+		legend_x->SetTextFont(43);
+		legend_x->SetBorderSize(0);
+		legend_x->SetTextSize(10);
+
+		int jet_itr = 0;
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		{
+			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+			c_x->Clear();
+			c_x->Divide(3,2);
+
+			int trk_itr = 0;
+			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+			{
+				string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+				if (i_trk < 2 || i_trk > 6) continue;
+
+				c_x->cd(trk_itr+1);
+
+				for (int i_cent = 0; i_cent < 6; i_cent++)
+				{
+					string centrality = num_to_cent(31,i_cent);
+
+					SetHStyle_smallify(h_MB_r_1D[i_jet][i_trk][i_cent], i_cent, 1);
+					SetHStyle_smallify(h_TM_r_1D[i_jet][i_trk][i_cent], i_cent, 1);
+
+					if (jet_itr == 0 && i_trk == 2)
+					{
+						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],num_to_cent(31,i_cent).c_str(),"lp");
+					}
+
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(1E-2,1E2);
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+
+					if (i_cent == 0) h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
+					else h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					gPad->SetLogy();
+				}
+
+				c_x->cd(trk_itr+1);
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.94,0.88,jet_label.c_str());
+				ltx->DrawLatexNDC(0.94,0.82,trk_label.c_str());
+
+				trk_itr++;
+			}
+
+			c_x->cd(6);
+			legend_x->Draw();
+
+			if (i_jet == jet_pt_start) name = "(";
+			else if (i_jet == jet_pt_end - 1) name = ")";
+			else name = "";
+			c_x->Print(Form("UE_x.pdf%s", name.c_str()), Form("Title: jet%i", i_jet));
+			jet_itr++;
+
+		}
+	}
+*/
 }

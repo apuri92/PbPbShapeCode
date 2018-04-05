@@ -36,12 +36,15 @@ class UEEstimator
 
     TH3D * _h_v2_EP;    
     TFile * _f_flowv2;
+    TH3D * _h_v3_EP;    
+    TFile * _f_flowv3;
 
   public:	
     // meaning of these quantities is explained in the constructor where the default values are assigned
     Float_t ptBkgrThreshold;
     Float_t jetptBkgrThreshold;
-    Float_t Psi;
+    Double_t Psi;
+    Double_t Psi3;
     Float_t m_maxjetdeltaR;
 
     UEEstimator()
@@ -62,14 +65,14 @@ class UEEstimator
       ptaxis = (TAxis*) _f_weights->Get("UE_track_pt"); 
       for(int i=ptaxis->FindBin(1.);i<=ptaxis->FindBin(15.);i++){ //First bin at 1 GeV last at 15 GeV
 		for(int j=0;j<7;j++){
-			_h_eta_w[i][j]=(TH1F*)_f_weights->Get(Form("trk_eta_pt%i_cent%i",i,j)); //TODO update eta disitrbution
+			_h_eta_w[i][j]=(TH1F*)_f_weights->Get(Form("trk_eta_pt%i_cent%i",i,j));
 		}				
 	  }
 
 		 TString path_to_UE = gSystem->GetFromPipe("echo $ROOTCOREBIN");
 		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","READ");
 
-	  //Parametrization from 2.76 TeV PbPb //TODO update eta disitrbution
+	  //Parametrization from 2.76 TeV PbPb
 	  /*
 	  for (int i=0; i<10; i++)
         {_f1_trkEta[i] = new TF1( Form("f1_trkEta%i", i), "[0]*exp(-pow(x,2)/[1]) + [2]*exp(-pow(x,2)/[3])", -2.5, 2.5);
@@ -86,6 +89,9 @@ class UEEstimator
 
 	   _f_flowv2 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/flowV2.root","read");
 	   _h_v2_EP = (TH3D*)_f_flowv2->Get("V2_EP");
+	   
+	   _f_flowv3 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/flowV3.root","read");
+	   _h_v3_EP = (TH3D*)_f_flowv3->Get("V3_EP");
 
 	   _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","read");;
 
@@ -104,7 +110,8 @@ class UEEstimator
     Float_t GetMaxConepT() {return _maxConePt;}
     Int_t GetMaxConeIndex() {return _maxConeIndex;}     
     Float_t GetNConesWeight() {return (_w_ncones>0)? 1./_w_ncones : 0;}
-    Float_t GetDeltaPsi(float phi, float psi);
+    Float_t GetDeltaPsi(double phi, double psi);
+    Float_t GetDeltaPsi3(double phi, double psi);
 
     // functions to calculate weights -- explained in .cxx file
     void ExcludeConesByTrk(vector<float> &trk_pt,vector<float> &trk_eta,vector<float> &trk_phi);
@@ -113,6 +120,7 @@ class UEEstimator
     void FindCone(float trk_pt,float trk_eta,float trk_phi);
     Float_t CalculateEtaWeight(float trk_pT, float trk_eta, float jet_eta, Int_t icent);
     Float_t CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
+    Float_t CalculateV3Weight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
     void initShapeUE(bool isMC);
     double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
     Int_t GetTrackpTBin(float pt) {

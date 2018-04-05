@@ -194,6 +194,7 @@ EL::StatusCode PbPbFragmentation :: initialize ()
 	uee->ptBkgrThreshold = _trkptBkgrThreshold;
 	uee->jetptBkgrThreshold = _jetptBkgrThreshold;
 	uee->m_maxjetdeltaR = _maxjetdeltaR;
+	uee->initShapeUE(isMC);
 	
 	//Uncert tool
 	uncertprovider = new UncertProvider(_uncert_index,_mcProbCut,_cut_level.c_str(), GetCentralityNBins(31)-1, _eff_jety);

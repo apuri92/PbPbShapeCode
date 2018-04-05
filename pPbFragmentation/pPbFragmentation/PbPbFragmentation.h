@@ -96,7 +96,9 @@ class PbPbFragmentation : public BaseClass{
 	vector<vector<TH2D*>> ChPS_raw_fine; //!
 	//Raw disitrbutions from random cones
 	vector<vector<TH2D*>> ff_raw_UE; //!
-	vector<vector<TH2D*>> ChPS_raw_UE; //!	
+	vector<vector<TH2D*>> ChPS_raw_UE; //!
+	vector<vector<TH2D*>> ChPS_MB_raw_UE; //!
+	vector<vector<TH2D*>> ChPS_MB_raw_UE_err; //!	
 	vector<vector<TH2D*>> ff_raw_UE_fine; //!
 	vector<vector<TH2D*>> ChPS_raw_UE_fine; //!	
 	vector<vector<TH3D*>> ChPS_raw_UE_fine_response; //!	

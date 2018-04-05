@@ -111,11 +111,13 @@ class BaseClass : public EL::Algorithm
 	bool _doCoarsTrackpT;
 	int _PythiaPowheg;
 	bool _isOverlay;
-
+	bool _addmuons;
+	
 	bool event_isTriggered[10]; //!	//TODO
 	bool trigger[10]; //!	//TODO
 	int jet_isTriggered[10]; //! //TODO
 	float trig_prescale[10]; //! //TODO
+	
 	
 	//Evnets 
 	int m_eventCounter; //!

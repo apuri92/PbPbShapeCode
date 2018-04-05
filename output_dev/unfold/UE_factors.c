@@ -35,45 +35,28 @@ void UE_factors()
 		{
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_MB_method = (TH2*)input_file->Get(name.c_str());
-			name = Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent);
-			TH1* h_jet_spectra_unW = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_uw_jet_y4_c%i", i_cent));
-			h_jet_spectra_unW->Sumw2();
+			name = Form("ChPS_MB_UE_err_dR%i_cent%i", i_dR, i_cent);
+			TH2* h_MB_method_err = (TH2*)input_file->Get(name.c_str());
 
 
 			name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_TM_method = (TH2*)input_file->Get(name.c_str());
-			name = Form("h_reco_jet_spectrum_y4_cent%i", i_cent);
-			TH1* h_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_w_jet_y4_c%i", i_cent));
-			h_jet_spectra->Sumw2();
 
 
+			//SET ERRORS FROM MB_ERR HISTOGRAM
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 			{
-				double n_jets_w = h_jet_spectra->GetBinContent(i_jet_bin);
-				double n_jets_unw = h_jet_spectra_unW->GetBinContent(i_jet_bin);
-
-				if (n_jets_w == 0) continue;
-
 				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
 				{
-					double updated_UE_MB = h_MB_method->GetBinContent(i_trk_bin, i_jet_bin) / n_jets_unw;
-					double updated_UE_TM = h_TM_method->GetBinContent(i_trk_bin, i_jet_bin) / n_jets_w;
-
-					double updated_UE_MB_err = h_MB_method->GetBinError(i_trk_bin, i_jet_bin) / n_jets_unw;
-					double updated_UE_TM_err = h_TM_method->GetBinError(i_trk_bin, i_jet_bin) / n_jets_w;
-
-					h_MB_method->SetBinContent(i_trk_bin, i_jet_bin, updated_UE_MB);
-					h_TM_method->SetBinContent(i_trk_bin, i_jet_bin, updated_UE_TM);
-
+					double updated_UE_MB_err = h_MB_method_err->GetBinContent(i_trk_bin, i_jet_bin);
 					h_MB_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_MB_err);
-					h_TM_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_TM_err);
 				}
 			}
 
 
 			name = Form("ratio_dR%i_cent%i", i_dR, i_cent);
 			h_ratio[i_dR][i_cent] = (TH2*)h_TM_method->Clone(name.c_str());
-			h_ratio[i_dR][i_cent]->Divide(h_MB_method);
+			h_ratio[i_dR][i_cent]->Divide(h_MB_method); //errors propagated assuming they are uncorrelated
 
 			UE_factors->cd();
 			name = Form("UE_ratio_dR%i_cent%i", i_dR, i_cent);

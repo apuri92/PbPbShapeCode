@@ -72,6 +72,7 @@ class PbPbFFShape : public BaseClass{
 	TrackCorrector* trkcorr; //!
 	JetCorrector* jetcorr; //!
 
+	vector<TFile*> fcal_trees; //!
 	//Axis histograms
 	TH3D *h_jet_pt_eta_phi; //!
 	TH3D *h_trk_pt_eta_phi; //!

@@ -89,6 +89,7 @@ BaseClass :: BaseClass (const BaseClass& base)  {
 	_doCoarsTrackpT=base._doCoarsTrackpT;
 	_PythiaPowheg = base._PythiaPowheg;
 	_isOverlay = base._isOverlay;
+	_addmuons = base._addmuons;
 }
 
 

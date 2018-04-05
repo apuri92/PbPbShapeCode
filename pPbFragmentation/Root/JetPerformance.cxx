@@ -127,18 +127,21 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	wk()->addOutput (htrig_reco_pt);
 	wk()->addOutput (h_triggercounter);
 	
+	/*
 	wk()->addOutput (h2_JetCl_DiffEtRaw);
     wk()->addOutput (h2_JetCl_DiffEtAlt);
     wk()->addOutput (h2_JetCl_PtNconst1);
     wk()->addOutput (h2_JetCl_PtNconst2);
     wk()->addOutput (h3_JetCl_NegEt);
+    */
     
     wk()->addOutput (h3_HLT_jet_spect);
 	
+	/*
 	for (int i=0;i<_nTriggers;i++){
 		wk()->addOutput (hjetpt_trig.at(i));
 	}
-	
+	*/
 	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)
 	{	
 		temphist_2D = new TH2D(Form("h_jet_v_mass_cent%i",i),Form("h_jet_v_mass_cent%i",i),ptJetBinsN, ptJetBins,mJetBinsN, mJetBins);
@@ -158,89 +161,123 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	
 	
 	cout << " Histograms  ready, now setting tree" << endl;
-	TFile *outputFile = wk()->getOutputFile (_outputName);
+	//TFile *outputFile = wk()->getOutputFile (_outputName);
 	tree_performance = new TTree ("tree_performance", "Performance tree"); // TODO - track charge
-	tree_performance->SetDirectory (outputFile);
+	//tree_performance->SetDirectory (outputFile);
+	wk()->addOutput(tree_performance);
 
 	tree_performance->Branch("event_n",&event_n,"event_n/I");
 	tree_performance->Branch("run_n",&run_n,"run_n/I");
 	tree_performance->Branch("lbn_n",&lbn_n,"lbn_n/I");
-	tree_performance->Branch("FCalEt",&FCalEt,"FCalEt/F");
+	tree_performance->Branch("FCalEt",&FCal_Et,"FCalEt/F");
 	tree_performance->Branch("weight",&weight,"weight/F");
-	
+	tree_performance->Branch("centrality",&jet_centrality,"centrality/I");
 	for (int i=0;i<_nTriggers;i++){
-		tree_performance->Branch(Form("event_isTriggered_%i",i),&event_isTriggered[i],Form("event_isTriggered_%i/O",i));
-		tree_performance->Branch(Form("trigger_prescale_%i",i),&trig_prescale[i],Form("trigger_prescale_%i/F",i));
-		tree_performance->Branch(Form("jet_isTriggered_%i",i),&jet_isTriggered[i],Form("jet_isTriggered_%i/I",i));
-	}
-
-	tree_performance->Branch("jet_pt_EM",&jet_pt_EM,"jet_pt_EM/F");
-	tree_performance->Branch("jet_pt_xcalib",&jet_pt_xcalib,"jet_pt_xcalib/F");
-	//tree_performance->Branch("jet_pt_prexcalib",&jet_pt_prexcalib,"jet_pt_prexcalib/F");
-	//tree_performance->Branch("jet_pt_seb",&jet_pt_seb,"jet_pt_seb/F");
-	tree_performance->Branch("jet_pt_unsubtracted",&jet_pt_unsubtracted,"jet_pt_unsubtracted/F");
-	tree_performance->Branch("jet_pt",&jet_pt,"jet_pt/F");
-	tree_performance->Branch("jet_phi",&jet_phi,"jet_phi/F");
-	tree_performance->Branch("jet_eta",&jet_eta,"jet_eta/F");
-	tree_performance->Branch("jet_m",&jet_m,"jet_m/F");
-	tree_performance->Branch("jet_nConst",&jet_nConst,"jet_nConst/I");
-	tree_performance->Branch("jet_isGood",&jet_isGood,"jet_isGood/I");
-	//tree_performance->Branch("jet_NBJ_pT",&jet_NBJ_pT,"jet_NBJ_pT/F");
-	tree_performance->Branch("jet_isMuonIsolated",&jet_isMuonIsolated,"jet_isMuonIsolated/I");
-	tree_performance->Branch("jet_centrality",&jet_centrality,"jet_centrality/I");
-	
-
-	/*
-	tree_performance->Branch("jet_jetQuality",&jet_jetQuality,"jet_jetQuality/F");
-	tree_performance->Branch("jet_jetTime",&jet_jetTime,"jet_jetTime/F");
-	tree_performance->Branch("jet_jethecq",&jet_jethecq,"jet_jethecq/F");
-	tree_performance->Branch("jet_jetnegE",&jet_jetnegE,"jet_jetnegE/F");
-	tree_performance->Branch("jet_jetemf",&jet_jetemf,"jet_jetemf/F");
-	tree_performance->Branch("jet_jethecf",&jet_jethecf,"jet_jethecf/F");
-	tree_performance->Branch("jet_jetfracSamplingMax",&jet_jetfracSamplingMax,"jet_jetfracSamplingMax/F");
-	tree_performance->Branch("jet_jetchf",&jet_jetchf,"jet_jetchf/F");
-	tree_performance->Branch("jet_jetBchCorrCell",&jet_jetBchCorrCell,"jet_jetBchCorrCell/F");
-	tree_performance->Branch("jet_jetLArBadHVEnergyFrac",&jet_jetLArBadHVEnergyFrac,"jet_jetLArBadHVEnergyFrac/F");
-	tree_performance->Branch("jet_jetLArBadHVNCell",&jet_jetLArBadHVNCell,"jet_jetLArBadHVNCell/I");
-	
-	if(strcmp (_test_reco_jet_collection.c_str(),"none") != 0){
-		tree_performance->Branch("test_jet_pt_EM",&test_jet_pt_EM,"test_jet_pt_EM/F");
-		tree_performance->Branch("test_jet_phi",&test_jet_phi,"test_jet_phi/F");
-		tree_performance->Branch("test_jet_eta",&test_jet_eta,"test_jet_eta/F");
-		tree_performance->Branch("test_jet_m",&test_jet_m,"test_jet_m/F");
-		tree_performance->Branch("test_jet_isGood",&test_jet_isGood,"test_jet_isGood/I");
+		tree_performance->Branch(Form("event_isTriggered_%s",trigger_chains.at(i).c_str()),&event_isTriggered[i],Form("event_isTriggered_%i/O",i));
+		tree_performance->Branch(Form("trigger_prescale_%s",trigger_chains.at(i).c_str()),&trig_prescale[i],Form("trigger_prescale_%i/F",i));
 	}
 	
-	tree_performance->Branch("jet_ClSub_et",&jet_ClSub_et,"jet_ClSub_et/F");
- 	tree_performance->Branch("jet_ClUnsub_et",&jet_ClUnsub_et,"jet_ClUnsub_et/F");
-	tree_performance->Branch("jet_Clneg_et",&jet_Clneg_et,"jet_Clneg_et/F");
-	tree_performance->Branch("jet_Clpost_et",&jet_Clpost_et,"jet_Clpost_et/F");
-	tree_performance->Branch("ClUnsub_et",&ClUnsub_et);
-	tree_performance->Branch("ClUnsub_eta",&ClUnsub_eta);
-	tree_performance->Branch("ClUnsub_phi",&ClUnsub_phi);
-	*/
-	if(_data_switch==1){
-		tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
-		tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
-		tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
-		tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
-		tree_performance->Branch("truth_reco_jet_dR",&truth_reco_jet_dR,"truth_reco_jet_dR/F");
-		//tree_performance->Branch("truth_jet_NBJ_pT",&truth_jet_NBJ_pT,"truth_jet_NBJ_pT/F");
-	}
-	
-	truth_tree_performance = new TTree ("truth_tree_performance", "Performance tree"); // TODO - track charge
-	truth_tree_performance->SetDirectory (outputFile);
-
-	if(_data_switch==1){
-		truth_tree_performance->Branch("event_n",&event_n,"event_n/I");
-		truth_tree_performance->Branch("run_n",&run_n,"run_n/I");
-		truth_tree_performance->Branch("FCalEt",&FCalEt,"FCalEt/F");
-		truth_tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
-		truth_tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
-		truth_tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
-		truth_tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
-	}
+	//TODO also need change at the end of event loop
+	bool jet_tree = false;
+	if(jet_tree){
 		
+
+		tree_performance->Branch("jet_pt_EM",&jet_pt_EM,"jet_pt_EM/F");
+		tree_performance->Branch("jet_pt_xcalib",&jet_pt_xcalib,"jet_pt_xcalib/F");
+		//tree_performance->Branch("jet_pt_prexcalib",&jet_pt_prexcalib,"jet_pt_prexcalib/F");
+		//tree_performance->Branch("jet_pt_seb",&jet_pt_seb,"jet_pt_seb/F");
+		tree_performance->Branch("jet_pt_unsubtracted",&jet_pt_unsubtracted,"jet_pt_unsubtracted/F");
+		//tree_performance->Branch("jet_pt",&jet_pt,"jet_pt/F");
+		tree_performance->Branch("jet_phi",&jet_phi,"jet_phi/F");
+		tree_performance->Branch("jet_eta",&jet_eta,"jet_eta/F");
+		tree_performance->Branch("jet_m",&jet_m,"jet_m/F");
+		tree_performance->Branch("jet_nConst",&jet_nConst,"jet_nConst/I");
+		tree_performance->Branch("jet_isGood",&jet_isGood,"jet_isGood/I");
+		//tree_performance->Branch("jet_NBJ_pT",&jet_NBJ_pT,"jet_NBJ_pT/F");
+		//tree_performance->Branch("jet_isMuonIsolated",&jet_isMuonIsolated,"jet_isMuonIsolated/I");
+	
+		/*
+		tree_performance->Branch("jet_jetQuality",&jet_jetQuality,"jet_jetQuality/F");
+		tree_performance->Branch("jet_jetTime",&jet_jetTime,"jet_jetTime/F");
+		tree_performance->Branch("jet_jethecq",&jet_jethecq,"jet_jethecq/F");
+		tree_performance->Branch("jet_jetnegE",&jet_jetnegE,"jet_jetnegE/F");
+		tree_performance->Branch("jet_jetemf",&jet_jetemf,"jet_jetemf/F");
+		tree_performance->Branch("jet_jethecf",&jet_jethecf,"jet_jethecf/F");
+		tree_performance->Branch("jet_jetfracSamplingMax",&jet_jetfracSamplingMax,"jet_jetfracSamplingMax/F");
+		tree_performance->Branch("jet_jetchf",&jet_jetchf,"jet_jetchf/F");
+		tree_performance->Branch("jet_jetBchCorrCell",&jet_jetBchCorrCell,"jet_jetBchCorrCell/F");
+		tree_performance->Branch("jet_jetLArBadHVEnergyFrac",&jet_jetLArBadHVEnergyFrac,"jet_jetLArBadHVEnergyFrac/F");
+		tree_performance->Branch("jet_jetLArBadHVNCell",&jet_jetLArBadHVNCell,"jet_jetLArBadHVNCell/I");
+	
+		if(strcmp (_test_reco_jet_collection.c_str(),"none") != 0){
+			tree_performance->Branch("test_jet_pt_EM",&test_jet_pt_EM,"test_jet_pt_EM/F");
+			tree_performance->Branch("test_jet_phi",&test_jet_phi,"test_jet_phi/F");
+			tree_performance->Branch("test_jet_eta",&test_jet_eta,"test_jet_eta/F");
+			tree_performance->Branch("test_jet_m",&test_jet_m,"test_jet_m/F");
+			tree_performance->Branch("test_jet_isGood",&test_jet_isGood,"test_jet_isGood/I");
+		}
+	
+		tree_performance->Branch("jet_ClSub_et",&jet_ClSub_et,"jet_ClSub_et/F");
+	 	tree_performance->Branch("jet_ClUnsub_et",&jet_ClUnsub_et,"jet_ClUnsub_et/F");
+		tree_performance->Branch("jet_Clneg_et",&jet_Clneg_et,"jet_Clneg_et/F");
+		tree_performance->Branch("jet_Clpost_et",&jet_Clpost_et,"jet_Clpost_et/F");
+		tree_performance->Branch("ClUnsub_et",&ClUnsub_et);
+		tree_performance->Branch("ClUnsub_eta",&ClUnsub_eta);
+		tree_performance->Branch("ClUnsub_phi",&ClUnsub_phi);
+		*/
+		if(_data_switch==1){
+			tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
+			tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
+			tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
+			tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
+			tree_performance->Branch("truth_reco_jet_dR",&truth_reco_jet_dR,"truth_reco_jet_dR/F");
+			//tree_performance->Branch("truth_jet_NBJ_pT",&truth_jet_NBJ_pT,"truth_jet_NBJ_pT/F");
+		}
+	
+		truth_tree_performance = new TTree ("truth_tree_performance", "Performance tree"); // TODO - track charge
+		//truth_tree_performance->SetDirectory (outputFile);
+		wk()->addOutput(truth_tree_performance);
+
+		if(_data_switch==1){
+			truth_tree_performance->Branch("event_n",&event_n,"event_n/I");
+			truth_tree_performance->Branch("run_n",&run_n,"run_n/I");
+			truth_tree_performance->Branch("FCalEt",&FCal_Et,"FCalEt/F");
+			truth_tree_performance->Branch("truth_jet_pt",&truth_jet_pt,"truth_jet_pt/F");
+			truth_tree_performance->Branch("truth_jet_phi",&truth_jet_phi,"truth_jet_phi/F");
+			truth_tree_performance->Branch("truth_jet_eta",&truth_jet_eta,"truth_jet_eta/F");
+			truth_tree_performance->Branch("truth_jet_m",&truth_jet_m,"truth_jet_m/F");
+		}
+	}
+	//Event tree
+	else {
+
+		tree_performance->Branch("jet_pt_EM",&jet_pt_EM_vector);
+		tree_performance->Branch("jet_pt_xcalib",&jet_pt_xcalib_vector);
+		//tree_performance->Branch("jet_pt_unsubtracted",&jet_pt_unsubtracted_vector,"jet_pt_unsubtracted/F");
+		tree_performance->Branch("jet_phi",&jet_phi_vector);
+		tree_performance->Branch("jet_eta",&jet_eta_vector);
+		tree_performance->Branch("jet_m",&jet_m_vector);
+		tree_performance->Branch("jet_nConst",&jet_nConst_vector);
+		tree_performance->Branch("jet_isGood",&Is_jet_Good);
+		tree_performance->Branch("jet_trigger_prescale",&jet_TrigPresc_vector);
+		
+		tree_performance->Branch("muon_pt",&muon_pt_vector);
+		tree_performance->Branch("muon_phi",&muon_phi_vector);
+		tree_performance->Branch("muon_eta",&muon_eta_vector);
+	
+		
+		if(_data_switch==1){
+			tree_performance->Branch("truth_jet_pt",&truth_jet_pt_vector);
+			tree_performance->Branch("truth_jet_phi",&truth_jet_phi_vector);
+			tree_performance->Branch("truth_jet_eta",&truth_jet_eta_vector);
+			tree_performance->Branch("truth_muon_pt",&truth_muon_pt_vector);
+			tree_performance->Branch("truth_muon_phi",&truth_muon_phi_vector);
+			tree_performance->Branch("truth_muon_eta",&truth_muon_eta_vector);
+			tree_performance->Branch("truth_jet_m",&truth_jet_m_vector);
+			tree_performance->Branch("truth_reco_jet_dR",&truth_reco_jet_dR_vector);
+			tree_performance->Branch("truth_matched_index",&truth_matched_index);
+		}	
+	}	
 	cout << " tree  ready" << endl; 
 	
 	return EL::StatusCode::SUCCESS;
@@ -334,6 +371,17 @@ EL::StatusCode JetPerformance :: initialize ()
 	
 	//JetCorrector
 	jetcorr = new JetCorrector();
+	
+	//MuonSelectionTool 
+	m_muonSelection = new CP::MuonSelectionTool("MuonSelection");
+	m_muonSelection->msg().setLevel( MSG::ERROR ); 
+	m_muonSelection->setProperty( "MaxEta", 2.5 ); 
+	m_muonSelection->setProperty( "MuQuality", 2); // 0-tight, 1-medium, 2-loose, 3-very loose
+	EL_RETURN_CHECK("initialize()", m_muonSelection->initialize() );
+	 
+	//Muon corection tool (MC only) 
+	m_muonCalibrationAndSmearingTool = new CP::MuonCalibrationAndSmearingTool( "MuonCorrectionTool" ); 
+	EL_RETURN_CHECK("initialize()", m_muonCalibrationAndSmearingTool->initialize() );
 
 	cout << " Initialization done" << endl;
 	return EL::StatusCode::SUCCESS;
@@ -371,7 +419,7 @@ EL::StatusCode JetPerformance :: execute (){
 	
 	//if(m_eventCounter%statSize==0) cout << "EventNumber " << event_n << endl;
 		
-	double FCal_Et = 0;
+	FCal_Et = 0;
 	int cent_bin=0;
 	//TODO FCAl weights if needed
 	if (_centrality_scheme>1) {
@@ -495,6 +543,7 @@ EL::StatusCode JetPerformance :: execute (){
 	
 	float event_weight = 1;
 	double max_pt = 1;
+	bool keep_event = false;
 	TLorentzVector jet4vector;
 	
 	//----------------------------
@@ -504,13 +553,13 @@ EL::StatusCode JetPerformance :: execute (){
     if (_doClusters) EL_RETURN_CHECK("execute()",event->retrieve( cls, "HIClusters" ));
 	
 	//Jet vectors
-	vector<float> jet_pt_EM_vector, test_jet_pt_EM_vector, jet_pt_unsubtracted_vector, jet_pt_SEB_vector,jet_pt_prexcalib_vector,jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector,jet_m_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector;
-	vector<int> Is_jet_Good, Is_test_jet_Good, Is_dummyJet,jet_IsTrig_vector;
-	vector<float> truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector, truth_jet_y_vector;
-	vector<int> truth_jet_indices, truth_jet_isDummy_vector,jet_nConst_vector;
+	vector<float> test_jet_pt_EM_vector, jet_pt_SEB_vector,jet_pt_prexcalib_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector;
+	vector<int> Is_test_jet_Good, Is_dummyJet,jet_IsTrig_vector;
+	vector<float> truth_jet_y_vector;
+	vector<int> truth_jet_indices, truth_jet_isDummy_vector;
 	vector<int> hasTruth,jet_jetLArBadHVNCell_vector;
 	vector<int> isTriggered[_nTriggers];
-	vector<float> jet_NBJ_pT_vector,truth_jet_NBJ_pT_vector,jet_TrigPresc_vector;
+	vector<float> jet_NBJ_pT_vector,truth_jet_NBJ_pT_vector;
 	vector<float> trig_EF_jet_pt, trig_EF_jet_phi, trig_EF_jet_eta;
 	vector<float> antikt2_pt,antikt2_phi,antikt2_eta;
 	vector<float> jet_jetQuality_vector,jet_jetTime_vector,jet_jethecq_vector,jet_jetnegE_vector,jet_jetemf_vector,jet_jethecf_vector,jet_jetchf_vector,jet_jetfracSamplingMax_vector,jet_jetLArBadHVEnergyFrac_vector,jet_jetBchCorrCell_vector;
@@ -549,6 +598,10 @@ EL::StatusCode JetPerformance :: execute (){
 	
 	jet_IsTrig_vector.clear();
 	jet_TrigPresc_vector.clear();
+	
+	muon_eta_vector.clear();
+	muon_phi_vector.clear();
+	muon_pt_vector.clear();
 		
 	for (int j=0;j<_nTriggers;j++){
 		isTriggered[j].clear();
@@ -641,6 +694,13 @@ EL::StatusCode JetPerformance :: execute (){
 		//EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) );
 		
 		//cout << " Calib " << (newjet.pt() * 0.001);
+		
+		//For non DF collections
+		if (_dataset == 3 && _reco_jet_collection.find("DF") == std::string::npos) // pp: calibrate with sequence set in ShapeToolInit
+		{
+			newjet.setJetP4("JetEMScaleMomentum",jet_4mom); //Required
+			EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) ); //calibrates with sequence EtaJes_Insitu for data, EtaJes for MC
+		}
 		
 		const xAOD::JetFourMom_t jet_4mom_xcalib = newjet.jetP4();
 		newjet.setJetP4("JetGSCScaleMomentum", jet_4mom_xcalib);
@@ -786,6 +846,49 @@ EL::StatusCode JetPerformance :: execute (){
 		}
 	}
 	
+	//Muons
+	const xAOD::MuonContainer * muons = 0;
+	EL_RETURN_CHECK("execute()",event->retrieve(muons,"Muons"));
+	
+	// create a shallow copy of the muons container 
+	std::pair< xAOD::MuonContainer*, xAOD::ShallowAuxContainer* > muons_shallowCopy = xAOD::shallowCopyContainer( *muons ); 
+	    
+	xAOD::MuonContainer::iterator muonSC_itr = (muons_shallowCopy.first)->begin(); 
+	xAOD::MuonContainer::iterator muonSC_end = (muons_shallowCopy.first)->end(); 
+	for( ; muonSC_itr != muonSC_end; ++muonSC_itr ) { 
+		if(_data_switch==1 && m_muonCalibrationAndSmearingTool->applyCorrection(**muonSC_itr) == CP::CorrectionCode::Error){ // apply correction and check return code 
+		Error("execute()", "MuonCalibrationAndSmearingTool returns Error CorrectionCode"); 
+		}
+		muon_pt_vector.push_back((*muonSC_itr)->pt() * 0.001);
+		muon_eta_vector.push_back((*muonSC_itr)->eta());
+		muon_phi_vector.push_back((*muonSC_itr)->phi());
+		if ((*muonSC_itr)->pt() * 0.001 > 5.) keep_event = true;
+	}
+	//Truth muons
+	if(_data_switch == 1){
+	
+		const xAOD::TruthParticleContainer * particles = 0;
+		if ( !event->retrieve( particles, "TruthParticles" ).isSuccess() ){
+			Error("execute()", "Failed to retrieve TruthParticle container. Exiting." );
+			return EL::StatusCode::FAILURE;
+		}
+		xAOD::TruthParticleContainer::const_iterator truth_itr = particles->begin();
+		xAOD::TruthParticleContainer::const_iterator truth_end = particles->end();
+		for( ; truth_itr!=truth_end; ++truth_itr){
+
+			int ty=TrackHelperTools::getTypeTruth((*truth_itr)->barcode(),(*truth_itr)->pdgId(), (*truth_itr)->status(), (*truth_itr)->charge());				
+			if(ty!=1 && ty!=5) continue;				
+			//get the tracks....
+			float pt = (*truth_itr)->pt()/ 1000.0;				
+			float eta = (*truth_itr)->eta();				
+			float phi = (*truth_itr)->phi();
+
+			if (fabs((*truth_itr)->pdgId())==13) {muon_pt_vector.push_back(pt);muon_eta_vector.push_back(eta);muon_phi_vector.push_back(phi);}
+		} 
+	} 
+
+
+	
 	//Here is the analysis code
 	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++){
 			
@@ -823,7 +926,7 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_jetBchCorrCell = jet_jetBchCorrCell_vector.at(i);
 		jet_jetLArBadHVEnergyFrac = jet_jetLArBadHVEnergyFrac_vector.at(i);
 		jet_jetLArBadHVNCell = jet_jetLArBadHVNCell_vector.at(i);
-		weight=jet_weight;		 
+		//weight=jet_weight;		 
 		
 		//10 GeV reco cut
 		if (jet_pt_xcalib<10.) continue;
@@ -838,12 +941,15 @@ EL::StatusCode JetPerformance :: execute (){
 				truth_jet_pt = truth_jet_pt_vector.at(truth_jet_indices[i]);
 				truth_jet_m = truth_jet_m_vector.at(truth_jet_indices[i]);
 				truth_reco_jet_dR = DeltaR(truth_jet_phi,truth_jet_eta,jet_phi,jet_eta);
-				//truth_jet_NBJ_pT = truth_jet_NBJ_pT_vector.at(truth_jet_indices[i]);
+				truth_reco_jet_dR_vector.push_back(truth_reco_jet_dR);
+				truth_matched_index.push_back(truth_jet_indices[i]);
 			}
 			else{
 				truth_jet_eta = -100.;
 				truth_jet_phi = -100.;
 				truth_jet_pt = 0;
+				truth_reco_jet_dR_vector.push_back(-1);
+				truth_matched_index.push_back(-1);
 			}
 			
 		}
@@ -921,12 +1027,16 @@ EL::StatusCode JetPerformance :: execute (){
 		   jet_Clpost_et = et_pos;
 		   
 		
-       } // doClusters
-       if (jet_pt < _pTjetCut) continue;
-       tree_performance->Fill();
+       } // doClusters		
+      if (jet_pt < _pTjetCut) continue;
+      keep_event = true;
+      //tree_performance->Fill(); //TODO
 		
 	}
-	
+	if (keep_event) tree_performance->Fill(); //TODO
+	//delete shallow copy of muon container 
+	delete muons_shallowCopy.first; 
+	delete muons_shallowCopy.second; 
 	return EL::StatusCode::SUCCESS;
 }
 
@@ -936,6 +1046,16 @@ EL::StatusCode JetPerformance :: postExecute (){
 
 EL::StatusCode JetPerformance :: finalize (){
 	//xAOD::TEvent* event = wk()->xaodEvent();
+	
+	//cleaning muons
+	if(m_muonCalibrationAndSmearingTool){ 
+		delete m_muonCalibrationAndSmearingTool; 
+		m_muonCalibrationAndSmearingTool = 0; 
+	 } 
+	 if(m_muonSelection){ 
+		delete m_muonSelection; 
+		m_muonSelection = 0; 
+	 }
 	
 	// cleaning up trigger tools
 	if (_data_switch==0){	  

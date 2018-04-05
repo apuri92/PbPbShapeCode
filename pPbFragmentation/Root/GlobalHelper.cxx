@@ -49,8 +49,8 @@ float GetEventPlane(const xAOD::CaloClusterContainer *hiclus)
 	return GetAveragePsi(psiEP_N, psiEP_P);
 }
 
-float GetEventPlane(const xAOD::HIEventShapeContainer* calos){
-	float psi_2;
+double GetEventPlane(const xAOD::HIEventShapeContainer* calos){
+	double psi_2;
 	//for(const xAOD::HIEventShape calo_itr : calos)
 		//{
 		    //std::string summary;
@@ -60,12 +60,32 @@ float GetEventPlane(const xAOD::HIEventShapeContainer* calos){
 		        float FCal_Et=(calos->at(5)->et()*0.001*0.001);		        
 		        double qx_2=(calos->at(5)->etCos().at(1));
 		        double qy_2=(calos->at(5)->etSin().at(1));
-		        float N_psi_2 = std::atan2(qy_2,qx_2);
+		        double N_psi_2 = std::atan2(qy_2,qx_2);
 		        psi_2 = N_psi_2/2.0;        
 		        //break;
 		    }
 		//}
 	return psi_2;	
+}
+
+double GetEventPlane(const xAOD::HIEventShapeContainer* calos, int order){
+	double psi_n;
+	double norm = (double) order;
+	//for(const xAOD::HIEventShape calo_itr : calos)
+		//{
+		    //std::string summary;
+		    //if(calos->isAvailable<std::string>("Summary")) summary=calos->auxdata<std::string>("Summary");
+		    //if(summary.compare("FCal")==0)
+		    {
+		        float FCal_Et=(calos->at(5)->et()*0.001*0.001);		        
+		        double qx_n=(calos->at(5)->etCos().at(order-1));
+		        double qy_n=(calos->at(5)->etSin().at(order-1));
+		        double N_psi_n = std::atan2(qy_n,qx_n);
+		        psi_n = N_psi_n/norm;        
+		        //break;
+		    }
+		//}
+	return psi_n;	
 }
 
 Float_t GetAveragePsi(Float_t psi1, Float_t psi2)
@@ -295,3 +315,10 @@ int GetCentralityNBins(Int_t centralityScheme)
 	else return 1;
 }
 
+double GetMBFCal(int run_number, int event_number)
+{
+	
+
+
+
+}

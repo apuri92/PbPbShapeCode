@@ -217,5 +217,21 @@ EL::StatusCode PbPbFFShape :: initialize ()
 
 	cout << " Initialization done" << endl;
 	return EL::StatusCode::SUCCESS;
+
+
+	//MB Fcal trees
+
+	vector<int> run_numbers;
+	run_numbers.push_back("1");
+	run_numbers.push_back("2");
+	run_numbers.push_back("3");
+	run_numbers.push_back("4");
+	TString xfn = gSystem->GetFromPipe("echo $ROOTCOREBIN");
+
+	for (int i = 0; i < run_numbers.size(); i++)
+	{
+		fcal_trees.push_back(new TFile(xfn+Form("/../pPbFragmentation/data/run_%i.root", run_numbers.at(i)),"READ"));
+	}
+
 }
 

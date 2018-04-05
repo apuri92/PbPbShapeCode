@@ -178,12 +178,42 @@ Float_t UEEstimator::CalculateFlowWeight(float trk_pt,float trk_eta,float trk_ph
    return w_flow;
 }
 
-Float_t UEEstimator::GetDeltaPsi(float phi, float psi)
+Float_t UEEstimator::CalculateV3Weight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt)
+//@brief: calculate a weight that is due to a difference in the flow between a jet 
+//@       position and a position of a given particle that is used to estimate the UE
+//@note:  naming of some variable is not optimal as we don't want to deviate from previous codes
+{
+
+   Float_t v3 = _h_v3_EP->GetBinContent(_h_v3_EP->GetXaxis()->FindBin(FCalEt),_h_v3_EP->GetYaxis()->FindBin(trk_pt),_h_v3_EP->GetZaxis()->FindBin(trk_eta));
+			// calculate the event plane  
+   Float_t w_flow  = (v3*cos(3*GetDeltaPsi3( trk_phi, Psi3))!=-0.5)?
+                 ( (1 + 2*v3*cos(3*GetDeltaPsi3( nearJetPhi, Psi3)) )
+                  /(1 + 2*v3*cos(3*GetDeltaPsi3( trk_phi, Psi3)) ) ):0; 	// modulate/demodulate
+   if (w_flow > 1.4) w_flow = 1.4;	// if the correction is too large ...
+   if (w_flow < 0.6) w_flow = 0.6;      // ... or too small, then take some maximal/minimal value
+
+   return w_flow;
+}
+
+Float_t UEEstimator::GetDeltaPsi(double phi, double psi)
 //@brief: distance from the event plane in convention of flow calculations
 {
-    Float_t diff;
+    Double_t diff;
     diff = fabs(phi - psi);
     while (diff > TMath::Pi()/2. ) diff = TMath::Pi() - diff;
+    return fabs(diff);
+}
+
+Float_t UEEstimator::GetDeltaPsi3(double phi, double psi)
+//@brief: distance from the event plane in convention of flow calculations
+{
+    Double_t diff;
+    diff = fabs(phi - psi);
+    //cout << "diff " << diff;
+    //if (diff>1.047) diff=diff-0.002;
+    //if (diff<-1.047) diff=diff+0.002;
+    //cout << " diff " << diff <<endl;
+    while (diff > TMath::Pi()/3. ) diff = 2*TMath::Pi()/3. - diff;
     return fabs(diff);
 }
 

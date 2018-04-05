@@ -26,6 +26,7 @@
 #include "xAODTracking/TrackParticleContainer.h"
 #include "xAODTracking/VertexContainer.h"
 #include "pPbFragmentation/JetCorrector.h"
+#include "pPbFragmentation/TrackHelperTools.h"
 
 #define private public
 #include "xAODHIEvent/HIEventShapeAuxContainer.h"
@@ -88,7 +89,7 @@ class JetPerformance : public BaseClass{
 	
 	float jet_ClSub_et, jet_ClUnsub_et, jet_Clneg_et, jet_Clpost_et; //!
 			
-	float FCalEt; //!
+	float FCal_Et; //!
 	
 	float jet_NBJ_pT;
 	float truth_jet_pt, truth_jet_phi, truth_jet_eta, truth_jet_m, truth_reco_jet_dR, truth_jet_NBJ_pT; //!
@@ -98,8 +99,9 @@ class JetPerformance : public BaseClass{
 	float test_jet_eta, test_jet_phi,test_jet_m, test_jet_pt_EM; //!
 	float jet_jetQuality,jet_jetTime,jet_jethecq,jet_jetnegE,jet_jetemf,jet_jethecf,jet_jetfracSamplingMax,jet_jetchf,jet_jetBchCorrCell,jet_jetLArBadHVEnergyFrac,weight; //!
 	
-	vector<float> ClUnsub_et, ClUnsub_eta, ClUnsub_phi; //!
-	
+	vector<float> jet_TrigPresc_vector,muon_pt_vector, muon_phi_vector, muon_eta_vector, jet_pt_EM_vector,jet_pt_unsubtracted_vector,jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector,jet_m_vector,ClUnsub_et, ClUnsub_eta, ClUnsub_phi; //!
+	vector<int> Is_jet_Good, jet_nConst_vector, truth_matched_index; //!
+	vector<float> truth_reco_jet_dR_vector,truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector,truth_muon_pt_vector,truth_muon_phi_vector,truth_muon_eta_vector; //!
 	JetCorrector* jetcorr; //!
 	
 	// this is a standard constructor

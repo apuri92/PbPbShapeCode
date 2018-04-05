@@ -17,9 +17,11 @@ int GetCentralityBin(Int_t centralityScheme, float FCal_Et, bool isMC=false);
 void SetRejectionHistogram(TH1D* h);
 int GetCentralityNBins(Int_t centralityScheme);
 float GetEventPlane(const xAOD::CaloClusterContainer *hiclus);
-float GetEventPlane(const xAOD::HIEventShapeContainer* calos);
+double GetEventPlane(const xAOD::HIEventShapeContainer* calos);
 Float_t GetAveragePsi(Float_t psi1, Float_t psi2);
 Int_t GetPsiBin(Float_t psi);
+double GetEventPlane(const xAOD::HIEventShapeContainer* calos, int order);
+double GetMBFcal(int run_number, int event_number)
 //@CODE_end
 
 #endif

@@ -466,8 +466,8 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      if ((scheme==0) && (variable=="eta-trk-coars"))
      {
       printf("\n... eta-trk-binning : four simple bins ");
-      num = 13;
-      double value=-1.3;
+      num = 21;
+      double value=-2.1;
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
