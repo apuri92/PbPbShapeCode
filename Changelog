@@ -1,5 +1,10 @@
 #TODO
 --------
+6/5/2018
+*added tree handling for updated fcal cent binning
+*restored modified draw_chps code
+*error handling for subtraction done
+--------
 04/5/2018
 *updated to new SVN version
 *started to fix error propagation in UE subtraction

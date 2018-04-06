@@ -52,6 +52,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
 
+	h_fcal_change = new TH2D("h_fcal_change","h_fcal_change",10,0,10,10,0,10);
+	wk()->addOutput (h_fcal_change);
 
 	//Axis histograms
 	h_jet_pt_eta_phi = new TH3D("h_jet_pt_eta_phi","h_jet_pt_eta_phi",ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, phiJetBinsN, phiJetBins);
@@ -62,6 +64,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	wk()->addOutput (h_trk_pt_eta_phi);
 	wk()->addOutput (h_z_zfine_d0z0);
 	wk()->addOutput (h_resp_hitsfine_drfine);
+
+	h_fcal_change = new TH2D("h_fcal_change","h_fcal_change",10,0,10,10,0,10);
+	wk()->addOutput (h_fcal_change);
 
 	//Debugging histograms
 	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)

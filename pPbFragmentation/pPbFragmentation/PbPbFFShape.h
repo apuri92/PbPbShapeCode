@@ -73,15 +73,19 @@ class PbPbFFShape : public BaseClass{
 	JetCorrector* jetcorr; //!
 
 	vector<TFile*> fcal_trees; //!
+	vector<int> run_numbers; //!
+
 	//Axis histograms
 	TH3D *h_jet_pt_eta_phi; //!
 	TH3D *h_trk_pt_eta_phi; //!
 	TH3D *h_z_zfine_d0z0; //!
 	TH3D *h_resp_hitsfine_drfine; //!
 
+	
 	//Basic histograms
 	TH3D *hET_ETsub; //!
 	TH1D *h_FCal_Et_restr; //!
+	TH2D *h_fcal_change; //!
 	//TH3F *deriv_val; //!
 	
 	TH1D * h_centrality; //!

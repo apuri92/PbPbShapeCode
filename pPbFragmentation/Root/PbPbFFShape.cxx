@@ -66,7 +66,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 	if(m_eventCounter%statSize==0) std::cout << "Event: " << m_eventCounter << std::endl;
 	m_eventCounter++;
-//	if (m_eventCounter != 13372) return EL::StatusCode::SUCCESS;
+//	if (m_eventCounter < 2030) return EL::StatusCode::SUCCESS;
 //	cout << "Event: " << m_eventCounter << endl;
 	//All events
 	bool keep = true;
@@ -132,11 +132,53 @@ EL::StatusCode PbPbFFShape :: execute (){
 		uee->Psi = GetEventPlane(calos);
 	}
 
+
+
+	if (_dataset == 4 && isMC)
+	{
+		int run_number = eventInfo->runNumber();
+		int event_number = eventInfo->eventNumber();
+		float new_Fcal = -1;
+		int tree_cent_bin = -1;
+
+		for (int i = 0; i < run_numbers.size(); i++)
+		{
+			if (run_number == run_numbers.at(i))
+			{
+				TTree *tree = (TTree*)fcal_trees.at(i)->Get("tree_output");
+				float tree_Fcal;
+				int tree_eventNumber;
+				int tree_runNumber;
+				tree->SetBranchAddress("FCalEt",&tree_Fcal);
+				tree->SetBranchAddress("run_n",&tree_runNumber);
+				tree->SetBranchAddress("event_n",&tree_eventNumber);
+
+				for (int i_entry = 0; i_entry < tree->GetEntries(); i_entry++)
+				{
+					tree->GetEntry(i_entry);
+					if (event_number == tree_eventNumber)
+					{
+						new_Fcal = tree_Fcal;
+						tree_cent_bin = GetCentralityBin(_centrality_scheme, new_Fcal,  isHIJING );
+						break;
+					}
+				}
+				break;
+			}
+		}
+
+		//	cout << FCalEt << " " << cent_bin << " -> " << new_Fcal << " "  << tree_cent_bin << endl;
+		h_fcal_change->Fill(cent_bin, tree_cent_bin);
+		cent_bin = tree_cent_bin;
+	}
+
+
 	if (cent_bin < 0 || event_weight_fcal == 0) {
 		if(cent_bin==-2) Error("execute()", "Unknown centrality scheme" );
 		h_RejectionHisto->Fill(1.5);
 		keep = false;
 	}
+
 
 	// GRL
 	if(!isMC)
@@ -224,6 +266,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	//TODO MBTS timing cut?
 
 	h_RejectionHisto->Fill(7.5);
+
 
 	// trigger
 	if (_data_switch==0)
@@ -534,7 +577,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
 			for (int i_dR = 0; i_dR < 13; i_dR++)
 			{
-				for (int i_pt = 0; i_pt < 11; i_pt++)
+				for (int i_pt = 0; i_pt < 10; i_pt++)
 				{
 					double UE_err = -1;
 					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
