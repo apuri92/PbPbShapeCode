@@ -124,7 +124,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
 		if (_dataset == 3) event_weight_fcal = 1;
 		h_centrality->Fill(cent_bin);
-
+		h_centrality->Fill(n_cent_bins-1);
 		//Get HI clusters for flow
 		//const xAOD::CaloClusterContainer *hiclus(0);
 		//EL_RETURN_CHECK("execute",event->retrieve(hiclus,"HIClusters") );
@@ -555,7 +555,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			int truthindex=TruthJetIndex.at(i);
 			if (truthindex<0) continue; //Matching to truth jets
 			if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) continue;
-			if (!truth_jet_isolated_vector.at(TruthJetIndex.at(i))) continue;
+//			if (!truth_jet_isolated_vector.at(TruthJetIndex.at(i))) continue;
 
 
 			h_reco_post_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
@@ -921,7 +921,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			truth_jet_phi = truth_jet_phi_vector.at(i);
 			int y_bin = jetcorr->GetJetYBin(truth_jet_y);
 
-			if(!truth_jet_isolated_vector.at(i)) continue;
+//			if(!truth_jet_isolated_vector.at(i)) continue;
 
 			if (RecoJetIndex.at(i) >= 0)
 			{

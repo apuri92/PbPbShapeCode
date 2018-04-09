@@ -701,7 +701,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 				   float w_flow=1;
 				   if (_dataset==4) {
 				   	w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
-				   	w_flow = w_flow * uee->CalculateV3Weight( pt, eta, phi, jet_phi,  FCalEt );
+				   	//w_flow = w_flow * uee->CalculateV3Weight( pt, eta, phi, jet_phi,  FCalEt );
 				   }
 				   float w_bkgr = w_eta * w_ncones * w_flow;
 		    		
@@ -834,7 +834,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 		} // end reco track loop
 		//Alternative UE
 		int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
-		for (int i_dR = 0; i_dR < 7; i_dR++) //Up to 0.4
+		for (int i_dR = 0; i_dR < 1; i_dR++) //Up to 0.4
 		{
 			for (int i_pt = 0; i_pt < 7; i_pt++)
 			{

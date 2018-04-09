@@ -63,15 +63,19 @@ class MBUEEstimator : public BaseClass{
 	
 	JetCorrector* jetcorr; //!
 				
-
+	bool m_shapeFF;
+	
+	
 	
 	//vector<vector<TH3D*>> h_trk_dNdEtadPhidpT; //!
 	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_HP; //!
 	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_HP_fine; //!
-	vector<TH2D*> h_jet_v_Psi_HP; //!
+	vector<TH3D*> h_jet_v_Psi_HP; //!
 	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC; //!
 	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC_fine; //!
-	vector<TH2D*> h_jet_v_Psi_MC; //!
+	vector<TH3D*> h_jet_v_Psi_MC; //!
+	
+	TH2D * map_excluded_jets;//!
 	
 	TH1D * h_centrality_HP; //!
 	TH1D * h_FCal_Et_HP; //!

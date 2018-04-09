@@ -305,8 +305,8 @@ int main(int argc, char ** argv)
 							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
 							UE_err = h_UE_MB_err->GetBinContent(i_trk_bin, i_jet_bin);
 
-							correction = n_jets_data / n_jets_mc * h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //correct number of jets, correct for UE JER correlation
-							correction_err = n_jets_data / n_jets_mc *  h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
+							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //correct number of jets, correct for UE JER correlation
+							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
 
 							raw = h_raw_subtr->GetBinContent(i_trk_bin, i_jet_bin);
 							raw_err = h_raw_subtr->GetBinError(i_trk_bin, i_jet_bin);

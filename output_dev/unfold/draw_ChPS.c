@@ -1252,7 +1252,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		TCanvas *c_evol_dR = new TCanvas("c_evol_dR","c_evol_dR",900,600);
 		if (dataset_type == "pp") c_evol_dR->SetCanvasSize(600,600);
-		TLegend *legend_evol_dR = new TLegend(0.18, 0.05, 0.45, 0.48, "","brNDC");
+		TLegend *legend_evol_dR = new TLegend(0.18, 0.18, 0.30, 0.38, "","brNDC");
 		legend_evol_dR->SetTextFont(43);
 		legend_evol_dR->SetBorderSize(0);
 		if (dataset_type == "pp") legend_evol_dR->SetTextSize(12);

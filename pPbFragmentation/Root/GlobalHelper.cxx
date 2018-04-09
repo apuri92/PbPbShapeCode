@@ -315,10 +315,3 @@ int GetCentralityNBins(Int_t centralityScheme)
 	else return 1;
 }
 
-double GetMBFCal(int run_number, int event_number)
-{
-	
-
-
-
-}

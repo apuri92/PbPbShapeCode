@@ -153,11 +153,12 @@ float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float unc
   //pt weight
   weight = 1./((eff + uncert)*eff_jet_corr*eff_eta_corr);
   
+  //bool test = false;
   bool test = false;
-  //bool test = true;
   if ((weight < 0.1 || weight>10.) || test)
   {
-	  if (R<0.4) cout << "Probably efficiency problem, weight: " << weight << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << " eff_jet_corr " << eff_jet_corr << " jet pt " << jet_pt << " jet y " << jet_y << " y bin " << ybin << " dR " << R <<endl;
+	if (R<0.4) cout << "Probably efficiency problem, weight: " << weight << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << " eff_jet_corr " << eff_jet_corr << " jet pt " << jet_pt << " jet y " << jet_y << " y bin " << ybin << " dR " << R <<endl;
+	cout << "Probably efficiency problem, weight: " << weight << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << " eff_jet_corr " << eff_jet_corr << " jet pt " << jet_pt << " jet y " << jet_y << " y bin " << ybin << " dR " << R <<endl;
   	///if (fabs(jet_y)>1.2)	cout << "Probably efficiency problem, weight: " << weight << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << " eff_jet_corr " << eff_jet_corr << " jet pt " << jet_pt << " jet y " << jet_y << " y bin " << ybin << " dR " << R <<endl;
   	//if (fabs(jet_y)>2. && R<0.4 && pt >1.) cout << "Probably efficiency problem, weight: " << weight << " pt  " << pt << " eta " << eta << " eta bin " << etabin <<  " centrality "<< centrality << " eff_jet_corr " << eff_jet_corr << " jet pt " << jet_pt << " jet y " << jet_y << " y bin " << ybin << " dR " << R << " eff_eta_corr " << eff_eta_corr << " eff_jet_corr " << eff_jet_corr << " uncert " << uncert <<endl;
   	if (!test) cout << "Warning: Setting eff weight to 1" << endl;

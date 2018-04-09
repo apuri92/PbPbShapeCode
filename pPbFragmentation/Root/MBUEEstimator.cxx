@@ -120,6 +120,26 @@ EL::StatusCode MBUEEstimator :: initialize ()
 	TrackHelperTools::SetCutLevel(m_trackSelectorTool, _cut_level.c_str());
 	EL_RETURN_CHECK("initialize()",m_trackSelectorTool->initialize());
 	
+	//Calibration
+	const std::string name = "PbPbFragmentation"; //string describing the current thread, for logging
+	TString jetAlgo = "AntiKt4HI"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
+	TString config = "JES_MC15CHI_060316.config"; //Path to global config used to initialize the tool (see below)
+	TString calibSeq = "EtaJES_DEV"; //String describing the calibration sequence to apply (see below)
+									 //bool isData = false; -- not used //bool describing if the events are data or from simulation
+
+	//insitu calibration
+	TString jetAlgo_insitu = "AntiKt4EMTopo"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
+	TString config_insitu = "JES_2015dataset_recommendation_Feb2016.config"; //Path to global config used to initialize the tool (see below)
+	const std::string name_insitu = "insitu"; //string describing the current thread, for logging
+	TString calibSeq_insitu = "Insitu_DEV"; //String describing the calibration sequence to apply (see below)
+
+	//Call the constructor. The default constructor can also be used if the arguments are set with python configuration instead
+	m_jetCalibration = new JetCalibrationTool(name, jetAlgo, config, calibSeq, true);
+	m_jetCalibration_insitu = new JetCalibrationTool(name_insitu, jetAlgo_insitu, config_insitu, calibSeq_insitu, true);
+
+	//Initialize the tool
+	EL_RETURN_CHECK("initialize()",m_jetCalibration->initializeTool(name));
+	EL_RETURN_CHECK("initialize()",m_jetCalibration_insitu->initializeTool(name_insitu));
 	
 	// GRL
 	TString xfn = gSystem->GetFromPipe("echo $ROOTCOREBIN");
@@ -162,6 +182,8 @@ EL::StatusCode MBUEEstimator :: initialize ()
 EL::StatusCode MBUEEstimator :: histInitialize ()
 {
 	
+	m_shapeFF = true;
+	
 	FCal_only = false;
 	cout << " Setting  histograms" << endl;
 	
@@ -169,7 +191,8 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	double ptTrkBins[1000],  etaTrkBins[1000], phiTrkBins[1000],ptTrkBinsFine[1000];
 
 	SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
-	SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
+	if (m_shapeFF) SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
+	else SetupBinning(0, "pt-trk-rebin", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "pt-trk", ptTrkBinsFine, ptTrkBinsFineN);
 	SetupBinning(0, "eta-trk-coars", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk-coars", phiTrkBins, phiTrkBinsN);
@@ -230,22 +253,27 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
 	TH2D* temphist_2D = nullptr;
 	TH1D* temphist_1D = nullptr;
 	
+	map_excluded_jets = new TH2D ("map_excluded_jets","map_excluded_jets",etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+	
 	int ndPsibins = 16;
 	int ndRbins = 13;
+	if (!m_shapeFF){
+		ndRbins=1;
+	}
 	//h_trk_dNdEtadPhidpT =  vector<vector<TH3D*> > (ndPsibins, vector<TH3D*>(_nCentbins));
 	h_UE_dNdEtadPhidpT_HP =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
 	h_UE_dNdEtadPhidpT_HP_fine =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
-	h_jet_v_Psi_HP =  vector<TH2D*>(_nCentbins);
+	h_jet_v_Psi_HP =  vector<TH3D*>(_nCentbins);
 	h_UE_dNdEtadPhidpT_MC =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
 	h_UE_dNdEtadPhidpT_MC_fine =  vector<vector<vector<TH3D*>>> (ndPsibins, vector<vector<TH3D*>> (_nCentbins,vector<TH3D*>(ndRbins)));
-	h_jet_v_Psi_MC =  vector<TH2D*>(_nCentbins);
+	h_jet_v_Psi_MC =  vector<TH3D*>(_nCentbins);
 	for (int j=0;j<_nCentbins;j++){
-		temphist_2D = new TH2D(Form("h_jet_v_Psi_HP_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16,32,-TMath::Pi(),TMath::Pi());
-		h_jet_v_Psi_HP.at(j) = temphist_2D;
+		temphist_3D = new TH3D(Form("h_jet_v_Psi_HP_cent%i",j),Form("h_jet_v_Psi_HP_cent%i",j),16,0,16,21,-2.1,2.1,32,-TMath::Pi(),TMath::Pi());
+		h_jet_v_Psi_HP.at(j) = temphist_3D;
 		h_jet_v_Psi_HP.at(j)->Sumw2();
 		wk()->addOutput (h_jet_v_Psi_HP.at(j));
-		temphist_2D = new TH2D(Form("h_jet_v_Psi_MC_cent%i",j),Form("h_jet_v_Psi_cent%i",j),16,0,16,32,-TMath::Pi(),TMath::Pi());
-		h_jet_v_Psi_MC.at(j) = temphist_2D;
+		temphist_3D = new TH3D(Form("h_jet_v_Psi_MC_cent%i",j),Form("h_jet_v_Psi_MC_cent%i",j),16,0,16,21,-2.1,2.1,32,-TMath::Pi(),TMath::Pi());
+		h_jet_v_Psi_MC.at(j) = temphist_3D;
 		h_jet_v_Psi_MC.at(j)->Sumw2();
 		wk()->addOutput (h_jet_v_Psi_MC.at(j));
 		for (int i=0;i<ndPsibins;i++){
@@ -256,25 +284,25 @@ EL::StatusCode MBUEEstimator :: histInitialize ()
             //wk()->addOutput (h_trk_dNdEtadPhidpT.at(i).at(j));
             
             for (int k=0;k<ndRbins;k++){
-		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i",i,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i",i,j,k),Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i",i,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
 				h_UE_dNdEtadPhidpT_HP.at(i).at(j).at(k) = temphist_3D;			        
 		        h_UE_dNdEtadPhidpT_HP.at(i).at(j).at(k)->Sumw2();
 		        wk()->addOutput (h_UE_dNdEtadPhidpT_HP.at(i).at(j).at(k));
 		        
-		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i",i,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i",i,j,k),Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i",i,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
 				h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k) = temphist_3D;			        
 		        h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k)->Sumw2();
 		        wk()->addOutput (h_UE_dNdEtadPhidpT_MC.at(i).at(j).at(k));
 		        
-		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_HP_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
 				h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k) = temphist_3D;			        
 		        h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k)->Sumw2();
-		        wk()->addOutput (h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k));
+		        if (! m_shapeFF) wk()->addOutput (h_UE_dNdEtadPhidpT_HP_fine.at(i).at(j).at(k));
 		        
-		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+		        temphist_3D = new TH3D(Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i_fine",i,j,k),Form("h_UE_dNdEtadPhidpT_MC_dPsi%i_cent%i_dR%i_fine",i,j,k),ptTrkBinsFineN, ptTrkBinsFine,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
 				h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k) = temphist_3D;			        
 		        h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k)->Sumw2();
-		        wk()->addOutput (h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k));
+		        if (! m_shapeFF) wk()->addOutput (h_UE_dNdEtadPhidpT_MC_fine.at(i).at(j).at(k));
 		    }    
 		}	
 	}
@@ -288,8 +316,12 @@ EL::StatusCode MBUEEstimator :: execute (){
 	xAOD::TEvent* event = wk()->xaodEvent();
 	
 	//cout << "test" << endl;
-	
-	float dRbins[14]={0. , 0.05 , 0.1 , 0.15 , 0.2 , 0.25 , 0.3 , 0.4 , 0.5 , 0.6 , 0.7 , 0.8 , 1.0 , 1.2 };
+	int ndRbins=13;
+	double dRbins[14]={0. , 0.05 , 0.1 , 0.15 , 0.2 , 0.25 , 0.3 , 0.4 , 0.5 , 0.6 , 0.7 , 0.8 , 1.0 , 1.2 };
+	if (!m_shapeFF){
+		ndRbins=1;
+		dRbins[1]=0.4;
+	}
 	// Event counter
 	int statSize=1;
 	
@@ -493,8 +525,85 @@ EL::StatusCode MBUEEstimator :: execute (){
 	//cout << "Psi " << Psi << endl;
 	
 	h_Psi->Fill(Psi);
+	// ---- GETTING RECO JETS ----
+	xAOD::TStore *store = new xAOD::TStore; //For calibration
+	const xAOD::JetContainer* jets = 0;
+	EL_RETURN_CHECK("execute()",event->retrieve( jets, "AntiKt4HIJets" ));
 	
-	for (int dRbin = 0; dRbin<13;dRbin++){		
+	xAOD::JetContainer* updatedjets = new xAOD::JetContainer();
+	xAOD::AuxContainerBase* updatedjetsAux = new xAOD::AuxContainerBase();
+	updatedjets->setStore( updatedjetsAux );
+	
+	store->record(updatedjets,"updatedjets");
+	store->record(updatedjetsAux,"updatedjetsAux");
+
+	xAOD::JetContainer::const_iterator jet_itr = jets->begin();
+	xAOD::JetContainer::const_iterator jet_end = jets->end();
+	vector<float> jet_phi_vector,jet_eta_vector;
+	for( ; jet_itr != jet_end; ++jet_itr )
+	{
+		xAOD::Jet newjet;// = new xAOD::Jet();
+		newjet.makePrivateStore( **jet_itr );
+
+		const xAOD::JetFourMom_t jet_4mom_def = newjet.jetP4();
+		float def_jet_pt  = (jet_4mom_def.pt() * 0.001);
+		
+		xAOD::JetFourMom_t jet_4mom = newjet.jetP4("JetSubtractedScaleMomentum"); //getting SubtractedScale instead of EMScale because EMScale is not in DFAntiKt4HI
+		float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+
+		const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet.jetP4("JetUnsubtractedScaleMomentum");
+		float unsubtracted_jet_pt  = (jet_4mom_unsubtracted.pt() * 0.001);
+
+		newjet.setJetP4("JetConstitScaleMomentum",jet_4mom_unsubtracted); //Required
+		
+		const xAOD::JetFourMom_t jet_4mom_xcalib = newjet.jetP4();
+		newjet.setJetP4("JetGSCScaleMomentum", jet_4mom_xcalib);
+
+		//Cross-calibration
+		if (_data_switch==0) EL_RETURN_CHECK("execute()", m_jetCalibration_insitu->applyCalibration( newjet ) );
+				
+		jet_pt  = (newjet.pt() * 0.001);
+		jet_eta = newjet.eta();
+		jet_phi = newjet.phi();
+		jet_m = newjet.m()*0.001;
+		
+		if (jet_pt<100.) continue;
+				
+		jet_phi_vector.push_back(jet_phi);
+		jet_eta_vector.push_back(jet_eta);
+		
+	}
+	
+	map_excluded_jets->Reset();
+	for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){	
+		float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
+		for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
+			float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
+			bool tobeexcluded = false;
+			for (int i=0;i<jet_phi_vector.size();i++){	
+				float dR = DeltaR(jet_phi_vector.at(i), jet_eta_vector.at(i), jet_phi, jet_eta);
+				if (dR<0.8) {tobeexcluded=true;break;}
+			}
+			for (const auto& trk : *recoTracks) {
+				float eta = trk->eta();
+				float phi = trk->phi();
+				float pt = trk->pt()/1000.;
+
+				trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
+				if (fabs(eta) > 2.5) continue;
+				if (pt < 10.) continue; //min pT cut
+				double d0 = trk->d0();
+				double d0_cut = f_d0_cut->Eval(pt);
+				if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
+				if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool		
+				float dR = DeltaR(jet_phi, jet_eta, phi, eta);
+				if (dR<0.4) {tobeexcluded = true; break;}
+			}
+			if (tobeexcluded) map_excluded_jets->SetBinContent(etabin,phibin,1.);
+		}			
+	}	
+	
+	for (int dRbin = 0; dRbin<ndRbins;dRbin++){		
 		for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){	
 			float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
 			float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
@@ -503,8 +612,9 @@ EL::StatusCode MBUEEstimator :: execute (){
 			h_jet_phi_v_Psi->Fill(jet_phi,Psi);
 			h_jet_phi_v_dPsi->Fill(jet_phi,DeltaPsi(jet_phi,Psi));
 			for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
+				if (map_excluded_jets->GetBinContent(etabin,phibin)>0.5) continue;
 				float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
-				//if (fabs(jet_eta)>1.3) continue;
+				if (fabs(jet_eta)>1.3 && m_shapeFF) continue;
 				for (const auto& trk : *recoTracks) {
 					float eta = trk->eta();
 					float phi = trk->phi();
@@ -552,9 +662,13 @@ EL::StatusCode MBUEEstimator :: execute (){
 	//Get normalization
 	for (int phibin = 1; phibin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetNbins();phibin++){
 		float jet_phi = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetZaxis()->GetBinCenter(phibin);
-		float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
-		h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,jet_phi,event_weight_fcal_2*trigger_prescale);
-		h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,jet_phi,event_weight_fcal_3*trigger_prescale);
+		for (int etabin = 1; etabin <=h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetNbins() ;etabin++){
+			if (map_excluded_jets->GetBinContent(etabin,phibin)>0.5) continue;
+			float jet_eta = h_UE_dNdEtadPhidpT_HP.at(0).at(0).at(0)->GetYaxis()->GetBinCenter(etabin);
+			float jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,Psi));
+			h_jet_v_Psi_HP.at(cent_bin)->Fill(jet_dPsi_bin,jet_eta,jet_phi,event_weight_fcal_2*trigger_prescale);
+			h_jet_v_Psi_MC.at(cent_bin)->Fill(jet_dPsi_bin,jet_eta,jet_phi,event_weight_fcal_3*trigger_prescale);
+		}
 	}
 
 		

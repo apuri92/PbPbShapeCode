@@ -74,11 +74,11 @@ void draw_spectra(string config_file = "ff_config.cfg")
 			h_raw.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
 			h_raw.at(i_cent).at(i_y)->Scale(1.,"width");
 
-			name = Form("h_true_jet_y%i_c%i", i_y, i_cent);
+			name = Form("h_unfolded_jet_y%i_c%i", i_y, i_cent);
 			h_unfolded.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
 			h_unfolded.at(i_cent).at(i_y)->Scale(1.,"width");
 
-			name = Form("h_unfolded_jet_y%i_c%i", i_y, i_cent);
+			name = Form("h_true_jet_y%i_c%i", i_y, i_cent);
 			h_true.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
 			h_true.at(i_cent).at(i_y)->Scale(1.,"width");
 
