@@ -221,7 +221,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 					}
 					line->DrawLine(1e2, 1, 1e3, 1);
 					gPad->SetLogx(0);
-					gPad->SetLogy(0);
+					gPad->SetLogy();
 
 				}
 

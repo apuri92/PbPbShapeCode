@@ -1,9 +1,14 @@
 #TODO
 --------
-9/5/2018
+4/12/2018
+*fixed dates in changeling
+*cleaned up reco tracks in truthjet plots
+*cleaned up PbPbFFShape code (removed updating fcal info, removed event selection on basis of truth jet in forward region)
+--------
+4/9/2018
 *updated to svn code
 --------
-6/5/2018
+4/6/2018
 *added tree handling for updated fcal cent binning
 *restored modified draw_chps code
 *error handling for subtraction done

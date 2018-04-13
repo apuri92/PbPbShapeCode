@@ -10,6 +10,7 @@ void comp_ChPS(bool isMC = 1)
 	if (isMC) did = "MC";
 
 	cout << "Drawing ChPS..." << endl;
+	cout << Form("Doing in %s mode", did.c_str()) << endl;
 
 	TFile *f_PbPb = new TFile(Form("final_ChPS_%s_PbPb.root", did.c_str()));
 	TFile *f_pp = new TFile(Form("final_ChPS_%s_pp.root", did.c_str()));
@@ -112,7 +113,7 @@ void comp_ChPS(bool isMC = 1)
 	double trk_pt_lo = 1.;
 	double trk_pt_hi = 150.;
 	double ratio_lo = 0.;
-	double ratio_hi = 5.;
+	double ratio_hi = 5;
 
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
@@ -401,8 +402,8 @@ void comp_ChPS(bool isMC = 1)
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_raw_subtr_indR->Print(Form("output_pdf/ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-			c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+//			c_ChPS_raw_subtr_indR->Print(Form("output_pdf/ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+//			c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 			c_ChPS_final_indR->Print(Form("output_pdf/ChPS_final_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 			jet_itr++;
@@ -912,8 +913,8 @@ void comp_ChPS(bool isMC = 1)
 			pdf_label = "";
 			if (i_dR == 0) pdf_label = "(";
 			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_raw_subtr->Print(Form("output_pdf/ChPS_raw_subtr_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-			c_ChPS_raw_subtr_unf->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+//			c_ChPS_raw_subtr->Print(Form("output_pdf/ChPS_raw_subtr_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+//			c_ChPS_raw_subtr_unf->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 			c_ChPS_final->Print(Form("output_pdf/ChPS_final_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 		} //end dr loop
 	}

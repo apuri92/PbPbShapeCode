@@ -53,17 +53,13 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
-	//wrt trk pt: raw_truthjet
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet_subtr (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet_subtr_bbb (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
 	//wrt trk pt: truth
 	vector<vector<vector<TH1*>>> h_ChPS_truth (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	//wrt trk pt: UE
 	vector<vector<vector<TH1*>>> h_ChPS_UE (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_UE_truthjet (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+
+	vector<vector<vector<TH1*>>> h_ChPS_fake (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	//other
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_subtr_raw (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -71,32 +67,21 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_B2S (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_subtr_raw_truthjet (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_bbb_subtr_truthjet (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_truthjet (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-
 	//wrt r: raw_0
 	vector<vector<vector<TH1*>>> h_ChPS_raw_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_raw_subtr_unf_bbb_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
-	//wrt r: raw_truthjet
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet_subtr_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_raw_truthjet_subtr_bbb_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
 	//wrt r: truth
 	vector<vector<vector<TH1*>>> h_ChPS_truth_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	//wrt r: UE
 	vector<vector<vector<TH1*>>> h_ChPS_UE_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_UE_truthjet_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_fake_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 	//wrt r: other
 	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_ChPS_ratio_closure_truthjet_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
 
 	//wrt trk pt, injet: raw_0
@@ -120,8 +105,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	double trk_pt_lo = 1.;
 	double trk_pt_hi = 150.;
 
-	double ratio_lo = 0.5;
-	double ratio_hi = 1.5;
+	double ratio_lo = 0;
+	double ratio_hi = 2;
 
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
@@ -195,27 +180,15 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
 
-				name = Form("h_ChPS_raw_truthjet_subtr_bbb_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-				h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
-
-				name = Form("h_ChPS_raw_truthjet_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-				h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
-
-				name = Form("h_ChPS_raw_truthjet_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-				h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
-
-				name = Form("h_ChPS_ratio_closure_truthjet_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-				h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
-
-
 				if (dataset_type == "PbPb")
 				{
 					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 					h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
-
-					name = Form("h_ChPS_UE_truthjet_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-					h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 				}
+
+				name = Form("h_ChPS_fake_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
 			}
 
 			//wrt trkpt
@@ -231,7 +204,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					h_ChPS_response_matrix.at(i_dR).at(i_cent)->GetYaxis()->SetTitle("Bins in truth [p_{T}^{jet} and p_{T}^{trk}]");
 				}
 
-				//				if (dataset_type == "PbPb")
+				if (dataset_type == "PbPb")
 				{
 					//UE
 					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
@@ -244,16 +217,18 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					f_output->cd();
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
-					name = Form("h_ChPS_UE_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (UE)");
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-					f_output->cd();
-					h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
 				}
+
+				name = Form("h_ChPS_fake_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (UE)");
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-3,1E2);
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
+				f_output->cd();
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
+
 
 				//truth
 				name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
@@ -302,36 +277,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				f_output->cd();
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
-
-				//raw_truthjet
-				name = Form("h_ChPS_raw_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-				f_output->cd();
-				h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
-				name = Form("h_ChPS_raw_truthjet_subtr_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-				f_output->cd();
-				h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
-				name = Form("h_ChPS_raw_truthjet_subtr_bbb_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-				f_output->cd();
-				h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
-
 				//raw_ratios
 				name = Form("h_ChPS_ratio_subtr_raw_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
@@ -362,37 +307,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				f_output->cd();
 				name = Form("h_ChPS_ratio_final_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
-
-				//raw_truthjet_ratios
-				name = Form("h_ChPS_ratio_subtr_raw_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet));
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Ratio");
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-				h_ChPS_ratio_subtr_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-
-				name = Form("h_ChPS_ratio_bbb_subtr_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet));
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Ratio");
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-				h_ChPS_ratio_bbb_subtr_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-
-				name = Form("h_ChPS_ratio_closure_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet));
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Final}{Truth}");
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-				f_output->cd();
-				name = Form("h_ChPS_ratio_final_truthjet_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-				h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
 
 
 				//(B+S/S)
@@ -449,34 +363,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 					h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 
-					//raw_truthjet
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5, 1E3);
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
-
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5, 1E3);
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
-
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_raw_truthjet_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5, 1E3);
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-					h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
-
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-					h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
-
 					if (dataset_type == "PbPb")
 					{
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
@@ -484,17 +370,21 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5, 1E3);
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
-
-						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
-						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
-						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_UE_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
-						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
 					}
+
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinContent(i_dR+1, h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetBinContent(i_trk+1));
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->SetBinError(i_dR+1, h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetBinError(i_trk+1));
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5, 1E3);
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("r");
 				}
 			}
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
+				name = Form("h_ChPS_truth_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
 				name = Form("h_ChPS_raw_subtr_unf_bbb_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
 
@@ -541,41 +431,29 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "PbPb" && i_cent == 6) continue;
 					if (dataset_type == "pp" && i_cent < 6) continue;
 
-					SetHStyle_smallify(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet),0, doSmall);
-
-					SetHStyle_smallify(h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet),1, doSmall);
-					if (dataset_type == "PbPb") SetHStyle_smallify(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet),2, doSmall);
-					SetHStyle_smallify(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet),3, doSmall);
-					SetHStyle_smallify(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet),4, doSmall);
-					SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),5, doSmall);
-
-					SetHStyle_smallify(h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet),6, doSmall);
-					SetHStyle_smallify(h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet),7, doSmall);
-					SetHStyle_smallify(h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet),8, doSmall);
+					SetHStyle_smallify(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet), 0, doSmall);
+					SetHStyle_smallify(h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet), 1, doSmall);
+					if (dataset_type == "PbPb") SetHStyle_smallify(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet), 2, doSmall);
+					SetHStyle_smallify(h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet), 3, doSmall);
+					SetHStyle_smallify(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet), 4, doSmall);
+					SetHStyle_smallify(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet), 5, doSmall);
+					SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet), 6, doSmall);
+					SetHStyle_smallify(h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet), 4, doSmall);
+					SetHStyle_smallify(h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet), 5, doSmall);
+					SetHStyle_smallify(h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet), 6, doSmall);
 
 					if (i_jet == jet_pt_start && i_dR == 0 && first_pass)
 					{
-						if (isMC) legend_evol->AddEntry(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet),"Truth","lp");
-
+						legend_evol->AddEntry(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet),"Truth","lp");
 						legend_evol->AddEntry(h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet),"Raw","lp");
-
-						if (dataset_type == "PbPb")
-						{
-							legend_evol->AddEntry(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr","lp");
-							legend_evol->AddEntry(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
-							legend_evol->AddEntry(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
-
-							legend_evol->AddEntry(h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet),"Subtr/Raw", "lp");
-							legend_evol->AddEntry(h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet),"Unf/Subtr", "lp");
-							if (isMC) legend_evol->AddEntry(h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet),"Unf/Truth", "lp");
-						}
-						else
-						{
-							legend_evol->AddEntry(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet),"Raw+Unf","lp");
-							legend_evol->AddEntry(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),"Raw+Unf+BbB","lp");
-							if (isMC) legend_evol->AddEntry(h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet),"Unfolded/Truth", "lp");
-							legend_evol->AddEntry(h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet),"Unfolded/Raw", "lp");
-						}
+						if (dataset_type == "PbPb") legend_evol->AddEntry(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet),"UE","lp");
+						legend_evol->AddEntry(h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet),"Fakes","lp");
+						legend_evol->AddEntry(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr","lp");
+						legend_evol->AddEntry(h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
+						legend_evol->AddEntry(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
+						legend_evol->AddEntry(h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet),"Subtr/Raw", "lp");
+						legend_evol->AddEntry(h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet),"Unf/Subtr", "lp");
+						legend_evol->AddEntry(h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet),"Unf/Truth", "lp");
 					}
 
 					if (dataset_type == "pp") c_evol->Divide(1,2);
@@ -586,10 +464,12 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					else c_evol->cd(i_cent+1)->cd(1);
 
 					h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("");
+					if (dataset_type == "PbPb") h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-					if (dataset_type == "PbPb") h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-					if (isMC) h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					gPad->SetLogx();
 					gPad->SetLogy();
 
@@ -597,8 +477,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "pp") c_evol->cd(2);
 					else c_evol->cd(i_cent+1)->cd(2);
 					h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->Draw("");
-					if (isMC) h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-					if (dataset_type == "PbPb") h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					gPad->SetLogx();
 
 					if (dataset_type == "pp") h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
@@ -663,7 +543,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				if (dataset_type == "pp") c_ChPS_final->Divide(1,2);
 				if (dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1)->Divide(1,2);
 
-				if (isMC) setup_canvas(c_ChPS_final, dataset_type, i_cent);
+				setup_canvas(c_ChPS_final, dataset_type, i_cent);
 
 				int jet_itr = 0;
 				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -675,28 +555,23 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					if (i_dR == 0 && first_pass_cent) legend_ChPS_final->AddEntry(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
 
-					if (isMC && dataset_type == "pp") c_ChPS_final->cd(1);
-					if (isMC && dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_ChPS_final->cd();
-					if (!isMC && dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1);
+					if (dataset_type == "pp") c_ChPS_final->cd(1);
+					if (dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1)->cd(1);
 
 					if (i_jet == jet_pt_start) h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("");
 					else h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 					gPad->SetLogx();
 					gPad->SetLogy();
 
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_ChPS_final->cd(2);
-						if (dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1)->cd(2);
-						if (i_jet == jet_pt_start) h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("");
-						else h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-						gPad->SetLogx();
+					if (dataset_type == "pp") c_ChPS_final->cd(2);
+					if (dataset_type == "PbPb") c_ChPS_final->cd(i_cent+1)->cd(2);
+					if (i_jet == jet_pt_start) h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("");
+					else h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
+					gPad->SetLogx();
 
-						if (dataset_type == "pp") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-						if (dataset_type == "PbPb") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
-					}
+					if (dataset_type == "pp") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+					if (dataset_type == "PbPb") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
+					line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
 
 					jet_itr++;
 				} // end jet loop
@@ -747,7 +622,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			if (dataset_type == "pp") c_ChPS_final_inJet->Divide(1,2);
 			if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->Divide(1,2);
 
-			if (isMC) setup_canvas(c_ChPS_final_inJet, dataset_type, i_cent);
+			setup_canvas(c_ChPS_final_inJet, dataset_type, i_cent);
 
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -759,28 +634,23 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 				if (first_pass_cent) legend_ChPS_final_inJet->AddEntry(h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet),jet_label.c_str(),"lp");
 
-				if (isMC && dataset_type == "pp") c_ChPS_final_inJet->cd(1);
-				if (isMC && dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(1);
-				if (!isMC && dataset_type == "pp") c_ChPS_final_inJet->cd();
-				if (!isMC && dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1);
+				if (dataset_type == "pp") c_ChPS_final_inJet->cd(1);
+				if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(1);
 
 				if (i_jet == jet_pt_start) h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Draw("");
 				else h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->Draw("same");
 				gPad->SetLogx();
 				gPad->SetLogy();
 
-				if (isMC)
-				{
-					if (dataset_type == "pp") c_ChPS_final_inJet->cd(2);
-					if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(2);
-					if (i_jet == jet_pt_start) h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("");
-					else h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("same");
-					gPad->SetLogx();
+				if (dataset_type == "pp") c_ChPS_final_inJet->cd(2);
+				if (dataset_type == "PbPb") c_ChPS_final_inJet->cd(i_cent+1)->cd(2);
+				if (i_jet == jet_pt_start) h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("");
+				else h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->Draw("same");
+				gPad->SetLogx();
 
-					if (dataset_type == "pp") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-					if (dataset_type == "PbPb") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-					line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
-				}
+				if (dataset_type == "pp") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+				if (dataset_type == "PbPb") h_ChPS_ratio_closure_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
+				line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
 
 				jet_itr++;
 			} // end jet loop
@@ -837,12 +707,15 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				{
 					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
-					if (dataset_type == "PbPb") SetHStyle_smallify(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
-					if (i_dR == 0 && first_pass_cent) legend_ChPS_UE->AddEntry(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
-
+					SetHStyle_smallify(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
+					if (i_dR == 0 && first_pass_cent)
+					{
+						legend_ChPS_UE->AddEntry(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
+						legend_ChPS_UE->AddEntry(h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
+					}
 					double max = h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetMaximum();
 					double min = h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetMinimum();
-					//					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.2*min,1.05*max);
+//					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.2*min,1.05*max);
 
 					if (dataset_type == "pp") c_ChPS_UE->cd();
 					if (dataset_type == "PbPb") c_ChPS_UE->cd(i_cent+1);
@@ -905,7 +778,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				if (dataset_type == "pp") c_ChPS_dR->Divide(1,2);
 				if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->Divide(1,2);
 
-				if (isMC) setup_canvas(c_ChPS_dR, dataset_type, i_cent);
+				setup_canvas(c_ChPS_dR, dataset_type, i_cent);
 
 				int trk_itr = 0;
 				double max = 0., min = 999., tmp;
@@ -918,10 +791,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
-					if (isMC && dataset_type == "pp") c_ChPS_dR->cd(1);
-					if (isMC && dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_ChPS_dR->cd();
-					if (!isMC && dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1);
+					if (dataset_type == "pp") c_ChPS_dR->cd(1);
+					if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(1);
 
 					if (trk_itr == 0) h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 					else h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
@@ -929,19 +800,16 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					gPad->SetLogx(0);
 					gPad->SetLogy();
 
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_ChPS_dR->cd(2);
-						if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
-						if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-						else h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-						gPad->SetLogx(0);
-						gPad->SetLogy(0);
+					if (dataset_type == "pp") c_ChPS_dR->cd(2);
+					if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
+					if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
+					else h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+					gPad->SetLogx(0);
+					gPad->SetLogy(0);
 
-						if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-						if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(0, 1, 1.2, 1);
-					}
+					if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+					if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
+					line->DrawLine(0, 1, 1.2, 1);
 
 					trk_itr++;
 
@@ -970,101 +838,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end jet loop
 	}
 
-	//draw as function of dR for reco trk in truthjet
-	{
-		cout << "Doing Final ChPS plots (as function of r, for trk pT) for tracks in truth jets" << endl;
 
-		TCanvas *c_ChPS_truthjet_dR = new TCanvas("c_ChPS_dR","c_ChPS_dR",900,600);
-		if (dataset_type == "pp") c_ChPS_truthjet_dR->SetCanvasSize(600,600);
-		TLegend *legend_ChPS_truthjet_dR = new TLegend(0.20, 0.78, 0.50, 0.93, "","brNDC");
-		legend_ChPS_truthjet_dR->SetTextFont(43);
-		legend_ChPS_truthjet_dR->SetBorderSize(0);
-		if (dataset_type == "pp") legend_ChPS_truthjet_dR->SetTextSize(12);
-		if (dataset_type == "PbPb") legend_ChPS_truthjet_dR->SetTextSize(10);
-
-		int jet_itr = 0;
-		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-		{
-			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-			c_ChPS_truthjet_dR->cd();
-			c_ChPS_truthjet_dR->Clear();
-			if (dataset_type == "PbPb") c_ChPS_truthjet_dR->Divide(3,2);
-
-			bool first_pass_cent = true;
-			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
-			{
-				string centrality = num_to_cent(centrality_scheme,i_cent);
-				if (dataset_type == "pp" && i_cent < 6) continue;
-				else if (dataset_type == "PbPb" && i_cent == 6) continue;
-
-				if (dataset_type == "pp") c_ChPS_truthjet_dR->Divide(1,2);
-				if (dataset_type == "PbPb") c_ChPS_truthjet_dR->cd(i_cent+1)->Divide(1,2);
-
-				if (isMC) setup_canvas(c_ChPS_truthjet_dR, dataset_type, i_cent);
-
-				int trk_itr = 0;
-				double max = 0., min = 999., tmp;
-				for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
-				{
-
-					string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-
-					SetHStyle_smallify(h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
-					SetHStyle_smallify(h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
-
-					if (jet_itr == 0 && first_pass_cent) legend_ChPS_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
-
-					if (isMC && dataset_type == "pp") c_ChPS_truthjet_dR->cd(1);
-					if (isMC && dataset_type == "PbPb") c_ChPS_truthjet_dR->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_ChPS_truthjet_dR->cd();
-					if (!isMC && dataset_type == "PbPb") c_ChPS_truthjet_dR->cd(i_cent+1);
-
-					if (trk_itr == 0) h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-					else h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-
-					gPad->SetLogx(0);
-					gPad->SetLogy();
-
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_ChPS_truthjet_dR->cd(2);
-						if (dataset_type == "PbPb") c_ChPS_truthjet_dR->cd(i_cent+1)->cd(2);
-						if (trk_itr == 0) h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-						else h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-						gPad->SetLogx(0);
-						gPad->SetLogy(0);
-
-						if (dataset_type == "pp") h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-						if (dataset_type == "PbPb") h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(0, 1, 1.2, 1);
-					}
-
-					trk_itr++;
-
-				} // end trk loop
-
-				if (dataset_type == "pp") c_ChPS_truthjet_dR->cd();
-				if (dataset_type == "PbPb") c_ChPS_truthjet_dR->cd(i_cent+1);
-				ltx->SetTextAlign(32);
-				ltx->SetTextSize(12);
-				if (dataset_type == "pp") ltx->SetTextSize(16);
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
-
-				legend_ChPS_truthjet_dR->Draw();
-				first_pass_cent = false;
-			} //end cent loop
-
-			pdf_label = "";
-			if (i_jet == jet_pt_start) pdf_label = "(";
-			if (i_jet == jet_pt_end-1) pdf_label = ")";
-			c_ChPS_truthjet_dR->Print(Form("output_pdf/%s/ChPS_final_dR_truthjet_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-
-			jet_itr++;
-
-		} //end jet loop
-	}
 
 	//draw UE as function of dR
 	if (dataset_type == "PbPb")
@@ -1097,12 +871,11 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				double max = 0., min = 999., tmp;
 				for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 				{
-
 					string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 					SetHStyle_smallify(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
+					SetHStyle_smallify(h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
 					if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR_UE->AddEntry(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
-
 					if (trk_itr == 0) h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 					else h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 
@@ -1134,9 +907,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		} //end jet loop
 	}
 
-
 	//background to signal ratio
-	if (dataset_type == "PbPb")
 	{
 		cout << "Doing B2S ratio (as function of trk pT, for jet pT)" << endl;
 
@@ -1159,7 +930,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
 				string centrality = num_to_cent(centrality_scheme,i_cent);
-				if (i_cent == 6) continue;
+				if (dataset_type == "pp" && i_cent < 6) continue;
+				else if (dataset_type == "PbPb" && i_cent == 6) continue;
 
 				int jet_itr = 0;
 				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -1286,6 +1058,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					SetHStyle_smallify(h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet),1, doSmall);
 					if (dataset_type == "PbPb") SetHStyle_smallify(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet),2, doSmall);
+					SetHStyle_smallify(h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet),6, doSmall);
 					SetHStyle_smallify(h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet),3, doSmall);
 					SetHStyle_smallify(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),4, doSmall);
 					SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),5, doSmall);
@@ -1294,41 +1067,29 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					if (i_jet == jet_pt_start && trk_itr == 0 && first_pass)
 					{
-						if (isMC) legend_evol_dR->AddEntry(h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet),"Truth","lp");
-
+						legend_evol_dR->AddEntry(h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet),"Truth","lp");
 						legend_evol_dR->AddEntry(h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet),"Raw","lp");
-
-						if (dataset_type == "PbPb")
-						{
-							legend_evol_dR->AddEntry(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet),"UE","lp");
-							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr","lp");
-							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
-							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
-
-							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unf/Truth", "lp");
-						}
-						else
-						{
-							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Unf","lp");
-							legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Unf+BbB","lp");
-							if (isMC) legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unfolded/Truth", "lp");
-						}
+						if (dataset_type == "PbPb") legend_evol_dR->AddEntry(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet),"UE","lp");
+						legend_evol_dR->AddEntry(h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet),"Fake","lp");
+						legend_evol_dR->AddEntry(h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr","lp");
+						legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
+						legend_evol_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
+						legend_evol_dR->AddEntry(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),"Unf/Truth", "lp");
 					}
 
 					if (dataset_type == "pp") c_evol_dR->Divide(1,2);
 					if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->Divide(1,2);
 
-					if (isMC) setup_canvas(c_evol_dR, dataset_type, i_cent);
+					setup_canvas(c_evol_dR, dataset_type, i_cent);
 
-					if (isMC && dataset_type == "pp") c_evol_dR->cd(1);
-					if (isMC && dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_evol_dR->cd();
-					if (!isMC && dataset_type == "PbPb") c_evol_dR->cd(i_cent+1);
+					if (dataset_type == "pp") c_evol_dR->cd(1);
+					if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(1);
 
-					h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-					if (isMC) h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
+					h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					if (dataset_type == "PbPb") h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-					if (dataset_type == "PbPb") h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+					h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 					gPad->SetLogx(0);
@@ -1336,15 +1097,12 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					line->DrawLine(0, 0, 1.2, 0);
 
 
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_evol_dR->cd(2);
-						if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(2);
-						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw();
+					if (dataset_type == "pp") c_evol_dR->cd(2);
+					if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(2);
+					h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw();
 
-						gPad->SetLogx(0);
-						line->DrawLine(0, 1, 1.2, 1);
-					}
+					gPad->SetLogx(0);
+					line->DrawLine(0, 1, 1.2, 1);
 
 
 					if (dataset_type == "pp") c_evol_dR->cd();
@@ -1374,219 +1132,5 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			jet_itr++;
 		} //end jet loop
 	}
-
-	//Draw evol_dRution plots
-	{
-		cout << "Doing evolution (as function of r) for tracks in truth jet" << endl;
-		TCanvas *c_evol_truthjet_dR = new TCanvas("c_evol_dR","c_evol_dR",900,600);
-		if (dataset_type == "pp") c_evol_truthjet_dR->SetCanvasSize(600,600);
-		TLegend *legend_evol_truthjet_dR = new TLegend(0.20, 0.1, 0.50, 0.40, "","brNDC");
-		legend_evol_truthjet_dR->SetTextFont(43);
-		legend_evol_truthjet_dR->SetBorderSize(0);
-		if (dataset_type == "pp") legend_evol_truthjet_dR->SetTextSize(12);
-		if (dataset_type == "PbPb") legend_evol_truthjet_dR->SetTextSize(8);
-
-		int jet_itr = 0;
-		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-		{
-			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-
-			int trk_itr = 0;
-			for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
-			{
-				string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-
-				c_evol_truthjet_dR->cd();
-				c_evol_truthjet_dR->Clear();
-				if (dataset_type == "PbPb") c_evol_truthjet_dR->Divide(3,2);
-				bool first_pass = true;
-
-				for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
-				{
-					string centrality = num_to_cent(centrality_scheme,i_cent);
-
-					if (dataset_type == "PbPb" && i_cent == 6) continue;
-					if (dataset_type == "pp" && i_cent < 6) continue;
-
-					SetHStyle_smallify( h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet),0, doSmall);
-					SetHStyle_smallify( h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),1, doSmall);
-					if (dataset_type == "PbPb") SetHStyle_smallify( h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),2, doSmall);
-					SetHStyle_smallify( h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet),3, doSmall);
-					SetHStyle_smallify( h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet),4, doSmall);
-					SetHStyle_smallify(h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),4, doSmall);
-
-					if (i_jet == jet_pt_start && trk_itr == 0 && first_pass)
-					{
-						if (isMC) legend_evol_truthjet_dR->AddEntry(h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet),"Truth","lp");
-
-						legend_evol_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),"Raw_{TJ}","lp");
-
-						if (dataset_type == "PbPb")
-						{
-							legend_evol_truthjet_dR->AddEntry(h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),"UE_{TJ}","lp");
-							legend_evol_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr_{TJ}","lp");
-							legend_evol_truthjet_dR->AddEntry(h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+BbB_{TJ}","lp");
-
-							if (isMC) legend_evol_truthjet_dR->AddEntry(h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet),"Final/Truth", "lp");
-						}
-
-					}
-
-					if (dataset_type == "pp") c_evol_truthjet_dR->Divide(1,2);
-					if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->Divide(1,2);
-
-					if (isMC) setup_canvas(c_evol_truthjet_dR, dataset_type, i_cent);
-
-					if (isMC && dataset_type == "pp") c_evol_truthjet_dR->cd(1);
-					if (isMC && dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_evol_truthjet_dR->cd();
-					if (!isMC && dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1);
-
-					h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-					if (dataset_type == "PbPb") h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-					if (dataset_type == "PbPb") h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-					h_ChPS_raw_truthjet_subtr_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-					if (isMC) h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
-
-					gPad->SetLogx(0);
-					gPad->SetLogy();
-					line->DrawLine(0, 0, 1.2, 0);
-
-					if (i_trk == 2 && i_jet == 7 && i_cent == 0)
-					{
-						//						h_ChPS_raw_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
-						//						h_ChPS_UE_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
-						//						h_ChPS_raw_truthjet_subtr_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
-						//						h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Print("all");
-					}
-
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_evol_truthjet_dR->cd(2);
-						if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1)->cd(2);
-						if (isMC) h_ChPS_ratio_closure_truthjet_indR.at(i_trk).at(i_cent).at(i_jet)->Draw();
-
-						gPad->SetLogx(0);
-						line->DrawLine(0, 1, 1.2, 1);
-					}
-
-
-					if (dataset_type == "pp") c_evol_truthjet_dR->cd();
-					if (dataset_type == "PbPb") c_evol_truthjet_dR->cd(i_cent+1);
-					ltx->SetTextAlign(32);
-					ltx->SetTextSize(12);
-					if (dataset_type == "pp") ltx->SetTextSize(16);
-					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", trk_label.c_str()));
-					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", jet_label.c_str()));
-					ltx->DrawLatexNDC(0.93, 0.80, Form("%s", centrality.c_str()));
-					ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
-					c_evol_truthjet_dR->cd(i_cent+1)->cd(1);
-					legend_evol_truthjet_dR->Draw();
-
-					first_pass = false;
-				} // end cent loop
-
-				pdf_label = "";
-				if (i_trk == trk_pt_start && i_jet == jet_pt_start) pdf_label = "(";
-				if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) pdf_label = ")";
-				c_evol_truthjet_dR->Print(Form("output_pdf/%s/evol_dR_truthjet_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
-
-				trk_itr++;
-			} //end trk loop
-
-			jet_itr++;
-		} //end jet loop
-	}
-
-
-
-	//Draw Final ChPS_truthjet plots
-	{
-		cout << "Doing Final ChPS plots (as function of trk pT, for jet pT) for tracks in truth jet" << endl;
-
-		TCanvas *c_ChPS_truthjet_final = new TCanvas("c_ChPS_truthjet_final","c_ChPS_truthjet_final",900,600);
-		if (dataset_type == "pp") c_ChPS_truthjet_final->SetCanvasSize(600,600);
-		TLegend *legend_ChPS_truthjet_final = new TLegend(0.20, 0.43, 0.40, 0.60, "","brNDC");
-		legend_ChPS_truthjet_final->SetTextFont(43);
-		legend_ChPS_truthjet_final->SetBorderSize(0);
-		if (dataset_type == "pp") legend_ChPS_truthjet_final->SetTextSize(12);
-		if (dataset_type == "PbPb") legend_ChPS_truthjet_final->SetTextSize(8);
-
-		for (int i_dR = 0; i_dR < N_dR; i_dR++)
-		{
-			string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
-
-			c_ChPS_truthjet_final->cd();
-			c_ChPS_truthjet_final->Clear();
-			if (dataset_type == "PbPb") c_ChPS_truthjet_final->Divide(3,2);
-
-			bool first_pass_cent = true;
-			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
-			{
-				string centrality = num_to_cent(centrality_scheme,i_cent);
-				if (dataset_type == "pp" && i_cent < 6) continue;
-				else if (dataset_type == "PbPb" && i_cent == 6) continue;
-
-				if (dataset_type == "pp") c_ChPS_truthjet_final->Divide(1,2);
-				if (dataset_type == "PbPb") c_ChPS_truthjet_final->cd(i_cent+1)->Divide(1,2);
-
-				if (isMC) setup_canvas(c_ChPS_truthjet_final, dataset_type, i_cent);
-
-				int jet_itr = 0;
-				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-				{
-					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-
-					SetHStyle_smallify(h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
-					SetHStyle_smallify(h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet), jet_itr, doSmall);
-
-					if (i_dR == 0 && first_pass_cent) legend_ChPS_truthjet_final->AddEntry(h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
-
-					if (isMC && dataset_type == "pp") c_ChPS_truthjet_final->cd(1);
-					if (isMC && dataset_type == "PbPb") c_ChPS_truthjet_final->cd(i_cent+1)->cd(1);
-					if (!isMC && dataset_type == "pp") c_ChPS_truthjet_final->cd();
-					if (!isMC && dataset_type == "PbPb") c_ChPS_truthjet_final->cd(i_cent+1);
-
-					if (i_jet == jet_pt_start) h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("");
-					else h_ChPS_raw_truthjet_subtr_bbb.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-					gPad->SetLogx();
-					gPad->SetLogy();
-
-					if (isMC)
-					{
-						if (dataset_type == "pp") c_ChPS_truthjet_final->cd(2);
-						if (dataset_type == "PbPb") c_ChPS_truthjet_final->cd(i_cent+1)->cd(2);
-						if (i_jet == jet_pt_start) h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->Draw("");
-						else h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
-						gPad->SetLogx();
-
-						if (dataset_type == "pp") h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-						if (dataset_type == "PbPb") h_ChPS_ratio_closure_truthjet.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
-					}
-
-					jet_itr++;
-				} // end jet loop
-
-				if (dataset_type == "pp") c_ChPS_truthjet_final->cd();
-				if (dataset_type == "PbPb") c_ChPS_truthjet_final->cd(i_cent+1);
-				ltx->SetTextAlign(32);
-				ltx->SetTextSize(12);
-				if (dataset_type == "pp") ltx->SetTextSize(16);
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", dr_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
-				legend_ChPS_truthjet_final->Draw();
-				first_pass_cent = false;
-			} //end cent loop
-
-			pdf_label = "";
-			if (i_dR == 0) pdf_label = "(";
-			if (i_dR == N_dR-1) pdf_label = ")";
-			c_ChPS_truthjet_final->Print(Form("output_pdf/%s/ChPS_final_truthjet_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-
-		} //end dR loop
-	}
-
 
 }
