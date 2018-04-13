@@ -52,6 +52,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
 
+	h_fcal_change = new TH2D("h_fcal_change","h_fcal_change",10,0,10,10,0,10);
+	wk()->addOutput (h_fcal_change);
 
 	//Axis histograms
 	h_jet_pt_eta_phi = new TH3D("h_jet_pt_eta_phi","h_jet_pt_eta_phi",ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, phiJetBinsN, phiJetBins);

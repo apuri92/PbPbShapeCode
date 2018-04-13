@@ -402,8 +402,8 @@ void comp_ChPS(bool isMC = 1)
 			pdf_label = "";
 			if (i_jet == jet_pt_start) pdf_label = "(";
 			if (i_jet == jet_pt_end-1) pdf_label = ")";
-//			c_ChPS_raw_subtr_indR->Print(Form("output_pdf/ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-//			c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_raw_subtr_indR->Print(Form("output_pdf/ChPS_raw_subtr_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+			c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 			c_ChPS_final_indR->Print(Form("output_pdf/ChPS_final_ratio_dR_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 			jet_itr++;

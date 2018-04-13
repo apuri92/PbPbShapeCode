@@ -711,7 +711,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (i_dR == 0 && first_pass_cent)
 					{
 						legend_ChPS_UE->AddEntry(h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
-						legend_ChPS_UE->AddEntry(h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet),jet_label.c_str(),"lp");
 					}
 					double max = h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetMaximum();
 					double min = h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetMinimum();

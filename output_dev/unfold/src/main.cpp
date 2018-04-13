@@ -230,13 +230,9 @@ int main(int argc, char ** argv)
 						final_fake = fake * correction;
 						final_fake_err = fake_err * correction; //error propg: multiplying by constant
 
-						subtr = raw;;
-						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2)));
-						else subtr_err = sqrt(pow(raw_err,2));
-
-//						subtr = raw - final_fake;
-//						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2) - pow(final_fake_err,2) )); //errors fully correlated
-//						else subtr_err = sqrt(pow(raw_err,2) + pow(final_fake_err,2)); //errors uncorrelated
+						subtr = raw - final_fake;
+						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2) - pow(final_fake_err,2) )); //errors fully correlated
+						else subtr_err = sqrt(pow(raw_err,2) + pow(final_fake_err,2)); //errors uncorrelated
 					}
 
 					if (dataset_type == "PbPb")

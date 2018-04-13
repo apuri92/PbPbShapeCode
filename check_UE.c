@@ -342,7 +342,7 @@ void check_UE()
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-/*
+
 	//drawing 2D histo
 	{
 		cout << "drawing 2D histo" << endl;
@@ -375,7 +375,7 @@ void check_UE()
 				double low_range = 126;
 				double hi_range = 316;
 
-				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+				h_TM_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(90, 500);
 				h_FS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 				h_FNS_MB_2D[i_dR][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
@@ -392,7 +392,7 @@ void check_UE()
 				ltx->SetTextAlign(32);
 				ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
 				gPad->SetLogx();
-				gPad->SetLogy(0);
+				gPad->SetLogy();
 
 				c_FS_MB_2D->cd(i_cent+1);
 				h_FS_MB_2D[i_dR][i_cent]->Draw("colz text");
@@ -417,11 +417,11 @@ void check_UE()
 			else if (i_dR == 12) name = ")";
 			else name = "";
 			c_TM_MB_2D->Print(Form("UE_TM_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-			c_FS_MB_2D->Print(Form("UE_FS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
-			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+//			c_FS_MB_2D->Print(Form("UE_FS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+//			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 		}
 	}
-*/
+
 	/*
 	{
 		//projecting over track pT
@@ -728,7 +728,7 @@ void check_UE()
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
-						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
+//						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
 //						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
@@ -752,8 +752,7 @@ void check_UE()
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-//					h_MB_tj_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -769,8 +768,7 @@ void check_UE()
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.95, 1.05);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-//					h_MB_tj_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					line->DrawLine(0, 1, 1.2, 1);
