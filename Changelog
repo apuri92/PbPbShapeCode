@@ -1,6 +1,10 @@
 #TODO
 --------
 4/13/2018
+*ran all pbpb mc data and pp mc data with forward jet veto, and tree fcal
+replacement, with MC reweighted etaphi MB maps
+--------
+4/13/2018
 *restored to pre-friday (4/6) version, running with forward truth jet veto for
 ALL MC (PbPb and pp) and tree replacing FCal stuff for PbPb MC
 *using MC reweighted eta phi maps (this is incorrect method)
