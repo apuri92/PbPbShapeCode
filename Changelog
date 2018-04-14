@@ -1,6 +1,10 @@
 #TODO
 --------
 4/14/2018
+*running all pbpb pp mc data without forward jet veto and tree fcal
+replacement, using UE_MC for MC and UE_HP for data (this is incorrect method)
+--------
+4/14/2018
 *running all pbpb pp mc data with forward jet veto and tree fcal replacement,
 using UE_HP for both data and MC (this is the correct method)
 --------

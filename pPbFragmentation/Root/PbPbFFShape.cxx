@@ -134,44 +134,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 
 
-
-	if (_dataset == 4 && isMC)
-	{
-		int run_number = eventInfo->runNumber();
-		int event_number = eventInfo->eventNumber();
-		float new_Fcal = -1;
-		int tree_cent_bin = -1;
-
-		for (int i = 0; i < run_numbers.size(); i++)
-		{
-			if (run_number == run_numbers.at(i))
-			{
-				TTree *tree = (TTree*)fcal_trees.at(i)->Get("tree_output");
-				float tree_Fcal;
-				int tree_eventNumber;
-				int tree_runNumber;
-				tree->SetBranchAddress("FCalEt",&tree_Fcal);
-				tree->SetBranchAddress("run_n",&tree_runNumber);
-				tree->SetBranchAddress("event_n",&tree_eventNumber);
-
-				for (int i_entry = 0; i_entry < tree->GetEntries(); i_entry++)
-				{
-					tree->GetEntry(i_entry);
-					if (event_number == tree_eventNumber)
-					{
-						new_Fcal = tree_Fcal;
-						tree_cent_bin = GetCentralityBin(_centrality_scheme, new_Fcal,  isHIJING );
-						break;
-					}
-				}
-				break;
-			}
-		}
-		h_fcal_change->Fill(cent_bin, tree_cent_bin);
-		cent_bin = tree_cent_bin;
-	}
-
-
 	if (cent_bin < 0 || event_weight_fcal == 0) {
 		if(cent_bin==-2) Error("execute()", "Unknown centrality scheme" );
 		h_RejectionHisto->Fill(1.5);
@@ -287,31 +249,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
 	h_FCal_Et_unw->Fill(FCalEt); //no weighting
-
-	if(_data_switch == 1)
-	{
-		const xAOD::JetContainer * truthjets = 0;
-
-		bool skip_event = false;
-		EL_RETURN_CHECK("execute()",event->retrieve( truthjets, _truth_jet_collection.c_str() ));
-
-		xAOD::JetContainer::const_iterator jet_itr = truthjets->begin();
-		xAOD::JetContainer::const_iterator jet_end = truthjets->end();
-		for( ; jet_itr != jet_end; ++jet_itr )
-		{
-			xAOD::JetFourMom_t jet_truth_4mom = (*jet_itr)->jetP4();
-			double pt    = (jet_truth_4mom.pt() * 0.001 );
-			double eta    = (jet_truth_4mom.eta());
-
-			if (pt > 20. && fabs(eta) > 3. ) skip_event = true;
-		}
-
-		if (skip_event)
-		{
-			h_FCal_Et_restr->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
-			return EL::StatusCode::SUCCESS;
-		}
-	}
 
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
