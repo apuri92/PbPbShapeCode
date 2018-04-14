@@ -1,5 +1,9 @@
 #TODO
 --------
+4/14/2018
+*running all pbpb pp mc data with forward jet veto and tree fcal replacement,
+using UE_HP for both data and MC (this is the correct method)
+--------
 4/13/2018
 *ran all pbpb mc data and pp mc data with forward jet veto, and tree fcal
 replacement, with MC reweighted etaphi MB maps
