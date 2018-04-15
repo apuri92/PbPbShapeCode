@@ -229,8 +229,9 @@ void UEEstimator::initShapeUE(bool isMC)
 				for (int i_cent = 0; i_cent < 6; i_cent++)
 				{
 					std::string name;
-					if (isMC) name = Form("h_UE_MC_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
-					else name = Form("h_UE_HP_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
+//					if (isMC) name = Form("h_UE_MC_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
+//					else
+					name = Form("h_UE_HP_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
 					h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
 				}
 			}
