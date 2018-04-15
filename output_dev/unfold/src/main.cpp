@@ -36,6 +36,7 @@ int main(int argc, char ** argv)
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	std::string truthjet_mode = "FS"; truthjet_mode = m_config->GetValue("truthjet_mode", dataset_type.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
+	int apply_UE_uncert = 0; apply_UE_uncert = m_config->GetValue("apply_UE_uncert", apply_UE_uncert);
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
 
@@ -48,6 +49,7 @@ int main(int argc, char ** argv)
 	TFile *f_data = new TFile(Form("../raw_results/FF_%s_out_histo_%s_5p02_r001.root", did.c_str(), dataset_type.c_str()));
 	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
 	TFile *UE_factors = new TFile(Form("UE_factors.root"));
+	TFile *UE_uncert = new TFile(Form("UE_uncert.root"));
 	TFile *f_output = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
 	std::string name;
 
@@ -167,6 +169,8 @@ int main(int argc, char ** argv)
 			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_FS = (TH2*)f_mc->Get(Form("ChPS_FS_UE_dR%i_cent%i",i_dR,i_cent));;
+			TH1* h_UE_uncert;
+			if (dataset_type == "PbPb") h_UE_uncert = (TH1*)((TH1*)UE_uncert->Get(Form("UE_uncert_4_cent%i", i_cent)))->Clone(Form("UE_uncert_4_cent%i_dR%i", i_cent, i_dR));
 
 			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
 			h_final_UE->Reset();
@@ -237,7 +241,8 @@ int main(int argc, char ** argv)
 
 					if (dataset_type == "PbPb")
 					{
-						if (i_trk_bin < trkpT_binning->FindBin(10.))
+//						if (i_trk_bin < trkpT_binning->FindBin(10.))
+						if (i_trk_bin >= trkpT_binning->FindBin(0.9) && i_trk_bin < trkpT_binning->FindBin(10.))
 						{
 							fake = 0;
 							fake_err = 0;
@@ -251,6 +256,8 @@ int main(int argc, char ** argv)
 							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 
 							final_UE = UE * correction; //reduces to TM method for MC
+							if (apply_UE_uncert && !isMC) final_UE = final_UE / h_UE_uncert->GetBinContent(i_trk_bin);
+
 							if (isMC) final_UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin); //use errors from TM method
 							else final_UE_err = sqrt(pow(UE_err,2) + pow(correction_err,2)); //uncorrelated errors
 

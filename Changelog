@@ -1,5 +1,9 @@
 #TODO
 --------
+4/15/2018
+*removing all isolation cuts in online code (no forward veto or tree fcal stuff)
+*implemented UE_uncert in main.cpp
+--------
 4/14/2018
 *running all pbpb pp mc data without forward jet veto and tree fcal
 replacement, using UE_HP for both data and MC (this is the correct method)

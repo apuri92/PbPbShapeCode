@@ -728,7 +728,7 @@ void check_UE()
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
-//						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
+						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
 //						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
@@ -752,10 +752,10 @@ void check_UE()
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-//					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					legend_x->Draw();
 
 
@@ -767,10 +767,12 @@ void check_UE()
 					gPad->SetRightMargin(0);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.95, 1.05);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-//					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.99, 1.01);
+					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+//					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
+					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					line->DrawLine(0, 1, 1.2, 1);
 
 

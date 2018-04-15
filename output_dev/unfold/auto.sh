@@ -2,6 +2,7 @@ function auto {
 	echo "dataset_type: $1" > auto.cfg
 	echo "isMC: $2" >> auto.cfg
 	echo "diagnostic_mode: true" >> auto.cfg
+	echo "apply_UE_uncert: 0" >> auto.cfg
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
 		root -b -q "get_posCorr.c(\"auto.cfg\")" 

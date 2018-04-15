@@ -474,7 +474,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 		bool pass_reco_pt_cut = true;
 		if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity)
-		if(!jet_isolated_vector.at(i)) continue;
+//		if(!jet_isolated_vector.at(i)) continue;
 		if (jet_pt <= _pTjetCut) pass_reco_pt_cut = false;
 		int y_bin = jetcorr->GetJetYBin(jet_y);
 
@@ -491,7 +491,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			int truthindex=TruthJetIndex.at(i);
 			if (truthindex<0) continue; //Matching to truth jets
 			if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) continue;
-			if (!truth_jet_isolated_vector.at(TruthJetIndex.at(i))) continue;
+//			if (!truth_jet_isolated_vector.at(TruthJetIndex.at(i))) continue;
 
 
 			h_reco_post_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
@@ -857,7 +857,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			truth_jet_phi = truth_jet_phi_vector.at(i);
 			int y_bin = jetcorr->GetJetYBin(truth_jet_y);
 
-			if(!truth_jet_isolated_vector.at(i)) continue;
+//			if(!truth_jet_isolated_vector.at(i)) continue;
 
 			if (RecoJetIndex.at(i) >= 0)
 			{
