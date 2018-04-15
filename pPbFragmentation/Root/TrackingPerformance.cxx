@@ -731,7 +731,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 	//Track vectors
 	vector<float> trk_good_pt, trk_good_eta, trk_good_phi;
 	vector<int>   trk_good_isMatched, trk_good_vertextype;
-	vector<float> trk_good_matched_eta, trk_good_matched_phi, trk_good_matched_pt;
+	vector<float> trk_good_matched_eta, trk_good_matched_phi, trk_good_matched_pt, trk_good_matched_inJet;
 	vector<float> trk_good_matched_eta_reco, trk_good_matched_phi_reco, trk_good_matched_pt_reco;
 
 	//Loop over reconstructed tracks
@@ -975,6 +975,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 			trk_good_matched_eta.push_back((*truthLink)->eta());
 			trk_good_matched_pt.push_back((*truthLink)->pt()*0.001);
 			trk_good_matched_phi.push_back((*truthLink)->phi());
+			trk_good_matched_inJet.push_back(good_jet);
 
 			trk_good_matched_pt_reco.push_back(pt);
 			trk_good_matched_eta_reco.push_back(eta);
@@ -990,6 +991,67 @@ EL::StatusCode TrackingPerformance :: execute (){
 			trk_good_isMatched.push_back(0);
 		}
 	}
+
+	//get efficiencies for shape study
+	for(unsigned int j = 0; j< trk_good_matched_pt.size(); j++)
+	{
+		if (!trk_good_matched_inJet.at(j)) continue; //this is same as the jet condition below applied to truth tracks
+		float eta = trk_good_matched_eta.at(j);
+		float phi = trk_good_matched_phi.at(j);
+		float pt = trk_good_matched_pt.at(j);
+		float pt_reco = trk_good_matched_pt_reco.at(j);
+
+		float eff_weight = 1;
+//		eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+		h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight*eff_weight);
+		h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight*eff_weight);
+
+	}
+
+	//get the MC tracks....
+	truth_itr = particles->begin();
+	for( ; truth_itr!=truth_end; ++truth_itr)
+	{
+		if( fabs((*truth_itr)->charge())<0.5 ) continue;
+		if( ((*truth_itr)->status())!=1) continue;
+
+		int ty=getTypeTruth((*truth_itr)->barcode(),(*truth_itr)->pdgId(),(*truth_itr)->status(),(*truth_itr)->charge());
+		if(ty!=1 && ty!=5) continue;
+
+		//get the tracks....
+		float eta = (*truth_itr)->eta();
+		float phi = (*truth_itr)->phi();
+		float pt = (*truth_itr)->pt()/ 1000.0;
+
+		bool good_jet = false;
+		for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++)
+		{
+			float jet_eta = jet_eta_vector.at(i);
+			float jet_phi = jet_phi_vector.at(i);
+			float jet_pt = jet_pt_xcalib_vector.at(i);
+			float jet_y = jet_y_vector.at(i);
+
+			float R = DeltaR(phi,eta,jet_phi,jet_eta);
+
+			int truthindex=TruthJetIndex.at(i);
+			if (truthindex<0) continue; //Reco jet must be matched to truth jet
+			if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity)
+			if (R > _dR_max) continue; //track must be in jet
+
+			good_jet = true;
+		}
+
+		if (!good_jet) continue;
+
+		h_trk_foreff_full[cent_bin]->Fill(phi, pt, eta, event_weight);
+		h_trk_foreff_full[nCentBins-1]->Fill(phi, pt, eta, event_weight);
+
+		h_trk_foreff_entries[cent_bin]->Fill(phi, pt, eta);
+		h_trk_foreff_entries[nCentBins-1]->Fill(phi, pt, eta);
+
+	}
+
+
 
 	//Reco jets
 	bool isFirstPass = true;
@@ -1122,13 +1184,13 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_Injet_matched[cent_bin]->Fill(jet_pt, pt, fabs(rapidity), event_weight);
 			h_eff_Injet_matched[nCentBins-1]->Fill(jet_pt, pt, fabs(rapidity), event_weight);
 
-			float eff_weight = 1;
-			if (isFirstPass)
-			{
-//				eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
-				h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight*eff_weight);
-				h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight*eff_weight);
-			}
+//			float eff_weight = 1;
+//			if (isFirstPass)
+//			{
+////				eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+//				h_trk_foreff_matched[cent_bin]->Fill(phi, pt, eta, event_weight*eff_weight);
+//				h_trk_foreff_matched[nCentBins-1]->Fill(phi, pt, eta, event_weight*eff_weight);
+//			}
 
 		}
 
@@ -1189,16 +1251,16 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_Injet_entries[cent_bin]->Fill(jet_pt,pt,fabs(rapidity));
 			h_eff_Injet_entries[nCentBins-1]->Fill(jet_pt,pt,fabs(rapidity));
 
-			if (isFirstPass)
-			{
-				h_trk_foreff_full[cent_bin]->Fill(phi, pt, eta, event_weight);
-				h_trk_foreff_full[nCentBins-1]->Fill(phi, pt, eta, event_weight);
-
-				h_trk_foreff_entries[cent_bin]->Fill(phi, pt, eta);
-				h_trk_foreff_entries[nCentBins-1]->Fill(phi, pt, eta);
-
-				h_truth_trk_map->Fill(pt,eta,phi, event_weight);
-			}
+//			if (isFirstPass)
+//			{
+//				h_trk_foreff_full[cent_bin]->Fill(phi, pt, eta, event_weight);
+//				h_trk_foreff_full[nCentBins-1]->Fill(phi, pt, eta, event_weight);
+//
+//				h_trk_foreff_entries[cent_bin]->Fill(phi, pt, eta);
+//				h_trk_foreff_entries[nCentBins-1]->Fill(phi, pt, eta);
+//
+//				h_truth_trk_map->Fill(pt,eta,phi, event_weight);
+//			}
 		}
 
 		isFirstPass = false;

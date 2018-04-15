@@ -1,6 +1,10 @@
 #TODO
 --------
 4/15/2018
+*put back isolation cuts without running online
+*potential fixes in tracking performance code
+--------
+4/15/2018
 *removing all isolation cuts in online code (no forward veto or tree fcal stuff)
 *implemented UE_uncert in main.cpp
 --------
