@@ -20,7 +20,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 
 	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
-	TFile *UE_factors = new TFile(Form("UE_factors.root"), "recreate");
+	TFile *UE_factors = new TFile(Form("output_pdf/root/UE_factors.root"), "recreate");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();

@@ -4,7 +4,7 @@ function auto {
 
 	echo "diagnostic_mode: true" >> auto.cfg
 	echo "apply_UE_uncert: 0" >> auto.cfg
-	echo "sys_mode: 101" >> auto.cfg
+	# echo "sys_mode: 101" >> auto.cfg
 	echo "verbose: 0" >> auto.cfg
 
 	if [[ $mode == "unfold" ]]; then

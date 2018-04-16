@@ -26,7 +26,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	if (verbose) m_config->Print();
 
-	TFile *f_input = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
+	TFile *f_input = new TFile(Form("output_pdf/root/unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
 
 	vector<vector<TH1*>> h_raw (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
 	vector<vector<TH1*>> h_unfolded (n_cent_cuts, vector<TH1*> (N_JET_Y+1));

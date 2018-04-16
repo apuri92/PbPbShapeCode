@@ -29,8 +29,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	if (verbose) m_config->Print();
 
 
-	TFile *f_input = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
-	TFile *f_output = new TFile(Form("final_ChPS_%s_%s.root",did.c_str(), dataset_type.c_str()), "recreate");
+	TFile *f_input = new TFile(Form("output_pdf/root/unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
+	TFile *f_output = new TFile(Form("output_pdf/root/final_ChPS_%s_%s.root",did.c_str(), dataset_type.c_str()), "recreate");
 
 	TAxis* dR_binning = (TAxis*)f_input->Get("dR_binning");
 	TAxis* jetpT_binning = (TAxis*)f_input->Get("jetpT_binning");

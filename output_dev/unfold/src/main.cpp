@@ -55,10 +55,10 @@ int main(int argc, char ** argv)
 	cout << f_mc->GetName() << endl;
 	cout << f_data->GetName() << endl;
 
-	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
-	TFile *UE_factors = new TFile(Form("UE_factors.root"));
+	TFile *dr_factors = new TFile(Form("output_pdf/root/posCorr_factors_%s.root", dataset_type.c_str()));
+	TFile *UE_factors = new TFile(Form("output_pdf/root/UE_factors.root"));
 	TFile *UE_uncert = new TFile(Form("UE_uncert.root"));
-	TFile *f_output = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
+	TFile *f_output = new TFile(Form("output_pdf/root/unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
 	std::string name;
 
 	int N_Y = 5;

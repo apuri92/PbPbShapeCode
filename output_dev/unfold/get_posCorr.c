@@ -27,7 +27,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	name = Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
 	cout << file->GetName() << endl;
-	TFile *output = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
+	TFile *output = new TFile(Form("output_pdf/root/posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
 
 	TAxis* jet_pt_binning = (TAxis*)((TH3*)file->Get("h_reco_jet_spectrum_y0_cent0"))->GetXaxis();
 	TAxis* trk_pt_binning = (TAxis*)((TH3*)file->Get("h_dR_change_jetpt0_cent0"))->GetZaxis();

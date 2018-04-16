@@ -12,8 +12,8 @@ void comp_ChPS(bool isMC = 1)
 
 	cout << Form("Doing in %s mode", did.c_str()) << endl;
 
-	TFile *f_PbPb = new TFile(Form("final_ChPS_%s_PbPb.root", did.c_str()));
-	TFile *f_pp = new TFile(Form("final_ChPS_%s_pp.root", did.c_str()));
+	TFile *f_PbPb = new TFile(Form("output_pdf/root/final_ChPS_%s_PbPb.root", did.c_str()));
+	TFile *f_pp = new TFile(Form("output_pdf/root/final_ChPS_%s_pp.root", did.c_str()));
 
 	TFile *f_FF_PbPb = new TFile("FF_files/Uncertainties_eta_4_dpt_PbPb.root");
 	TFile *f_FF_pp = new TFile("FF_files/Uncertainties_eta_4_dpt_pp.root");
