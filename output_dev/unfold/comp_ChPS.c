@@ -3,13 +3,13 @@
 
 void comp_ChPS(bool isMC = 1)
 {
+	cout << "######### DOING COMP_ChPS #########" << endl;
 
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 	std::string did = "data";
 	if (isMC) did = "MC";
 
-	cout << "Drawing ChPS..." << endl;
 	cout << Form("Doing in %s mode", did.c_str()) << endl;
 
 	TFile *f_PbPb = new TFile(Form("final_ChPS_%s_PbPb.root", did.c_str()));
@@ -918,6 +918,8 @@ void comp_ChPS(bool isMC = 1)
 			c_ChPS_final->Print(Form("output_pdf/ChPS_final_ratio_%s.pdf%s", did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 		} //end dr loop
 	}
+
+	cout << "######### DONE COMP_ChPS #########" << endl << endl;;
 
 
 }

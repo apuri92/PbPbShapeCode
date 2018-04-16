@@ -22,31 +22,39 @@ using std::endl;
 
 int main(int argc, char ** argv)
 {
+
+	cout << "######### RUNNING UNFOLDING #########" << endl;
 	std::string config_file = "ff_config.cfg";
 	if (argc == 2) config_file = argv[1];
-	cout << "Using config file: " << config_file << endl;
 	gErrorIgnoreLevel = 3001;
-	cout << "Unfolding..." << endl;
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
-	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	std::string truthjet_mode = "FS"; truthjet_mode = m_config->GetValue("truthjet_mode", dataset_type.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
+	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
 	int apply_UE_uncert = 0; apply_UE_uncert = m_config->GetValue("apply_UE_uncert", apply_UE_uncert);
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
-
+	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 	std::string did = "data";
 	if (isMC) did = "MC";
 
 	//	##############	Config done	##############"
+	if (verbose) m_config->Print();
 
-	TFile *f_mc = new TFile(Form("../raw_results/FF_MC_out_histo_%s_5p02_r001.root", dataset_type.c_str()));
-	TFile *f_data = new TFile(Form("../raw_results/FF_%s_out_histo_%s_5p02_r001.root", did.c_str(), dataset_type.c_str()));
+	std::string sys_path = "";
+	if (sys_mode > 0) sys_path = Form("systematics/%i", sys_mode);
+
+	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
+	TFile *f_data = new TFile(Form("../raw_results/%s/FF_%s_out_histo_%s_5p02_r001.root",sys_path.c_str(), did.c_str(), dataset_type.c_str()));
+
+	cout << f_mc->GetName() << endl;
+	cout << f_data->GetName() << endl;
+
 	TFile *dr_factors = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()));
 	TFile *UE_factors = new TFile(Form("UE_factors.root"));
 	TFile *UE_uncert = new TFile(Form("UE_uncert.root"));
@@ -606,7 +614,7 @@ int main(int argc, char ** argv)
 		delete h_reco_unfolded;
 	}
 
-	cout << "Done unfolding" << endl;
+	cout << "######### DONE UNFOLDING #########" << endl << endl;
 
 	return 0;
 }

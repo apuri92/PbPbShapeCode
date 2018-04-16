@@ -4,14 +4,14 @@ static const int N_JET_Y = 4;
 double jet_y_binning[N_JET_Y+1] = {0, 0.3, 0.8, 1.2, 1.3};
 void draw_spectra(string config_file = "ff_config.cfg")
 {
+	cout << "######### RUNNING DRAW_Spectra #########" << endl;
+
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	cout << "Drawing ChPS..." << endl;
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
-	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
@@ -19,10 +19,12 @@ void draw_spectra(string config_file = "ff_config.cfg")
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
 	bool diagnostic = false; diagnostic = m_config->GetValue("diagnostic_mode", diagnostic);
+	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 
 	std::string did = "data";
 	if (isMC) did = "MC";
 	//	##############	Config done	##############"
+	if (verbose) m_config->Print();
 
 	TFile *f_input = new TFile(Form("unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
 
@@ -269,6 +271,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 		} //end dR loop
 	}
 
+	cout << "######### DONE DRAW_Spectra #########" << endl << endl;;
 
 
 }

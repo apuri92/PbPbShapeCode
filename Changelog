@@ -1,7 +1,10 @@
 #TODO
 --------
 4/16/2018
-*updated to svn version
+*offline code can run different versions of systematics
+--------
+4/16/2018
+*updated online code to svn version
 --------
 4/16/2018
 *fixed bug regarding uncertainty for jets

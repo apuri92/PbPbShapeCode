@@ -48,8 +48,8 @@ void combine_samples()
 		}
 	}
 
-	if (0) combine_eff_trketa(theFiles, weights);
-	if (1) combine_eff_dr(theFiles, weights);
+	if (1) combine_eff_trketa(theFiles, weights);
+	if (0) combine_eff_dr(theFiles, weights);
 
 
 

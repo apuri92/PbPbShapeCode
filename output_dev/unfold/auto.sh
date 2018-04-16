@@ -1,14 +1,18 @@
 function auto {
 	echo "dataset_type: $1" > auto.cfg
-	echo "isMC: $2" >> auto.cfg
+	echo "isMC: $2" >> auto.cfg	
+
 	echo "diagnostic_mode: true" >> auto.cfg
 	echo "apply_UE_uncert: 0" >> auto.cfg
+	echo "sys_mode: 101" >> auto.cfg
+	echo "verbose: 0" >> auto.cfg
+
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
 		root -b -q "get_posCorr.c(\"auto.cfg\")" 
 		
 		if [[ $dataset_type=="PbPb" ]]; then
-			root -b -q UE_factors.c
+			root -b -q "UE_factors.c(\"auto.cfg\")" 
 		fi
 
 		./analysis auto.cfg

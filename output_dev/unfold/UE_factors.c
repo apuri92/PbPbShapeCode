@@ -1,11 +1,25 @@
 #include "../functions/global_variables.h"
 
-void UE_factors()
+void UE_factors(string config_file = "ff_config.cfg")
 {
+	cout << "######### GETTING UE FACTORS #########" << endl;
+
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *input_file = new TFile("../raw_results/FF_MC_out_histo_PbPb_5p02_r001.root");
+	//	##############	Reading config	##############"
+	TEnv *m_config = new TEnv();
+	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
+	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
+	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
+	//	##############	Config done	##############"
+
+	std::string sys_path = "";
+	if (sys_mode > 0) sys_path = Form("systematics/%i", sys_mode);
+	if (verbose) m_config->Print();
+
+
+	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 	TFile *UE_factors = new TFile(Form("UE_factors.root"), "recreate");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
@@ -82,5 +96,7 @@ void UE_factors()
 		else name = "";
 		c1->Print(Form("output_pdf/PbPb/UE_factors.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 	}
+
+	cout << "######### DONE GETTING UE FACTORS #########" << endl << endl;;
 
 }

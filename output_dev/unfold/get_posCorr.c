@@ -2,6 +2,8 @@
 
 void get_posCorr(string config_file = "ff_config.cfg")
 {
+	cout << "######### GETTING POS_CORR FACTORS #########" << endl;
+
 	SetAtlasStyle();
 	string name;
 	gErrorIgnoreLevel = 3001;
@@ -9,16 +11,22 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
-	m_config->Print();
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
+	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
+	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 
 	//	##############	Config done	##############"
 
-	name = Form("../raw_results/FF_MC_out_histo_%s_5p02_r001.root", dataset_type.c_str());
+	std::string sys_path = "";
+	if (sys_mode > 0) sys_path = Form("systematics/%i", sys_mode);
+	if (verbose) m_config->Print();
+
+	name = Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
+	cout << file->GetName() << endl;
 	TFile *output = new TFile(Form("posCorr_factors_%s.root", dataset_type.c_str()),"recreate");
 
 	TAxis* jet_pt_binning = (TAxis*)((TH3*)file->Get("h_reco_jet_spectrum_y0_cent0"))->GetXaxis();
@@ -610,6 +618,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	name = ")";
 	c6->Print(Form("output_pdf/%s/pos_corr_factors_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: End"));
 
+	cout << "######### DONE POS_CORR FACTORS #########" << endl << endl;
 
 
 }
