@@ -381,11 +381,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			EL_RETURN_CHECK("execute()", m_jetCalibration->applyCalibration( newjet ) ); //calibrates with sequence EtaJes_Insitu for data, EtaJes for MC
 		}
 
-		float jet_pt  = (newjet.pt() * 0.001);
-		float jet_eta = newjet.eta();
-		float jet_phi = newjet.phi();
-		float jet_m = newjet.m()*0.001;
-
 
 		//Uncertainties
 
@@ -412,6 +407,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 			}
 			//if (truthMjet) delete truthMjet;
 		}
+
+		float jet_pt  = (newjet.pt() * 0.001);
+		float jet_eta = newjet.eta();
+		float jet_phi = newjet.phi();
+		float jet_m = newjet.m()*0.001;
+
 
 		if (fabs(jet_eta)> (2.5 - _dR_max)) continue;
 //		if (jet_pt <= _pTjetCut) continue; //removing cut here. impelmenting only for spectra, ChPS, and response matrices
