@@ -3,8 +3,8 @@ function auto {
 	echo "isMC: $2" >> auto.cfg	
 
 	echo "diagnostic_mode: true" >> auto.cfg
-	echo "apply_UE_uncert: 0" >> auto.cfg
-	# echo "sys_mode: 101" >> auto.cfg
+	echo "apply_UE_uncert: 1" >> auto.cfg
+	echo "sys_mode: -1" >> auto.cfg
 	echo "verbose: 0" >> auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
@@ -22,6 +22,7 @@ function auto {
 	root -b -q "draw_spectra.c(\"auto.cfg\")"
 	rm auto.cfg
 }
+
 
 
 mode=$1 #if running full unfolding as well

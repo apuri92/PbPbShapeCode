@@ -1,7 +1,7 @@
 #include "../functions/global_variables.h"
 #include "TEnv.h"
 
-void comp_ChPS(bool isMC = 1)
+void comp_ChPS(bool isMC = 0)
 {
 	cout << "######### DOING COMP_ChPS #########" << endl;
 
@@ -14,6 +14,7 @@ void comp_ChPS(bool isMC = 1)
 
 	TFile *f_PbPb = new TFile(Form("output_pdf/root/final_ChPS_%s_PbPb.root", did.c_str()));
 	TFile *f_pp = new TFile(Form("output_pdf/root/final_ChPS_%s_pp.root", did.c_str()));
+	TFile *f_RDpT = new TFile(Form("output_pdf/root/final_RDpT_%s.root", did.c_str()), "recreate");
 
 	TFile *f_FF_PbPb = new TFile("FF_files/Uncertainties_eta_4_dpt_PbPb.root");
 	TFile *f_FF_pp = new TFile("FF_files/Uncertainties_eta_4_dpt_pp.root");
@@ -33,6 +34,12 @@ void comp_ChPS(bool isMC = 1)
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
+
+
+	f_RDpT->cd();
+	dR_binning->Write("dR_binning");
+	jetpT_binning->Write("jetpT_binning");
+	trkpT_binning->Write("trkpT_binning");
 
 	double array_dr_bins[N_dR+1];
 	for (int i_dR = 0; i_dR <= N_dR; i_dR++) array_dr_bins[i_dR] = dR_binning->GetBinLowEdge(i_dR+1);
@@ -166,6 +173,11 @@ void comp_ChPS(bool isMC = 1)
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb_indR.at(i_trk).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_indR.at(i_trk).at(6).at(i_jet));
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T}, r)}");
+
+				f_RDpT->cd();
+				name = Form("h_ChPS_RDpT_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
 			}
 
 			//injet
