@@ -1,18 +1,39 @@
 #include "../functions/global_variables.h"
 
-void draw_conf_plots(bool isMC = 0)
+void draw_conf_plots(string config_file = "sys_config.cfg")
 {
 	cout << "######### DOING COMP_ChPS #########" << endl;
 
 	SetAtlasStyle();
-	gErrorIgnoreLevel = 3001;
+//	gErrorIgnoreLevel = 3001;
+	string name;
+
+	//	##############	Reading config	##############"
+	TEnv *m_config = new TEnv();
+	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
+
+	std::string mode = "RDpT"; mode = m_config->GetValue("mode", mode.c_str());
+	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
+
+	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
+	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
+	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
+
 	std::string did = "data";
 	if (isMC) did = "MC";
 
-	cout << Form("Doing in %s mode", did.c_str()) << endl;
+	if (verbose) m_config->Print();
+	//	##############	Config done	##############"
 
-	TFile *f_RDpT = new TFile(Form("output_pdf_nominal/root/final_RDpT_%s.root", did.c_str()));
-	TFile *f_sys = new TFile(Form("output_pdf_nominal/root/final_RDpT_sys_%s.root", did.c_str()));
+	if (mode == "RDpT") dataset_type = "";
+	else dataset_type = Form("_%s", dataset_type.c_str());
+
+	TFile *f_RDpT = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
+	TFile *f_sys = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
+
+	cout << "Using files:" << endl;
+	cout << f_RDpT->GetName() << endl;
+	cout << f_sys->GetName() << endl;
 
 
 	TAxis* dR_binning = (TAxis*)f_RDpT->Get("dR_binning");
@@ -29,7 +50,6 @@ void draw_conf_plots(bool isMC = 0)
 	vector<vector<vector<TH1*>>> h_ChPS_final_sys_Totalneg_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TGraphAsymmErrors*>>> g_ChPS_final_sys_final_indR (N_trkpt, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt)));
 
-	string name;
 	string pdf_label;
 
 	TLine *line = new TLine();
@@ -53,15 +73,18 @@ void draw_conf_plots(bool isMC = 0)
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
+			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if (dataset_type == "_pp" && i_cent < 6) continue;
+
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
-				name = Form("h_ChPS_RDpT_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
 				h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet] = (TH1*)f_RDpT->Get(name.c_str());
 
-				name = Form("h_ChPS_RDpT_indR_trk%i_cent%i_jetpt%i_sys_Totalpos", i_trk, i_cent, i_jet);
+				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_p",mode.c_str(), i_trk, i_cent, i_jet);
 				h_ChPS_final_sys_Totalpos_indR[i_trk][i_cent][i_jet] = (TH1*)f_sys->Get(name.c_str());
 
-				name = Form("h_ChPS_RDpT_indR_trk%i_cent%i_jetpt%i_sys_Totalneg", i_trk, i_cent, i_jet);
+				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_n",mode.c_str(), i_trk, i_cent, i_jet);
 				h_ChPS_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)f_sys->Get(name.c_str());
 
 				g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]);
@@ -88,6 +111,14 @@ void draw_conf_plots(bool isMC = 0)
 		}
 	}
 
+	double y_range_lo = 0;
+	double y_range_hi = 4;
+
+	if (mode == "ChPS")
+	{
+		y_range_lo = 1E-7;
+		y_range_hi = 1E7;
+	}
 
 	// drawing
 	{
@@ -106,8 +137,11 @@ void draw_conf_plots(bool isMC = 0)
 			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
 			bool first_pass_cent = true;
-			for (int i_cent = 0; i_cent < 6; i_cent++)
+			for (int i_cent = 0; i_cent <= 6; i_cent++)
 			{
+				if (dataset_type == "_PbPb" && i_cent == 6) continue;
+				if (dataset_type == "_pp" && i_cent < 6) continue;
+
 				string centrality = num_to_cent(31,i_cent);
 
 				int trk_itr = 0;
@@ -117,7 +151,7 @@ void draw_conf_plots(bool isMC = 0)
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
 
-					if (i_trk != 2 && i_trk != 4 && i_trk != 6 && i_trk != 8) continue;
+					if (i_trk != 2 && i_trk != 3 && i_trk != 4 && i_trk != 5 && i_trk != 6 && i_trk != 7 &&  i_trk != 8) continue;
 
 
 					string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
@@ -128,13 +162,14 @@ void draw_conf_plots(bool isMC = 0)
 					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
 
 					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0, 2.5);
+					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 
 					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0, 2.5);
+					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 
+					if (mode == "ChPS") gPad->SetLogy();
 
 					if (trk_itr == 0) g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->Draw("a 2");
 					else g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->Draw("same 2");
@@ -149,13 +184,15 @@ void draw_conf_plots(bool isMC = 0)
 				ltx->SetTextSize(16);
 				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-				line->DrawLine(0, 1, 0.6, 1);
+				if (mode == "RDpT") line->DrawLine(0, 1, 0.6, 1);
 				legend->Draw();
 				ATLASLabel(0.19, 0.88, "Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
 				first_pass_cent = false;
 
-				if ((i_jet != 7 && i_jet != 9) || (i_cent != 0 && i_cent != 5) ) continue;
-				canvas->Print(Form("output_pdf_nominal/conf/ChPS_final_ratio_dR_CONF_%s_jet%i_cent%i.pdf", did.c_str(), i_jet, i_cent));
+				if ( (dataset_type == "_PbPb") && ((i_jet != 7 && i_jet != 9) || (i_cent != 0 && i_cent != 5) )) continue;
+				else if ( (dataset_type == "_pp") && ((i_jet != 7 && i_jet != 9) || (i_cent != 6) )) continue;
+
+				canvas->Print(Form("output_pdf_nominal/conf/%s_final_ratio_dR_CONF_%s%s_jet%i_cent%i.pdf",mode.c_str(), did.c_str(), dataset_type.c_str(), i_jet, i_cent));
 
 
 			} //end cent loop
@@ -178,8 +215,14 @@ void draw_conf_plots(bool isMC = 0)
 		legend_open->SetTextSize(13);
 
 		bool first_pass_cent = true;
-		for (int i_cent = 0; i_cent < 6; i_cent++)
+		for (int i_cent = 0; i_cent <= 6; i_cent++)
 		{
+			cout << i_cent << endl;
+
+			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if (dataset_type == "_pp" && i_cent < 6) continue;
+			cout << i_cent << endl;
+
 			string centrality = num_to_cent(31,i_cent);
 
 
@@ -216,14 +259,16 @@ void draw_conf_plots(bool isMC = 0)
 
 					}
 
+
 					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0, 4.5);
+					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 
 					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0, 4.5);
+					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					h_ChPS_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 
+					if (mode == "ChPS") gPad->SetLogy();
 
 					if (jet_itr == 0 && trk_itr == 0) g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->Draw("a2");
 					else g_ChPS_final_sys_final_indR[i_trk][i_cent][i_jet]->Draw("same 2");
@@ -237,7 +282,7 @@ void draw_conf_plots(bool isMC = 0)
 				ltx->SetTextAlign(32);
 				ltx->SetTextSize(16);
 				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", centrality.c_str()));
-				line->DrawLine(0, 1, 0.6, 1);
+				if (mode == "RDpT") line->DrawLine(0, 1, 0.6, 1);
 				legend_open->Draw();
 				legend->Draw();
 				ATLASLabel(0.19, 0.88, "Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
@@ -253,10 +298,13 @@ void draw_conf_plots(bool isMC = 0)
 				trk_itr++;
 
 			} //end cent loop
+			cout << i_cent << endl;
 
-			if (i_cent != 0 && i_cent != 5) continue;
+			if ((dataset_type == "_PbPb") && (i_cent != 0 && i_cent != 5)) continue;
+			if ((dataset_type == "_pp") && (i_cent != 6)) continue;
+			cout << i_cent << endl;
 
-			canvas->Print(Form("output_pdf_nominal/conf/ChPS_final_ratio_dR_CONF_%s_trk_cent%i.pdf", did.c_str(), i_cent));
+			canvas->Print(Form("output_pdf_nominal/conf/%s_final_ratio_dR_CONF_%s%strk_cent%i.pdf", mode.c_str(), did.c_str(), dataset_type.c_str(), i_cent));
 
 			first_pass_cent = false;
 		} //end jet loop

@@ -54,7 +54,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys105"); //MCProbCut
 	sys_names.push_back("sys106"); //HIJES_1_P
 	sys_names.push_back("sys107"); //HIJES_2_P
-//	sys_names.push_back("sys108"); //HIJES_1_N
+	sys_names.push_back("sys108"); //HIJES_1_N
 //	sys_names.push_back("sys109"); //HIJES_2_N
 //	sys_names.push_back("sys110"); //Material_P
 //	sys_names.push_back("sys111"); //Material_N
@@ -64,18 +64,18 @@ void systematics_dev(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys117"); //CentHIJES_N
 //	sys_names.push_back("sys118"); //ppJES_P
 //	sys_names.push_back("sys199"); //ppJES_N
-//	sys_names.push_back("sys200"); //UE
+	sys_names.push_back("sys200"); //UE
 
 
 	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("Sign");
-	combined_sys_names.push_back("MCProb");
+//	combined_sys_names.push_back("MCProb");
 	combined_sys_names.push_back("HIJES");
-	combined_sys_names.push_back("Material");
-	combined_sys_names.push_back("Tracking");
-	combined_sys_names.push_back("TrackingResolution");
-	combined_sys_names.push_back("CentHIJES");
-	combined_sys_names.push_back("ppJES");
+//	combined_sys_names.push_back("Material");
+//	combined_sys_names.push_back("Tracking");
+//	combined_sys_names.push_back("TrackingResolution");
+//	combined_sys_names.push_back("CentHIJES");
+//	combined_sys_names.push_back("ppJES");
 	combined_sys_names.push_back("UE");
 
 
@@ -101,13 +101,16 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
 	{
-		name = Form("output_pdf_%s/root/final_%s_%s.root", sys_names[i_sys].c_str(), mode.c_str(), did.c_str());
+		name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), mode.c_str(), did.c_str(), dataset_type.c_str());
 		sys_files.push_back( new TFile( name.c_str() ) );
 
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
+				if (dataset_type == "_PbPb" && i_cent == 6) continue;
+				if (dataset_type == "_pp" && i_cent < 6) continue;
+
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
@@ -118,7 +121,6 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 //					cout << Form("%i_%i_%i %i ", i_trk, i_cent, i_jet, i_sys);
 //					cout << Form("%s --> x", sys_names[i_sys].c_str()) << endl;
-
 
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
 					h_sys_p[i_sys][i_trk][i_cent][i_jet] = (TH1*)h_sys[i_sys][i_trk][i_cent][i_jet]->Clone(Form("%s_%s_p", name.c_str(), sys_names[i_sys].c_str()) );
@@ -189,6 +191,9 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
+			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if (dataset_type == "_pp" && i_cent < 6) continue;
+
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
 
@@ -281,6 +286,9 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
+			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if (dataset_type == "_pp" && i_cent < 6) continue;
+
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
 				for (int i_dR = 1; i_dR <= N_dR; i_dR++)
@@ -319,6 +327,94 @@ void systematics_dev(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->Write(name.c_str());
 
 			}
+		}
+	}
+
+
+	//drawing
+	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
+	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.30, 0.38, "","brNDC");
+	legend_sys->SetTextFont(43);
+	legend_sys->SetBorderSize(0);
+
+	TLatex *ltx = new TLatex();
+	ltx->SetTextFont(43);
+	ltx->SetTextSize(12);
+
+
+	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+	{
+		string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+		for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
+		{
+			string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+			legend_sys->Clear();
+			c_sys->cd();
+			c_sys->Clear();
+			c_sys->Divide(3,2);
+
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+				if (dataset_type == "_PbPb" && i_cent == 6) continue;
+				if (dataset_type == "_pp" && i_cent < 6) continue;
+				string centrality = num_to_cent(31,i_cent);
+
+
+
+				SetHStyle_smallify(h_total_sys_p[i_trk][i_cent][i_jet],0, 1);
+				SetHStyle_smallify(h_total_sys_n[i_trk][i_cent][i_jet],0, 1);
+
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+
+
+				c_sys->cd(i_cent+1);
+				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
+
+
+				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
+				{
+					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, 1);
+					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, 1);
+
+					if (i_cent == 0) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
+
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+
+					c_sys->cd(i_cent+1);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
+
+				}
+
+				if (i_cent == 0) legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","lp");
+
+				legend_sys->Draw();
+				ltx->SetTextAlign(32);
+				ltx->SetTextSize(12);
+
+				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", trk_label.c_str()));
+				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", jet_label.c_str()));
+				ltx->DrawLatexNDC(0.93, 0.80, Form("%s", centrality.c_str()));
+
+				
+
+			}
+
+			string pdf_label = "";
+			if (i_trk == trk_pt_start && i_jet == jet_pt_start) pdf_label = "(";
+			if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) pdf_label = ")";
+			cout << pdf_label << endl;
+			c_sys->Print(Form("output_pdf_nominal/%s_dR_sys%s_errorx.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
+
+
 		}
 	}
 
