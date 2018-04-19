@@ -12,15 +12,22 @@ void UE_factors(string config_file = "ff_config.cfg")
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
+
+	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
 	std::string sys_path = "";
-	if (sys_mode > 0) sys_path = Form("systematics/%i", sys_mode);
-	if (verbose) m_config->Print();
-
-
+	if (sys_mode == 0) sys_path = Form("nominal");
+	if (sys_mode > 0) sys_path = Form("sys%i", sys_mode);
 	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
-	TFile *UE_factors = new TFile(Form("output_pdf/root/UE_factors.root"), "recreate");
+
+	cout << "Using file:" << endl;
+	cout << input_file->GetName() << endl;
+
+	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
+	TFile *UE_factors = new TFile(Form("output_pdf%s/root/UE_factors.root", sys_path.c_str()), "recreate");
+
+
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
@@ -94,7 +101,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 		if (i_dR == 0) name = "(";
 		else if (i_dR == 12) name = ")";
 		else name = "";
-		c1->Print(Form("output_pdf/PbPb/UE_factors.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+		c1->Print(Form("output_pdf%s/PbPb/UE_factors.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 	}
 
 	cout << "######### DONE GETTING UE FACTORS #########" << endl << endl;;

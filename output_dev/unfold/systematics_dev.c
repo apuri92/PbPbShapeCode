@@ -49,11 +49,11 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	vector<string> sys_names;
 	vector<string> combined_sys_names;
 
-//	sys_names.push_back("sys101"); //JER
-//	sys_names.push_back("sys102"); //Sign
+	sys_names.push_back("sys101"); //JER
+	sys_names.push_back("sys102"); //Sign
 //	sys_names.push_back("sys105"); //MCProbCut
 	sys_names.push_back("sys106"); //HIJES_1_P
-//	sys_names.push_back("sys107"); //HIJES_2_P
+	sys_names.push_back("sys107"); //HIJES_2_P
 //	sys_names.push_back("sys108"); //HIJES_1_N
 //	sys_names.push_back("sys109"); //HIJES_2_N
 //	sys_names.push_back("sys110"); //Material_P
@@ -67,16 +67,16 @@ void systematics_dev(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys200"); //UE
 
 
-//	combined_sys_names.push_back("JER");
-//	combined_sys_names.push_back("Sign");
-//	combined_sys_names.push_back("MCProb");
+	combined_sys_names.push_back("JER");
+	combined_sys_names.push_back("Sign");
+	combined_sys_names.push_back("MCProb");
 	combined_sys_names.push_back("HIJES");
-//	combined_sys_names.push_back("Material");
-//	combined_sys_names.push_back("Tracking");
-//	combined_sys_names.push_back("TrackingResolution");
-//	combined_sys_names.push_back("CentHIJES");
-//	combined_sys_names.push_back("ppJES");
-//	combined_sys_names.push_back("UE");
+	combined_sys_names.push_back("Material");
+	combined_sys_names.push_back("Tracking");
+	combined_sys_names.push_back("TrackingResolution");
+	combined_sys_names.push_back("CentHIJES");
+	combined_sys_names.push_back("ppJES");
+	combined_sys_names.push_back("UE");
 
 
 	vector<vector<vector<TH1*>>> h_nom (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -116,6 +116,8 @@ void systematics_dev(string config_file = "sys_config.cfg")
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Add(h_nom[i_trk][i_cent][i_jet], -1);
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Divide(h_nom[i_trk][i_cent][i_jet]);
 
+//					cout << Form("%i_%i_%i %i ", i_trk, i_cent, i_jet, i_sys);
+//					cout << Form("%s --> x", sys_names[i_sys].c_str()) << endl;
 
 
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
@@ -182,6 +184,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 		}
 	}
 
+
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -197,6 +200,8 @@ void systematics_dev(string config_file = "sys_config.cfg")
 						for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
 						{
 
+//							cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
+//							cout << Form("%s --> %s", sys_names[i_sys].c_str(), combined_sys_names[i_comb_sys].c_str()) << endl;
 
 							double tmp;
 
@@ -220,22 +225,16 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 								tmp = h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, tmp);
-
-								break;
 							}
 
-							//each systematic is needs to be combined
-							else if (
-
-								( ( sys_names[i_sys] == "sys106" || sys_names[i_sys] == "sys107" || sys_names[i_sys] == "sys108" || sys_names[i_sys] == "sys109" ) && combined_sys_names[i_comb_sys] == "HIJES" )
+							//each systematic needs to be combined
+							if ( ( ( sys_names[i_sys] == "sys106" || sys_names[i_sys] == "sys107" || sys_names[i_sys] == "sys108" || sys_names[i_sys] == "sys109" ) && combined_sys_names[i_comb_sys] == "HIJES" )
 								||
 								( ( sys_names[i_sys] == "sys110" || sys_names[i_sys] == "sys111" ) && combined_sys_names[i_comb_sys] == "Material" )
 								||
 								( ( sys_names[i_sys] == "sys116" || sys_names[i_sys] == "sys117" ) && combined_sys_names[i_comb_sys] == "CentHIJES" )
 								||
-								( ( sys_names[i_sys] == "sys118" || sys_names[i_sys] == "sys119" ) && combined_sys_names[i_comb_sys] == "ppJES" )
-
-								)
+								( ( sys_names[i_sys] == "sys118" || sys_names[i_sys] == "sys119" ) && combined_sys_names[i_comb_sys] == "ppJES" ) )
 							{
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
 //								cout << Form("%s --> %s", sys_names[i_sys].c_str(), combined_sys_names[i_comb_sys].c_str()) << endl;
@@ -249,7 +248,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 									h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
 
 									tmp = pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
 								}
 								else
 								{
@@ -258,15 +257,11 @@ void systematics_dev(string config_file = "sys_config.cfg")
 									h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
 
 									tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+									tmp = tmp + pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
 								}
 
-								break;
-
 							}
-
-
 
 						}
 					}
@@ -282,52 +277,50 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	}
 
 
-//	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-//	{
-//		for (int i_cent = 0; i_cent < 6; i_cent++)
-//		{
-//			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
-//			{
-//				for (int i_dR = 1; i_dR <= N_dR; i_dR++)
-//				{
-//					for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
-//					{
-//
-//						if (i_comb_sys == 0)
-//						{
-//							tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_total_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//
-//							tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_total_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//						}
-//						else
-//						{
-//
-//							tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//
-//							tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//
-//							//
-//							tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//
-//							tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-//							h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-//
-//						}
-//
-//					}
-//				}
-//			}
-//		}
-//	}
+	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+	{
+		for (int i_cent = 0; i_cent < 6; i_cent++)
+		{
+			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+			{
+				for (int i_dR = 1; i_dR <= N_dR; i_dR++)
+				{
+					double tmp;
+					for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
+					{
+
+						if (i_comb_sys == 0)
+						{
+							tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							h_total_sys_p[i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+
+							tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							h_total_sys_n[i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
+						}
+						else
+						{
+							tmp = pow(h_total_sys_p[i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							tmp = tmp + pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							h_total_sys_p[i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+
+							tmp = pow(h_total_sys_n[i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							tmp = tmp + pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+							h_total_sys_n[i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
+						}
+
+
+					}
+				}
+
+				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_p",mode.c_str(), i_trk, i_cent, i_jet);
+				h_total_sys_p[i_trk][i_cent][i_jet]->Write(name.c_str());
+
+				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_n",mode.c_str(), i_trk, i_cent, i_jet);
+				h_total_sys_n[i_trk][i_cent][i_jet]->Write(name.c_str());
+
+			}
+		}
+	}
 
 
 	cout << "######### Done Systematics #########" << endl;

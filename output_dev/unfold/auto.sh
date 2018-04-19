@@ -4,13 +4,13 @@ function auto {
 
 	echo "diagnostic_mode: true" >> auto.cfg
 	echo "apply_UE_uncert: 1" >> auto.cfg
-	echo "sys_mode: -1" >> auto.cfg
+	echo "sys_mode: 102" >> auto.cfg
 	echo "verbose: 0" >> auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
 		root -b -q "get_posCorr.c(\"auto.cfg\")" 
-		
+		echo $dataset_type 
 		if [[ $dataset_type=="PbPb" ]]; then
 			root -b -q "UE_factors.c(\"auto.cfg\")" 
 		fi

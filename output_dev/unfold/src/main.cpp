@@ -27,42 +27,46 @@ int main(int argc, char ** argv)
 	std::string config_file = "ff_config.cfg";
 	if (argc == 2) config_file = argv[1];
 	gErrorIgnoreLevel = 3001;
+	std::string name;
+
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
-	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
-	std::string truthjet_mode = "FS"; truthjet_mode = m_config->GetValue("truthjet_mode", dataset_type.c_str());
-	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
-	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
-	int apply_UE_uncert = 0; apply_UE_uncert = m_config->GetValue("apply_UE_uncert", apply_UE_uncert);
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
+	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
+
+	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
+
 	std::string did = "data";
 	if (isMC) did = "MC";
 
-	//	##############	Config done	##############"
+	int apply_UE_uncert = 0;
+	if (sys_mode == 200 && dataset_type == "PbPb") apply_UE_uncert = 1;
 	if (verbose) m_config->Print();
+	//	##############	Config done	##############"
 
 	std::string sys_path = "";
-	if (sys_mode > 0) sys_path = Form("systematics/%i", sys_mode);
+	if (sys_mode == 0) sys_path = Form("nominal");
+	if (sys_mode > 0) sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
 	TFile *f_data = new TFile(Form("../raw_results/%s/FF_%s_out_histo_%s_5p02_r001.root",sys_path.c_str(), did.c_str(), dataset_type.c_str()));
 
+	cout << "Using files:" << endl;
 	cout << f_mc->GetName() << endl;
-	cout << f_data->GetName() << endl;
+	cout << f_data->GetName() << endl;	
 
-	TFile *dr_factors = new TFile(Form("output_pdf/root/posCorr_factors_%s.root", dataset_type.c_str()));
-	TFile *UE_factors = new TFile(Form("output_pdf/root/UE_factors.root"));
+	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
+	TFile *dr_factors = new TFile(Form("output_pdf%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
+	TFile *UE_factors = new TFile(Form("output_pdf%s/root/UE_factors.root", sys_path.c_str()));
 	TFile *UE_uncert = new TFile(Form("UE_uncert.root"));
-	TFile *f_output = new TFile(Form("output_pdf/root/unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()),"recreate");
-	std::string name;
+	TFile *f_output = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
 	int N_Y = 5;
-
 
 	TAxis* dR_binning = (TAxis*)((TH3*)f_mc->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)f_mc->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
@@ -71,7 +75,6 @@ int main(int argc, char ** argv)
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
-
 
 	f_output->cd();
 	dR_binning->Write("dR_binning");
@@ -176,7 +179,6 @@ int main(int argc, char ** argv)
 			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_MB_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
-			TH2* h_UE_FS = (TH2*)f_mc->Get(Form("ChPS_FS_UE_dR%i_cent%i",i_dR,i_cent));;
 			TH1* h_UE_uncert;
 			if (dataset_type == "PbPb") h_UE_uncert = (TH1*)((TH1*)UE_uncert->Get(Form("UE_uncert_4_cent%i", i_cent)))->Clone(Form("UE_uncert_4_cent%i_dR%i", i_cent, i_dR));
 
@@ -249,7 +251,6 @@ int main(int argc, char ** argv)
 
 					if (dataset_type == "PbPb")
 					{
-//						if (i_trk_bin < trkpT_binning->FindBin(10.))
 						if (i_trk_bin >= trkpT_binning->FindBin(0.9) && i_trk_bin < trkpT_binning->FindBin(10.))
 						{
 							fake = 0;
@@ -297,7 +298,7 @@ int main(int argc, char ** argv)
 						}
 					}
 
-					if (subtr < 0 && (i_jet_bin >= 8 && i_jet_bin <= 11) && (i_trk_bin >=2 && i_trk_bin <= 9))
+					if (verbose && subtr < 0 && (i_jet_bin >= 8 && i_jet_bin <= 11) && (i_trk_bin >=2 && i_trk_bin <= 9))
 					{
 						double jet_lo = jetpT_binning->GetBinLowEdge(i_jet_bin);
 						double jet_hi = jetpT_binning->GetBinUpEdge(i_jet_bin);

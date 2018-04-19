@@ -14,19 +14,26 @@ void draw_spectra(string config_file = "ff_config.cfg")
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
-	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
-	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
-	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
-	bool diagnostic = false; diagnostic = m_config->GetValue("diagnostic_mode", diagnostic);
+	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
+
+	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 
 	std::string did = "data";
 	if (isMC) did = "MC";
-	//	##############	Config done	##############"
-	if (verbose) m_config->Print();
 
-	TFile *f_input = new TFile(Form("output_pdf/root/unfolded_%s_%s.root",did.c_str(), dataset_type.c_str()));
+	if (verbose) m_config->Print();
+	//	##############	Config done	##############"
+	std::string sys_path = "";
+	if (sys_mode == 0) sys_path = Form("_nominal");
+	if (sys_mode > 0) sys_path = Form("_sys%i", sys_mode);
+
+
+	TFile *f_input = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));
+	cout << "Using files:" << endl;
+	cout << f_input->GetName() << endl;
+
 
 	vector<vector<TH1*>> h_raw (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
 	vector<vector<TH1*>> h_unfolded (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
@@ -265,8 +272,8 @@ void draw_spectra(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_y == 0) pdf_label = "(";
 			if (i_y == N_JET_Y) pdf_label = ")";
-			c_spect_closure->Print(Form("output_pdf/%s/spect_closure_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
-			c_resp_matrix->Print(Form("output_pdf/%s/resp_matrix_jet_%s_%s.pdf%s", dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
+			c_spect_closure->Print(Form("output_pdf%s/%s/spect_closure_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
+			c_resp_matrix->Print(Form("output_pdf%s/%s/resp_matrix_jet_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 
 		} //end dR loop
 	}
