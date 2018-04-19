@@ -839,7 +839,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 			for (int i_pt = 0; i_pt < 7; i_pt++)
 			{
 				double UE_err = -1;
-				double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+				double UE_val = uee->getShapeUE(i_dR, i_dPsi, 0, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
 				double trk_bin_center = ChPS_MB_raw_UE.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 				//cout << " c" << cent_bin <<" dr " << i_dR << " i_dPsi " << i_dPsi << " i_pt " << i_pt << " trk_bin_center " << trk_bin_center << " jet_eta " << jet_eta << " jet_phi " << jet_phi << " UE " << UE_val << endl;
 				ChPS_MB_raw_UE.at(y_bin).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
