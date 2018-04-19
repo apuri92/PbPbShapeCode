@@ -98,12 +98,23 @@ Float_t GetAveragePsi(Float_t psi1, Float_t psi2)
 Int_t GetPsiBin(Float_t psi)
 {
    int bin = 0;
+   //for (float dPsi=0.2;dPsi<=TMath::Pi();dPsi=dPsi+0.2){
    for (float dPsi=0.1;dPsi<=TMath::Pi();dPsi=dPsi+0.1){
+
    		//cout << "psi " << psi << " dPsi " << dPsi << endl;
    		if (psi<=dPsi) return bin;
    		bin++;
    }
    return bin;
+}
+
+Float_t GetDeltaPsi3(double phi, double psi)
+//@brief: distance from the event plane in convention of flow calculations
+{
+    Double_t diff;
+    diff = fabs(phi - psi);
+    while (diff > TMath::Pi()/3. ) diff = fabs(2*TMath::Pi()/3. - diff);
+    return fabs(diff);
 }
 
 int GetCentralityBin(Int_t centralityScheme, float FCal_Et, bool isMC)

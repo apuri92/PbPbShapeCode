@@ -85,7 +85,16 @@ void UncertProvider::UncerJESIntrinsic(xAOD::Jet* recon)
    Float_t jetM = recon->m();
    
    //cout << "jet pt " << jetPt << " jet eta " << jetEta << " jet phi " << jetPhi << " jet m" << jetM << endl;  
-   uncertainty = 1+ significance * (jesProv.getUncertainty(component,(*recon)));
+   if (uncert_index>19) uncertainty = 1+ significance * (jesProv.getUncertainty(component,(*recon)));
+   //Combine all JES2015_19NP
+   else {
+   	 float total=0.;
+   	 for (int unc=20;unc<42;unc++){
+   	 	if (unc%2==1) continue;
+   	 	total+=pow( jesProv.getUncertainty(GetJESSysComponent(unc),(*recon) ), 2  );
+   	 }
+   	 uncertainty = 1+ significance * sqrt(total);  
+   }
    //cout << "Uncert 0: " <<  (jesProv.getUncertainty(0,(*recon))) << endl;
    //cout << "Uncert 1: " <<  (jesProv.getUncertainty(1,(*recon))) << endl ;
    //cout << "Uncert 18: " <<  (jesProv.getUncertainty(18,(*recon))) << endl ;
@@ -209,7 +218,7 @@ float UncertProvider::GetMCProb(){
 void UncertProvider::GetTrackUncert(){         
    if (uncert_index==1) uncert_class=3; //JER uncert
    else if (uncert_index>5 && uncert_index<10) uncert_class=2; //HI JES  
-   else if (uncert_index>19) uncert_class=1; //intrincis JES
+   else if (uncert_index>17) uncert_class=1; //intrincis JES
    else if (uncert_index>9 && uncert_index < 15) uncert_class=4; //tracking efficiency
    else if (uncert_index ==15) uncert_class=5; //Trk resolution
    else if (uncert_index ==16 || uncert_index ==17) uncert_class=6; //Trk resolution
@@ -258,7 +267,9 @@ string UncertProvider::GetSysName(int uncert){
 		break;
 		case 17: UncertLabel="JES_HIC_N";
 		break;
-		case 18: UncertLabel="trk_ChScale";
+		case 18: UncertLabel="JES_Intrinsic_P";
+		break;
+		case 19: UncertLabel="JES_Intrinsic_P";
 		break;
 
 

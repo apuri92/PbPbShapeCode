@@ -21,6 +21,7 @@ double GetEventPlane(const xAOD::HIEventShapeContainer* calos);
 Float_t GetAveragePsi(Float_t psi1, Float_t psi2);
 Int_t GetPsiBin(Float_t psi);
 double GetEventPlane(const xAOD::HIEventShapeContainer* calos, int order);
+Float_t GetDeltaPsi3(double phi, double psi);
 //@CODE_end
 
 #endif

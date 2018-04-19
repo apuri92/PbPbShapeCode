@@ -69,6 +69,7 @@ EL::StatusCode JetPerformance :: setupJob (EL::Job& job)
 EL::StatusCode JetPerformance :: histInitialize ()
 {   
 	cout << " Setting  histograms" << endl;
+	jet_tree = true;
 	
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",100,0,5);
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
@@ -162,7 +163,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 	
 	cout << " Histograms  ready, now setting tree" << endl;
 	//TFile *outputFile = wk()->getOutputFile (_outputName);
-	tree_performance = new TTree ("tree_performance", "Performance tree"); // TODO - track charge
+	tree_performance = new TTree ("tree_performance", "Performance tree");
 	//tree_performance->SetDirectory (outputFile);
 	wk()->addOutput(tree_performance);
 
@@ -177,8 +178,6 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		tree_performance->Branch(Form("trigger_prescale_%s",trigger_chains.at(i).c_str()),&trig_prescale[i],Form("trigger_prescale_%i/F",i));
 	}
 	
-	//TODO also need change at the end of event loop
-	bool jet_tree = false;
 	if(jet_tree){
 		
 
@@ -208,15 +207,16 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		tree_performance->Branch("jet_jetBchCorrCell",&jet_jetBchCorrCell,"jet_jetBchCorrCell/F");
 		tree_performance->Branch("jet_jetLArBadHVEnergyFrac",&jet_jetLArBadHVEnergyFrac,"jet_jetLArBadHVEnergyFrac/F");
 		tree_performance->Branch("jet_jetLArBadHVNCell",&jet_jetLArBadHVNCell,"jet_jetLArBadHVNCell/I");
-	
+	    */
 		if(strcmp (_test_reco_jet_collection.c_str(),"none") != 0){
+			tree_performance->Branch("test_jet_pt",&test_jet_pt,"test_jet_pt/F");
 			tree_performance->Branch("test_jet_pt_EM",&test_jet_pt_EM,"test_jet_pt_EM/F");
 			tree_performance->Branch("test_jet_phi",&test_jet_phi,"test_jet_phi/F");
 			tree_performance->Branch("test_jet_eta",&test_jet_eta,"test_jet_eta/F");
 			tree_performance->Branch("test_jet_m",&test_jet_m,"test_jet_m/F");
 			tree_performance->Branch("test_jet_isGood",&test_jet_isGood,"test_jet_isGood/I");
 		}
-	
+	    /*
 		tree_performance->Branch("jet_ClSub_et",&jet_ClSub_et,"jet_ClSub_et/F");
 	 	tree_performance->Branch("jet_ClUnsub_et",&jet_ClUnsub_et,"jet_ClUnsub_et/F");
 		tree_performance->Branch("jet_Clneg_et",&jet_Clneg_et,"jet_Clneg_et/F");
@@ -234,7 +234,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 			//tree_performance->Branch("truth_jet_NBJ_pT",&truth_jet_NBJ_pT,"truth_jet_NBJ_pT/F");
 		}
 	
-		truth_tree_performance = new TTree ("truth_tree_performance", "Performance tree"); // TODO - track charge
+		truth_tree_performance = new TTree ("truth_tree_performance", "Performance tree");
 		//truth_tree_performance->SetDirectory (outputFile);
 		wk()->addOutput(truth_tree_performance);
 
@@ -264,6 +264,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		tree_performance->Branch("muon_pt",&muon_pt_vector);
 		tree_performance->Branch("muon_phi",&muon_phi_vector);
 		tree_performance->Branch("muon_eta",&muon_eta_vector);
+		tree_performance->Branch("muon_charge",&muon_charge_vector);
 	
 		
 		if(_data_switch==1){
@@ -273,6 +274,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 			tree_performance->Branch("truth_muon_pt",&truth_muon_pt_vector);
 			tree_performance->Branch("truth_muon_phi",&truth_muon_phi_vector);
 			tree_performance->Branch("truth_muon_eta",&truth_muon_eta_vector);
+			tree_performance->Branch("truth_muon_charge",&truth_muon_charge_vector);
 			tree_performance->Branch("truth_jet_m",&truth_jet_m_vector);
 			tree_performance->Branch("truth_reco_jet_dR",&truth_reco_jet_dR_vector);
 			tree_performance->Branch("truth_matched_index",&truth_matched_index);
@@ -360,6 +362,19 @@ EL::StatusCode JetPerformance :: initialize ()
 	//Initialize the tool
 	EL_RETURN_CHECK("initialize()",m_jetCalibration->initializeTool(name));
 	EL_RETURN_CHECK("initialize()",m_jetCalibration_insitu->initializeTool(name_insitu));
+	
+	//Test collection calibration
+	const std::string name_test = "TestCollection"; //string describing the current thread, for logging
+	TString jetAlgo_test = "AntiKt4EMTopo"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
+	TString config_test = "JES_MC15cRecommendation_May2016.config"; //Path to global config used to initialize the tool (see below)
+	TString calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_Insitu_DEV"; //String describing the calibration sequence to apply (see below)
+									 //bool isData = false; -- not used //bool describing if the events are data or from simulatio
+	if (_data_switch==0) calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_DEV";
+	//Call the constructor. The default constructor can also be used if the arguments are set with python configuration instead
+	m_jetCalibration_test = new JetCalibrationTool(name_test, jetAlgo_test, config_test, calibSeq_test, true);
+	
+	//Initialize the tool
+	EL_RETURN_CHECK("initialize()",m_jetCalibration_test->initializeTool(name_test));
 	
 	//Jet Cleaning
 	// initialize and configure the jet cleaning tool
@@ -553,7 +568,7 @@ EL::StatusCode JetPerformance :: execute (){
     if (_doClusters) EL_RETURN_CHECK("execute()",event->retrieve( cls, "HIClusters" ));
 	
 	//Jet vectors
-	vector<float> test_jet_pt_EM_vector, jet_pt_SEB_vector,jet_pt_prexcalib_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector;
+	vector<float> jet_pt_SEB_vector,jet_pt_prexcalib_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector,test_jet_pt_EM_vector,test_jet_pt_vector;
 	vector<int> Is_test_jet_Good, Is_dummyJet,jet_IsTrig_vector;
 	vector<float> truth_jet_y_vector;
 	vector<int> truth_jet_indices, truth_jet_isDummy_vector;
@@ -595,6 +610,7 @@ EL::StatusCode JetPerformance :: execute (){
 	jet_jetBchCorrCell_vector.clear();
 	jet_jetLArBadHVEnergyFrac_vector.clear();
 	jet_jetLArBadHVNCell_vector.clear();
+	Is_jet_Good.clear();
 	
 	jet_IsTrig_vector.clear();
 	jet_TrigPresc_vector.clear();
@@ -602,6 +618,12 @@ EL::StatusCode JetPerformance :: execute (){
 	muon_eta_vector.clear();
 	muon_phi_vector.clear();
 	muon_pt_vector.clear();
+	muon_charge_vector.clear();
+	
+	truth_muon_eta_vector.clear();
+	truth_muon_phi_vector.clear();
+	truth_muon_pt_vector.clear();
+	truth_muon_charge_vector.clear();
 		
 	for (int j=0;j<_nTriggers;j++){
 		isTriggered[j].clear();
@@ -634,8 +656,7 @@ EL::StatusCode JetPerformance :: execute (){
 				event_weight = jetcorr->GetJetWeight(truth_jet_pt, truth_jet_eta, truth_jet_phi);
 				max_pt = truth_jet_pt;
 			}
-			weight=event_weight;
-
+		
 			//if (pt < _truthpTjetCut) continue;
 			//if (fabs(eta)>2.1) continue;
 
@@ -654,7 +675,7 @@ EL::StatusCode JetPerformance :: execute (){
 			truth_tree_performance->Fill();
 		}
 	}
-	
+	weight=event_weight;
 	
 	//***** Reco jets*****
 		
@@ -794,24 +815,34 @@ EL::StatusCode JetPerformance :: execute (){
 	if (strcmp (_test_reco_jet_collection.c_str(),"none") != 0){	
 		const xAOD::JetContainer* test_jets = 0;
 		EL_RETURN_CHECK("execute()",event->retrieve( test_jets, _test_reco_jet_collection.c_str() ));
-	
+		
 		xAOD::JetContainer::const_iterator test_jet_itr = test_jets->begin();
 		xAOD::JetContainer::const_iterator test_jet_end = test_jets->end();
+		
+		xAOD::JetContainer* updatedtestjets = new xAOD::JetContainer();
+		xAOD::AuxContainerBase* updatedtestjetsAux = new xAOD::AuxContainerBase();
+		updatedtestjets->setStore( updatedtestjetsAux );
+
+		
 		for( ; test_jet_itr != test_jet_end; ++test_jet_itr ) {
 		
-			//TODO calibration
+			xAOD::Jet newjet_test;
+			newjet_test.makePrivateStore( **test_jet_itr );
 			const xAOD::JetFourMom_t jet_4mom = ( *test_jet_itr )->jetP4("JetPileupScaleMomentum");
 			float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+			EL_RETURN_CHECK("execute()", m_jetCalibration_test->applyCalibration( newjet_test ) );
 						
-			jet_eta = jet_4mom.eta();
-			jet_phi = jet_4mom.phi();
-			jet_m   = jet_4mom.M()*0.001;
+			jet_pt = newjet_test.pt()*0.001;
+			jet_eta = newjet_test.eta();
+			jet_phi = newjet_test.phi();
+			jet_m   = newjet_test.m()*0.001;
 				
 			//Jet quality moment
 			if( !m_jetCleaning->accept( **test_jet_itr )) Is_test_jet_Good.push_back(0);
 			else Is_test_jet_Good.push_back(1);
 				
-			test_jet_pt_EM_vector.push_back(uncalib_jet_pt);		
+			test_jet_pt_EM_vector.push_back(uncalib_jet_pt);
+			test_jet_pt_vector.push_back(jet_pt);		
 			test_jet_phi_vector.push_back(jet_phi);
 			test_jet_eta_vector.push_back(jet_eta);
 			test_jet_m_vector.push_back(jet_m);
@@ -862,6 +893,7 @@ EL::StatusCode JetPerformance :: execute (){
 		muon_pt_vector.push_back((*muonSC_itr)->pt() * 0.001);
 		muon_eta_vector.push_back((*muonSC_itr)->eta());
 		muon_phi_vector.push_back((*muonSC_itr)->phi());
+		muon_charge_vector.push_back((*muonSC_itr)->charge());
 		if ((*muonSC_itr)->pt() * 0.001 > 5.) keep_event = true;
 	}
 	//Truth muons
@@ -882,8 +914,9 @@ EL::StatusCode JetPerformance :: execute (){
 			float pt = (*truth_itr)->pt()/ 1000.0;				
 			float eta = (*truth_itr)->eta();				
 			float phi = (*truth_itr)->phi();
+			float charge = (*truth_itr)->charge();
 
-			if (fabs((*truth_itr)->pdgId())==13) {muon_pt_vector.push_back(pt);muon_eta_vector.push_back(eta);muon_phi_vector.push_back(phi);}
+			if (fabs((*truth_itr)->pdgId())==13) {truth_muon_pt_vector.push_back(pt);truth_muon_eta_vector.push_back(eta);truth_muon_phi_vector.push_back(phi);truth_muon_charge_vector.push_back(charge);}
 		} 
 	} 
 
@@ -969,6 +1002,7 @@ EL::StatusCode JetPerformance :: execute (){
 				test_jet_phi = test_jet_phi_vector.at(index);
 				test_jet_m = test_jet_m_vector.at(index);
 				test_jet_pt_EM = test_jet_pt_EM_vector.at(index);
+				test_jet_pt = test_jet_pt_vector.at(index);
 				test_jet_isGood = Is_test_jet_Good.at(index);
 			}	
 		}
@@ -1030,10 +1064,10 @@ EL::StatusCode JetPerformance :: execute (){
        } // doClusters		
       if (jet_pt < _pTjetCut) continue;
       keep_event = true;
-      //tree_performance->Fill(); //TODO
+      if (jet_tree) tree_performance->Fill();
 		
 	}
-	if (keep_event) tree_performance->Fill(); //TODO
+	if (!jet_tree && keep_event) tree_performance->Fill();
 	//delete shallow copy of muon container 
 	delete muons_shallowCopy.first; 
 	delete muons_shallowCopy.second; 
