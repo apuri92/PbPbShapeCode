@@ -33,9 +33,9 @@ class UEEstimator
     TAxis * ptaxis;
     TFile *_f_ShapeUE;
 
-	vector<vector<vector<vector<vector<TH2*>>>>> h_UE = vector<vector<vector<vector<vector<TH2*>>>>> (13, vector<vector<vector<vector<TH2*>>>> (16, vector<vector<vector<TH2*>>> (6, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL)))));
+//	vector<vector<vector<vector<vector<TH2*>>>>> h_UE = vector<vector<vector<vector<vector<TH2*>>>>> (13, vector<vector<vector<vector<TH2*>>>> (16, vector<vector<vector<TH2*>>> (6, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL)))));
 
-//	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
+	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
 
     TH3D * _h_v2_EP;    
     TFile * _f_flowv2;
@@ -74,6 +74,7 @@ class UEEstimator
 
 		 TString path_to_UE = gSystem->GetFromPipe("echo $ROOTCOREBIN");
 		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","READ");
+//		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_v2_v3.root","read");;
 
 	  //Parametrization from 2.76 TeV PbPb
 	  /*
@@ -96,7 +97,6 @@ class UEEstimator
 	   _f_flowv3 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/flowV3.root","read");
 	   _h_v3_EP = (TH3D*)_f_flowv3->Get("V3_EP");
 
-	   _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_v2_v3.root","read");;
 
       _etaOfCone = 0;	// eta position of a cone found for a given particle
       _phiOfCone = 0;	// phi position of a cone found for a given particle
@@ -125,7 +125,9 @@ class UEEstimator
     Float_t CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
     Float_t CalculateV3Weight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
     void initShapeUE(bool isMC);
-    double getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
+//	double getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
+
+    double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
     Int_t GetTrackpTBin(float pt) {
     	Int_t bin=-1;
     		if (pt>0.2) bin=0; if (pt>1.) bin=1; if (pt>2.) bin=2; if (pt>3.) bin=3; if (pt>4.) bin=4; if (pt>5.) bin=5; 

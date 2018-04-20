@@ -51,15 +51,15 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	sys_names.push_back("sys101"); //JER
 	sys_names.push_back("sys102"); //Sign
-//	sys_names.push_back("sys105"); //MCProbCut
+	sys_names.push_back("sys105"); //MCProbCut
 	sys_names.push_back("sys106"); //HIJES_1_P
 	sys_names.push_back("sys107"); //HIJES_2_P
 	sys_names.push_back("sys108"); //HIJES_1_N
-//	sys_names.push_back("sys109"); //HIJES_2_N
-//	sys_names.push_back("sys110"); //Material_P
-//	sys_names.push_back("sys111"); //Material_N
-//	sys_names.push_back("sys114"); //Tracking
-//	sys_names.push_back("sys115"); //TrackingRes
+	sys_names.push_back("sys109"); //HIJES_2_N
+	sys_names.push_back("sys110"); //Material_P
+	sys_names.push_back("sys111"); //Material_N
+	sys_names.push_back("sys114"); //Tracking
+	sys_names.push_back("sys115"); //TrackingRes
 //	sys_names.push_back("sys116"); //CentHIJES_P
 //	sys_names.push_back("sys117"); //CentHIJES_N
 //	sys_names.push_back("sys118"); //ppJES_P
@@ -69,11 +69,11 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("Sign");
-//	combined_sys_names.push_back("MCProb");
+	combined_sys_names.push_back("MCProb");
 	combined_sys_names.push_back("HIJES");
-//	combined_sys_names.push_back("Material");
-//	combined_sys_names.push_back("Tracking");
-//	combined_sys_names.push_back("TrackingResolution");
+	combined_sys_names.push_back("Material");
+	combined_sys_names.push_back("Tracking");
+	combined_sys_names.push_back("TrackingRes");
 //	combined_sys_names.push_back("CentHIJES");
 //	combined_sys_names.push_back("ppJES");
 	combined_sys_names.push_back("UE");
@@ -106,13 +106,14 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
-			for (int i_cent = 0; i_cent < 6; i_cent++)
+			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if (dataset_type == "_PbPb" && i_cent == 6) continue;
+				if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
 				if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
+					
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
 					if (i_sys == 0) h_nom[i_trk][i_cent][i_jet] = (TH1*)((TH1*)nom_file->Get(name.c_str()))->Clone(Form("%s_nom", name.c_str()));
 					h_sys[i_sys][i_trk][i_cent][i_jet] = (TH1*)((TH1*)sys_files[i_sys]->Get(name.c_str()))->Clone(Form("%s_%s", name.c_str(), sys_names[i_sys].c_str()));
@@ -166,7 +167,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 						}
 						else //regular rules, setup pos and negative sides
 						{
-							if (tmp >= 0 ) h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, tmp);
+							if (tmp >= 0. ) h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, tmp);
 							else h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, tmp);
 						}
 
@@ -189,9 +190,9 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
-		for (int i_cent = 0; i_cent < 6; i_cent++)
+		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -215,7 +216,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 								(sys_names[i_sys] == "sys101" && combined_sys_names[i_comb_sys] == "JER") ||
 								(sys_names[i_sys] == "sys102" && combined_sys_names[i_comb_sys] == "Sign") ||
-								(sys_names[i_sys] == "sys105" && combined_sys_names[i_comb_sys] == "MCProbCut") ||
+								(sys_names[i_sys] == "sys105" && combined_sys_names[i_comb_sys] == "MCProb") ||
 								(sys_names[i_sys] == "sys114" && combined_sys_names[i_comb_sys] == "Tracking") ||
 								(sys_names[i_sys] == "sys115" && combined_sys_names[i_comb_sys] == "TrackingRes") ||
 								(sys_names[i_sys] == "sys200" && combined_sys_names[i_comb_sys] == "UE")
@@ -284,9 +285,9 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
-		for (int i_cent = 0; i_cent < 6; i_cent++)
+		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if (dataset_type == "_PbPb" && i_cent == 6) continue;
+			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -355,9 +356,9 @@ void systematics_dev(string config_file = "sys_config.cfg")
 			c_sys->Clear();
 			c_sys->Divide(3,2);
 
-			for (int i_cent = 0; i_cent < 6; i_cent++)
+			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if (dataset_type == "_PbPb" && i_cent == 6) continue;
+				if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
 				if (dataset_type == "_pp" && i_cent < 6) continue;
 				string centrality = num_to_cent(31,i_cent);
 
@@ -365,26 +366,37 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 				SetHStyle_smallify(h_total_sys_p[i_trk][i_cent][i_jet],0, 1);
 				SetHStyle_smallify(h_total_sys_n[i_trk][i_cent][i_jet],0, 1);
+				h_total_sys_p[i_trk][i_cent][i_jet]->SetLineWidth(1);
+				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(1);
+
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 
 
 				c_sys->cd(i_cent+1);
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
+				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l same");
 
 
 				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
 				{
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, 1);
 					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, 1);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+
 
 					if (i_cent == 0) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 
@@ -411,8 +423,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 			string pdf_label = "";
 			if (i_trk == trk_pt_start && i_jet == jet_pt_start) pdf_label = "(";
 			if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) pdf_label = ")";
-			cout << pdf_label << endl;
-			c_sys->Print(Form("output_pdf_nominal/%s_dR_sys%s_errorx.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
+			c_sys->Print(Form("output_pdf_nominal/%s_dR_sys%s_error.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
 
 
 		}

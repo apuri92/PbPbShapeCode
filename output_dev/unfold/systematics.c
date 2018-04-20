@@ -25,8 +25,8 @@ void systematics(bool isMC = 0)
 	vector<TFile*> sys_files;
 	vector<string> sys_names;
 
-	sys_names.push_back("sys101");
-	sys_names.push_back("sys102");
+//	sys_names.push_back("sys101");
+//	sys_names.push_back("sys102");
 	sys_names.push_back("sys106");
 	sys_names.push_back("sys107");
 	sys_names.push_back("sys108");
@@ -169,7 +169,7 @@ void systematics(bool isMC = 0)
 						}
 
 						//Sign
-						if (sys_names[i] == "sys101")
+						if (sys_names[i] == "sys102")
 						{
 							tmp = h_ChPS_RDpT_indR_sys[i][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
@@ -328,24 +328,25 @@ void systematics(bool isMC = 0)
 				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_JERneg[i_trk][i_cent][i_jet],1, 1);
 				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_Signpos[i_trk][i_cent][i_jet],2, 1);
 				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_Signneg[i_trk][i_cent][i_jet],2, 1);
-				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet],3, 1);
-				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_JESneg[i_trk][i_cent][i_jet],3, 1);
-				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_UEpos[i_trk][i_cent][i_jet],4, 1);
-				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_UEneg[i_trk][i_cent][i_jet],4, 1);
+				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet],1, 1);
+				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_JESneg[i_trk][i_cent][i_jet],1, 1);
+				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_UEpos[i_trk][i_cent][i_jet],2, 1);
+				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_UEneg[i_trk][i_cent][i_jet],2, 1);
 				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_Totalpos[i_trk][i_cent][i_jet],0, 1);
 				SetHStyle_smallify(h_ChPS_RDpT_indR_sys_Totalneg[i_trk][i_cent][i_jet],0, 1);
 
 				if (i_cent == 0)
 				{
-					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet],"JER","lp");
+//					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet],"JER","lp");
 					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet],"HIJES","lp");
-					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_Signpos[i_trk][i_cent][i_jet],"Sign","lp");
+//					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_Signpos[i_trk][i_cent][i_jet],"Sign","lp");
 					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_UEpos[i_trk][i_cent][i_jet],"UE","lp");
 					legend_sys->AddEntry(h_ChPS_RDpT_indR_sys_Totalpos[i_trk][i_cent][i_jet],"Total","lp");
 				}
 
 
 				h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 
 				h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 				h_ChPS_RDpT_indR_sys_JERneg[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
@@ -358,20 +359,21 @@ void systematics(bool isMC = 0)
 				h_ChPS_RDpT_indR_sys_Totalneg[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
 
 				h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0,0.6);
+				h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0,0.6);
 
 
 				c_sys->cd(i_cent+1);
-				h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet]->Draw("l");
-				h_ChPS_RDpT_indR_sys_JERneg[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_Signpos[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_Signneg[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_JESneg[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_UEpos[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_UEneg[i_trk][i_cent][i_jet]->Draw("l same");
+//				h_ChPS_RDpT_indR_sys_JERpos[i_trk][i_cent][i_jet]->Draw("l");
+//				h_ChPS_RDpT_indR_sys_JERneg[i_trk][i_cent][i_jet]->Draw("l same");
+//				h_ChPS_RDpT_indR_sys_Signpos[i_trk][i_cent][i_jet]->Draw("l same");
+//				h_ChPS_RDpT_indR_sys_Signneg[i_trk][i_cent][i_jet]->Draw("l same");
+				h_ChPS_RDpT_indR_sys_JESpos[i_trk][i_cent][i_jet]->Draw("p");
+				h_ChPS_RDpT_indR_sys_JESneg[i_trk][i_cent][i_jet]->Draw("p same");
+				h_ChPS_RDpT_indR_sys_UEpos[i_trk][i_cent][i_jet]->Draw("p same");
+				h_ChPS_RDpT_indR_sys_UEneg[i_trk][i_cent][i_jet]->Draw("p same");
 
-				h_ChPS_RDpT_indR_sys_Totalpos[i_trk][i_cent][i_jet]->Draw("l same");
-				h_ChPS_RDpT_indR_sys_Totalneg[i_trk][i_cent][i_jet]->Draw("l same");
+//				h_ChPS_RDpT_indR_sys_Totalpos[i_trk][i_cent][i_jet]->Draw("l same");
+//				h_ChPS_RDpT_indR_sys_Totalneg[i_trk][i_cent][i_jet]->Draw("l same");
 
 
 				legend_sys->Draw();
