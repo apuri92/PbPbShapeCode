@@ -50,14 +50,14 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	vector<string> combined_sys_names;
 
 	sys_names.push_back("sys101"); //JER
-	sys_names.push_back("sys102"); //Sign
+//	sys_names.push_back("sys102"); //Sign
 	sys_names.push_back("sys105"); //MCProbCut
 	sys_names.push_back("sys106"); //HIJES_1_P
 	sys_names.push_back("sys107"); //HIJES_2_P
 	sys_names.push_back("sys108"); //HIJES_1_N
 	sys_names.push_back("sys109"); //HIJES_2_N
-	sys_names.push_back("sys110"); //Material_P
-	sys_names.push_back("sys111"); //Material_N
+//	sys_names.push_back("sys110"); //Material_P
+//	sys_names.push_back("sys111"); //Material_N
 	sys_names.push_back("sys114"); //Tracking
 	sys_names.push_back("sys115"); //TrackingRes
 //	sys_names.push_back("sys116"); //CentHIJES_P
@@ -68,10 +68,10 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 
 	combined_sys_names.push_back("JER");
-	combined_sys_names.push_back("Sign");
+//	combined_sys_names.push_back("Sign");
 	combined_sys_names.push_back("MCProb");
 	combined_sys_names.push_back("HIJES");
-	combined_sys_names.push_back("Material");
+//	combined_sys_names.push_back("Material");
 	combined_sys_names.push_back("Tracking");
 	combined_sys_names.push_back("TrackingRes");
 //	combined_sys_names.push_back("CentHIJES");
@@ -333,10 +333,15 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 
 	//drawing
+
+	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
+	string r_label = "#it{r}";
+
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
-	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.30, 0.38, "","brNDC");
+	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.30, 0.45, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
+	legend_sys->SetTextSize(10);
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
@@ -345,11 +350,11 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
-		string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+		string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
 		for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 		{
-			string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+			string trk_label = Form("%1.1f < p_{T}^{Trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 			legend_sys->Clear();
 			c_sys->cd();
@@ -374,8 +379,10 @@ void systematics_dev(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 
 				c_sys->cd(i_cent+1);
@@ -391,14 +398,16 @@ void systematics_dev(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
 
 
-					if (i_cent == 0) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
+					if (i_cent == 0) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"l");
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("#delta R_{D (p_{T})}");
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 					c_sys->cd(i_cent+1);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
@@ -406,7 +415,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 
 				}
 
-				if (i_cent == 0) legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","lp");
+				if (i_cent == 0) legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","l");
 
 				legend_sys->Draw();
 				ltx->SetTextAlign(32);

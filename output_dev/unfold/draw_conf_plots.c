@@ -7,15 +7,16 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 	string name;
+	//	"#it{R}_{D (p_{#it{T}}, #it{r})}"
+	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
+	string r_label = "#it{r}";
 
 	//	##############	Reading config	##############"
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
 
-	std::string mode = "RDpT"; mode = m_config->GetValue("mode", mode.c_str());
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 
-	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 
@@ -25,8 +26,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
-	if (mode == "RDpT") dataset_type = "";
-	else dataset_type = Form("_%s", dataset_type.c_str());
 
 	TFile *f_RDpT = new TFile(Form("output_pdf_nominal/root/final_RDpT_%s.root", did.c_str()));
 	TFile *f_RDpT_sys = new TFile(Form("output_pdf_nominal/root/final_RDpT_sys_%s.root", did.c_str()));
@@ -106,8 +105,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				h_RDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)f_RDpT_sys->Get(name.c_str());
 
 				g_RDpT_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]);
-				g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->GetTitle());
-				g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->GetTitle());
+				g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
+				g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 
 				//DpT PbPb
@@ -124,8 +123,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetName(Form("%s_PbPb", name.c_str()));
 
 				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]);
-				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->GetTitle());
-				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->GetTitle());
+				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
+				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 
 				//DpT pp
@@ -144,8 +143,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->SetName(Form("%s_pp", name.c_str()));
 
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet] = new TGraphAsymmErrors(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetTitle(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->GetTitle());
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetTitle(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetXaxis()->GetTitle());
+					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
+					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				}
 
 
@@ -207,7 +206,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		cout << "Doing Final RDpT ratio (PbPb/pp) plots in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.19, 0.68, 0.40, 0.82, "","brNDC");
+		TLegend *legend = new TLegend(0.19, 0.62, 0.40, 0.782, "","brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
 		legend->SetTextSize(13);
@@ -238,7 +237,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
 
 					y_range_lo = 0.;
-					y_range_hi = 4.;
+					y_range_hi = 3.5;
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
@@ -263,7 +262,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				line->DrawLine(0, 1, 0.6, 1);
 				legend->Draw();
-				ATLASLabel(0.19, 0.88, "Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+				ATLASLabel(0.19, 0.88, "Internal", "#splitline{Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 0.25 pb^{-1}}", kBlack);
+				ltx->DrawLatexNDC(0.70, 0.90, Form("AntiKt R = 0.4 Jets"));
 				first_pass_cent = false;
 
 //				if ((i_jet != 7 && i_jet != 9)) || (i_cent != 0 && i_cent != 5) ) continue;
@@ -281,11 +281,11 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		cout << "Doing Final RDpT for different jets for one track pT" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.2619048,0.5965217,0.3521303,0.746087,NULL,"brNDC");
+		TLegend *legend_open = new TLegend(0.25,0.55,0.47,0.71,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.19,0.55,0.41,0.71,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
 		legend->SetTextSize(13);
-		TLegend *legend_open = new TLegend(0.197995,0.5965217,0.4160401,0.746087,NULL,"brNDC");
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
 		legend_open->SetTextSize(13);
@@ -308,7 +308,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				int jet_itr = 0;
 				for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 				{
-					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+					string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
 
 					if (i_trk == 2)
@@ -316,19 +316,19 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 						SetHStyle(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet], jet_itr);
 						SetHStyle_graph(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet], jet_itr);
 
-						if (first_pass_cent) legend->AddEntry(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet],jet_label.c_str(),"lp");
+						if (first_pass_cent) legend->AddEntry(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]," ","lp");
 
 					}
 					if (i_trk == 6)
 					{
 						SetHStyle_open(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet], jet_itr);
 						SetHStyle_graph(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet], jet_itr);
-						if (first_pass_cent) legend_open->AddEntry(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]," ","lp");
+						if (first_pass_cent) legend_open->AddEntry(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet],jet_label.c_str(),"lp");
 
 					}
 
 					y_range_lo = 0.;
-					y_range_hi = 4.;
+					y_range_hi = 4.5;
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
@@ -351,17 +351,18 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				ltx->SetTextAlign(32);
 				ltx->SetTextSize(16);
 				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", centrality.c_str()));
-				if (mode == "RDpT") line->DrawLine(0, 1, 0.6, 1);
-				legend_open->Draw();
+				line->DrawLine(0, 1, 0.6, 1);
 				legend->Draw();
-				ATLASLabel(0.19, 0.88, "Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+				legend_open->Draw();
+				ATLASLabel(0.19, 0.88, "Internal", "#splitline{Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 0.25 pb^{-1}}", kBlack);
+				ltx->DrawLatexNDC(0.70, 0.90, Form("AntiKt R = 0.4 Jets"));
 
 				ltx->SetTextAlign(21);
 				ltx->SetTextSize(12);
 
 
-				if (i_trk == 2) ltx->DrawLatexNDC(0.2944862,0.7704348, Form("#splitline{%1.1f < p_{T}^{Trk} }{ < %1.1f GeV}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1) ));
-				if (i_trk == 6) ltx->DrawLatexNDC(0.2192982,0.7704348, Form("#splitline{%1.1f < p_{T}^{Trk} }{ < %1.1f GeV}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1) ));
+				if (i_trk == 6) ltx->DrawLatexNDC(0.2944862,0.7304348, Form("#splitline{%1.1f < p_{T}^{Trk} }{ < %1.1f GeV}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1) ));
+				if (i_trk == 2) ltx->DrawLatexNDC(0.2192982,0.7304348, Form("#splitline{%1.1f < p_{T}^{Trk} }{ < %1.1f GeV}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1) ));
 
 
 				trk_itr++;
@@ -380,11 +381,11 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		cout << "Doing Final DpT spectra for PbPb and pp in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.2619048,0.20,0.3521303,0.3,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.2619048,0.20,0.3521303,0.33,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
 		legend->SetTextSize(13);
-		TLegend *legend_open = new TLegend(0.197995,0.20,0.4160401,0.3,NULL,"brNDC");
+		TLegend *legend_open = new TLegend(0.197995,0.20,0.4160401,0.33,NULL,"brNDC");
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
 		legend_open->SetTextSize(13);
@@ -459,12 +460,17 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				legend_open->Draw();
 				legend->Draw();
-				ATLASLabel(0.19, 0.40, "Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+
+				ATLASLabel(0.45, 0.88, "Internal", "#splitline{Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 0.25 pb^{-1}}", kBlack);
+				ltx->SetTextAlign(12);
+				ltx->DrawLatexNDC(0.19, 0.40, Form("AntiKt R = 0.4 Jets"));
+
+				ltx->SetTextFont(43);
 				first_pass_cent = false;
 
 				ltx->SetTextAlign(22);
-				ltx->DrawLatexNDC(0.28,0.32, Form("PbPb"));
-				ltx->DrawLatexNDC(0.22,0.32, Form("pp"));
+				ltx->DrawLatexNDC(0.28,0.35, Form("PbPb"));
+				ltx->DrawLatexNDC(0.23,0.35, Form("pp"));
 
 //				if ((i_jet != 7 && i_jet != 9) || (i_cent != 0 && i_cent != 5)) continue;
 

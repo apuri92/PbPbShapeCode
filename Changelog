@@ -1,5 +1,9 @@
 #TODO
 --------
+4/20/2018
+*uncertainty provider applies eff corr to UE
+*updates to drawing systematic and conf note plots
+--------
 4/19/2018
 *restored version that runs over UE with only v2
 *stable offline code (including systematics and shit)

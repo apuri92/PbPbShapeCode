@@ -524,17 +524,20 @@ EL::StatusCode PbPbFFShape :: execute (){
 //					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 
+					double eff_uncertainty = 0;
+					if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(trk_bin_center,jet_eta, i_dR, cent_bin);
+
 					if (pass_reco_pt_cut)
 					{
-						ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
-						ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
+						ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight * 1./(1. + eff_uncertainty));
+						ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight * 1./(1. + eff_uncertainty));
 					}
 
 					//for reco tracks in truth jet
 
 					if (_data_switch)
 					{
-						ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight);
+						ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight * 1./(1. + eff_uncertainty));
 					}
 				}
 			}
