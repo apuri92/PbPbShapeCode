@@ -48,6 +48,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	jetpT_binning->Write("jetpT_binning");
 	trkpT_binning->Write("trkpT_binning");
 
+	string dptr_label = "#it{D} (p_{#it{T}}, #it{r}) [GeV^{-1}]";
+
 
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
@@ -144,7 +146,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			name = Form("h_ChPS_raw_subtr_unf_bbb_injet_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (r < 0.4)");
+			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r < 0.4)", dptr_label.c_str()));
 			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 			h_ChPS_raw_subtr_unf_bbb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 			f_output->cd();
@@ -154,7 +156,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			name = Form("h_ChPS_truth_injet_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_truth_injet.at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (r < 0.4)");
+			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r < 0.4)", dptr_label.c_str()));
 			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 			h_ChPS_truth_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 
@@ -220,7 +222,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					name = Form("h_ChPS_UE_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (UE)");
+					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (UE)", dptr_label.c_str()));
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-3,1E2);
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 					h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
@@ -232,7 +234,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_fake_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (UE)");
+				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (UE)", dptr_label.c_str()));
 				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-3,1E2);
 				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
@@ -244,7 +246,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r) (Truth matched)");
+				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s", dptr_label.c_str()));
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 				f_output->cd();
@@ -254,7 +256,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_raw_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
+				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(dptr_label.c_str());
 				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 				f_output->cd();
@@ -263,7 +265,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_raw_subtr_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
+				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(dptr_label.c_str());
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 				f_output->cd();
@@ -272,7 +274,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
+				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(dptr_label.c_str());
 				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw_subtr_unf.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 				f_output->cd();
@@ -281,7 +283,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_raw_subtr_unf_bbb_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet) = (TH1*)f_input->Get(name.c_str());
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}, r)");
+				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(dptr_label.c_str());
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_raw_subtr_unf_bbb.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 				f_output->cd();
@@ -325,7 +327,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr.at(i_dR).at(i_cent).at(i_jet));
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Bkgrd+Signal}{Signal}");
+				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(" dn^{meas}_{ch} / dn^{sub}_{ch} ");
+//				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Bkgrd+Signal}{Signal}");
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-1,1E3);
 				h_ChPS_ratio_B2S.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
@@ -1009,6 +1012,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "pp") c_resp_matrix->cd();
 					if (dataset_type == "PbPb") c_resp_matrix->cd(i_cent+1);
 
+					gPad->SetRightMargin(0.15);
 					h_ChPS_response_matrix.at(i_dR).at(i_cent)->GetXaxis()->SetTitle("Bins in reco [p_{T}^{jet} and p_{T}^{trk}]");
 					h_ChPS_response_matrix.at(i_dR).at(i_cent)->GetYaxis()->SetTitle("Bins in truth [p_{T}^{jet} and p_{T}^{trk}]");
 

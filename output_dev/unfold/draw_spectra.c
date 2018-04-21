@@ -163,15 +163,15 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				SetHStyle_smallify(h_true.at(i_cent).at(i_y), 2, doSmall);
 				SetHStyle_smallify(h_closure.at(i_cent).at(i_y), 6, doSmall);
 
-				double jet_pt_lo = 120;
-				double jet_pt_hi = 510;
+				double jet_pt_lo = 126;
+				double jet_pt_hi = 620;
 				h_raw.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(jet_pt_lo, jet_pt_hi);
 				h_unfolded.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(jet_pt_lo, jet_pt_hi);
 				h_true.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(jet_pt_lo, jet_pt_hi);
 				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(jet_pt_lo, jet_pt_hi);
 
-				h_true.at(i_cent).at(i_y)->GetXaxis()->SetNdivisions(504);
-				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetNdivisions(504);
+//				h_true.at(i_cent).at(i_y)->GetXaxis()->SetNdivisions(504);
+//				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetNdivisions(504);
 
 				h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitle("Normalized counts [GeV^{-1}]");
 				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitle("MC Closure");
@@ -184,8 +184,8 @@ void draw_spectra(string config_file = "ff_config.cfg")
 
 				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitle("p_{T}^{Jet} [GeV]");
 
-				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.85, 1.15);
-				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);
+				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.84, 1.16);
+//				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);
 
 
 				if (i_y == 0 && first_pass_cent)
@@ -207,7 +207,6 @@ void draw_spectra(string config_file = "ff_config.cfg")
 					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1);
 				}
 
-				h_true.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(1E2,5E2);
 				h_true.at(i_cent).at(i_y)->Draw("");
 				h_raw.at(i_cent).at(i_y)->Draw("same");
 				h_unfolded.at(i_cent).at(i_y)->Draw("same");
@@ -218,7 +217,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				{
 					if (dataset_type == "pp") c_spect_closure->cd(2);
 					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
-					h_closure.at(i_cent).at(i_y)->GetXaxis()->SetRangeUser(1E2,5E2);
+					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);
 					h_closure.at(i_cent).at(i_y)->Draw("");
 					if (dataset_type == "pp") h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
 					if (dataset_type == "PbPb")
@@ -228,15 +227,16 @@ void draw_spectra(string config_file = "ff_config.cfg")
 						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
 
 					}
-					line->DrawLine(1e2, 1, 1e3, 1);
+					line->DrawLine(jet_pt_lo, 1, jet_pt_hi, 1);
 					gPad->SetLogx(0);
-					gPad->SetLogy();
+					gPad->SetLogy(0);
 
 				}
 
 
 				if (dataset_type == "pp") c_spect_closure->cd();
 				if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1);
+
 				ltx->SetTextAlign(32);
 				ltx->SetTextSize(12);
 				if (dataset_type == "pp") ltx->SetTextSize(16);
@@ -254,6 +254,8 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				h_response_matrix.at(i_cent).at(i_y)->GetXaxis()->SetTitle("p_{T}^{reco jet}");
 				h_response_matrix.at(i_cent).at(i_y)->GetYaxis()->SetTitle("p_{T}^{truth jet}");
 //				h_response_matrix.at(i_cent).at(i_y)->GetZaxis()->SetRangeUser(1e-10, 1e1);
+
+				gPad->SetRightMargin(0.15);
 
 				h_response_matrix.at(i_cent).at(i_y)->Draw("colz");
 				gPad->SetLogx();
@@ -275,6 +277,11 @@ void draw_spectra(string config_file = "ff_config.cfg")
 			c_spect_closure->Print(Form("output_pdf%s/%s/spect_closure_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 			c_resp_matrix->Print(Form("output_pdf%s/%s/resp_matrix_jet_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 
+			if (i_y == 0)
+			{
+				c_resp_matrix->Print(Form("output_pdf%s/%s/resp_matrix_jet_%s_%s.root", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str()));
+
+			}
 		} //end dR loop
 	}
 

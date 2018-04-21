@@ -1,6 +1,10 @@
 #TODO
 --------
 4/20/2018
+*UE_tight used for when running with significance (need both ppTight_tight and uncert_index = 2
+*stylistic updates to plots
+--------
+4/20/2018
 *uncertainty provider applies eff corr to UE
 *updates to drawing systematic and conf note plots
 --------

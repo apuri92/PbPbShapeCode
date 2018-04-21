@@ -1,5 +1,5 @@
 
-systematics=(110) # (101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200)
+systematics=(0) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200)
 
 
 function unfold_draw_DpT {
@@ -8,11 +8,11 @@ function unfold_draw_DpT {
 	echo "sys_mode: $3" >> unfold_draw_DpT_auto.cfg
 	echo "verbose: 0" >> unfold_draw_DpT_auto.cfg
 	echo "draw_mode: 1" >> unfold_draw_DpT_auto.cfg
-	
+
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
-		root -b -q "get_posCorr.c(\"unfold_draw_DpT_auto.cfg\")" 
-		root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")" 
+		root -b -q "get_posCorr.c(\"unfold_draw_DpT_auto.cfg\")"
+		root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")"
 		./analysis unfold_draw_DpT_auto.cfg
 	fi
 
@@ -37,9 +37,9 @@ mode=$1
 
 for i in ${systematics[@]}; do
 	echo "************************************"
-	echo "****** Running Systematic $i *******"
-	echo "************************************" 
-	
+	echo "****** Running Version $i *******"
+	echo "************************************"
+
 	if [[ $i > 0 ]]; then
 		mkdir -p output_pdf_sys$i/root
 		mkdir -p output_pdf_sys$i/PbPb

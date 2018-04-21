@@ -3,7 +3,7 @@ function run {
 	echo "dataset_type: $2" >> tmp.cfg
 	echo "isMC: $3" >> tmp.cfg
 	echo "verbose: 1" >> tmp.cfg
-	root -b -q "systematics_dev.c(\"tmp.cfg\")"
+	root -b -q "systematics.c(\"tmp.cfg\")"
 	# root -b -q "draw_conf_plots.c(\"tmp.cfg\")"
 }
 

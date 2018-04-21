@@ -9,6 +9,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	string name;
 	//	"#it{R}_{D (p_{#it{T}}, #it{r})}"
 	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
+	string dptr_label = "#it{D} (p_{#it{T}}, #it{r}) [GeV^{-1}]";
 	string r_label = "#it{r}";
 
 	//	##############	Reading config	##############"
@@ -123,7 +124,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetName(Form("%s_PbPb", name.c_str()));
 
 				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]);
-				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
+				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(dptr_label.c_str());
 				g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 
@@ -143,7 +144,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->SetName(Form("%s_pp", name.c_str()));
 
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet] = new TGraphAsymmErrors(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
+					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetTitle(dptr_label.c_str());
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				}
 

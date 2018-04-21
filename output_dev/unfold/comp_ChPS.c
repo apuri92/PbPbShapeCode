@@ -28,6 +28,8 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 	if (sys_mode == 0) sys_path = Form("_nominal");
 	if (sys_mode > 0) sys_path = Form("_sys%i", sys_mode);
 
+	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
+	string dptr_label = "#it{D} (p_{#it{T}}, #it{r}) [GeV^{-1}]";
 
 	cout << Form("Doing in %s mode", did.c_str()) << endl;
 
@@ -197,7 +199,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_final_ratio_PbPb_pp_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb_indR.at(i_trk).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_indR.at(i_trk).at(6).at(i_jet));
-				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T}, r)}");
+				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
 
 				f_RDpT->cd();
 				name = Form("h_RDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
@@ -229,7 +231,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			name = Form("h_ChPS_final_ratio_PbPb_pp_cent%i_jetpt%i", i_cent, i_jet);
 			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->Clone(name.c_str());
 			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp_injet.at(6).at(i_jet));
-			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T},r)} (r < 0.4)");
+			h_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r < 0.4)", rdptr_label.c_str()));
 			g_ChPS_final_ratio_injet.at(i_cent).at(i_jet) = new TGraphErrors(h_ChPS_final_ratio_injet.at(i_cent).at(i_jet));
 
 //			h_FF_final_PbPb_injet.at(i_cent).at(i_jet) = (TH1*)f_FF_PbPb->Get(Form("h_dpt_PbPb_%i_cent%i", i_jet, i_cent));
@@ -295,12 +297,12 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_final_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
-				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T}, r)}");
+				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
 
 				name = Form("h_ChPS_truth_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
-				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Truth R_{D (p_{T}, r)}");
+				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("Truth %s", rdptr_label.c_str()));
 
 			}
 		}
@@ -512,7 +514,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						
 						
 						c_ChPS_fol_unf_indR->cd(i_cent+1);
-						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T})}");
+						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
 						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
@@ -600,11 +602,11 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					}
 					
 					
-					g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T},r #leq 0.4) _{PbPb}");
-					g_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T},r #leq 0.4)}");
-					g_FF_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T}) _{PbPb}");
-					g_FF_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T})}");
-					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("R_{D (p_{T},r #leq 0.4)}");
+					g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", rdptr_label.c_str()));
+					g_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", rdptr_label.c_str()));
+					g_FF_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(dptr_label.c_str());
+					g_FF_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
+					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", rdptr_label.c_str()));
 					
 					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
 					g_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
@@ -669,7 +671,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					
 					
 					//PbPb
-					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("D (p_{T},r #leq 0.4) _{PbPb}");
+					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", dptr_label.c_str()));
 					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
 					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
 					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
@@ -763,7 +765,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 							fit_quality_ChPS_pp_injet.at(6).at(i_jet)->SetPoint(i, x, y/fit);
 						}
 						
-						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetTitle("D (p_{T},r #leq 0.4) _{PbPb}");
+						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", dptr_label.c_str()));
 						fit_quality_FF_pp_injet.at(6).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
 						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
 						fit_quality_FF_pp_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");

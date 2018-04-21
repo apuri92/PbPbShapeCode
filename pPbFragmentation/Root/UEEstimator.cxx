@@ -237,6 +237,29 @@ void UEEstimator::initShapeUE(bool isMC)
 			}
 		}
 	}
+}
+
+void UEEstimator::initShapeUE(bool isMC, int uncert)
+{
+
+	for (int i_dR = 0; i_dR < 13; i_dR++)
+	{
+		for (int i_dPsi = 0; i_dPsi < 16; i_dPsi++)
+		{
+			for (int i_pt = 0; i_pt < 10; i_pt++)
+			{
+				for (int i_cent = 0; i_cent < 6; i_cent++)
+				{
+					std::string name;
+					name = Form("h_UE_HP_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
+					if (uncert == 2) h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE_tight->Get(name.c_str());
+					else h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
+				}
+			}
+		}
+	}
+}
+
 
 //	for (int i_dR = 0; i_dR < 13; i_dR++)
 //	{
@@ -256,7 +279,7 @@ void UEEstimator::initShapeUE(bool isMC)
 //			}
 //		}
 //	}
-}
+
 
 double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error)
 {

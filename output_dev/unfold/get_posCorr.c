@@ -310,6 +310,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth r");
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco r");
 //					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1e-9,1);
+					gPad->SetRightMargin(0.15);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
 					ltx->SetTextSize(12);
 					ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));

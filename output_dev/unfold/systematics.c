@@ -2,7 +2,7 @@
 #include "draw_functions.c"
 #include "TEnv.h"
 
-void systematics_dev(string config_file = "sys_config.cfg")
+void systematics(string config_file = "sys_config.cfg")
 {
 	cout << "######### DOING Systematics #########" << endl;
 	SetAtlasStyle();
@@ -50,7 +50,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	vector<string> combined_sys_names;
 
 	sys_names.push_back("sys101"); //JER
-//	sys_names.push_back("sys102"); //Sign
+	sys_names.push_back("sys102"); //Sign
 	sys_names.push_back("sys105"); //MCProbCut
 	sys_names.push_back("sys106"); //HIJES_1_P
 	sys_names.push_back("sys107"); //HIJES_2_P
@@ -60,8 +60,8 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	sys_names.push_back("sys111"); //Material_N
 	sys_names.push_back("sys114"); //Tracking
 	sys_names.push_back("sys115"); //TrackingRes
-//	sys_names.push_back("sys116"); //CentHIJES_P
-//	sys_names.push_back("sys117"); //CentHIJES_N
+	sys_names.push_back("sys116"); //CentHIJES_P
+	sys_names.push_back("sys117"); //CentHIJES_N
 //	sys_names.push_back("sys118"); //ppJES_P
 //	sys_names.push_back("sys199"); //ppJES_N
 	sys_names.push_back("sys200"); //UE
@@ -94,10 +94,13 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	int trk_pt_start = 2;
 	int trk_pt_end = 9;
 
+	cout << "Systematics from:" << endl;
+
 	for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
 	{
 		name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), mode.c_str(), did.c_str(), dataset_type.c_str());
 		sys_files.push_back( new TFile( name.c_str() ) );
+		cout << sys_files[i_sys]->GetName() << endl;
 
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
@@ -344,6 +347,7 @@ void systematics_dev(string config_file = "sys_config.cfg")
 	//drawing
 
 	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
+	if (mode == "ChPS") rdptr_label = "#it{D} (p_{#it{T}}, #it{r})}";
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
