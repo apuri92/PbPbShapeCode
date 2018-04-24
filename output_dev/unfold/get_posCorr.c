@@ -92,7 +92,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH2*)h_dR_change->Project3D("yx");
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetName(Form("2D_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
-				name = Form("2D Resp. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
+				name = Form("2D Resp. Cent: %s, %4.0f < #it{p}_{T}^{jet} < %4.0f GeV, %4.1f < #it{p}_{T}^{trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 
 				output->cd();
@@ -101,7 +101,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				//Reco projection
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH1*)h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->ProjectionY(Form("reco_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
-				name = Form("Reco Proj. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
+				name = Form("Reco Proj. Cent: %s, %4.0f < #it{p}_{T}^{jet} < %4.0f GeV, %4.1f < #it{p}_{T}^{trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 				name = Form("Reco_dR_c%i_j%i_trk%i",i_cent, i_jetpt, i_pt_bin);
 				h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetName(name.c_str());
@@ -111,7 +111,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				//Truth projection
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH1*)h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->ProjectionX(Form("truth_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Sumw2();
-				name = Form("Truth Proj. Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
+				name = Form("Truth Proj. Cent: %s, %4.0f < #it{p}_{T}^{jet} < %4.0f GeV, %4.1f < #it{p}_{T}^{trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 				name = Form("Truth_dR_c%i_j%i_trk%i",i_cent, i_jetpt, i_pt_bin);
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetName(name.c_str());
@@ -136,7 +136,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 //					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetBinError(i+1,error);
 //				}
 
-				name = Form("Ratio Cent: %s, %4.1f < p_{T}^{Jet} < %4.1f, %4.1f < p_{T}^{Trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
+				name = Form("Ratio Cent: %s, %4.0f < #it{p}_{T}^{jet} < %4.0f GeV, %4.1f < #it{p}_{T}^{trk} < %4.1f", num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi, pt_lo, pt_hi);
 				h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetTitle(name.c_str());
 
 				name = Form("Ratio_dR_c%i_j%i_trk%i",i_cent, i_jetpt, i_pt_bin);
@@ -200,7 +200,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 				output->cd();
 
-				name = Form("Check: %s, %4.1f < p_{T}^{Jet} < %4.2f, %4.2f < dR < %4.2f", cent.c_str(), pt_lo, pt_hi, dR_lo, dR_hi);
+				name = Form("Check: %s, %4.1f < #it{p}_{T}^{jet} < %4.2f, %4.2f < dR < %4.2f", cent.c_str(), pt_lo, pt_hi, dR_lo, dR_hi);
 				h_check.at(i_jetpt).at(i_cent).at(i_dR)->SetTitle(name.c_str());
 
 				name = Form("h_bin_by_bin_cent%i_jetpt%i_dR%i",i_cent, i_jetpt, i_dR);
@@ -313,7 +313,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					gPad->SetRightMargin(0.15);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
 					ltx->SetTextSize(12);
-					ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					line->DrawLine(0,0,1.2,1.2);
 					gPad->SetLogz();
 				}
@@ -325,10 +325,10 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					SetHStyle(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
 //					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
-					if (trk_iter == 0) legend1->AddEntry(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+					if (trk_iter == 0) legend1->AddEntry(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					gPad->SetLogy();
 				}
 
@@ -339,18 +339,18 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					SetHStyle(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
 //					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
-					if (trk_iter == 0) legend2->AddEntry(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+					if (trk_iter == 0) legend2->AddEntry(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					gPad->SetLogy();
 				}
 
 				//Drawing 1D ratio of response projections, each page is a centrality, each pad is a trk pt bin, each pad has different curves for jet pt
 				{
 					c3->cd(trk_iter+1);
-					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("dR");
-					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Ratio");
+					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("#it{r}");
+					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Correction Factor");
 					SetHStyle(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
 					double y_max = h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetBinContent(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetMaximumBin());
@@ -361,11 +361,18 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					if (diff> 1) diff = 0.5;
 					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1 - diff, 1 + diff);
 //					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(-4,5);
-					if (trk_iter == 0) legend3->AddEntry(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < p_{T}^{Jet} < %4.0f", pt_jet_lo, pt_jet_hi));
+					if (trk_iter == 0) legend3->AddEntry(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("pe");
 					else h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same pe");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					if (jet_iter == 0)
+					{
+						ltx->SetTextAlign(12);
+						ltx->DrawLatexNDC(0.20,0.90,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f GeV",pt_lo, pt_hi));
+					}
 					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
+					ltx->SetTextAlign(32);
+					if (jet_iter == 0) ltx->DrawLatexNDC(0.90,0.90,num_to_cent(31,i_cent).c_str());
+
 				}
 
 				//Drawing purity of response, each page is a centrality, each pad is a trk pt bin, each pad has different curves for jet pt
@@ -379,10 +386,10 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					SetHStyle(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
 					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
-					if (trk_iter == 0) legend4->AddEntry(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+					if (trk_iter == 0) legend4->AddEntry(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,0.5,1.2,0.5);
 					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
 				}
@@ -395,10 +402,10 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					SetHStyle(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
 					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
-					if (trk_iter == 0) legend5->AddEntry(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+					if (trk_iter == 0) legend5->AddEntry(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < p_{T}^{Trk} < %4.1f",pt_lo, pt_hi));
+					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,0.5,1.2,0.5);
 					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
 				}
@@ -411,7 +418,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			//2D Response
 			{
 				c0->cd(1);
-				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.1f < p_{T}^{Jet} < %4.1f",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
+				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.0f < #it{p}_{T}^{jet} < %4.0f GeV",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
 				if (first_cent_pass && jet_iter == 0) name = "(";
 				else name = "";
 				c0->Print(Form("output_pdf%s/%s/ShapeResponse2D_%s.pdf%s",sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));
@@ -459,7 +466,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 		//Ratio plots
 		{
 			c3->cd();
-			ltx->DrawLatexNDC(0.055,0.975,num_to_cent(31,i_cent).c_str());
+//			ltx->DrawLatexNDC(0.055,0.975,num_to_cent(31,i_cent).c_str());
 
 			c3->cd(1);
 			legend3->SetX1NDC(0.2);
@@ -569,12 +576,12 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				if (pt_jet_hi < 127. ||
 					pt_jet_lo> 315.) continue;
 
-				if (first_cent_pass) legend6->AddEntry(h_check.at(i_jetpt).at(i_cent).at(i_dR), Form("%4.1f < p_{T}^{Jet} < %4.1f", pt_jet_lo, pt_jet_hi));
+				if (first_cent_pass) legend6->AddEntry(h_check.at(i_jetpt).at(i_cent).at(i_dR), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetYaxis()->SetRangeUser(0,2);
 				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetXaxis()->SetRangeUser(1,100);
 
 				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetYaxis()->SetTitle("Correction Factors");
-				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+				h_check.at(i_jetpt).at(i_cent).at(i_dR)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
 				SetHStyle_smallify(h_check.at(i_jetpt).at(i_cent).at(i_dR),jet_iter, doSmall);
 //				smallify(h_check.at(i_jetpt).at(i_cent).at(i_dR));
 				if (jet_iter == 0) h_check.at(i_jetpt).at(i_cent).at(i_dR)->Draw("p");

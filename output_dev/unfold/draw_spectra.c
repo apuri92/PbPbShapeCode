@@ -182,7 +182,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(12);
 				}
 
-				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitle("p_{T}^{Jet} [GeV]");
+				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitle("#it{p}_{T}^{jet} [GeV]");
 
 				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.84, 1.16);
 //				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);

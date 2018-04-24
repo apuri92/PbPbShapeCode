@@ -40,7 +40,7 @@ void EventAccept()
 		else if (i == 8) name = "Passed trigger selection Events";
 		else name = Form("Rejected by %s", h_accept_PbPb->GetXaxis()->GetBinLabel(i+1));
 
-		ltx->DrawLatex(i+0.5, 3E4, name.c_str());
+		ltx->DrawLatex(i+0.5, 1E4, name.c_str());
 	}
 
 
@@ -61,7 +61,7 @@ void EventAccept()
 		else if (i == 8) name = "Passed trigger selection Events";
 		else name = Form("Rejected by %s", h_accept_PbPb->GetXaxis()->GetBinLabel(i+1));
 
-		ltx->DrawLatex(i+0.5, 3E3, name.c_str());
+		ltx->DrawLatex(i+0.5, 2.5E3, name.c_str());
 	}
 
 

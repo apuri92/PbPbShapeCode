@@ -32,10 +32,10 @@ void UE_factors(string config_file = "ff_config.cfg")
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
 
-	vector<vector<TH2*>> h_ratio = vector<vector<TH2*>> (13, vector<TH2*> (6));
 
 	string name;
 	TCanvas *c1 = new TCanvas("c1","c1",800,400);
+	TCanvas *c2 = new TCanvas("c2","c2",800,400);
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
 	ltx->SetTextSize(11);
@@ -45,6 +45,24 @@ void UE_factors(string config_file = "ff_config.cfg")
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
 
+	vector<vector<TH2*>> h_ratio = vector<vector<TH2*>> (13, vector<TH2*> (6));
+	vector<vector<vector<TH1*>>> h_ratio_1d = vector<vector<vector<TH1*>>> (13, vector<vector<TH1*>> (6, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ratio_1d_r = vector<vector<vector<TH1*>>> (N_trkpt, vector<vector<TH1*>> (6, vector<TH1*> (N_jetpt)));
+
+	double array_dr_bins[N_dR+1];
+	for (int i_dR = 0; i_dR <= N_dR; i_dR++) array_dr_bins[i_dR] = dR_binning->GetBinLowEdge(i_dR+1);
+	for (int i_cent = 0; i_cent < 6; i_cent++)
+	{
+		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
+		{
+			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+			{
+				name = Form("h_ratio_1d_r_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ratio_1d_r[i_trk][i_cent][i_jet] = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+			}
+		}
+	}
+
 
 	for (int i_dR = 0; i_dR < 13; i_dR++)
 	{
@@ -52,6 +70,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 		c1->Clear();
 		c1->Divide(3,2);
+
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
@@ -83,10 +102,25 @@ void UE_factors(string config_file = "ff_config.cfg")
 			name = Form("UE_ratio_dR%i_cent%i", i_dR, i_cent);
 			h_ratio[i_dR][i_cent]->Write(name.c_str());
 
+			for (int i_jet_bin = 0; i_jet_bin < N_jetpt; i_jet_bin++)
+			{
+				name = Form("ratio_1d_dR%i_cent%i_jet%i", i_dR, i_cent, i_jet_bin);
+				h_ratio_1d[i_dR][i_cent][i_jet_bin] = (TH1*)h_ratio[i_dR][i_cent]->ProjectionX(name.c_str(), i_jet_bin+1, i_jet_bin+1);
+				h_ratio_1d[i_dR][i_cent][i_jet_bin]->GetYaxis()->SetTitle("Correction factors");
+				h_ratio_1d[i_dR][i_cent][i_jet_bin]->GetXaxis()->SetTitle("#it{p}_{T}^{trk}");
+
+				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+				{
+					h_ratio_1d_r[i_trk][i_cent][i_jet_bin]->SetBinContent(i_dR+1, h_ratio_1d[i_dR][i_cent][i_jet_bin]->GetBinContent(i_trk+1));
+				}
+
+			}
+
 			c1->cd(i_cent+1);
+			h_ratio[i_dR][i_cent]->SetMarkerSize(2);
 			h_ratio[i_dR][i_cent]->Draw("colz text");
-			h_ratio[i_dR][i_cent]->GetYaxis()->SetTitle("p_{T}^{Jet}");
-			h_ratio[i_dR][i_cent]->GetXaxis()->SetTitle("p_{T}^{Trk}");
+			h_ratio[i_dR][i_cent]->GetYaxis()->SetTitle("#it{p}_{T}^{jet}");
+			h_ratio[i_dR][i_cent]->GetXaxis()->SetTitle("#it{p}_{T}^{trk}");
 
 			h_ratio[i_dR][i_cent]->GetXaxis()->SetRangeUser(1,10);
 			h_ratio[i_dR][i_cent]->GetYaxis()->SetRangeUser(90,500);
@@ -97,11 +131,83 @@ void UE_factors(string config_file = "ff_config.cfg")
 			ltx->DrawLatexNDC(0.90,0.98,num_to_cent(31,i_cent).c_str());
 			gPad->SetLogx();
 			gPad->SetLogy();
+
 		}
 		if (i_dR == 0) name = "(";
 		else if (i_dR == 12) name = ")";
 		else name = "";
 		c1->Print(Form("output_pdf%s/PbPb/UE_factors.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+
+
+	}
+
+
+	int jet_pt_start = 7;
+	int jet_pt_end = 11;
+	TLine *line = new TLine();
+	line->SetLineColor(kBlack);
+
+	{
+		//just the factors as function of r
+		cout << "posres as Function of R" << endl;
+		TCanvas *c_pos_res = new TCanvas("c_pos_res","c_pos_res",900,600);
+
+		TLegend *legend_pos_res = new TLegend(0.55, 0.50, 0.75, 0.80, "","brNDC");
+		legend_pos_res->SetTextFont(43);
+		legend_pos_res->SetBorderSize(0);
+		legend_pos_res->SetTextSize(10);
+
+
+
+		int jet_itr = 0;
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		{
+			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+			c_pos_res->Clear();
+			c_pos_res->Divide(3,2);
+
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+				int trk_itr = 0;
+				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+				{
+					if (i_trk < 2 || i_trk > 6) continue;
+
+					string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+					SetHStyle_smallify(h_ratio_1d_r[i_trk][i_cent][i_jet], trk_itr, 1);
+
+					if (jet_itr == 0 && i_cent == 0) legend_pos_res->AddEntry(h_ratio_1d_r[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
+
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0., 5);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0., 0.6);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle("#it{r}");
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("Correction Factors");
+
+					c_pos_res->cd(i_cent+1);
+					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("p");
+					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
+					line->DrawLine(0, 1, 0.6, 1);
+
+					trk_itr++;
+				}
+
+				c_pos_res->cd(i_cent+1);
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.94,0.92,num_to_cent(31,i_cent).c_str());
+				ltx->DrawLatexNDC(0.94,0.85,jet_label.c_str());
+				legend_pos_res->Draw();
+
+			}
+
+			if (i_jet == jet_pt_start) name = "(";
+			else if (i_jet == jet_pt_end - 1) name = ")";
+			else name = "";
+			c_pos_res->Print(Form("output_pdf%s/PbPb/UE_factors_r.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: jet%i", i_jet));
+			jet_itr++;
+
+		}
 	}
 
 	cout << "######### DONE GETTING UE FACTORS #########" << endl << endl;;

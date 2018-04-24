@@ -45,7 +45,9 @@ int main(int argc, char ** argv)
 	if (isMC) did = "MC";
 
 	int apply_UE_uncert = 0;
+	int apply_fake_uncert = 0;
 	if (sys_mode == 200 && dataset_type == "PbPb") apply_UE_uncert = 1;
+	if (sys_mode == 201) apply_fake_uncert = 1;
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
@@ -227,6 +229,9 @@ int main(int argc, char ** argv)
 					double subtr = 0, subtr_err = 0;
 					double correction = 1, correction_err = 0;
 
+					double fake_uncert = 1;
+					if (apply_fake_uncert) fake_uncert = 1.3;
+
 					if (dataset_type == "pp")
 					{
 						UE = 0;
@@ -241,8 +246,8 @@ int main(int argc, char ** argv)
 						raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
 						raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 
-						final_fake = fake * correction;
-						final_fake_err = fake_err * correction; //error propg: multiplying by constant
+						final_fake = fake * correction * fake_uncert;
+						final_fake_err = fake_err * correction * fake_uncert; //error propg: multiplying by constant
 
 						subtr = raw - final_fake;
 						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2) - pow(final_fake_err,2) )); //errors fully correlated
@@ -289,8 +294,8 @@ int main(int argc, char ** argv)
 							raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
 							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 
-							final_fake = fake * correction;
-							final_fake_err = fake_err * correction;
+							final_fake = fake * correction * fake_uncert;
+							final_fake_err = fake_err * correction * fake_uncert;
 
 							subtr = raw - final_fake;
 							if (isMC) subtr_err = sqrt(pow(raw_err,2) - pow(final_fake_err,2)); //errors fully correlated

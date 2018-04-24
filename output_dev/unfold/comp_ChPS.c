@@ -339,7 +339,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 			{
-				string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				
 				c_ChPS_raw_subtr_indR->cd();
 				c_ChPS_raw_subtr_indR->Clear();
@@ -370,7 +370,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						
 						if (i_trk < 2 || i_trk > 8) continue;
 						
-						string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+						string trk_label = Form("%1.2f < #it{p}_{T}^{trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 						
 						SetHStyle_smallify(h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, 1);
 						SetHStyle_smallify(h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, 1);
@@ -466,14 +466,14 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 			{
-				string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				
 				
 				int trk_itr = 0;
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
 					if (i_trk < 2 || i_trk > 8) continue;
-					string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+					string trk_label = Form("%1.2f < #it{p}_{T}^{trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 					
 					//				if (i_trk != 2 &&
 					//					i_trk != 5 &&
@@ -573,7 +573,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 			{
-				string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				
 				bool first_pass_cent = true;
 				
@@ -608,11 +608,11 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					g_FF_final_ratio_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
 					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", rdptr_label.c_str()));
 					
-					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					g_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					g_FF_final_ratio_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					g_FF_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+					g_FF_final_ratio_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+					g_ChPS_final_ratio_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+					g_FF_final_ratio_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+					g_ChPS_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+					g_FF_final_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
 					
 					
 					//ratio
@@ -673,8 +673,8 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					//PbPb
 					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", dptr_label.c_str()));
 					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
-					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
 					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetXaxis()->SetLimits(1,400);
 					fit_quality_FF_PbPb_injet.at(i_cent).at(i_jet)->GetXaxis()->SetLimits(1,400);
 					g_FF_final_PbPb_sys_injet.at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
@@ -765,10 +765,10 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 							fit_quality_ChPS_pp_injet.at(6).at(i_jet)->SetPoint(i, x, y/fit);
 						}
 						
-						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetTitle(Form("%s (r #leq 0.4)", dptr_label.c_str()));
+						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetYaxis()->SetTitle(Form("%s (#it{r} #leq 0.4)", dptr_label.c_str()));
 						fit_quality_FF_pp_injet.at(6).at(i_jet)->GetYaxis()->SetTitle("Fit Quality");
-						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
-						fit_quality_FF_pp_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("p_{T}^{Trk} [GeV]");
+						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
+						fit_quality_FF_pp_injet.at(6).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
 						
 						
 						g_FF_final_pp_sys_injet.at(6).at(i_jet)->GetXaxis()->SetLimits(1,400);
@@ -855,7 +855,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			
 			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 			{
-				string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+				string dr_label = Form("%1.2f < #it{r} < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
 				
 				c_ChPS_raw_subtr->cd();
 				c_ChPS_raw_subtr->Clear();
@@ -878,7 +878,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					int jet_itr = 0;
 					for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 					{
-						string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+						string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 						
 						SetHStyle_smallify(h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet), jet_itr, 1);
 						SetHStyle_smallify(h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet), jet_itr, 1);

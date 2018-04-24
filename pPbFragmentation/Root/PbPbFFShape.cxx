@@ -507,7 +507,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			if (!jetcorr->MCJetJERClean(truth_jet_pt_vector.at(truthindex),jet_pt,truth_jet_eta_vector.at(truthindex),cent_bin_fine) ) continue; //cut on JER balance
 			//Reweighting
-			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin_fine); //TODO cent_bin_fine -> cent_bin when available
+			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
 		}
 
 		if (_dataset == 4) //only run this if doing PbPb, not pp
@@ -699,8 +699,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 						float z_weight =1.;
 						if (_applyReweighting)
 						{
-							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
-							z_weight = jetcorr->GetFFReweightingFactor(z_truth, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
+//							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
+//							z_weight = jetcorr->GetFFReweightingFactor(z_truth, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
 						}
 
 						//R_trk_jet
