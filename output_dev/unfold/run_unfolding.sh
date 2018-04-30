@@ -1,5 +1,5 @@
 
-systematics=(0) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201)
+systematics=(-1) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
 
 
 function unfold_draw_DpT {
@@ -7,7 +7,7 @@ function unfold_draw_DpT {
 	echo "isMC: $2" >> unfold_draw_DpT_auto.cfg
 	echo "sys_mode: $3" >> unfold_draw_DpT_auto.cfg
 	echo "verbose: 0" >> unfold_draw_DpT_auto.cfg
-	echo "draw_mode: 1" >> unfold_draw_DpT_auto.cfg
+	echo "draw_mode: 0" >> unfold_draw_DpT_auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"

@@ -308,8 +308,6 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 		}
 	}
 
-	cout << draw_mode << " SNANS " << endl;
-
 	if (draw_mode)
 	{
 		

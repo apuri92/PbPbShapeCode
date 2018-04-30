@@ -33,6 +33,15 @@ void systematics(string config_file = "sys_config.cfg")
 	TFile* nom_file = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
 	TFile* output_file = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()), "recreate");
 
+	TFile *f_pbpb, *f_pp;
+
+	if (mode == "RDpT")
+	{
+		f_pbpb = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_PbPb.root"));
+		f_pp = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_pp.root"));
+	}
+
+
 	cout << "Using files:" << endl;
 	cout << nom_file->GetName() << endl;
 
@@ -73,6 +82,7 @@ void systematics(string config_file = "sys_config.cfg")
 	sys_names.push_back("sys119"); //ppJES_N
 	sys_names.push_back("sys200"); //UE
 //	sys_names.push_back("sys201"); //Fakes
+	sys_names.push_back("sys202"); //MC_NonClosure
 
 
 	combined_sys_names.push_back("JER");
@@ -80,6 +90,7 @@ void systematics(string config_file = "sys_config.cfg")
 	combined_sys_names.push_back("UE");
 	combined_sys_names.push_back("Tracking");
 	combined_sys_names.push_back("Unfolding");
+	combined_sys_names.push_back("MCNonClosure");
 
 
 	vector<vector<vector<TH1*>>> h_nom (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -126,6 +137,9 @@ void systematics(string config_file = "sys_config.cfg")
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Add(h_nom[i_trk][i_cent][i_jet], -1);
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Divide(h_nom[i_trk][i_cent][i_jet]);
 
+//					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_nonSmooth", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
+//					TH1 *h_non_smooth = (TH1*)h_sys[i_sys][i_trk][i_cent][i_jet]->Clone(name.c_str());
+//					h_sys[i_sys][i_trk][i_cent][i_jet]->Smooth(3,"");
 //					cout << Form("%i_%i_%i %i ", i_trk, i_cent, i_jet, i_sys);
 //					cout << Form("%s --> x", sys_names[i_sys].c_str()) << endl;
 
@@ -183,6 +197,9 @@ void systematics(string config_file = "sys_config.cfg")
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
 
+//					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_nonSmooth", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
+//					h_non_smooth->Write(name.c_str());
+
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_p", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
 					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
 
@@ -222,7 +239,8 @@ void systematics(string config_file = "sys_config.cfg")
 
 								(sys_names[i_sys] == "sys101" && combined_sys_names[i_comb_sys] == "JER") ||
 								(sys_names[i_sys] == "sys103" && combined_sys_names[i_comb_sys] == "Unfolding") ||
-								(sys_names[i_sys] == "sys200" && combined_sys_names[i_comb_sys] == "UE")
+								(sys_names[i_sys] == "sys200" && combined_sys_names[i_comb_sys] == "UE") ||
+								(sys_names[i_sys] == "sys202" && combined_sys_names[i_comb_sys] == "MCNonClosure")
 								)
 							{
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
@@ -292,11 +310,53 @@ void systematics(string config_file = "sys_config.cfg")
 
 						}
 					}
+
+					if (combined_sys_names[i_comb_sys] == "MCNonClosure" && mode == "RDpT")
+					{
+						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_p", i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
+						TH1* h_pbpb_p = (TH1*)(TH1*)f_pbpb->Get(name.c_str())->Clone(Form("%s_pbpb", name.c_str()));
+
+						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_p", i_trk, 6, i_jet,combined_sys_names[i_comb_sys].c_str());
+						TH1* h_pp_p = (TH1*)(TH1*)f_pp->Get(name.c_str())->Clone(Form("%s_pp", name.c_str()));
+
+						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_n", i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
+						TH1* h_pbpb_n = (TH1*)(TH1*)f_pbpb->Get(name.c_str())->Clone(Form("%s_pbpb", name.c_str()));
+
+						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_n", i_trk, 6, i_jet,combined_sys_names[i_comb_sys].c_str());
+						TH1* h_pp_n = (TH1*)(TH1*)f_pp->Get(name.c_str())->Clone(Form("%s_pp", name.c_str()));
+
+
+						double dA_overA, dB_overB, dR_overR;
+						for (int i_dR = 1; i_dR <= N_dR; i_dR++)
+						{
+							dA_overA = h_pbpb_p->GetBinContent(i_dR);
+							dB_overB = h_pp_p->GetBinContent(i_dR);
+							dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
+							h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, dR_overR);
+
+							dA_overA = h_pbpb_n->GetBinContent(i_dR);
+							dB_overB = h_pp_n->GetBinContent(i_dR);
+							dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
+							h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -dR_overR);
+						}
+					}
+
+
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_p",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetTitle(name.c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetTitle(name.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
+
+
+					if (i_trk == 3 && i_cent == 0 && i_jet == 7 && combined_sys_names[i_comb_sys] == "MCNonClosure")
+					{
+						cout << "FILLING" << endl;
+						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
+						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
+					}
 
 				}
 			}
@@ -348,11 +408,12 @@ void systematics(string config_file = "sys_config.cfg")
 				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_n",mode.c_str(), i_trk, i_cent, i_jet);
 				h_total_sys_n[i_trk][i_cent][i_jet]->Write(name.c_str());
 
+
 			}
 		}
 	}
 
-
+/*
 	//drawing
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
@@ -375,7 +436,7 @@ void systematics(string config_file = "sys_config.cfg")
 
 		for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 		{
-			string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+			string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 			legend_sys->Clear();
 			c_sys->cd();
@@ -469,12 +530,12 @@ void systematics(string config_file = "sys_config.cfg")
 
 			if (mode == "RDpT")
 			{
-				ltx->DrawLatexNDC(0.2, 0.8, "#splitline{Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
+				ltx->DrawLatexNDC(0.2, 0.8, "#splitline{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
 			}
 			else
 			{
-				if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.2, 0.75, "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				if (dataset_type == "_pp") ltx->DrawLatexNDC(0.2, 0.8, "#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.2, 0.75, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				if (dataset_type == "_pp") ltx->DrawLatexNDC(0.2, 0.8, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 			}
 
 			string pdf_label = "";
@@ -486,7 +547,7 @@ void systematics(string config_file = "sys_config.cfg")
 		}
 	}
 
-
+*/
 
 	cout << "######### Done Systematics #########" << endl;
 

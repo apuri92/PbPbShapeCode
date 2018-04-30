@@ -1,7 +1,7 @@
 #include "../functions/global_variables.h"
 
-static const int N_JET_Y = 4;
-double jet_y_binning[N_JET_Y+1] = {0, 0.3, 0.8, 1.2, 1.3};
+//static const int N_JET_Y = 4;
+//double jet_y_binning[N_JET_Y+1] = {0, 0.3, 0.8, 1.2, 1.3};
 void draw_spectra(string config_file = "ff_config.cfg")
 {
 	cout << "######### RUNNING DRAW_Spectra #########" << endl;

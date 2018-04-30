@@ -44,7 +44,15 @@ class JetCorrector
 	TH1D *CHPS_weight_fine[8][8][20];
 	int etabin;
 	TFile * HP_v_MB_FCAl_weight_file;
-	
+
+
+ 	TFile * _f_reweighting_shape;
+	TAxis * jet_pt_binning_shape;
+	TH1 *jet_spectra_weight_shape_pp[1][6]; //eta and centrality
+	TH1 *CHPS_weight_shape_pp[13][6][15]; //dR, centrality and jet
+	TH1 *jet_spectra_weight_shape_PbPb[1][6]; //eta and centrality
+	TH1 *CHPS_weight_shape_PbPb[13][6][15]; //dR, centrality and jet
+
 	
   public:	
     int nJetYBins;
@@ -80,8 +88,8 @@ class JetCorrector
          _nCent_reweighting = 7;			// number of centrality bins      
 		 _f_reweighting = new TFile(xfn + "/../pPbFragmentation/data/spectra_weights_PbPb.root","read");
 		 jet_pt_binning = (TAxis*) ((TH1F*)_f_reweighting->Get("h_reco_jet_spectrum_4_cent0_system_0_PbPb"))->GetXaxis(); 
-		 		 
-		 //Now inclusive in eta 
+
+		 //Now inclusive in eta
 		 //for(int etabin=0;etabin<nJetYBins;etabin++){
 		 int etabin=4;
 			for(int j=0;j<_nCent_reweighting;j++){
@@ -94,9 +102,39 @@ class JetCorrector
 					FF_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 					CHPS_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 				}
-			}				
+			}
 		 //}
-         
+/*
+		 cout << "Reweighting init for shape study" << endl;
+		 //Reweighting for shape study
+		 _nCent_reweighting = 6;			// number of centrality bins
+		 _f_reweighting_shape = new TFile(xfn + "/../pPbFragmentation/data/shape_spectra_weights.root","read");
+		 jet_pt_binning_shape = (TAxis*) ((TH1*)_f_reweighting_shape->Get("jet_weight_pp_y0_c6"))->GetXaxis();
+
+		 for (int i_cent = 0; i_cent < 6; i_cent++)
+		 {
+			 if (i_cent == 0) jet_spectra_weight_shape_pp[0][i_cent] = (TH1*)_f_reweighting_shape->Get(Form("jet_weight_pp_y4_c6"));
+			 jet_spectra_weight_shape_PbPb[0][i_cent] = (TH1*)_f_reweighting_shape->Get(Form("jet_weight_PbPb_y4_c%i", i_cent));
+
+			 if (i_cent == 0) cout << jet_spectra_weight_shape_pp[0][i_cent]->GetName() << endl;
+			 cout << jet_spectra_weight_shape_PbPb[0][i_cent]->GetName() << endl;
+
+			 //TH1D *CHPS_weight_shape_pp[13][6][15]
+			 for (int i_jet = 0; i_jet < jet_pt_binning_shape->GetNbins(); i_jet++)
+			 {
+				 //ChPS weights
+				 for (int i_dR = 0; i_dR < 13; i_dR++)
+				 {
+					 if (i_cent == 0) CHPS_weight_shape_pp[i_dR][i_cent][i_jet] = (TH1*)_f_reweighting_shape->Get(Form("CHPS_weight_pp_dR%i_cent%i_jet%i", i_dR, 6, i_jet));
+					 CHPS_weight_shape_PbPb[i_dR][i_cent][i_jet] = (TH1*)_f_reweighting_shape->Get(Form("CHPS_weight_PbPb_dR%i_cent%i_jet%i", i_dR, i_cent, i_jet));
+
+					 if (i_cent == 0) cout << CHPS_weight_shape_pp[i_dR][i_cent][i_jet]->GetName() << endl;
+					 cout << CHPS_weight_shape_PbPb[i_dR][i_cent][i_jet]->GetName() << endl;
+				 }
+			 }
+		 }
+		 cout << "Done Reweighting init for shape study" << endl;
+*/
          //Event weights
          _HP_v_MB_FCAl_weight_file="FCal_HP_v_MB_weights.root";
          _weight_file="Powheg.reweight.root"; 

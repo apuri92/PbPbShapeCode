@@ -313,7 +313,9 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					gPad->SetRightMargin(0.15);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
 					ltx->SetTextSize(12);
-					ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
+					ltx->SetTextAlign(12);
+					ltx->DrawLatexNDC(0.19,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
+					ltx->DrawLatexNDC(0.19,0.965,Form("%s: %4.0f < #it{p}_{T}^{jet} < %4.0f GeV",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
 					line->DrawLine(0,0,1.2,1.2);
 					gPad->SetLogz();
 				}
@@ -418,7 +420,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 			//2D Response
 			{
 				c0->cd(1);
-				ltx->DrawLatexNDC(0.17,0.965,Form("%s: %4.0f < #it{p}_{T}^{jet} < %4.0f GeV",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
+				ltx->SetTextAlign(12);
 				if (first_cent_pass && jet_iter == 0) name = "(";
 				else name = "";
 				c0->Print(Form("output_pdf%s/%s/ShapeResponse2D_%s.pdf%s",sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), name.c_str()),Form("Title: c%i_j%i", i_cent, i_jetpt));

@@ -30,4 +30,7 @@
 
 int n_cent_cuts = 7; //all bins, including inclusive
 
+static const int N_JET_Y = 4;
+double jet_y_binning[N_JET_Y+1] = {0, 0.3, 0.8, 1.2, 1.3};
+
 #endif

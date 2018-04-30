@@ -15,8 +15,9 @@ function run {
 mode=$1
 
 run ChPS PbPb 0
-run RDpT x 0
 run ChPS pp 0
+run RDpT x 0
 
+# root -b -q get_RDpT_sys.c
 
 # root -b -q "draw_conf_plots.c(\"tmp.cfg\")"

@@ -140,7 +140,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		if (dataset_type == "PbPb" && i_cent == 6) continue;
 		if (dataset_type == "pp" && i_cent < 6) continue;
 
-		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 		{
 			//injet
 
@@ -318,6 +318,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_truth.at(i_dR).at(i_cent).at(i_jet));
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitle("#it{p}_{T}^{trk} [GeV]");
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("#frac{Unfolded}{Truth}");
+				if (isMC) h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Closure");
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 				h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
@@ -424,9 +425,50 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		}
 	}
 
+
+	//all jet stuff
+//	static const int N_JET_Y = 4;
+//	double jet_y_binning[N_JET_Y+1] = {0, 0.3, 0.8, 1.2, 1.3};
+
+	vector<vector<TH1*>> h_raw (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
+	vector<vector<TH1*>> h_unfolded (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
+	vector<vector<TH1*>> h_true (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
+	vector<vector<TH1*>> h_closure (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
+	vector<vector<TH1*>> h_response_matrix (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
+
+	for (int i_y = 0; i_y < N_JET_Y+1; i_y++)
+	{
+		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
+		{
+			if (dataset_type == "PbPb" && i_cent == 6) continue;
+			if (dataset_type == "pp" && i_cent < 6) continue;
+
+
+			name = Form("h_reco_jet_y%i_c%i", i_y, i_cent);
+			h_raw.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
+			h_raw.at(i_cent).at(i_y)->Scale(1.,"width");
+			f_output->cd();
+			h_raw.at(i_cent).at(i_y)->Write(name.c_str());
+
+			name = Form("h_unfolded_jet_y%i_c%i", i_y, i_cent);
+			h_unfolded.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
+			h_unfolded.at(i_cent).at(i_y)->Scale(1.,"width");
+			f_output->cd();
+			h_unfolded.at(i_cent).at(i_y)->Write(name.c_str());
+
+			name = Form("h_true_jet_y%i_c%i", i_y, i_cent);
+			h_true.at(i_cent).at(i_y) = (TH1*)f_input->Get(name.c_str());
+			h_true.at(i_cent).at(i_y)->Scale(1.,"width");
+			f_output->cd();
+			h_true.at(i_cent).at(i_y)->Write(name.c_str());
+		}
+
+	}
+
 	if (draw_mode)
 	{
-
+		cout << __LINE__ << endl;
+/*
 		{
 			cout << "Doing full analysis evolution plots" << endl;
 			TCanvas *c_evol = new TCanvas("c_evol","c_evol",900,600);
@@ -541,7 +583,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				} //end jet loop
 			} //end dR loop
 		} //end diagnostic
-
+*/
 /*
 		//Draw Final ChPS plots
 		{
@@ -778,7 +820,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			} //end dR loop
 		}
 */
-
+/*
 		//Draw B2S for indR plots
 		if (dataset_type == "PbPb")
 		{
@@ -809,19 +851,23 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					double max = 0., min = 999., tmp;
 					for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 					{
-						if (i_trk < 2 || i_trk > 6) continue;
+						if (i_trk < 3 || i_trk > 6) continue;
 
-						string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+						string trk_label = Form("%1.1f < #it{p}_{T}^{ch} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 						SetHStyle_smallify(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
 
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
-						double max = h_ChPS_ratio_B2S_indR.at(2).at(i_cent).at(i_jet)->GetMaximum();
-						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 1.4*max);
+//						double max = h_ChPS_ratio_B2S_indR.at(2).at(i_cent).at(i_jet)->GetMaximum();
+//						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 1.4*max);
+
+						if (i_cent <= 2) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 70);
+						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 20);
+
 						if (jet_itr == 0 && first_pass_cent) legend_B2S_dR->AddEntry(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
 						c_B2S_dR->cd(i_cent+1);
-						if (trk_itr == 1) line->DrawLine(0, 1, 0.6, 1);
+						if (trk_itr == 0) line->DrawLine(0, 1, 0.6, 1);
 
 						if (trk_itr == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
@@ -844,7 +890,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				} //end cent loop
 
 				c_B2S_dR->cd(1);
-				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
 				ltx->SetTextAlign(12);
 				ltx->DrawLatexNDC(0.19, 0.78, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 				c_B2S_dR->cd(2);
@@ -861,24 +907,24 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end jet loop
 		}
+*/
 
-/*
 		//draw as function of dR
 		{
 			cout << "Doing Final ChPS plots (as function of r, for trk pT)" << endl;
 
 			TCanvas *c_ChPS_dR = new TCanvas("c_ChPS_dR","c_ChPS_dR",900,600);
-			if (dataset_type == "pp") c_ChPS_dR->SetCanvasSize(600,600);
-			TLegend *legend_ChPS_dR = new TLegend(0.20, 0.78, 0.50, 0.93, "","brNDC");
+			if (dataset_type == "pp") c_ChPS_dR->SetCanvasSize(800,600);
+			TLegend *legend_ChPS_dR = new TLegend(0.19, 0.19, 0.50, 0.40, "","brNDC");
 			legend_ChPS_dR->SetTextFont(43);
 			legend_ChPS_dR->SetBorderSize(0);
-			if (dataset_type == "pp") legend_ChPS_dR->SetTextSize(12);
-			if (dataset_type == "PbPb") legend_ChPS_dR->SetTextSize(10);
+			if (dataset_type == "pp") legend_ChPS_dR->SetTextSize(18);
+			if (dataset_type == "PbPb") legend_ChPS_dR->SetTextSize(13);
 
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 			{
-				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				c_ChPS_dR->cd();
 				c_ChPS_dR->Clear();
 				if (dataset_type == "PbPb") c_ChPS_dR->Divide(3,2);
@@ -890,41 +936,58 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "pp" && i_cent < 6) continue;
 					else if (dataset_type == "PbPb" && i_cent == 6) continue;
 
-					if (dataset_type == "pp") c_ChPS_dR->Divide(1,2);
-					if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->Divide(1,2);
+					if (!isMC)
+					{
+						if (dataset_type == "pp") c_ChPS_dR->Divide(1,2);
+						if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->Divide(1,2);
+						setup_canvas(c_ChPS_dR, dataset_type, i_cent);
+					}
 
-					setup_canvas(c_ChPS_dR, dataset_type, i_cent);
 
 					int trk_itr = 0;
 					double max = 0., min = 999., tmp;
-					for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
+					for (int i_trk = 3; i_trk < 7; i_trk++)
 					{
-						string trk_label = Form("%1.2f < #it{p}_{T}^{trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+						string trk_label = Form("%1.2f < #it{p}_{T} < %1.2f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 						SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
 						SetHStyle_smallify(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
 
 						if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR->AddEntry(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
-						if (dataset_type == "pp") c_ChPS_dR->cd(1);
-						if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(1);
+						if (!isMC)
+						{
+							if (dataset_type == "pp") c_ChPS_dR->cd(1);
+							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(1);
 
-						if (trk_itr == 0) h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-						else h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+							if (trk_itr == 0) h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
+							else h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 
-						gPad->SetLogx(0);
-						gPad->SetLogy();
+							gPad->SetLogx(0);
+							gPad->SetLogy();
+						}
 
-						if (dataset_type == "pp") c_ChPS_dR->cd(2);
-						if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
+						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
+						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45, 1.55);
+
+						if (!isMC)
+						{
+							if (dataset_type == "pp") c_ChPS_dR->cd(2);
+							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
+						}
+						else
+						{
+							if (dataset_type == "pp") c_ChPS_dR->cd();
+							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1);
+						}
 						if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 						else h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 						gPad->SetLogx(0);
 						gPad->SetLogy(0);
 
-						if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-						if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(0, 1, 1.2, 1);
+//						if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+//						if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
+						line->DrawLine(0, 1, 0.6, 1);
 
 						trk_itr++;
 
@@ -933,15 +996,23 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					if (dataset_type == "pp") c_ChPS_dR->cd();
 					if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1);
 					ltx->SetTextAlign(32);
-					ltx->SetTextSize(12);
-					if (dataset_type == "pp") ltx->SetTextSize(16);
+					ltx->SetTextSize(15);
+					if (dataset_type == "pp") ltx->SetTextSize(18);
 					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
 					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-					ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
+//					ltx->DrawLatexNDC(0.93, 0.98, Form("%s %s", dataset_type.c_str(), did.c_str()));
 
 					legend_ChPS_dR->Draw();
 					first_pass_cent = false;
 				} //end cent loop
+
+				c_ChPS_dR->cd(1);
+				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
+				ltx->SetTextAlign(12);
+				ltx->SetTextSize(18);
+				if (dataset_type == "PbPb") ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				if (dataset_type == "pp") ltx->DrawLatexNDC(0.19, 0.84, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(0.19, 0.79, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";
@@ -953,7 +1024,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			} //end jet loop
 		}
 
-*/
+
 /*
 		//draw UE as function of dR
 		if (dataset_type == "PbPb")
@@ -1017,7 +1088,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				legend_ChPS_dR_UE->Draw();
 
 				c_ChPS_dR_UE->cd(5);
-				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
 
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";
@@ -1029,7 +1100,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			} //end jet loop
 		}
 */
-
+/*
 		//background to signal ratio
 		{
 			cout << "Doing B2S ratio (as function of trk pT, for jet pT)" << endl;
@@ -1092,7 +1163,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end dR loop
 		}
-
+*/
 /*
 		{
 			cout << "Doing response matrix tiles" << endl;

@@ -45,9 +45,14 @@ int main(int argc, char ** argv)
 	if (isMC) did = "MC";
 
 	int apply_UE_uncert = 0;
-	int apply_fake_uncert = 0;
 	if (sys_mode == 200 && dataset_type == "PbPb") apply_UE_uncert = 1;
+
+	int apply_fake_uncert = 0;
 	if (sys_mode == 201) apply_fake_uncert = 1;
+
+	int apply_MC_nonClos = 0;
+	if (sys_mode == 202) apply_MC_nonClos = 1;
+
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
@@ -441,6 +446,31 @@ int main(int argc, char ** argv)
 					h_truth->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_truth_err);
 				}
 			}
+
+
+			if (apply_MC_nonClos && !isMC)
+			{
+				TFile * f_MC_nonClosure = new TFile(Form("output_pdf_nominal/root/final_ChPS_MC_%s.root", dataset_type.c_str()));
+
+
+				for (int i_jet_bin = 0; i_jet_bin < N_jetpt; i_jet_bin++)
+				{
+					name = Form("h_ChPS_ratio_final_truth_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet_bin);
+					TH1* h_MC_nonClosure = (TH1*)f_MC_nonClosure->Get(name.c_str());
+					for (int i_trk_bin = 0; i_trk_bin < N_trkpt; i_trk_bin++)
+					{
+						double correction = h_MC_nonClosure->GetBinContent(i_trk_bin+1);
+						double orig = h_raw_subtr_unf_bbb->GetBinContent(i_trk_bin+1,i_jet_bin+1);
+						double orig_err = h_raw_subtr_unf_bbb->GetBinError(i_trk_bin+1,i_jet_bin+1);
+						cout << correction << endl;
+
+						h_raw_subtr_unf_bbb->SetBinContent(i_trk_bin+1,i_jet_bin+1, orig/correction);
+						h_raw_subtr_unf_bbb->SetBinError(i_trk_bin+1,i_jet_bin+1, orig_err/correction);
+
+					}
+				}
+			}
+
 
 			if (i_dR == 0)
 			{

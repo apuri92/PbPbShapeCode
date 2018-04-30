@@ -4,7 +4,7 @@
 
 void draw_sys_err(string config_file = "sys_config.cfg")
 {
-	cout << "######### DOING Systematics #########" << endl;
+	cout << "######### DOING draw Systematics #########" << endl;
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 	string name = "";
@@ -55,6 +55,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	combined_sys_names.push_back("UE");
 	combined_sys_names.push_back("Tracking");
 	combined_sys_names.push_back("Unfolding");
+	combined_sys_names.push_back("MCNonClosure");
 
 	vector<vector<vector<TH1*>>> h_total_sys_p (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_total_sys_n (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -65,7 +66,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
-	int trk_pt_start = 2;
+	int trk_pt_start = 3;
 	int trk_pt_end = 9;
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
@@ -73,10 +74,10 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 800, 600);
-	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.35, 0.45, "","brNDC");
+	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.40, 0.40, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
-	legend_sys->SetTextSize(14);
+	legend_sys->SetTextSize(20);
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
@@ -85,6 +86,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
 
+	int trk_select1 = 3;
+	int trk_select2 = 6;
 
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
@@ -94,15 +97,15 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
-			for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
+			for (int i_trk = trk_pt_start; i_trk < 11; i_trk++)
 			{
 
-				if ((i_jet != 7 && i_jet != 9) || (i_trk != 2 && i_trk != 5)) continue;
+				if ((i_jet != 7 && i_jet != 8 && i_jet != 9 & i_jet != 10) || (i_trk != trk_select1 && i_trk != trk_select2)) continue;
 
 				if ((dataset_type == "_PbPb" || mode == "RDpT") && (i_cent != 0 && i_cent != 5)) continue;
 
 				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-				string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+				string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 				//setup canvas
 				c_sys->cd();
@@ -121,6 +124,11 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				if (dataset_type == "_pp")
+				{
+					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
+					h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
+				}
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 
@@ -132,6 +140,11 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitleFont(43);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitleSize(30);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitleFont(43);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitleSize(30);
 
 				c_sys->cd();
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l ");
@@ -146,7 +159,19 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
 
+//					if (combined_sys_names[i_comb_sys] == "Unfolding" && i_trk == 3 && i_jet == 8 && i_cent == 0)
+//					{
+//						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
+//					}
 
+					if (i_trk == 3 && i_cent == 0 && i_jet == 7 && combined_sys_names[i_comb_sys] == "JER")
+					{
+						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
+						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
+
+//						h_pp_comb_sys_p[i_comb_sys][i_trk][6][i_jet]->Print("all");
+//						h_pp_comb_sys_n[i_comb_sys][i_trk][6][i_jet]->Print("all");
+					}
 
 
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
@@ -178,8 +203,14 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(7);
 					}
 
-					legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"l");
-
+					if (combined_sys_names[i_comb_sys] == "MCNonClosure")
+					{
+						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],"MC non-closure","l");
+					}
+					else
+					{
+						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"l");
+					}
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
@@ -202,9 +233,10 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				ltx->SetTextAlign(32);
 				ltx->SetTextSize(18);
 
+				ltx->SetTextSize(25);
 				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", trk_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", jet_label.c_str()));
-				if (mode != "_pp") ltx->DrawLatexNDC(0.93, 0.80, Form("%s", centrality.c_str()));
+				ltx->DrawLatexNDC(0.93, 0.84, Form("%s", jet_label.c_str()));
+				if (dataset_type != "_pp") ltx->DrawLatexNDC(0.93, 0.79, Form("%s", centrality.c_str()));
 
 				line->SetLineStyle(1);
 //				line->SetLineWidth(1);
@@ -215,16 +247,17 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
 
 				ltx->SetTextAlign(12);
+				ltx->SetTextSize(23);
 
 				if (mode == "RDpT")
 				{
-					ltx->DrawLatexNDC(0.2, 0.85, "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-					ltx->DrawLatexNDC(0.2, 0.81, "#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					ltx->DrawLatexNDC(0.19, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				}
 				else
 				{
-					if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.2, 0.85, "Pb+Pb  #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-					if (dataset_type == "_pp") ltx->DrawLatexNDC(0.2, 0.85, "#it{pp}  #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					if (dataset_type == "_pp") ltx->DrawLatexNDC(0.19, 0.84, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				}
 
 				c_sys->Print(Form("output_pdf_nominal/systematics/%s_dR_sys%s_error_trk%i_jet%i_cent%i.pdf",mode.c_str(), dataset_type.c_str(), i_trk, i_jet, i_cent));
@@ -233,7 +266,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 		}
 	}
 
-	cout << "######### Done Systematics #########" << endl;
+	cout << "######### Done Draw Systematics #########" << endl;
 
 }
 
