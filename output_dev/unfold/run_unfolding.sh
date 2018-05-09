@@ -7,7 +7,7 @@ function unfold_draw_DpT {
 	echo "isMC: $2" >> unfold_draw_DpT_auto.cfg
 	echo "sys_mode: $3" >> unfold_draw_DpT_auto.cfg
 	echo "verbose: 0" >> unfold_draw_DpT_auto.cfg
-	echo "draw_mode: 0" >> unfold_draw_DpT_auto.cfg
+	echo "draw_mode: 1" >> unfold_draw_DpT_auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
@@ -46,13 +46,13 @@ for i in ${systematics[@]}; do
 		mkdir -p output_pdf_sys$i/pp
 	fi
 
-	unfold_draw_DpT PbPb 0 $i
-	unfold_draw_DpT pp 0 $i
+	# unfold_draw_DpT PbPb 0 $i
+	# unfold_draw_DpT pp 0 $i
 	get_RDpT 0 $i
 
-	unfold_draw_DpT PbPb 1 $i
-	unfold_draw_DpT pp 1 $i
-	get_RDpT 1 $i
+	# unfold_draw_DpT PbPb 1 $i
+	# unfold_draw_DpT pp 1 $i
+	# get_RDpT 1 $i
 done
 
 

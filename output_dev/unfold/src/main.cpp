@@ -237,6 +237,13 @@ int main(int argc, char ** argv)
 					double fake_uncert = 1;
 					if (apply_fake_uncert) fake_uncert = 1.3;
 
+					raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
+					if (raw == 0)
+					{
+						h_raw_subtr->SetBinContent(i_trk_bin, i_jet_bin, 0);
+						h_raw_subtr->SetBinError(i_trk_bin, i_jet_bin, 0);
+						continue;
+					}
 					if (dataset_type == "pp")
 					{
 						UE = 0;

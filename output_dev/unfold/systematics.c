@@ -311,6 +311,7 @@ void systematics(string config_file = "sys_config.cfg")
 						}
 					}
 
+					//uncorrelated so has to be done separately
 					if (combined_sys_names[i_comb_sys] == "MCNonClosure" && mode == "RDpT")
 					{
 						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_p", i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
@@ -349,14 +350,6 @@ void systematics(string config_file = "sys_config.cfg")
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetTitle(name.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
-
-
-					if (i_trk == 3 && i_cent == 0 && i_jet == 7 && combined_sys_names[i_comb_sys] == "MCNonClosure")
-					{
-						cout << "FILLING" << endl;
-						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
-						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
-					}
 
 				}
 			}
@@ -413,7 +406,7 @@ void systematics(string config_file = "sys_config.cfg")
 		}
 	}
 
-/*
+
 	//drawing
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
@@ -547,7 +540,7 @@ void systematics(string config_file = "sys_config.cfg")
 		}
 	}
 
-*/
+
 
 	cout << "######### Done Systematics #########" << endl;
 

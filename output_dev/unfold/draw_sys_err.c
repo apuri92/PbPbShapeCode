@@ -136,8 +136,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(2);
 
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
@@ -159,29 +159,11 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
 
-//					if (combined_sys_names[i_comb_sys] == "Unfolding" && i_trk == 3 && i_jet == 8 && i_cent == 0)
-//					{
-//						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
-//					}
-
-					if (i_trk == 3 && i_cent == 0 && i_jet == 7 && combined_sys_names[i_comb_sys] == "JER")
-					{
-						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
-						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Print("all");
-
-//						h_pp_comb_sys_p[i_comb_sys][i_trk][6][i_jet]->Print("all");
-//						h_pp_comb_sys_n[i_comb_sys][i_trk][6][i_jet]->Print("all");
-					}
-
-
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
 					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
-
-//					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
-//					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
 
 					bool empty_hist_p = false;
 					bool empty_hist_n = false;

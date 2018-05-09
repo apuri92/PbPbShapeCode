@@ -468,7 +468,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	if (draw_mode)
 	{
 		cout << __LINE__ << endl;
-/*
+
 		{
 			cout << "Doing full analysis evolution plots" << endl;
 			TCanvas *c_evol = new TCanvas("c_evol","c_evol",900,600);
@@ -583,8 +583,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				} //end jet loop
 			} //end dR loop
 		} //end diagnostic
-*/
-/*
+
+
 		//Draw Final ChPS plots
 		{
 			cout << "Doing Final ChPS plots (as function of trk pT, for jet pT)" << endl;
@@ -667,8 +667,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end dR loop
 		}
-*/
-/*
+
+
 		//Draw Final ChPS plots in jet
 		{
 			cout << "Doing Final ChPS plots (as function of trk pT, for jet pT) for R < 0.4" << endl;
@@ -745,8 +745,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			c_ChPS_final_inJet->Print(Form("output_pdf%s/%s/ChPS_final_inJet_%s_%s.pdf", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str()), Form("Title:InJet"));
 
 		}
-*/
-/*
+
 		//Draw Final UE plots
 		if (dataset_type == "PbPb")
 		{
@@ -819,8 +818,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end dR loop
 		}
-*/
-/*
+
+
 		//Draw B2S for indR plots
 		if (dataset_type == "PbPb")
 		{
@@ -828,10 +827,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			TCanvas *c_B2S_dR = new TCanvas("c_B2S_dR","c_B2S_dR",900,600);
 			if (dataset_type == "pp") c_B2S_dR->SetCanvasSize(600,600);
-			TLegend *legend_B2S_dR = new TLegend(0.18, 0.54, 0.48, 0.84, "","brNDC");
+			TLegend *legend_B2S_dR = new TLegend(0.18, 0.27, 0.48, 0.62, "","brNDC");
 			legend_B2S_dR->SetTextFont(43);
 			legend_B2S_dR->SetBorderSize(0);
-			legend_B2S_dR->SetTextSize(12);
+			legend_B2S_dR->SetTextSize(14);
 
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -851,12 +850,22 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					double max = 0., min = 999., tmp;
 					for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 					{
-						if (i_trk < 3 || i_trk > 6) continue;
+						if (i_trk < 2 || i_trk > 6) continue;
 
 						string trk_label = Form("%1.1f < #it{p}_{T}^{ch} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 						SetHStyle_smallify(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetLabelFont(43);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetLabelSize(14);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetLabelFont(43);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetLabelSize(14);
 
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleFont(43);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleSize(14);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitleFont(43);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitleSize(14);
+
+						
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
 //						double max = h_ChPS_ratio_B2S_indR.at(2).at(i_cent).at(i_jet)->GetMaximum();
 //						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 1.4*max);
@@ -867,9 +876,12 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						if (jet_itr == 0 && first_pass_cent) legend_B2S_dR->AddEntry(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
 						c_B2S_dR->cd(i_cent+1);
-						if (trk_itr == 0) line->DrawLine(0, 1, 0.6, 1);
 
-						if (trk_itr == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
+						if (trk_itr == 0)
+						{
+							h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
+							line->DrawLine(0, 1, 0.6, 1);
+						}
 						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 
 						gPad->SetLogx(0);
@@ -883,17 +895,25 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					c_B2S_dR->cd(i_cent+1);
 					ltx->SetTextAlign(32);
 					ltx->SetTextSize(12);
-					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
-					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
+					ATLASLabel(0.19, 0.88, "     Internal", "", kBlack);
+					ltx->SetTextAlign(12);
+					ltx->SetTextSize(15);
+					ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					ltx->DrawLatexNDC(0.19, 0.77, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+					ltx->DrawLatexNDC(0.19, 0.72, Form("%s", jet_label.c_str()));
+					ltx->DrawLatexNDC(0.19, 0.66, Form("%s", centrality.c_str()));
+
+//
+//					ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+//					ltx->SetTextAlign(12);
+//					ltx->DrawLatexNDC(0.19, 0.78, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+
 
 					first_pass_cent = false;
 				} //end cent loop
 
 				c_B2S_dR->cd(1);
-				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
-				ltx->SetTextAlign(12);
-				ltx->DrawLatexNDC(0.19, 0.78, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-				c_B2S_dR->cd(2);
+				c_B2S_dR->cd(6);
 				legend_B2S_dR->Draw();
 
 				pdf_label = "";
@@ -907,7 +927,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end jet loop
 		}
-*/
 
 		//draw as function of dR
 		{
@@ -1024,8 +1043,6 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			} //end jet loop
 		}
 
-
-/*
 		//draw UE as function of dR
 		if (dataset_type == "PbPb")
 		{
@@ -1099,8 +1116,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end jet loop
 		}
-*/
-/*
+
 		//background to signal ratio
 		{
 			cout << "Doing B2S ratio (as function of trk pT, for jet pT)" << endl;
@@ -1163,8 +1179,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end dR loop
 		}
-*/
-/*
+
 		{
 			cout << "Doing response matrix tiles" << endl;
 
@@ -1213,9 +1228,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			} //end dR loop
 		}
-*/
 
-/*
+
 		//Draw evol_dRution plots
 		{
 			cout << "Doing evolution (as function of r)" << endl;
@@ -1331,7 +1345,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			} //end jet loop
 		}
 
-		*/
+
 	}
 	cout << "######### DONE DRAW_CHPS #########" << endl << endl;;
 

@@ -5,8 +5,8 @@ void check_UE()
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *input_file = new TFile("output_dev/raw_results/nominal_orig/FF_MC_out_histo_PbPb_5p02_r001.root");
-	TFile *input_file_data = new TFile("output_dev/raw_results/nominal_orig/FF_data_out_histo_PbPb_5p02_r001.root");
+	TFile *input_file = new TFile("output_dev/raw_results//FF_MC_out_histo_PbPb_5p02_r001.root");
+	TFile *input_file_data = new TFile("output_dev/raw_results//FF_data_out_histo_PbPb_5p02_r001.root");
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
