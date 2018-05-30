@@ -78,7 +78,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
-
+	line->SetLineStyle(3);
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
 	ltx->SetTextSize(12);
@@ -125,7 +125,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				g_RDpT_final_stat_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]);
 				g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
 				g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
+	
 
 				//DpT PbPb
 				name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
@@ -296,15 +296,15 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
 
 					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 
 					if (trk_itr == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
 					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
@@ -321,7 +321,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				line->DrawLine(0, 1, 0.6, 1);
 				legend->Draw();
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);
 				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -395,7 +395,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					}
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
 
 					y_range_lo = 0.;
 					y_range_hi = 4.2;
@@ -435,7 +435,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 			legend->Draw();
 			legend_open->Draw();
 
-			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
+			ATLASLabel(0.17, 0.88, "Preliminary", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(23);
 			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -494,8 +494,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					SetHStyle_open(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet], trk_itr);
 					SetHStyle_graph_open(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet], trk_itr);
 
- 					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1);
- 					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(1);
+ 					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2);
+ 					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(2);
 
  					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
 					if (jet_itr == 0 && first_pass_cent) legend_open->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
@@ -506,21 +506,21 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 
 					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(504);
+					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->SetFillColorAlpha(g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetFillColor(),opacity);
 
 					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(504);
+					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
 
 					if (trk_itr == 0) g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("a E2");
 					else g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("E2 same");
@@ -553,7 +553,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);
 				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -631,14 +631,14 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
 
 					y_range_lo = 0.;
 					y_range_hi = 4.2;
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 
@@ -655,8 +655,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				} // end cent loop
 
 				canvas->cd();
-				line->DrawLine(0, 1, 0.6, 1);
-
 				legend->Draw();
 				legend_open->Draw();
 
@@ -673,8 +671,11 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 			} //end trk loop
 
+			canvas->cd();
+			line->DrawLine(0, 1, 0.6, 1);
 
-			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
+
+			ATLASLabel(0.17, 0.88, "Preliminary", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(23);
 			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");

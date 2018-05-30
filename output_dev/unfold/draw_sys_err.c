@@ -118,12 +118,22 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_n",mode.c_str(), i_trk, i_cent, i_jet);
 				h_total_sys_n[i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
 
+				//set bin error so bar through point is non-zero
+				for (int i = 0 ; i < N_dR; i++)
+				{
+					h_total_sys_p[i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
+					h_total_sys_n[i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
+				}
 
 				SetHStyle_smallify(h_total_sys_p[i_trk][i_cent][i_jet],0, doSmall);
 				SetHStyle_smallify(h_total_sys_n[i_trk][i_cent][i_jet],0, doSmall);
+//				h_total_sys_p[i_trk][i_cent][i_jet]->SetMarkerStyle(20);
+//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerStyle(20);
+//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
+//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.34,0.34);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.34,0.34);
 				if (dataset_type == "_pp")
 				{
 					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
@@ -147,8 +157,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitleSize(30);
 
 				c_sys->cd();
-				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l ");
-				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l  same");
+				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("lp ");
+				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("lp same");
 
 				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
 				{
@@ -159,8 +169,19 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
 
+					//set bin error so bar through point is non-zero
+					for (int i = 0 ; i < N_dR; i++)
+					{
+						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
+						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
+					}
+
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
 					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
+//					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerStyle(20);
+//					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerStyle(20);
+//					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerSize(1);
+//					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerSize(1);
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
@@ -187,11 +208,11 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 					if (combined_sys_names[i_comb_sys] == "MCNonClosure")
 					{
-						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],"MC non-closure","l");
+						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],"MC non-closure","lp");
 					}
 					else
 					{
-						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"l");
+						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
 					}
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
@@ -203,13 +224,13 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 					c_sys->cd();
-					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l  same");
-					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l  same");
+					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("lp same");
+					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("lp same");
 				}
 
 				c_sys->cd();
 				if (dataset_type == "_pp") c_sys->cd();
-				legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","l");
+				legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","lp");
 
 				legend_sys->Draw();
 				ltx->SetTextAlign(32);
@@ -226,7 +247,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				ltx->SetTextAlign(12);
 				c_sys->cd();
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
 
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);

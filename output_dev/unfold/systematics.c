@@ -137,9 +137,6 @@ void systematics(string config_file = "sys_config.cfg")
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Add(h_nom[i_trk][i_cent][i_jet], -1);
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Divide(h_nom[i_trk][i_cent][i_jet]);
 
-//					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_nonSmooth", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
-//					TH1 *h_non_smooth = (TH1*)h_sys[i_sys][i_trk][i_cent][i_jet]->Clone(name.c_str());
-//					h_sys[i_sys][i_trk][i_cent][i_jet]->Smooth(3,"");
 //					cout << Form("%i_%i_%i %i ", i_trk, i_cent, i_jet, i_sys);
 //					cout << Form("%s --> x", sys_names[i_sys].c_str()) << endl;
 
@@ -342,6 +339,12 @@ void systematics(string config_file = "sys_config.cfg")
 						}
 					}
 
+					//remove fluctuations in JES uncert
+					if (combined_sys_names[i_comb_sys] == "JES")
+					{
+						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
+						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
+					}
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_p",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetTitle(name.c_str());
@@ -517,7 +520,7 @@ void systematics(string config_file = "sys_config.cfg")
 
 
 			c_sys->cd(1);
-			ATLASLabel(0.19, 0.88, "     Internal", "", kBlack);
+			ATLASLabel(0.19, 0.88, "     Preliminary", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(10);
 
