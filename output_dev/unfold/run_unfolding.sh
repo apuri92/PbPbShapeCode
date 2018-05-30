@@ -46,8 +46,8 @@ for i in ${systematics[@]}; do
 		mkdir -p output_pdf_sys$i/pp
 	fi
 
-	# unfold_draw_DpT PbPb 0 $i
-	# unfold_draw_DpT pp 0 $i
+	unfold_draw_DpT PbPb 0 $i
+	unfold_draw_DpT pp 0 $i
 	get_RDpT 0 $i
 
 	# unfold_draw_DpT PbPb 1 $i
