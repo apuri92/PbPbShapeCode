@@ -124,7 +124,7 @@ class BaseClass : public EL::Algorithm
 	int event_n, run_n, lbn_n; //!
 	
 	//Jets
-	float jet_pt, jet_Et, jet_eta, jet_y, jet_phi,jet_m, jet_a2_pt, jet_a2_eta, jet_a2_phi, jet_pt_seb, jet_pt_prexcalib, jet_pt_xcalib, jet_pt_unsubtracted, jet_pt_EM; //!
+	float jet_pt, jet_Et, jet_eta, jet_y, jet_phi,jet_m, jet_a2_pt, jet_a2_eta, jet_a2_phi, jet_pt_seb, jet_pt_prexcalib, jet_pt_xcalib, jet_pt_unsubtracted, jet_pt_EM, jet_m_EM; //!
 	int jet_nConst; //!
 	//MC	
 	//int _barcodeMin; //!

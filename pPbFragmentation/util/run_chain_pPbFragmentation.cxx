@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 	bool doCoarsTrackpT;
 	int PythiaPowheg = 0;
 	bool isOverlay;
+	bool addmuons;
 
 	//Boost configuration
 	//1) command line only: options can only be given on command line, not in config file
@@ -170,6 +171,7 @@ int main(int argc, char *argv[])
 		("doCoarsTrackpT",boost::program_options::value<bool>(&doCoarsTrackpT)->default_value(0),"Use coars binning from the shape analysis")
 		("PythiaPowheg,u",boost::program_options::value<int>(&PythiaPowheg)->default_value(0),"PythiaPowheg or Pythia")
 		("isOverlay",boost::program_options::value<bool>(&isOverlay)->default_value(0),"True for MBOverlay data")
+		("addmuons",boost::program_options::value<bool>(&addmuons)->default_value(0),"Add muons to performance trees")
 		;
 	 
 	if (1<=dataset && dataset<=3) centrality_scheme = 1;
@@ -365,6 +367,7 @@ int main(int argc, char *argv[])
 	alg->_doCoarsTrackpT=doCoarsTrackpT;
 	alg->_PythiaPowheg=PythiaPowheg;
 	alg->_isOverlay=isOverlay;
+	alg->_addmuons=addmuons;
 
 	//Initialzie trigger
 	alg->SetTrigger_chains();

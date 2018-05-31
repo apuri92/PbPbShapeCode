@@ -26,9 +26,9 @@ void UncertProvider::CorrectJet(xAOD::Jet * reco, xAOD::Jet * truth = 0, int cen
 	return;
 }
 
-float UncertProvider::CorrectTrackEff(float pt, float eta, float dR, int centrality){
+float UncertProvider::CorrectTrackEff(float jetpt,float jety,float pt, float eta, float dR, int centrality){
 	if (uncert_index == 10 || uncert_index == 11) return UncerEffMaterial(pt, eta);
-	//if (uncert_index == 12 || uncert_index == 13) return UncerEffFit(pt, eta, centrality);
+	if (uncert_index == 12 || uncert_index == 13) return UncerEffFit(jetpt, jety, pt, centrality);
 	if (uncert_index == 14) return UncerDense(dR);	
 	else return 0;
 }  
@@ -182,16 +182,19 @@ float UncertProvider::UncerEffMaterial(float pt, float eta){
 	return significance*sqrt(uncertainty);			
 }
 
-/*
-float UncertProvider::UncerEffFit(float pt, float eta, int centrality){
+
+float UncertProvider::UncerEffFit(float jet_pt, float jety, float pt, int centrality){
 	Float_t significance=GetSysShift(uncert_index);
+	if (pt < 1.29) pt = 1.29;
+	if (jet_pt>500) jet_pt = 500.;
 	if (pt>350.) pt=350.;//Maximum pt provided
-	int etabin =  Trackhelper.GetTrackEtaBin(eta);
-	float uncertainty = _th1_eff_unc[etabin][centrality]->GetBinContent(_th1_eff_unc[etabin][centrality]->FindBin(pt));
+	int ybin = jety_bins->FindBin(fabs(jety))-1;
+	float uncertainty = _th1_eff_unc[ybin][centrality][jetpt_bins->FindBin(jet_pt)]->GetBinError(_th1_eff_unc[ybin][centrality][jetpt_bins->FindBin(jet_pt)]->FindBin(pt));
 	//cout << "Ucnert: " << significance*uncertainty << endl;
+	if (fabs(uncertainty) > 0.5) uncertainty = 0.5; // protection, the ucnertainty is <<5% 
 	return significance*uncertainty;			
 }
-*/
+
 
 /*
 float UncertProvider::UncerFit(float pt,TH1 * uncert){

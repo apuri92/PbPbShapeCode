@@ -466,8 +466,8 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      if ((scheme==0) && (variable=="eta-trk-coars"))
      {
       printf("\n... eta-trk-binning : four simple bins ");
-      num = 13;
-      double value=-1.3;
+      num = 21;
+      double value=-2.1;
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
@@ -478,13 +478,13 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      if ((scheme==0) && (variable=="phi-trk-coars"))
      {
       printf("\n... phi-trk-binning : four simple bins ");
-      num = 16;
+      num = 32;
       Float_t value=-TMath::Pi(); 
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
          printf("%.4f, ", array[i]);
-         value = value + TMath::Pi()/8.;
+         value = value + TMath::Pi()/16.;
         }
      }
      if ((scheme==0) && (variable=="eta-trk-fine"))

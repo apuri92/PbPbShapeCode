@@ -182,6 +182,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		
 
 		tree_performance->Branch("jet_pt_EM",&jet_pt_EM,"jet_pt_EM/F");
+		tree_performance->Branch("jet_m_EM",&jet_m_EM,"jet_m_EM/F");
 		tree_performance->Branch("jet_pt_xcalib",&jet_pt_xcalib,"jet_pt_xcalib/F");
 		//tree_performance->Branch("jet_pt_prexcalib",&jet_pt_prexcalib,"jet_pt_prexcalib/F");
 		//tree_performance->Branch("jet_pt_seb",&jet_pt_seb,"jet_pt_seb/F");
@@ -211,6 +212,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		if(strcmp (_test_reco_jet_collection.c_str(),"none") != 0){
 			tree_performance->Branch("test_jet_pt",&test_jet_pt,"test_jet_pt/F");
 			tree_performance->Branch("test_jet_pt_EM",&test_jet_pt_EM,"test_jet_pt_EM/F");
+			tree_performance->Branch("test_jet_m_EM",&test_jet_m_EM,"test_jet_m_EM/F");
 			tree_performance->Branch("test_jet_phi",&test_jet_phi,"test_jet_phi/F");
 			tree_performance->Branch("test_jet_eta",&test_jet_eta,"test_jet_eta/F");
 			tree_performance->Branch("test_jet_m",&test_jet_m,"test_jet_m/F");
@@ -367,9 +369,11 @@ EL::StatusCode JetPerformance :: initialize ()
 	const std::string name_test = "TestCollection"; //string describing the current thread, for logging
 	TString jetAlgo_test = "AntiKt4EMTopo"; //String describing your jet collection, for example AntiKt4EMTopo or AntiKt4LCTopo (see below)
 	TString config_test = "JES_MC15cRecommendation_May2016.config"; //Path to global config used to initialize the tool (see below)
-	TString calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_Insitu_DEV"; //String describing the calibration sequence to apply (see below)
+	TString calibSeq_test = "JetArea_Residual_Origin_DEV"; //String describing the calibration sequence to apply (see below)
+	//TString calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_DEV"; //String describing the calibration sequence to apply (see below)
 									 //bool isData = false; -- not used //bool describing if the events are data or from simulatio
-	if (_data_switch==0) calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_DEV";
+	//if (_data_switch==0) calibSeq_test = "JetArea_Residual_Origin_EtaJES_GSC_Insitu_DEV";
+	if (_data_switch==0) calibSeq_test = "JetArea_Residual_Origin_DEV";
 	//Call the constructor. The default constructor can also be used if the arguments are set with python configuration instead
 	m_jetCalibration_test = new JetCalibrationTool(name_test, jetAlgo_test, config_test, calibSeq_test, true);
 	
@@ -568,7 +572,7 @@ EL::StatusCode JetPerformance :: execute (){
     if (_doClusters) EL_RETURN_CHECK("execute()",event->retrieve( cls, "HIClusters" ));
 	
 	//Jet vectors
-	vector<float> jet_pt_SEB_vector,jet_pt_prexcalib_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector,test_jet_pt_EM_vector,test_jet_pt_vector;
+	vector<float> jet_pt_SEB_vector,jet_pt_prexcalib_vector,test_jet_phi_vector,test_jet_eta_vector,test_jet_m_vector,test_jet_pt_EM_vector,test_jet_m_EM_vector,test_jet_pt_vector;
 	vector<int> Is_test_jet_Good, Is_dummyJet,jet_IsTrig_vector;
 	vector<float> truth_jet_y_vector;
 	vector<int> truth_jet_indices, truth_jet_isDummy_vector;
@@ -590,6 +594,7 @@ EL::StatusCode JetPerformance :: execute (){
 	truth_jet_y_vector.clear();
 	
 	jet_pt_EM_vector.clear();
+	jet_m_EM_vector.clear();
 	jet_pt_unsubtracted_vector.clear();
 	jet_pt_SEB_vector.clear();
 	jet_pt_prexcalib_vector.clear();
@@ -704,6 +709,7 @@ EL::StatusCode JetPerformance :: execute (){
 
 		xAOD::JetFourMom_t jet_4mom = newjet.jetP4("JetSubtractedScaleMomentum"); //getting SubtractedScale instead of EMScale because EMScale is not in DFAntiKt4HI
 		float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+		float uncalib_jet_m  = (jet_4mom.M() * 0.001);
 
 		const xAOD::JetFourMom_t jet_4mom_unsubtracted = newjet.jetP4("JetUnsubtractedScaleMomentum");
 		float unsubtracted_jet_pt  = (jet_4mom_unsubtracted.pt() * 0.001);
@@ -740,6 +746,7 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_m = newjet.m()*0.001;
 		
 		jet_pt_EM_vector.push_back(uncalib_jet_pt);
+		jet_m_EM_vector.push_back(uncalib_jet_m);
 		jet_pt_unsubtracted_vector.push_back(unsubtracted_jet_pt);
 		jet_pt_xcalib_vector.push_back(jet_pt);
 		
@@ -830,6 +837,7 @@ EL::StatusCode JetPerformance :: execute (){
 			newjet_test.makePrivateStore( **test_jet_itr );
 			const xAOD::JetFourMom_t jet_4mom = ( *test_jet_itr )->jetP4("JetPileupScaleMomentum");
 			float uncalib_jet_pt  = (jet_4mom.pt() * 0.001);
+			float uncalib_jet_m  = (jet_4mom.M() * 0.001);
 			EL_RETURN_CHECK("execute()", m_jetCalibration_test->applyCalibration( newjet_test ) );
 						
 			jet_pt = newjet_test.pt()*0.001;
@@ -842,6 +850,7 @@ EL::StatusCode JetPerformance :: execute (){
 			else Is_test_jet_Good.push_back(1);
 				
 			test_jet_pt_EM_vector.push_back(uncalib_jet_pt);
+			test_jet_m_EM_vector.push_back(uncalib_jet_m);
 			test_jet_pt_vector.push_back(jet_pt);		
 			test_jet_phi_vector.push_back(jet_phi);
 			test_jet_eta_vector.push_back(jet_eta);
@@ -939,6 +948,7 @@ EL::StatusCode JetPerformance :: execute (){
 		jet_m = jet_m_vector.at(i);
 		jet_Et = sqrt(pow(jet_pt,2)+pow(jet_m,2));
 		jet_pt_EM = jet_pt_EM_vector.at(i);
+		jet_m_EM = jet_m_EM_vector.at(i);
 		jet_pt_unsubtracted = jet_pt_unsubtracted_vector.at(i);
 		//jet_pt_seb = jet_pt_SEB_vector.at(i);
 		//jet_pt_prexcalib = jet_pt_prexcalib_vector.at(i);
@@ -1002,6 +1012,7 @@ EL::StatusCode JetPerformance :: execute (){
 				test_jet_phi = test_jet_phi_vector.at(index);
 				test_jet_m = test_jet_m_vector.at(index);
 				test_jet_pt_EM = test_jet_pt_EM_vector.at(index);
+				test_jet_m_EM = test_jet_m_EM_vector.at(index);
 				test_jet_pt = test_jet_pt_vector.at(index);
 				test_jet_isGood = Is_test_jet_Good.at(index);
 			}	

@@ -46,6 +46,8 @@ class UncertProvider
 	TH1 * h_JER_eta[7];
 	TH1 * h_sJES_eta[7];
 	TRandom3 r;
+	TAxis *jety_bins;
+	TAxis *jetpt_bins;
 	JetCorrector JERhelper;
 	TrackCorrector Trackhelper;
 	JetUncertaintiesTool jesProv;
@@ -57,9 +59,10 @@ class UncertProvider
 	TFile* f_sagitta;
 	TH2 * h_sagitta;
 	
-	//TFile * _f_eff;
-	//TH1F *_th1_eff_unc[6][10];
-	//Int_t _nEta_eff;
+	int _nEta_eff_jetcorr;
+	
+	TFile * _f_eff;
+	TH1F *_th1_eff_unc[6][10][20];
 	
 	//Fine centrality for JES uncertainty
 	int nFineCentBins;
@@ -115,16 +118,19 @@ class UncertProvider
 		}
      	//***Tracking uncertainties
      	//Efficiency <->fit not needed now
-     	/*
-		  _nEta_eff=5;	  
-		  _f_eff = new TFile(xfn + "/../pPbFragmentation/data/mc_eff_fits_" + _cutlevel + ".root","read");
-	        
-		  for(int cent=0;cent<_nCent;cent++){	  
-			  for(int e=0;e<_nEta_eff;e++){	
-				_th1_eff_unc[e][cent]=(TH1F*)_f_eff->Get(Form("conf_int_eta%i_cent%i",e,cent));
-			  }
-		  }
-     	*/
+     	  
+		  _f_eff = new TFile(xfn + "/../pPbFragmentation/data/mc_eff_fits_pt_exclusive_" + _cutlevel + ".root","read");
+		  jety_bins = (TAxis*) _f_eff ->Get("jet_y_binning"); 
+		  jetpt_bins=(TAxis*)_f_eff->Get("jet_pt_binning");
+		  _nEta_eff_jetcorr = jety_bins->GetNbins();
+		  for(int cent=0;cent<_nCent;cent++){
+			for(int e=0;e<_nEta_eff_jetcorr;e++){
+				for(int jetb=1;jetb<=jetpt_bins->GetNbins();jetb++){
+					_th1_eff_unc[e][cent][jetb]=(TH1F*)_f_eff->Get(Form("histo_eff_eta%i_cent%i_pt%i",e,cent,jetb));
+				}
+			}
+		}
+     	
      	//Material
      	f_eff_uncert_2015_material = new TFile(xfn + "/../pPbFragmentation/data/TrackingEfficiencyRecommendations_20.7rel.root","read");
    		h_eff_uncert_2015_material[0]	= (TH2F*)f_eff_uncert_2015_material->Get("OneMinusRatioEfficiencyVSEtaPt_AfterRebinning_Old_Nominal_MCVSOld_5%Extra_MC_TightPrimary");
@@ -147,9 +153,9 @@ class UncertProvider
 	
 	string GetSysName(int uncert);
 	void CorrectJet(xAOD::Jet * reco, xAOD::Jet * truth, int cent, float FCalEt);
-	float CorrectTrackEff(float pt, float eta, float dR, int cent);
+	float CorrectTrackEff(float jetpt,float jety,float pt, float eta, float dR, int centrality);
 	void UncerTrackMomentum(float &pT, float eta, float phi, int charge);
-	//float UncerEffFit(float pt, float eta, int centrality);
+	float UncerEffFit(float jet_pt, float jety, float pt, int centrality);
 	float GetMCProb();
 	//CorrectTrack(xAODJet * reco);
     ~UncertProvider() {

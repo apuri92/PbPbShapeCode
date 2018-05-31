@@ -72,7 +72,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
 	SetupBinning(0, "phi-trk", phiJetBins, phiJetBinsN);
-	SetupBinning(0, "pt-trk", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk", phiTrkBins, phiTrkBinsN);
 	SetupBinning(0, "d0z0", d0z0Bins, d0z0BinsN);

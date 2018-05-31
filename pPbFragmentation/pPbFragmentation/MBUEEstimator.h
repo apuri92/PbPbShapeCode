@@ -68,12 +68,12 @@ class MBUEEstimator : public BaseClass{
 	
 	
 	//vector<vector<TH3D*>> h_trk_dNdEtadPhidpT; //!
-	vector<vector<vector<vector<TH3D*>>>> h_UE_dNdEtadPhidpT_HP; //!
-	vector<vector<vector<vector<TH3D*>>>> h_UE_dNdEtadPhidpT_HP_fine; //!
-	vector<vector<TH3D*>> h_jet_v_Psi_HP; //!
-	//vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC; //!
-	//vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC_fine; //!
-	//vector<TH3D*> h_jet_v_Psi_MC; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_HP; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_HP_fine; //!
+	vector<TH3D*> h_jet_v_Psi_HP; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC; //!
+	vector<vector<vector<TH3D*>>> h_UE_dNdEtadPhidpT_MC_fine; //!
+	vector<TH3D*> h_jet_v_Psi_MC; //!
 	
 	TH2D * map_excluded_jets;//!
 	

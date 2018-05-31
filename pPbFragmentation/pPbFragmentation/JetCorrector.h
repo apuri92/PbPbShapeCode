@@ -44,7 +44,7 @@ class JetCorrector
 	TH1D *CHPS_weight_fine[8][8][20];
 	int etabin;
 	TFile * HP_v_MB_FCAl_weight_file;
-
+	
 	
   public:	
     int nJetYBins;
@@ -80,8 +80,8 @@ class JetCorrector
          _nCent_reweighting = 7;			// number of centrality bins      
 		 _f_reweighting = new TFile(xfn + "/../pPbFragmentation/data/spectra_weights_PbPb.root","read");
 		 jet_pt_binning = (TAxis*) ((TH1F*)_f_reweighting->Get("h_reco_jet_spectrum_4_cent0_system_0_PbPb"))->GetXaxis(); 
-
-		 //Now inclusive in eta
+		 		 
+		 //Now inclusive in eta 
 		 //for(int etabin=0;etabin<nJetYBins;etabin++){
 		 int etabin=4;
 			for(int j=0;j<_nCent_reweighting;j++){
@@ -94,9 +94,9 @@ class JetCorrector
 					FF_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 					CHPS_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
 				}
-			}
+			}				
 		 //}
-
+         
          //Event weights
          _HP_v_MB_FCAl_weight_file="FCal_HP_v_MB_weights.root";
          _weight_file="Powheg.reweight.root"; 
