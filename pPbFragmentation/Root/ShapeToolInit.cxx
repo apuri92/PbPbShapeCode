@@ -218,6 +218,18 @@ EL::StatusCode PbPbFFShape :: initialize ()
 
 	cout << " Initialization done" << endl;
 
+//	//MB Fcal trees
+//	boost::assign::push_back( run_numbers )
+//	(286665)(286711)(286717)(286748)(286767)(286834)(286854)(286908)(286990)(287038)(287044)(287068)(287222)(287224)(287259)(287270)(287281)(287321)(287330)(287334)(287378)(287380)(287382)(287560)(287594)(287632)(287706)(287728)(287827)(287843)(287866)(287924)(287931);
+//
+//	TString base_path = gSystem->GetFromPipe("echo $ROOTCOREBIN");
+//
+//	for (int i = 0; i < run_numbers.size(); i++)
+//	{
+//		fcal_trees.push_back(new TFile(base_path+Form("/../pPbFragmentation/data/FCalTTreeE_MinBiasOverlay_30_03_17_28_run%i.root", run_numbers.at(i)),"READ"));
+//	}
+//
+//
 
 	return EL::StatusCode::SUCCESS;
 

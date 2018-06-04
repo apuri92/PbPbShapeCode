@@ -342,7 +342,7 @@ void check_UE()
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-
+/*
 	//drawing 2D histo
 	{
 		cout << "drawing 2D histo" << endl;
@@ -421,7 +421,7 @@ void check_UE()
 //			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 		}
 	}
-
+*/
 	/*
 	{
 		//projecting over track pT
@@ -797,7 +797,7 @@ void check_UE()
 		}
 	}
 
-	{
+/*	{
 		//just the factors as function of r
 		cout << "posres as Function of R" << endl;
 		TCanvas *c_pos_res = new TCanvas("c_pos_res","c_pos_res",900,600);
@@ -867,5 +867,5 @@ void check_UE()
 
 		}
 	}
-
+*/
 }
