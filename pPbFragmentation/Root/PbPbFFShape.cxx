@@ -131,7 +131,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		//EL_RETURN_CHECK("execute",event->retrieve(hiclus,"HIClusters") );
 		//cout << "Psi 1: " << GetEventPlane(hiclus) << " Psi 2: " << GetEventPlane(calos) << endl;
 		uee->Psi = GetEventPlane(calos);
-//		uee->Psi3 = GetEventPlane(calos, 3);
+		uee->Psi3 = GetEventPlane(calos, 3);
 	}
 
 //	if (_dataset == 4 && isMC)
@@ -574,15 +574,18 @@ EL::StatusCode PbPbFFShape :: execute (){
 		if (_dataset == 4) //only run this if doing PbPb, not pp
 		{
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
-//			int jet_dPsi3_bin = GetPsiBin(GetDeltaPsi3(jet_phi, uee->Psi3));
+			int jet_dPsi3_bin = GetPsiBin(GetDeltaPsi3(jet_phi, uee->Psi3));
 
+			//psi3 jet distro
+			h_jet_psi3.at(cent_bin)->Fill(jet_pt, jet_eta, GetDeltaPsi3(jet_phi, uee->Psi3) );
+			
 			for (int i_dR = 0; i_dR < 13; i_dR++)
 			{
 				for (int i_pt = 0; i_pt < 10; i_pt++)
 				{
 					double UE_err = -1;
-					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
-//					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+//					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 
 					double eff_uncertainty = 0;

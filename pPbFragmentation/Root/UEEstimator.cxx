@@ -242,6 +242,7 @@ void UEEstimator::initShapeUE(bool isMC)
 void UEEstimator::initShapeUE(bool isMC, int uncert)
 {
 
+	//UE with only v2 initialization
 	for (int i_dR = 0; i_dR < 13; i_dR++)
 	{
 		for (int i_dPsi = 0; i_dPsi < 16; i_dPsi++)
@@ -254,32 +255,18 @@ void UEEstimator::initShapeUE(bool isMC, int uncert)
 					name = Form("h_UE_HP_dR%i_dPsi%i_pt%i_cent%i", i_dR, i_dPsi, i_pt+1, i_cent);
 					if (uncert == 2) h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE_tight->Get(name.c_str());
 					else h_UE[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
+
+					//UE with v3 initialization
+					for (int i_dPsi3 = 0; i_dPsi3 < 6; i_dPsi3++)
+					{
+						name = Form("h_UE_HP_dR%i_dPsi%i_dPsi3_%i_pt%i_cent%i", i_dR, i_dPsi, i_dPsi3, i_pt+1, i_cent);
+						h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent] = (TH2*)_f_ShapeUE_v3->Get(name.c_str());
+					}
 				}
 			}
 		}
 	}
 }
-
-
-//	for (int i_dR = 0; i_dR < 13; i_dR++)
-//	{
-//		for (int i_dPsi = 0; i_dPsi < 16; i_dPsi++)
-//		{
-//			for (int i_dPsi3 = 0; i_dPsi3 < 6; i_dPsi3++)
-//			{
-//				for (int i_pt = 0; i_pt < 10; i_pt++)
-//				{
-//					for (int i_cent = 0; i_cent < 6; i_cent++)
-//					{
-//						std::string name;
-//						name = Form("h_UE_HP_dR%i_dPsi%i_dPsi3_%i_pt%i_cent%i", i_dR, i_dPsi, i_dPsi3, i_pt+1, i_cent);
-//						h_UE[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent] = (TH2*)_f_ShapeUE->Get(name.c_str());
-//					}
-//				}
-//			}
-//		}
-//	}
-
 
 double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error)
 {
@@ -290,14 +277,14 @@ double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, doubl
 	return val;
 }
 
-//double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error)
-//{
-//	int bin_eta = h_UE[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetXaxis()->FindBin(jet_eta);
-//	int bin_phi = h_UE[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetYaxis()->FindBin(jet_phi);
-//	double val =  h_UE[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinContent(bin_eta, bin_phi);
-//	error =  h_UE[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinError(bin_eta, bin_phi);
-//	return val;
-//}
+double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error)
+{
+	int bin_eta = h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetXaxis()->FindBin(jet_eta);
+	int bin_phi = h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetYaxis()->FindBin(jet_phi);
+	double val =  h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinContent(bin_eta, bin_phi);
+	error =  h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinError(bin_eta, bin_phi);
+	return val;
+}
 
 
 

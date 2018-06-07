@@ -104,6 +104,7 @@ class PbPbFFShape : public BaseClass{
 	vector<TH3D*> h_reco_truth_comparison; //!
 	vector<TH3D*> h_jet_for_eff; //!
 	vector<TH3D*> h_jet_for_eff_full; //!
+	vector<TH3D*> h_jet_psi3; //!
 
 
 	//Raw disitrbutions

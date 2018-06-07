@@ -27,7 +27,8 @@ void draw_spectra(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("_nominal");
-	if (sys_mode > 0) sys_path = Form("_sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("_c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("_sys%i", sys_mode);
 
 
 	TFile *f_input = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));

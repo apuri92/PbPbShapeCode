@@ -19,6 +19,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
 	int draw_mode = 1; draw_mode = m_config->GetValue("draw_mode", draw_mode);
 
+	double r_max_range = 1.2;
 	std::string did = "data";
 	if (isMC) did = "MC";
 
@@ -26,7 +27,8 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("_nominal");
-	if (sys_mode > 0) sys_path = Form("_sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("_c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("_sys%i", sys_mode);
 
 	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
 	string dptr_label = "#it{D} (p_{#it{T}}, #it{r}) [GeV^{-1}]";
@@ -379,15 +381,15 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						if (jet_itr == 0 && first_pass_cent) legend_ChPS_raw_subtr_unf_indR->AddEntry(h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 						if (jet_itr == 0 && first_pass_cent) legend_ChPS_final_indR->AddEntry(h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 						
-						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 1.2);
+						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
-						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 1.2);
+						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
-						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
+						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
@@ -419,7 +421,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					ltx->SetTextSize(12);
 					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
 					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-					line->DrawLine(0, 1, 1.2, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 					legend_ChPS_raw_subtr_indR->Draw();
 					
 					c_ChPS_raw_subtr_unf_indR->cd(i_cent+1);
@@ -427,7 +429,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					ltx->SetTextSize(12);
 					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
 					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-					line->DrawLine(0, 1, 1.2, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 					legend_ChPS_raw_subtr_unf_indR->Draw();
 					
 					c_ChPS_final_indR->cd(i_cent+1);
@@ -435,7 +437,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					ltx->SetTextSize(12);
 					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
 					ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
-					line->DrawLine(0, 1, 1.2, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 					legend_ChPS_final_indR->Draw();
 					
 					first_pass_cent = false;
@@ -498,15 +500,15 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						if (jet_itr == 0 && trk_itr == 0 && first_pass_cent) legend_ChPS_fol_unf_indR->AddEntry(h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf","lp");
 						if (jet_itr == 0 && trk_itr == 0 && first_pass_cent) legend_ChPS_fol_unf_indR->AddEntry(h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet),"Raw+Subtr+Unf+BbB","lp");
 						
-						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 1.2);
+						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
-						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 1.2);
+						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
-						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 1.2);
+						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
@@ -527,7 +529,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						ltx->DrawLatexNDC(0.93, 0.95, Form("%s", centrality.c_str()));
 						ltx->DrawLatexNDC(0.93, 0.88, Form("%s", trk_label.c_str()));
 						ltx->DrawLatexNDC(0.93, 0.80, Form("%s", jet_label.c_str()));
-						line->DrawLine(0, 1, 1.2, 1);
+						line->DrawLine(0, 1, r_max_range, 1);
 						legend_ChPS_fol_unf_indR->Draw();
 						
 					} // end cent loop

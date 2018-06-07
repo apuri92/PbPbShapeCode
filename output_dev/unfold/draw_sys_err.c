@@ -29,6 +29,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	bool doSmall = true;
 	doSmall = false;
 
+	double r_max_range = 1.2;
 	if (mode == "RDpT") dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
@@ -139,8 +140,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
 					h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
 				}
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->SetLineWidth(2);
 				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(2);
@@ -216,8 +217,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					}
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.6);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
@@ -243,7 +244,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				line->SetLineStyle(1);
 //				line->SetLineWidth(1);
-				line->DrawLine(0, 0, 0.6, 0);
+				line->DrawLine(0, 0, r_max_range, 0);
 
 				ltx->SetTextAlign(12);
 				c_sys->cd();

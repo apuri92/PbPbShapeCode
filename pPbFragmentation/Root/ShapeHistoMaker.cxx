@@ -92,12 +92,19 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_3D->Sumw2();
 		h_jet_for_eff_full.push_back(temphist_3D);
 
+		temphist_3D = new TH3D(Form("h_jet_psi3_cent%i",i),Form("h_jet_psi3_cent%i",i), ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, phiJetBinsN, phiJetBins);
+		temphist_3D->Sumw2();
+		h_jet_psi3.push_back(temphist_3D);
+
+
+
 		wk()->addOutput (h_reco_pre_truth_match.at(i));
 		wk()->addOutput (h_reco_post_truth_match.at(i));
 		wk()->addOutput (h_reco_truth_matched.at(i));
 		wk()->addOutput (h_reco_truth_comparison.at(i));
 		wk()->addOutput (h_jet_for_eff.at(i));
 		wk()->addOutput (h_jet_for_eff_full.at(i));
+		wk()->addOutput (h_jet_psi3.at(i));
 
 	}
 

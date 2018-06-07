@@ -30,7 +30,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("_nominal");
-	if (sys_mode > 0) sys_path = Form("_sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("_c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("_sys%i", sys_mode);
 
 	TFile *f_input = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));
 	TFile *f_output = new TFile(Form("output_pdf%s/root/final_ChPS_%s_%s.root", sys_path.c_str(),did.c_str(), dataset_type.c_str()), "recreate");
@@ -104,6 +105,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	vector<vector<TH1*>> h_ChPS_ratio_closure_injet (n_cent_cuts, vector<TH1*> (N_jetpt));
 
 
+	double r_max_range = 1.2;
 
 	string name;
 	string pdf_label;
@@ -409,6 +411,11 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_truth_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
 
+				if (dataset_type == "PbPb")
+				{
+					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+					h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+				}
 				name = Form("h_ChPS_raw_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
 
@@ -866,7 +873,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetTitleSize(14);
 
 						
-						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 //						double max = h_ChPS_ratio_B2S_indR.at(2).at(i_cent).at(i_jet)->GetMaximum();
 //						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 1.4*max);
 
@@ -881,7 +888,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						{
 							h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 							line->SetLineStyle(3);
-							line->DrawLine(0, 1, 0.6, 1);
+							line->DrawLine(0, 1, r_max_range, 1);
 						}
 						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 
@@ -987,7 +994,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							gPad->SetLogy();
 						}
 
-						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
+						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45, 1.55);
 
 						if (!isMC)
@@ -1007,7 +1014,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 //						if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
 //						if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
-						line->DrawLine(0, 1, 0.6, 1);
+						line->DrawLine(0, 1, r_max_range, 1);
 
 						trk_itr++;
 
@@ -1079,7 +1086,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 						if (i_trk < 2 || i_trk > 6) continue;
 						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-3, 1E3);
-						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, 0.6);
+						h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 						SetHStyle_smallify(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
 						if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR_UE->AddEntry(h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 						if (trk_itr == 0) h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
@@ -1237,7 +1244,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 			TCanvas *c_evol_dR = new TCanvas("c_evol_dR","c_evol_dR",900,600);
 			if (dataset_type == "pp") c_evol_dR->SetCanvasSize(600,600);
-			TLegend *legend_evol_dR = new TLegend(0.18, 0.18, 0.30, 0.38, "","brNDC");
+			TLegend *legend_evol_dR = new TLegend(0.18, 0.10, 0.30, 0.55, "","brNDC");
 			legend_evol_dR->SetTextFont(43);
 			legend_evol_dR->SetBorderSize(0);
 			if (dataset_type == "pp") legend_evol_dR->SetTextSize(12);
@@ -1307,7 +1314,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 						gPad->SetLogx(0);
 						gPad->SetLogy();
-						line->DrawLine(0, 0, 1.2, 0);
+						line->DrawLine(0, 0, r_max_range, 0);
 
 
 						if (dataset_type == "pp") c_evol_dR->cd(2);
@@ -1315,7 +1322,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw();
 
 						gPad->SetLogx(0);
-						line->DrawLine(0, 1, 1.2, 1);
+						line->DrawLine(0, 1, r_max_range, 1);
 
 
 						if (dataset_type == "pp") c_evol_dR->cd();

@@ -26,9 +26,11 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 	//	##############	Config done	##############"
 
+	double r_max_range = 1.2;
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	if (sys_mode > 0) sys_path = Form("sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
 
 	name = Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str());
 	TFile *file = new TFile(name.c_str());
@@ -316,7 +318,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					ltx->SetTextAlign(12);
 					ltx->DrawLatexNDC(0.19,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					ltx->DrawLatexNDC(0.19,0.965,Form("%s: %4.0f < #it{p}_{T}^{jet} < %4.0f GeV",num_to_cent(31,i_cent).c_str(), pt_jet_lo, pt_jet_hi));
-					line->DrawLine(0,0,1.2,1.2);
+					line->DrawLine(0,0,r_max_range,r_max_range);
 					gPad->SetLogz();
 				}
 
@@ -371,7 +373,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 						ltx->SetTextAlign(12);
 						ltx->DrawLatexNDC(0.20,0.90,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f GeV",pt_lo, pt_hi));
 					}
-					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
+					if (jet_iter == 0) line->DrawLine(0,1,r_max_range,1);
 					ltx->SetTextAlign(32);
 					if (jet_iter == 0) ltx->DrawLatexNDC(0.90,0.90,num_to_cent(31,i_cent).c_str());
 
@@ -387,13 +389,13 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Purity");
 					SetHStyle(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
+					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend4->AddEntry(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
 					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,0.5,1.2,0.5);
-					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
+					if (jet_iter == 0) line->DrawLine(0,1,r_max_range,1);
 				}
 
 				//Drawing efficienct of response projections, each page is a centrality, each pad is a trk pt bin, each pad has different curves for jet pt
@@ -403,13 +405,13 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Response Efficiency");
 					SetHStyle(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
+					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend5->AddEntry(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
 					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
-					if (jet_iter == 0) line->DrawLine(0,0.5,1.2,0.5);
-					if (jet_iter == 0) line->DrawLine(0,1,1.2,1);
+					if (jet_iter == 0) line->DrawLine(0,0.5,r_max_range,0.5);
+					if (jet_iter == 0) line->DrawLine(0,1,r_max_range,1);
 				}
 
 

@@ -18,7 +18,8 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	if (sys_mode > 0) sys_path = Form("sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
 	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	cout << "Using file:" << endl;
@@ -32,6 +33,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
 
+	double r_max_range = 1.2;
 
 	string name;
 	TCanvas *c1 = new TCanvas("c1","c1",800,400);
@@ -180,7 +182,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 					if (jet_itr == 0 && i_cent == 0) legend_pos_res->AddEntry(h_ratio_1d_r[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
 
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0., 5);
-					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0., 0.6);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0., r_max_range);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle("#it{r}");
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("Correction Factors");
@@ -188,7 +190,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 					c_pos_res->cd(i_cent+1);
 					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("p");
 					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
-					line->DrawLine(0, 1, 0.6, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 
 					trk_itr++;
 				}

@@ -1,12 +1,22 @@
 #include "output_dev/functions/global_variables.h"
 
-void check_UE()
+void check_UE(int sys_mode)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *input_file = new TFile("output_dev/raw_results//FF_MC_out_histo_PbPb_5p02_r001.root");
-	TFile *input_file_data = new TFile("output_dev/raw_results//FF_data_out_histo_PbPb_5p02_r001.root");
+
+	string sys_path;
+	double r_max_range
+	if (sys_mode == 0) sys_path = Form("nominal");
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
+	TFile *input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+
+	cout << "Using file" << input_file->GetName() << endl;
+	cout << "Using file" << input_file_data->GetName() << endl;
+
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
@@ -342,7 +352,7 @@ void check_UE()
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-/*
+
 	//drawing 2D histo
 	{
 		cout << "drawing 2D histo" << endl;
@@ -416,12 +426,12 @@ void check_UE()
 			if (i_dR == 0) name = "(";
 			else if (i_dR == 12) name = ")";
 			else name = "";
-			c_TM_MB_2D->Print(Form("UE_TM_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+			c_TM_MB_2D->Print(Form("UE_TM_MB_2D_c%i.pdf%s", sys_mode, name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 //			c_FS_MB_2D->Print(Form("UE_FS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 //			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 		}
 	}
-*/
+
 	/*
 	{
 		//projecting over track pT
@@ -728,7 +738,7 @@ void check_UE()
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
-//						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
+						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
 //						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
@@ -739,7 +749,7 @@ void check_UE()
 					avg = (h_MB_r_1D[i_jet][i_trk][i_cent]->GetMaximum() + h_MB_r_1D[i_jet][i_trk][i_cent]->GetMinimum())/2;
 					low_range = avg * 0.50; hi_range = avg * 1.50;
 
-//					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, 0.6);
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 
@@ -753,7 +763,7 @@ void check_UE()
 					gPad->SetBottomMargin(0);
 					gPad->SetRightMargin(0);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-//					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -771,10 +781,10 @@ void check_UE()
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.99, 1.01);
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
-//					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					line->DrawLine(0, 1, 0.6, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 
 
 					c_x->cd(i_cent+1);
@@ -790,7 +800,7 @@ void check_UE()
 				if (i_trk == 2 && i_jet == jet_pt_start) name = "(";
 				else if (i_trk == 6 && i_jet == jet_pt_end - 1) name = ")";
 				else name = "";
-				c_x->Print(Form("UE_x.pdf%s", name.c_str()), Form("Title: trk%i_jet%i", i_trk, i_jet));
+				c_x->Print(Form("UE_x_c%i.pdf%s", sys_mode, name.c_str()), Form("Title: trk%i_jet%i", i_trk, i_jet));
 
 			}
 
@@ -844,7 +854,7 @@ void check_UE()
 					c_pos_res->cd(i_cent+1);
 					if (trk_itr == 0) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
 					else h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					line->DrawLine(0, 1, 1.2, 1);
+					line->DrawLine(0, 1, r_max_range, 1);
 
 
 					trk_itr++;
