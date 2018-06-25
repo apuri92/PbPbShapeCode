@@ -411,6 +411,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_ChPS_truth_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
 
+				name = Form("h_ChPS_ratio_B2S_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
 				if (dataset_type == "PbPb")
 				{
 					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);

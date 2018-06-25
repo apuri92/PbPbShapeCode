@@ -1,5 +1,11 @@
 #TODO
 --------
+6/25/2018
+*Attempting renormalization fix 1:
+In MC, divide out event_weight_FCal for UE_MB histograms since they are
+already scaled to look like data. Normalize these by [regular jet spectra /
+sum of event weight fcal hist (h_renorm_mc_hp) ]
+--------
 5/31/2018
 *updated to svn and updated svn
 --------

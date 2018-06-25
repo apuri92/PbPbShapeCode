@@ -7,7 +7,7 @@ void check_UE(int sys_mode)
 
 
 	string sys_path;
-	double r_max_range
+	double r_max_range = 1.2;
 	if (sys_mode == 0) sys_path = Form("nominal");
 	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
 	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
@@ -125,6 +125,10 @@ void check_UE(int sys_mode)
 
 	for (int i_cent = 0; i_cent < 6; i_cent++)
 	{
+
+		TH1* h_renorm = (TH1*)input_file->Get(Form("h_renorm_cent%i", i_cent));
+		double renorm = h_renorm->GetBinContent(1);
+
 		for (int i_dR = 0; i_dR < N_dR; i_dR++)
 		{
 
@@ -136,6 +140,10 @@ void check_UE(int sys_mode)
 			name = Form("h_reco_jet_spectrum_y4_cent%i", i_cent);
 			TH1* h_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_jet_y4_c%i", i_cent));
 			h_jet_spectra->Sumw2();
+
+			name = Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent);
+			TH1* h_jet_spectra_unW = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_jet_unW_y4_c%i", i_cent));
+			h_jet_spectra_unW->Sumw2();
 
 			name = Form("h_true_jet_spectrum_y4_cent%i", i_cent);
 			TH1* h_true_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("true_jet_y4_c%i", i_cent));
@@ -181,6 +189,7 @@ void check_UE(int sys_mode)
 
 				double n_jets_data = h_jet_spectra_data->GetBinContent(i_jet);
 				double n_jets = h_jet_spectra->GetBinContent(i_jet);
+				double n_jets_unW = h_jet_spectra_unW->GetBinContent(i_jet);
 				double n_jets_true = h_true_jet_spectra->GetBinContent(i_jet);
 
 				if (n_jets == 0) continue;
@@ -188,14 +197,14 @@ void check_UE(int sys_mode)
 
 				for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
 				{
-					double updated_UE_MB = h_MB_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets;
+					double updated_UE_MB = h_MB_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) * renorm / n_jets;
 					double updated_UE_MB_data = h_MB_data_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_data;
 					double updated_UE_MB_tj = h_MB_tj_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 					double updated_UE_TM = h_TM_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets;
 					double updated_UE_FS = h_FS_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 					double updated_UE_FNS = h_FNS_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_true;
 
-					double updated_UE_MB_err = h_MB_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets;
+					double updated_UE_MB_err = h_MB_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) * renorm / n_jets;
 					double updated_UE_MB_data_err = h_MB_data_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_data;
 					double updated_UE_MB_tj_err = h_MB_tj_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_true;
 					double updated_UE_TM_err = h_TM_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets;
@@ -352,7 +361,7 @@ void check_UE(int sys_mode)
 	ltx->SetTextSize(12);
 	ltx->SetTextAlign(12);
 
-
+/*
 	//drawing 2D histo
 	{
 		cout << "drawing 2D histo" << endl;
@@ -431,7 +440,7 @@ void check_UE(int sys_mode)
 //			c_FNS_MB_2D->Print(Form("UE_FNS_MB_2D.pdf%s", name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 		}
 	}
-
+*/
 	/*
 	{
 		//projecting over track pT
@@ -696,10 +705,11 @@ void check_UE(int sys_mode)
 		cout << "Function of R" << endl;
 		TCanvas *c_x = new TCanvas("c_x","c_x",900,600);
 
-		TLegend *legend_x = new TLegend(0.20, 0.10, 0.50, 0.40, "","brNDC");
+		TLegend *legend_x = new TLegend(0.20, 0.05, 0.70, 0.30, "","brNDC");
 		legend_x->SetTextFont(43);
 		legend_x->SetBorderSize(0);
 		legend_x->SetTextSize(10);
+		legend_x->SetNColumns(2);
 
 
 		for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -738,8 +748,8 @@ void check_UE(int sys_mode)
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MB","lp");
-						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_data","lp");
-//						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
+						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MB_{data}","lp");
+						legend_x->AddEntry(h_MB_tj_r_1D[i_jet][i_trk][i_cent],"MB_{TJ}","lp");
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
 						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
@@ -747,10 +757,11 @@ void check_UE(int sys_mode)
 
 					double avg, low_range, hi_range;
 					avg = (h_MB_r_1D[i_jet][i_trk][i_cent]->GetMaximum() + h_MB_r_1D[i_jet][i_trk][i_cent]->GetMinimum())/2;
-					low_range = avg * 0.50; hi_range = avg * 1.50;
+					low_range = avg * 0.5; hi_range = avg * 1.5;
 
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+//					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(-10, 100);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 
 
@@ -776,9 +787,9 @@ void check_UE(int sys_mode)
 					gPad->SetTopMargin(0);
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.9, 1.1);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.7, 1.3);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
-					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.99, 1.01);
+					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.95, 1.05);
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw();
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
@@ -794,6 +805,10 @@ void check_UE(int sys_mode)
 					ltx->DrawLatexNDC(0.94,0.82,trk_label.c_str());
 
 				}
+
+				c_x->cd(6)->cd(1);
+				legend_x->Draw();
+
 
 				jet_itr++;
 

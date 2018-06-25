@@ -370,7 +370,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						
 						if (i_trk < 2 || i_trk > 8) continue;
 						
-						string trk_label = Form("%1.2f < #it{p}_{T}^{trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+						string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 						
 						SetHStyle_smallify(h_ChPS_raw_subtr_ratio_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, 1);
 						SetHStyle_smallify(h_ChPS_raw_subtr_unf_ratio_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, 1);
@@ -473,7 +473,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
 					if (i_trk < 2 || i_trk > 8) continue;
-					string trk_label = Form("%1.2f < #it{p}_{T}^{trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+					string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 					
 					//				if (i_trk != 2 &&
 					//					i_trk != 5 &&

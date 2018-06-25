@@ -140,3 +140,15 @@ float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, double je
 	if (isFine) return CHPS_weight_fine[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
 	else return CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
 }
+
+float JetCorrector::GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent)
+{
+	int pt_bin = (((TAxis*)eta_factors->Get("jetpT_binning"))->FindBin(jet_pt)) - 1;
+	int eta_bin = eta_weight[cent][pt_bin]->FindBin(jet_eta);
+	double factor = eta_weight[cent][pt_bin]->GetBinContent(eta_bin);
+	if (std::isnan(factor)) factor = 1.;
+//	cout << Form("%i, %1.2f, %1.2f -> %i, %i -> %s, %f", cent, jet_pt, jet_eta, pt_bin, eta_bin, eta_weight[cent][pt_bin]->GetName(), factor) << endl;
+	return factor;
+}
+
+

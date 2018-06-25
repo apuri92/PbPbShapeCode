@@ -105,6 +105,7 @@ class PbPbFFShape : public BaseClass{
 	vector<TH3D*> h_jet_for_eff; //!
 	vector<TH3D*> h_jet_for_eff_full; //!
 	vector<TH3D*> h_jet_psi3; //!
+	vector<TH3D*> h_reco_jets; //!
 
 
 	//Raw disitrbutions
@@ -149,6 +150,7 @@ class PbPbFFShape : public BaseClass{
 	vector<vector<TH1D*>> h_reco_jet_spectrum; //!
 	vector<vector<TH1D*>> h_reco_jet_spectrum_unW; //!
     vector<vector<TH1D*>> h_true_jet_spectrum; //!
+	vector<vector<TH1D*>> h_true_jet_spectrum_unW; //!
 	vector<vector<TH1D*>> h_true_jet_spectrum_matched; //!
 	vector<vector<TH1D*>> h_reco_jet_spectrum_matched; //!
 
@@ -187,6 +189,10 @@ class PbPbFFShape : public BaseClass{
 	vector<TH3D*> h_jet_pos_v_truth_ptmax; //!
 	vector<TH3D*> h_jet_pos_v_pt; //!
 	vector<TH3D*> h_jet_pos_v_truth_pt; //!
+	vector<TH1D*> h_renorm_mc_hp; //!
+	vector<TH1D*> h_renorm_mb_hp; //!
+	vector<TH1D*> h_renorm_comb; //!
+	vector<TH1D*> h_renorm_comb_inv; //!
 
 	TF1 *f_d0_cut; //!
 	

@@ -96,6 +96,10 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_3D->Sumw2();
 		h_jet_psi3.push_back(temphist_3D);
 
+		temphist_3D = new TH3D(Form("h_reco_jets_cent%i",i),Form("h_reco_jets_cent%i",i), ptJetBinsN, ptJetBins, etaTrkBinsN, etaTrkBins, phiJetBinsN, phiJetBins);
+		temphist_3D->Sumw2();
+		h_reco_jets.push_back(temphist_3D);
+
 
 
 		wk()->addOutput (h_reco_pre_truth_match.at(i));
@@ -105,7 +109,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		wk()->addOutput (h_jet_for_eff.at(i));
 		wk()->addOutput (h_jet_for_eff_full.at(i));
 		wk()->addOutput (h_jet_psi3.at(i));
-
+		wk()->addOutput (h_reco_jets.at(i));
 	}
 
 	//Basic histograms
@@ -196,6 +200,23 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_2D->Sumw2();
 		h_R2vR4.push_back(temphist_2D);
 
+
+		temphist_1D = new TH1D(Form("h_renorm_mb_hp_cent%i",i),Form("h_renorm_mb_hp_cent%i",i),1, 0, 1);
+		temphist_1D->Sumw2();
+		h_renorm_mb_hp.push_back(temphist_1D);
+
+		temphist_1D = new TH1D(Form("h_renorm_mc_hp_cent%i",i),Form("h_renorm_mc_hp_cent%i",i),1, 0, 1);
+		temphist_1D->Sumw2();
+		h_renorm_mc_hp.push_back(temphist_1D);
+
+		temphist_1D = new TH1D(Form("h_renorm_comb_cent%i",i),Form("h_renorm_comb_cent%i",i),1, 0, 1);
+		temphist_1D->Sumw2();
+		h_renorm_comb.push_back(temphist_1D);
+
+		temphist_1D = new TH1D(Form("h_renorm_comb_inv_cent%i",i),Form("h_renorm_comb_inv_cent%i",i),1, 0, 1);
+		temphist_1D->Sumw2();
+		h_renorm_comb_inv.push_back(temphist_1D);
+
 		if (_data_switch==1){
 			temphist_3D = new TH3D(Form("JES_v_max_z_cent%i",i),Form("JES_v_max_z_cent%i",i),zBinsN, zBins,respBinsN,respBins, ptJetBinsN, ptJetBins);
 			temphist_3D->Sumw2();
@@ -222,7 +243,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_3D = new TH3D(Form("h_jet_pos_v_truth_pt_cent%i",i),Form("h_jet_pos_v_truth_pt_cent%i",i),ptTrkBinsN, ptTrkBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
 			temphist_3D->Sumw2();
 			h_jet_pos_v_truth_pt.push_back(temphist_3D);
-
 		}
 
 		wk()->addOutput (h_PixHits.at(i));
@@ -235,6 +255,12 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 		wk()->addOutput (h_jetpT_v_multiplicity.at(i));
 
+		wk()->addOutput (h_renorm_mc_hp.at(i));
+		wk()->addOutput (h_renorm_mb_hp.at(i));
+		wk()->addOutput (h_renorm_comb.at(i));
+		wk()->addOutput (h_renorm_comb_inv.at(i));
+
+
 		if (_data_switch==1){
 			wk()->addOutput (JES_v_max_pT.at(i));
 			wk()->addOutput (JES_v_max_z.at(i));
@@ -242,7 +268,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			wk()->addOutput (h_jet_pos_v_truth_zmax.at(i));
 			wk()->addOutput (h_jet_pos_v_ptmax.at(i));
 			wk()->addOutput (h_jet_pos_v_truth_ptmax.at(i));
-
 		}
 		//wk()->addOutput (h_BL.at(i));
 
@@ -306,6 +331,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		response_ChPS_test_tr =  vector<vector<RooUnfoldResponse*> > (_ndRBins, vector<RooUnfoldResponse*>(_nCentbins));
 
 		h_true_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
+		h_true_jet_spectrum_unW =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 		h_true_jet_spectrum_matched =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 		h_reco_jet_spectrum_matched =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 		ff_jetResponse =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
@@ -553,6 +579,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 				temphist_1D = new TH1D(Form("h_true_jet_spectrum_y%i_cent%i",i,j),Form("h_true_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 				h_true_jet_spectrum.at(i).at(j) = temphist_1D;
 
+				temphist_1D = new TH1D(Form("h_true_jet_spectrum_unW_y%i_cent%i",i,j),Form("h_true_jet_spectrum_unW_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
+				h_true_jet_spectrum_unW.at(i).at(j) = temphist_1D;
+
 				temphist_1D = new TH1D(Form("h_reco_jet_spectrum_matched_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_matched_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 				h_reco_jet_spectrum_matched.at(i).at(j) = temphist_1D;
 
@@ -567,12 +596,14 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 				//Responses
 				h_true_jet_spectrum.at(i).at(j)->Sumw2();
+				h_true_jet_spectrum_unW.at(i).at(j)->Sumw2();
 				h_reco_jet_spectrum_matched.at(i).at(j)->Sumw2();
 				h_true_jet_spectrum_matched.at(i).at(j)->Sumw2();
 
 				ff_jetResponse.at(i).at(j)->Sumw2();
 
 				wk()->addOutput (h_true_jet_spectrum.at(i).at(j));
+				wk()->addOutput (h_true_jet_spectrum_unW.at(i).at(j));
 				wk()->addOutput (h_true_jet_spectrum_matched.at(i).at(j));
 				wk()->addOutput (h_reco_jet_spectrum_matched.at(i).at(j));
 				wk()->addOutput (ff_jetResponse.at(i).at(j));

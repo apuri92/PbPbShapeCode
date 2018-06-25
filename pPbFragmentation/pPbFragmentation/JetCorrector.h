@@ -44,7 +44,9 @@ class JetCorrector
 	TH1D *CHPS_weight_fine[8][8][20];
 	int etabin;
 	TFile * HP_v_MB_FCAl_weight_file;
-	
+
+	TFile * eta_factors;
+	TH1D * eta_weight[6][20];
 	
   public:	
     int nJetYBins;
@@ -52,6 +54,8 @@ class JetCorrector
     std::string _weight_file; 
 	std::string _centrality_weight_file;
 	std:: string _HP_v_MB_FCAl_weight_file;
+	std:: string _eta_weight_file;
+
 	float min_jet_pt;
 	float max_jet_pt;
 	bool m_isMB;
@@ -101,10 +105,13 @@ class JetCorrector
          _HP_v_MB_FCAl_weight_file="FCal_HP_v_MB_weights.root";
          _weight_file="Powheg.reweight.root"; 
 	     _centrality_weight_file="MB_FCal_Normalization.txt";
-        
+		 _eta_weight_file="eta_factors.root";
+
 		TString HP_v_MB_FCAl_weight = xfn + "/../pPbFragmentation/data/"+ _HP_v_MB_FCAl_weight_file;
 		TString event_weight_file = xfn + "/../pPbFragmentation/data/"+ _weight_file;
 		TString fcal_weight_file = xfn +"/../pPbFragmentation/data/"+ _centrality_weight_file;
+		TString eta_weight_file = xfn +"/../pPbFragmentation/data/"+ _eta_weight_file;
+
 
 		HP_v_MB_FCAl_weight_file = new TFile(HP_v_MB_FCAl_weight.Data());
 		weight_file = new TFile(event_weight_file.Data());
@@ -130,7 +137,18 @@ class JetCorrector
 			centiles.push_back(tmp1);
 			if(!ifs.good())break;
 		}    
-              
+
+		 eta_factors = new TFile(eta_weight_file.Data());
+		 int n_pt_bins = ((TAxis*)eta_factors->Get("jetpT_binning"))->GetNbins();
+		 for (int i_cent = 0; i_cent < 6; i_cent++)
+		 {
+			 for (int i_jet = 0; i_jet < n_pt_bins; i_jet++)
+			 {
+				 std::string name = Form("eta_factor_cent%i_jet%i", i_cent, i_jet);
+				 eta_weight[i_cent][i_jet] = (TH1D*)eta_factors->Get(name.c_str());
+			 }
+		 }
+
 
      }// end of constructor
 		
@@ -146,6 +164,7 @@ class JetCorrector
 	float GetJetReweightingFactor(double pt, double eta, int cent);
 	float GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine);
 	float GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent, bool isFine);
+	float GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent);
     ~JetCorrector() {}
 };
 

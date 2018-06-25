@@ -110,6 +110,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	int cent_bin = 0;
 	int cent_bin_fine = 0;
 	double event_weight_fcal = 1;
+	double mb_hp_weight = 1;
 	int n_cent_bins = GetCentralityNBins(_centrality_scheme);
 
 	const xAOD::HIEventShapeContainer* calos=0;
@@ -122,7 +123,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
 		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
 		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
-		if (_dataset == 3) event_weight_fcal = 1;
+		mb_hp_weight = jetcorr->GetFCalWeight(FCalEt, 2); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 		if (_dataset == 3) event_weight_fcal = 1;
 		h_centrality->Fill(cent_bin);
 		h_centrality->Fill(n_cent_bins-1);
 
@@ -548,14 +549,15 @@ EL::StatusCode PbPbFFShape :: execute (){
 		}
 		else if (_data_switch==1)
 		{
+//			double eta_weight = jetcorr->GetEtaReweightingFactor(jet_pt, jet_eta, cent_bin);
+//			jet_weight *=eta_weight;
+
 			h_reco_pre_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
 			h_reco_pre_truth_match.at(n_cent_bins-1)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
 
 			int truthindex=TruthJetIndex.at(i);
 			if (truthindex<0) continue; //Matching to truth jets
 			if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) continue;
-			if (!truth_jet_isolated_vector.at(TruthJetIndex.at(i))) continue;
-
 
 			h_reco_post_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
 			h_reco_post_truth_match.at(n_cent_bins-1)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
@@ -571,6 +573,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
 		}
 
+		h_reco_jets.at(cent_bin)->Fill(jet_pt, jet_eta, jet_phi, jet_weight);
 		if (_dataset == 4) //only run this if doing PbPb, not pp
 		{
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
@@ -584,8 +587,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 				for (int i_pt = 0; i_pt < 10; i_pt++)
 				{
 					double UE_err = -1;
-//					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
-					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+//					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 
 					double eff_uncertainty = 0;
@@ -593,17 +596,26 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 					if (pass_reco_pt_cut)
 					{
-						ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight * 1./(1. + eff_uncertainty));
-						ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight * 1./(1. + eff_uncertainty));
+						ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val * jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
+						ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err * jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
 					}
 
 					//for reco tracks in truth jet
 
 					if (_data_switch)
 					{
-						ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight * 1./(1. + eff_uncertainty));
+						ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
+
 					}
 				}
+			}
+
+			if (pass_reco_pt_cut)
+			{
+				h_renorm_mb_hp.at(cent_bin)->Fill(0.5,mb_hp_weight);
+				h_renorm_mc_hp.at(cent_bin)->Fill(0.5,event_weight_fcal);
+				h_renorm_comb.at(cent_bin)->Fill(0.5,mb_hp_weight/event_weight_fcal);
+				h_renorm_comb_inv.at(cent_bin)->Fill(0.5,event_weight_fcal/mb_hp_weight);
 			}
 		}
 		//fill ff normalization histogram
@@ -929,7 +941,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			truth_jet_phi = truth_jet_phi_vector.at(i);
 			int y_bin = jetcorr->GetJetYBin(truth_jet_y);
 
-			if(!truth_jet_isolated_vector.at(i)) continue;
 
 			if (RecoJetIndex.at(i) >= 0)
 			{
