@@ -109,8 +109,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 	FCalEt = 0;
 	int cent_bin = 0;
 	int cent_bin_fine = 0;
+	double fcal_mbov = 0; int cent_bin_mc = -1;
+	double fcal_mc = 0; int cent_bin_mbov = -1;
+
 	double event_weight_fcal = 1;
-	double mb_hp_weight = 1;
 	int n_cent_bins = GetCentralityNBins(_centrality_scheme);
 
 	const xAOD::HIEventShapeContainer* calos=0;
@@ -120,12 +122,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 		//Centrality
 		FCalEt=calos->at(5)->et()*1e-6;
 		cent_bin = GetCentralityBin(_centrality_scheme, FCalEt,  isHIJING );
+		fcal_mc = FCalEt;
+		cent_bin_mc = cent_bin;
 		cent_bin_fine = GetCentralityBin(30, FCalEt,  isHIJING ); //Need for some tools
 		if (_dataset == 3) cent_bin = 5; //if pp, use 60-80 bin, inclusive bin is filled anyway.
-		if (isMC) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
-		mb_hp_weight = jetcorr->GetFCalWeight(FCalEt, 2); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 		if (_dataset == 3) event_weight_fcal = 1;
-		h_centrality->Fill(cent_bin);
-		h_centrality->Fill(n_cent_bins-1);
+		if (isMC && _dataset == 4) event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 1); //1: MC -> HP, 2: MB -> HP, 3: MB -> MC , 2 or 3 not used here
+		if (_dataset == 3) event_weight_fcal = 1;
 
 		//Get HI clusters for flow
 		//const xAOD::CaloClusterContainer *hiclus(0);
@@ -133,6 +135,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 		//cout << "Psi 1: " << GetEventPlane(hiclus) << " Psi 2: " << GetEventPlane(calos) << endl;
 		uee->Psi = GetEventPlane(calos);
 		uee->Psi3 = GetEventPlane(calos, 3);
+
+
 	}
 
 //	if (_dataset == 4 && isMC)
@@ -161,14 +165,19 @@ EL::StatusCode PbPbFFShape :: execute (){
 //					{
 //						new_Fcal = tree_Fcal;
 //						tree_cent_bin = GetCentralityBin(_centrality_scheme, new_Fcal,  isHIJING );
+//
+//						fcal_mbov = new_Fcal;
+//						cent_bin_mbov = tree_cent_bin;
 //						break;
 //					}
 //				}
 //				break;
 //			}
 //		}
-//		h_fcal_change->Fill(cent_bin, tree_cent_bin);
 //		cent_bin = tree_cent_bin;
+//		FCalEt = new_Fcal;
+//		event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 4);
+//
 //	}
 
 	if (cent_bin < 0 || event_weight_fcal == 0) {
@@ -286,6 +295,17 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	h_FCal_Et->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
 	h_FCal_Et_unw->Fill(FCalEt); //no weighting
+	h_centrality->Fill(cent_bin);
+	//if pp, fill centbin 6 since offline code uses cent6 for pp
+	if (_dataset == 3) 	h_centrality->Fill(n_cent_bins-1);
+
+	//diagnostic
+	h_fcal_mc->Fill(fcal_mc);
+	h_cent_mc->Fill(cent_bin_mc);
+	h_fcal_mbov->Fill(fcal_mbov);
+	h_cent_mbov->Fill(cent_bin_mbov);
+	h_fcal_change->Fill(cent_bin_mc, cent_bin_mbov);
+	h_fcal_diff->Fill(fcal_mc - fcal_mbov);
 
 //	if(_data_switch == 1)
 //	{
@@ -478,7 +498,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 
 		if (fabs(jet_eta)> (2.5 - _dR_max)) continue;
-//		if (jet_pt <= _pTjetCut) continue; //removing cut here. impelmenting only for spectra, ChPS, and response matrices
+		if (jet_pt < 90.) continue;
 
 		jet_pt_xcalib_vector.push_back(jet_pt);
 		jet_phi_vector.push_back(jet_phi);
@@ -522,6 +542,132 @@ EL::StatusCode PbPbFFShape :: execute (){
 													_dR_truth_matching);
 
 
+	vector<double> cone_ue_eta, cone_ue_phi;
+	vector<bool> cone_ue_exclude;
+	vector<int> cone_ue_jetIndex;
+
+	//cone method
+	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++)
+	{
+		h_tmp->Fill(0.5); //total number of jets
+
+		jet_pt = jet_pt_xcalib_vector.at(i);
+		jet_eta = jet_eta_vector.at(i);
+		jet_phi = jet_phi_vector.at(i);
+
+		cone_ue_eta.push_back(jet_eta);
+		cone_ue_phi.push_back(DeltaPhi(jet_phi, TMath::Pi()));
+		cone_ue_exclude.push_back(0);
+		cone_ue_jetIndex.push_back(i);
+
+		cone_ue_eta.push_back(-jet_eta);
+		cone_ue_phi.push_back(jet_phi);
+		cone_ue_exclude.push_back(0);
+		cone_ue_jetIndex.push_back(i);
+
+		cone_ue_eta.push_back(-jet_eta);
+		cone_ue_phi.push_back(DeltaPhi(jet_phi, TMath::Pi()));
+		cone_ue_exclude.push_back(0);
+		cone_ue_jetIndex.push_back(i);
+	}
+
+
+	for (int i = 0; i < cone_ue_eta.size(); i++)
+	{
+		h_tmp->Fill(1.5); //total number of cones
+
+		double cone_eta = cone_ue_eta.at(i);
+		double cone_phi = cone_ue_phi.at(i);
+
+		for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
+		{
+			double jet_pt = jet_pt_xcalib_vector.at(j);
+
+			double jet_eta = jet_eta_vector.at(j);
+			double jet_phi = jet_phi_vector.at(j);
+			double distance_to_cone = DeltaR(cone_phi, cone_eta, jet_phi, jet_eta);
+
+			if (distance_to_cone < 1.6 && jet_pt > 90.)
+			{
+				cone_ue_exclude.at(i) = 1;
+				break;
+			}
+		}
+	}
+
+
+	int unused_cones = 0;
+	for (int i = 0; i < cone_ue_eta.size(); i++)
+	{
+
+		if (cone_ue_exclude.at(i))
+		{
+			h_tmp->Fill(2.5); //total number of excluded cones
+			unused_cones++;
+			continue;
+		}
+
+		h_tmp->Fill(3.5); //total number of used cones
+
+		float jet_weight = 1.;
+		jet_weight *=event_weight;
+
+		double cone_pt = jet_pt_xcalib_vector.at(cone_ue_jetIndex.at(i));
+
+		//normalization for cone_UE
+		double cone_eta = cone_ue_eta.at(i);
+		double cone_phi = cone_ue_phi.at(i);
+		cone_norm_jet.at(cent_bin)->Fill(cone_pt, jet_weight);
+
+		for (const auto& trk : *recoTracks)
+		{
+			//get the tracks....
+			float pt = trk->pt()/1000.;
+			float eta = trk->eta();
+			float phi = trk->phi();
+			bool isMatchedToTruthParticle = false;
+			if (isMC) {
+				ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");
+				float mcprob =trk->auxdata<float>("truthMatchProbability");
+				if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
+			}
+			if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
+			if (fabs(eta) >= 2.5) continue;
+			//Moving track pt in systematic variation  if needed
+			if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue;
+			if (pt < _pTtrkCut) continue; //min pT cut
+
+			float R = DeltaR(phi,eta,cone_phi, cone_eta);
+			if (R > 1.5) continue; //broad cut on dR to remove unecessary effcorr warnings for tracks too far from the jet anwyay
+
+			double d0 = trk->d0();
+			double d0_cut = f_d0_cut->Eval(pt);
+			if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
+			if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
+
+			//Efficiency correction;
+			float eff_uncertainty = 0;
+			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
+
+
+			int dr_bin = trkcorr->GetdRBin(R);
+			ChPS_cone_UE.at(dr_bin).at(cent_bin)->Fill(pt, cone_pt, jet_weight*eff_weight);
+		}
+	}
+
+
+	if (jet_pt_xcalib_vector.size() > 0)
+	{
+		if (cone_ue_eta.size() == unused_cones)
+		{
+			h_tmp->Fill(4.5); //total number of events with ZERO cones and non-zero jets
+		}
+		h_tmp->Fill(5.5); //total number of events with non-zero jets
+	}
+
+
+
+
 	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++)
 	{
 		//Reco jets entering the analysis are
@@ -537,10 +683,11 @@ EL::StatusCode PbPbFFShape :: execute (){
 		jet_phi = jet_phi_vector.at(i);
 
 		bool pass_reco_pt_cut = true;
-		if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity)
-		if(!jet_isolated_vector.at(i)) continue;
 		if (jet_pt <= _pTjetCut) pass_reco_pt_cut = false;
 		int y_bin = jetcorr->GetJetYBin(jet_y);
+		int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)ChPS_raw.at(0).at(0)->GetYaxis());
+		int truth_jetpt_bin;
+		float matched_truth_jet_pt;
 
 		if (_data_switch==0)
 		{
@@ -549,88 +696,64 @@ EL::StatusCode PbPbFFShape :: execute (){
 		}
 		else if (_data_switch==1)
 		{
-//			double eta_weight = jetcorr->GetEtaReweightingFactor(jet_pt, jet_eta, cent_bin);
-//			jet_weight *=eta_weight;
-
-			h_reco_pre_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
-			h_reco_pre_truth_match.at(n_cent_bins-1)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
-
 			int truthindex=TruthJetIndex.at(i);
 			if (truthindex<0) continue; //Matching to truth jets
 			if (truth_jet_pt_vector.at(TruthJetIndex.at(i)) < _truthpTjetCut) continue;
 
-			h_reco_post_truth_match.at(cent_bin)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
-			h_reco_post_truth_match.at(n_cent_bins-1)->Fill(jet_pt, jet_eta, jet_y, jet_weight);
-
-			float delta_r = DeltaR(jet_phi,jet_eta,truth_jet_phi_vector.at(truthindex),truth_jet_eta_vector.at(truthindex));
-			h_reco_truth_matched.at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(truthindex), delta_r, jet_weight);
-			h_reco_truth_matched.at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(truthindex), delta_r, jet_weight);
-			h_reco_truth_comparison.at(cent_bin)->Fill(truth_jet_pt_vector.at(truthindex), (jet_pt/truth_jet_pt_vector.at(truthindex) - 1), truth_jet_eta_vector.at(truthindex), jet_weight);
-			h_reco_truth_comparison.at(n_cent_bins-1)->Fill(truth_jet_pt_vector.at(truthindex), (jet_pt/truth_jet_pt_vector.at(truthindex) - 1), truth_jet_eta_vector.at(truthindex), jet_weight);
+			matched_truth_jet_pt = truth_jet_pt_vector.at(TruthJetIndex.at(i));
+			truth_jetpt_bin = jetcorr->GetJetpTBin(matched_truth_jet_pt, (TAxis*)ChPS_raw.at(0).at(0)->GetYaxis());
 
 			if (!jetcorr->MCJetJERClean(truth_jet_pt_vector.at(truthindex),jet_pt,truth_jet_eta_vector.at(truthindex),cent_bin_fine) ) continue; //cut on JER balance
 			//Reweighting
 			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
 		}
 
-		h_reco_jets.at(cent_bin)->Fill(jet_pt, jet_eta, jet_phi, jet_weight);
+
 		if (_dataset == 4) //only run this if doing PbPb, not pp
 		{
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
 			int jet_dPsi3_bin = GetPsiBin(GetDeltaPsi3(jet_phi, uee->Psi3));
 
+			//UE normalization
+			MB_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
+
 			//psi3 jet distro
-			h_jet_psi3.at(cent_bin)->Fill(jet_pt, jet_eta, GetDeltaPsi3(jet_phi, uee->Psi3) );
-			
+			h_jet_psi3.at(cent_bin)->Fill(jet_pt, fabs(jet_eta), GetDeltaPsi3(jet_phi, uee->Psi3) );
+
 			for (int i_dR = 0; i_dR < 13; i_dR++)
 			{
-				for (int i_pt = 0; i_pt < 10; i_pt++)
+				for (int i_pt = 0; i_pt < 7; i_pt++)
 				{
 					double UE_err = -1;
-					double UE_val = uee->getShapeUE(i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
-//					double UE_val = uee->getShapeUE(i_dR, i_dPsi, jet_dPsi3_bin, i_pt, cent_bin, jet_eta, jet_phi, UE_err);
+					double UE_val = 0;
+
+					if (jetpt_bin >= 6 && jetpt_bin < 12)
+					{
+						UE_val = uee->getShapeUE(1, i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
+					}
+
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
+					double r_bin_center = h_dR_change.at(0).at(0)->GetXaxis()->GetBinCenter(i_dR+1);
 
 					double eff_uncertainty = 0;
 					if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(jet_pt, jet_y, trk_bin_center,jet_eta, i_dR, cent_bin);
 
-					if (pass_reco_pt_cut)
-					{
-						ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val * jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
-						ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err * jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
-					}
-
-					//for reco tracks in truth jet
-
-					if (_data_switch)
-					{
-						ChPS_MB_UE_truthjet.at(i_dR).at(cent_bin)->Fill(trk_bin_center, truth_jet_pt_vector.at(TruthJetIndex.at(i)), UE_val*jet_weight * (1./event_weight_fcal) * 1./(1. + eff_uncertainty));
-
-					}
+					ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
+					ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
 				}
 			}
-
-			if (pass_reco_pt_cut)
-			{
-				h_renorm_mb_hp.at(cent_bin)->Fill(0.5,mb_hp_weight);
-				h_renorm_mc_hp.at(cent_bin)->Fill(0.5,event_weight_fcal);
-				h_renorm_comb.at(cent_bin)->Fill(0.5,mb_hp_weight/event_weight_fcal);
-				h_renorm_comb_inv.at(cent_bin)->Fill(0.5,event_weight_fcal/mb_hp_weight);
-			}
 		}
+
+
 		//fill ff normalization histogram
 		if (pass_reco_pt_cut)
 		{
-			h_reco_jet_spectrum_unW.at(y_bin).at(cent_bin)->Fill(jet_pt, jet_weight);
-			h_reco_jet_spectrum_unW.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, jet_weight);
-			h_reco_jet_spectrum_unW.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);
-			h_reco_jet_spectrum_unW.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);
-
 			h_reco_jet_spectrum.at(y_bin).at(cent_bin)->Fill(jet_pt, jet_weight);
 			h_reco_jet_spectrum.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, jet_weight);
 			h_reco_jet_spectrum.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);
 			h_reco_jet_spectrum.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);
 		}
+
 
 		//Reponses
 		if (_data_switch==1)
@@ -650,17 +773,14 @@ EL::StatusCode PbPbFFShape :: execute (){
 			truth_jet_y = truth_jet_y_vector.at(TruthJetIndex.at(i));
 			int y_truth_bin = jetcorr->GetJetYBin(truth_jet_y);
 
-			h_true_jet_spectrum_matched.at(y_truth_bin).at(cent_bin)->Fill(truth_jet_pt_vector.at(TruthJetIndex.at(i)),jet_weight);
-			h_true_jet_spectrum_matched.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight);
-			h_true_jet_spectrum_matched.at(y_truth_bin).at(n_cent_bins-1)->Fill(truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight);
-			h_true_jet_spectrum_matched.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight);
-
-			h_reco_jet_spectrum_matched.at(y_bin).at(cent_bin)->Fill(jet_pt,jet_weight);
-			h_reco_jet_spectrum_matched.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt,jet_weight);
-			h_reco_jet_spectrum_matched.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt,jet_weight);
-			h_reco_jet_spectrum_matched.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt,jet_weight);
+			FS_norm_jet.at(cent_bin)->Fill(matched_truth_jet_pt, jet_weight);
 
 		}
+
+
+		TM_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
+
+		int jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,uee->Psi));
 
 		float z_max=0;
 		float pT_max=0;
@@ -719,9 +839,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			int dr_bin = trkcorr->GetdRBin(R);
 			if (pass_reco_pt_cut)
 			{
-				ff_raw.at(dr_bin).at(cent_bin)->Fill(z,jet_pt, jet_weight*eff_weight);
-				ff_raw.at(dr_bin).at(n_cent_bins-1)->Fill(z,jet_pt, jet_weight*eff_weight);
-
 				ChPS_raw.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
 				ChPS_raw.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
 
@@ -732,13 +849,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 				}
 
 			}
-
-			if (_data_switch==1)
-			{
-				ChPS_raw_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-				ChPS_raw_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-			}
-
 
 			if(_data_switch==1)
 			{
@@ -781,66 +891,21 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 						//R_trk_jet
 						float R_reco_reco = DeltaR(phi,eta,jet_phi,jet_eta); //(reco_reco and truth_reco) and (reco_truth and truth_truth) are same
-						float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
-						float R_truth_reco = DeltaR(track_mc_phi,track_mc_eta,jet_phi,jet_eta);
 						float R_truth_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
-
-						int dr_bin_reco_reco = trkcorr->GetdRBin(R_reco_reco);
-						int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
-						int dr_bin_truth_reco = trkcorr->GetdRBin(R_truth_reco);
-						int dr_bin_truth_truth = trkcorr->GetdRBin(R_truth_truth);
 
 						float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
 
-						if (R_truth_truth < _dR_max)
-						{
-							int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(track_mc_eta,truth_jet_eta_vector.at(TruthJetIndex.at(i)))));
-							ChPS_test_tt_tt_deta.at(deta_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-							ChPS_test_tt_tt_deta.at(deta_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
+						h_dR_change.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
+						h_dR_change.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
 
-							int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(track_mc_phi,truth_jet_phi_vector.at(TruthJetIndex.at(i)))));
-							ChPS_test_tt_tt_dphi.at(dphi_bin).at(cent_bin)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-							ChPS_test_tt_tt_dphi.at(dphi_bin).at(n_cent_bins-1)->Fill(track_mc_pt,matched_truth_jet_pt, jet_weight);
-
-						}
-
-						if (pass_reco_pt_cut) ChPS_test_rr_rr.at(dr_bin_reco_reco).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight);
-
-						if (track_mc_pt > 0.9)
-						{
-							float eff_weight_truth = trkcorr->get_effcorr(track_mc_pt, eta, cent_bin, 0, _dataset);
-
-							ChPS_test_tt_tt.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight_truth);
-							ChPS_test_tt_tt_mod.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight);
-							ChPS_test_rt_tt.at(dr_bin_reco_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight_truth);
-							ChPS_test_tr_tt.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight_truth);
-							ChPS_test_rr_tt.at(dr_bin_reco_reco).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight_truth);
-
-							ChPS_test_tt_rt.at(dr_bin_truth_truth).at(cent_bin)->Fill(pt, matched_truth_jet_pt, jet_weight*eff_weight);
-							ChPS_test_tt_tr.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, jet_pt, jet_weight*eff_weight);
-							ChPS_test_tt_rr.at(dr_bin_truth_truth).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight);
-						}
-
-						int jetpt_bin = jetcorr->GetJetpTBin(matched_truth_jet_pt, (TAxis*)ChPS_raw.at(0).at(0)->GetYaxis());
-						h_dR_change.at(jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
-						h_dR_change.at(jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
 
 						if (pass_reco_pt_cut)
 						{
-
 							ff_trackpTResponse.at(dr_bin).at(cent_bin)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
 							ff_trackpTResponse.at(dr_bin).at(n_cent_bins-1)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
 
 							response_ChPS.at(dr_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
 							response_ChPS.at(dr_bin).at(n_cent_bins-1)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-
-							response_ChPS_test_rt.at(dr_bin).at(cent_bin)->Fill(pt, matched_truth_jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-							response_ChPS_test_tr.at(dr_bin).at(cent_bin)->Fill(track_mc_pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-
-//							reco_posRes_ChPS.at(dr_bin_reco_reco).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
-//							truth_posRes_ChPS.at(dr_bin_truth_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
-//							rt_posRes_ChPS.at(dr_bin_reco_truth).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
-//							tr_posRes_ChPS.at(dr_bin_truth_reco).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight);
 
 							//Only for truth matched tracks
 							if (R < _dR_max)
@@ -858,58 +923,40 @@ EL::StatusCode PbPbFFShape :: execute (){
 				//Fake/UE tracks
 				if (isFake)
 				{
-					if (pass_reco_pt_cut)
+					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin)
 					{
-						ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
-						ChPS_TM_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
-
-						if (R < _dR_max)
-						{
-							int jetpt_bin = jetcorr->GetJetpTBin(jet_pt, (TAxis*)reco_posRes_ChPS.at(0).at(0)->GetYaxis());
-							UE_distr.at(jetpt_bin).at(cent_bin)->Fill(R, pt, eta, jet_weight*eff_weight);
-							UE_distr.at(jetpt_bin).at(n_cent_bins-1)->Fill(R, pt, eta, jet_weight*eff_weight);
-						}
+						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
-
-					ChPS_TM_UE_truthjet.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-					ChPS_TM_UE_truthjet.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-
+					ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
+					ChPS_TM_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
 
 					float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 					int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);
 
-					ChPS_FS_UE.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
-					ChPS_FS_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+					ChPS_FS_UE.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
+					ChPS_FS_UE.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*eff_weight);
 
 					if (!isSecondary)
 					{
-						ChPS_FNS_UE.at(dr_bin).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
-						ChPS_FNS_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_FNS_UE.at(dr_bin_reco_truth).at(cent_bin)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
+						ChPS_FNS_UE.at(dr_bin_reco_truth).at(n_cent_bins-1)->Fill(pt,matched_truth_jet_pt, jet_weight*eff_weight);
 					}
 
 				}
 			}
 		} // end reco track loop
 
+		h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(DeltaPsi(jet_phi,uee->Psi),jet_eta,jet_phi, jet_weight);
+
 		//JES plots
-		if(_data_switch==1)
-		{
-			JES_v_max_pT.at(cent_bin)->Fill(pT_max,(jet_pt - truth_jet_pt_vector.at(TruthJetIndex.at(i)) )/truth_jet_pt_vector.at(TruthJetIndex.at(i)),truth_jet_pt_vector.at(TruthJetIndex.at(i)),jet_weight);
-			JES_v_max_z.at(cent_bin)->Fill(z_max,(jet_pt - truth_jet_pt_vector.at(TruthJetIndex.at(i)) )/truth_jet_pt_vector.at(TruthJetIndex.at(i)),truth_jet_pt_vector.at(TruthJetIndex.at(i)),jet_weight);
-
-			float truth_reco_R = DeltaR(jet_phi,jet_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)));
-
-			h_jet_pos_v_zmax.at(cent_bin)->Fill(z_max,truth_reco_R,truth_jet_pt_vector.at(TruthJetIndex.at(i)),jet_weight);
-			h_jet_pos_v_ptmax.at(cent_bin)->Fill(pT_max,truth_reco_R,truth_jet_pt_vector.at(TruthJetIndex.at(i)),jet_weight);
-
-		}
-		for (int nMultThreshold=0;nMultThreshold<trkcorr->nMultThresholds;nMultThreshold++) {h_jetpT_v_multiplicity.at(cent_bin)->Fill(jet_pt,nMultThreshold,trk_multiplicity[nMultThreshold]);}
+//		for (int nMultThreshold=0;nMultThreshold<trkcorr->nMultThresholds;nMultThreshold++) {h_jetpT_v_multiplicity.at(cent_bin)->Fill(jet_pt,nMultThreshold,trk_multiplicity[nMultThreshold]);}
 	}// end reco jet loop
 
 
-
 	std::vector<int> RecoJetIndex;
+
+
 
 	//Loop over truth jets
 	if(_data_switch == 1)
@@ -952,7 +999,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			h_jet_for_eff_full.at(n_cent_bins-1)->Fill(truth_jet_pt, fabs(truth_jet_eta), truth_jet_phi, jet_weight);
 
 			if (truth_jet_pt < _truthpTjetCut) continue;
-			if (fabs(truth_jet_y)>(2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity)
+			if (fabs(truth_jet_eta)>(2.5 - _dR_max)) continue; //cut on rapidity 
 
 			//TODO do we want to reweigth also truth spectrum?
 			//if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt,truth_jet_eta,cent_bin);
@@ -992,10 +1039,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 				if (truth_z > truth_z_max) truth_z_max = truth_z;
 				if (pt >  truth_pt_max ) truth_pt_max = pt;
 
-				if (R < 0.4 && dR_reco_truth > 0.)
-				{
-					h_jet_pos_v_truth_pt.at(cent_bin)->Fill(pt,dR_reco_truth,truth_jet_pt_vector.at(i),jet_weight);
-				}
 
 				//alternative
 				//TVector3 jet3vector; jet3vector.SetPtEtaPhi(truth_jet_pt,truth_jet_eta,truth_jet_phi);
@@ -1004,26 +1047,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 				int dr_bin = trkcorr->GetdRBin(R);
 
-				ff_truth.at(dr_bin).at(cent_bin)->Fill(truth_z,truth_jet_pt, jet_weight);
 				ChPS_truth.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
 
-				int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(eta, truth_jet_eta)));
-				ChPS_truth_deta.at(deta_bin).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
-
-				int dphi_bin = trkcorr->GetdRBin(fabs(DeltaPhi(phi,truth_jet_phi)));
-				ChPS_truth_dphi.at(dphi_bin).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
-
 				//Centrality inclusive
-				ff_truth.at(dr_bin).at(n_cent_bins-1)->Fill(truth_z,truth_jet_pt, jet_weight);
 				ChPS_truth.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt, jet_weight);
 			}
 
-
-			if (dR_reco_truth > 0.)
-			{
-				h_jet_pos_v_truth_zmax.at(cent_bin)->Fill(truth_z_max,dR_reco_truth,truth_jet_pt_vector.at(i),jet_weight);
-				h_jet_pos_v_truth_ptmax.at(cent_bin)->Fill(truth_pt_max,dR_reco_truth,truth_jet_pt_vector.at(i),jet_weight);
-			}
 		}
 	}
 
@@ -1043,6 +1072,15 @@ EL::StatusCode PbPbFFShape :: execute (){
 	TruthJetIndex.clear();
 	RecoJetIndex.clear();
 
+	jet_isolated_vector.clear();
+	truth_jet_isolated_vector.clear();
+
+	cone_ue_jetIndex.clear();
+	cone_ue_exclude.clear();
+	cone_ue_eta.clear();
+	cone_ue_phi.clear();
+
+
 	for (int j=0;j<_nTriggers;j++)
 	{
 		isTriggered[j].clear();
@@ -1059,6 +1097,15 @@ EL::StatusCode PbPbFFShape :: execute (){
 	truth_jet_phi_vector.shrink_to_fit();
 	TruthJetIndex.shrink_to_fit();
 	RecoJetIndex.shrink_to_fit();
+
+	jet_isolated_vector.shrink_to_fit();
+	truth_jet_isolated_vector.shrink_to_fit();
+
+	cone_ue_jetIndex.shrink_to_fit();
+	cone_ue_exclude.shrink_to_fit();
+	cone_ue_eta.shrink_to_fit();
+	cone_ue_phi.shrink_to_fit();
+
 
 	for (int j=0;j<_nTriggers;j++){
 		isTriggered[j].shrink_to_fit();

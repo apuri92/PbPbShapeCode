@@ -1,5 +1,24 @@
 #TODO
 --------
+9/10/2018
+*Online code:
+**added finer centrality binning for tree fcal replacement test
+**added psi binning
+**fixed minor bug in jetcorrector->GetEtaEeweighingFactor
+**added infrastructure for changing fcal to that from tree
+**added cone method: using cones at (-eta, -phi), (eta, -phi) and (-eta, phi)
+**removed jet y cut
+**Removed jet isolation
+**Removed old diagnostic histograms
+**Using UE from MC maps - added infrastructure to determine maps
+**using normalized fcal weights instead of fcal_hp_v_mb weights
+*Offline code
+**cone method to check_UE
+**removed diagnostic histos
+**fixed normalization histograms for different cXX versions
+**using MC maps for UE, no UE-JER correction needed in src/main
+
+--------
 6/25/2018
 *Attempting renormalization fix 1:
 In MC, divide out event_weight_FCal for UE_MB histograms since they are

@@ -715,6 +715,22 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
 	}
 
 
+	if ((scheme==0) && (variable=="PsiBins"))
+	{
+		num = 16;
+		int i = 0;
+		printf("\n... Psi bins  : ");
+		for (float dPsi=0.;dPsi<=TMath::Pi()+0.2;dPsi=dPsi+0.2){
+			array[i] = dPsi;
+			printf("%.2f, ", array[i]);
+			i++;
+		}
+
+		cout << " ... " << num << endl;
+
+
+	}
+
 }
 
 int MTCorrector::GetTrkpTBin(float pt){

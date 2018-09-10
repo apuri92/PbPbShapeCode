@@ -102,7 +102,7 @@ class JetPerformance : public BaseClass{
 	float jet_jetQuality,jet_jetTime,jet_jethecq,jet_jetnegE,jet_jetemf,jet_jethecf,jet_jetfracSamplingMax,jet_jetchf,jet_jetBchCorrCell,jet_jetLArBadHVEnergyFrac,weight; //!
 	
 	vector<float> jet_TrigPresc_vector,muon_pt_vector, muon_phi_vector, muon_eta_vector, muon_charge_vector, jet_pt_EM_vector,jet_m_EM_vector,jet_pt_unsubtracted_vector,jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector,jet_m_vector,ClUnsub_et, ClUnsub_eta, ClUnsub_phi; //!
-	vector<int> Is_jet_Good, jet_nConst_vector, truth_matched_index; //!
+	vector<int> Is_jet_Good, jet_nConst_vector, truth_matched_index, muon_quality_vector; //!
 	vector<float> truth_reco_jet_dR_vector,truth_jet_eta_vector,truth_jet_m_vector,truth_jet_phi_vector,truth_jet_pt_vector,truth_muon_pt_vector,truth_muon_phi_vector,truth_muon_eta_vector,truth_muon_charge_vector; //!
 	JetCorrector* jetcorr; //!
 	

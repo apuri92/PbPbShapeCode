@@ -69,7 +69,7 @@ EL::StatusCode JetPerformance :: setupJob (EL::Job& job)
 EL::StatusCode JetPerformance :: histInitialize ()
 {   
 	cout << " Setting  histograms" << endl;
-	jet_tree = true;
+	jet_tree = false;
 	
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",100,0,5);
 	h_RejectionHisto = new TH1D("RejectionHisto","RejectionHisto",9,0,9);
@@ -267,6 +267,7 @@ EL::StatusCode JetPerformance :: histInitialize ()
 		tree_performance->Branch("muon_phi",&muon_phi_vector);
 		tree_performance->Branch("muon_eta",&muon_eta_vector);
 		tree_performance->Branch("muon_charge",&muon_charge_vector);
+		tree_performance->Branch("muon_quality",&muon_quality_vector);
 	
 		
 		if(_data_switch==1){
@@ -396,10 +397,16 @@ EL::StatusCode JetPerformance :: initialize ()
 	m_muonSelection->msg().setLevel( MSG::ERROR ); 
 	m_muonSelection->setProperty( "MaxEta", 2.5 ); 
 	m_muonSelection->setProperty( "MuQuality", 2); // 0-tight, 1-medium, 2-loose, 3-very loose
+	m_muonSelection->setProperty("TrtCutOff",true);
 	EL_RETURN_CHECK("initialize()", m_muonSelection->initialize() );
 	 
 	//Muon corection tool (MC only) 
-	m_muonCalibrationAndSmearingTool = new CP::MuonCalibrationAndSmearingTool( "MuonCorrectionTool" ); 
+	m_muonCalibrationAndSmearingTool = new CP::MuonCalibrationAndSmearingTool( "MuonCorrectionTool" );
+	m_muonCalibrationAndSmearingTool->setProperty("Year", "Data15");
+	m_muonCalibrationAndSmearingTool->setProperty("Release", "Recs2016_15_07");
+	m_muonCalibrationAndSmearingTool->setProperty("SagittaCorr", false);
+	m_muonCalibrationAndSmearingTool->setProperty("doSagittaMCDistortion", false); 
+	m_muonCalibrationAndSmearingTool->setProperty("StatComb", true); 
 	EL_RETURN_CHECK("initialize()", m_muonCalibrationAndSmearingTool->initialize() );
 
 	cout << " Initialization done" << endl;
@@ -436,6 +443,8 @@ EL::StatusCode JetPerformance :: execute (){
 	run_n = eventInfo->runNumber();
 	lbn_n = eventInfo->lumiBlock();
 	
+	if (eventInfo->actualInteractionsPerCrossing() > 0) cout << "Pileup" << eventInfo->actualInteractionsPerCrossing() << endl;
+		
 	//if(m_eventCounter%statSize==0) cout << "EventNumber " << event_n << endl;
 		
 	FCal_Et = 0;
@@ -624,6 +633,7 @@ EL::StatusCode JetPerformance :: execute (){
 	muon_phi_vector.clear();
 	muon_pt_vector.clear();
 	muon_charge_vector.clear();
+	muon_quality_vector.clear();
 	
 	truth_muon_eta_vector.clear();
 	truth_muon_phi_vector.clear();
@@ -896,13 +906,14 @@ EL::StatusCode JetPerformance :: execute (){
 	xAOD::MuonContainer::iterator muonSC_itr = (muons_shallowCopy.first)->begin(); 
 	xAOD::MuonContainer::iterator muonSC_end = (muons_shallowCopy.first)->end(); 
 	for( ; muonSC_itr != muonSC_end; ++muonSC_itr ) { 
-		if(_data_switch==1 && m_muonCalibrationAndSmearingTool->applyCorrection(**muonSC_itr) == CP::CorrectionCode::Error){ // apply correction and check return code 
+		if(m_muonCalibrationAndSmearingTool->applyCorrection(**muonSC_itr) == CP::CorrectionCode::Error){ // apply correction and check return code 
 		Error("execute()", "MuonCalibrationAndSmearingTool returns Error CorrectionCode"); 
 		}
 		muon_pt_vector.push_back((*muonSC_itr)->pt() * 0.001);
 		muon_eta_vector.push_back((*muonSC_itr)->eta());
 		muon_phi_vector.push_back((*muonSC_itr)->phi());
 		muon_charge_vector.push_back((*muonSC_itr)->charge());
+		muon_quality_vector.push_back(m_muonSelection->getQuality(**muonSC_itr));
 		if ((*muonSC_itr)->pt() * 0.001 > 5.) keep_event = true;
 	}
 	//Truth muons

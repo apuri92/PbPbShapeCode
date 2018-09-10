@@ -72,22 +72,27 @@ class PbPbFFShape : public BaseClass{
 	TrackCorrector* trkcorr; //!
 	JetCorrector* jetcorr; //!
 
-	vector<TFile*> fcal_trees; //!
-	vector<int> run_numbers; //!
-
 	//Axis histograms
 	TH3D *h_jet_pt_eta_phi; //!
 	TH3D *h_trk_pt_eta_phi; //!
-	TH3D *h_z_zfine_d0z0; //!
-	TH3D *h_resp_hitsfine_drfine; //!
 
-	
+
 	//Basic histograms
 	TH3D *hET_ETsub; //!
 	TH1D *h_FCal_Et_restr; //!
 	TH2D *h_fcal_change; //!
+	TH1D *h_fcal_diff; //!
+
+
+	TH1D *h_tmp; //!
+
+
 	//TH3F *deriv_val; //!
-	
+	TH1 *h_fcal_mc; //!
+	TH1 *h_fcal_mbov; //!
+	TH1 *h_cent_mc; //!
+	TH1 *h_cent_mbov; //!
+
 	TH1D * h_centrality; //!
 	TH1D *h_dR_binning; //!
 
@@ -96,12 +101,12 @@ class PbPbFFShape : public BaseClass{
 
 	vector<vector<TH3D*>> h_dR_change; //!
 
+	bool derive_UE_mode = 0;
+	int lo_jetpt_bin = 6;
+	int hi_jetpt_bin = 8;
 
 	//debugging histograms
-	vector<TH3D*> h_reco_pre_truth_match; //!
-	vector<TH3D*> h_reco_post_truth_match; //!
 	vector<TH3D*> h_reco_truth_matched; //!
-	vector<TH3D*> h_reco_truth_comparison; //!
 	vector<TH3D*> h_jet_for_eff; //!
 	vector<TH3D*> h_jet_for_eff_full; //!
 	vector<TH3D*> h_jet_psi3; //!
@@ -109,90 +114,55 @@ class PbPbFFShape : public BaseClass{
 
 
 	//Raw disitrbutions
-	vector<vector<TH2D*>> ff_raw; //!  
 	vector<vector<TH2D*>> ChPS_raw; //!
-	vector<vector<TH2D*>> ChPS_raw_truthjet; //!
-	vector<vector<TH2D*>> ChPS_test_tt_tt_deta; //!
-	vector<vector<TH2D*>> ChPS_test_tt_tt_dphi; //!
-	vector<vector<TH2D*>> ChPS_test_tt_tt; //!
-	vector<vector<TH2D*>> ChPS_test_tt_tt_mod; //!
-	vector<vector<TH2D*>> ChPS_test_rr_tt; //!
-	vector<vector<TH2D*>> ChPS_test_rt_tt; //!
-	vector<vector<TH2D*>> ChPS_test_tr_tt; //!
-	vector<vector<TH2D*>> ChPS_test_tt_tr; //!
-	vector<vector<TH2D*>> ChPS_test_tt_rt; //!
-	vector<vector<TH2D*>> ChPS_test_tt_rr; //!
-	vector<vector<TH2D*>> ChPS_test_rr_rr; //!
+
+	//UE
+	vector<vector<vector<vector<TH3D*>>>> h_UE_dNdEtadPhidpT; //!
+	vector<vector<TH3D*>> h_jet_v_Psi; //!
+
+
+	//test UE
+	vector<TH1D*> cone_norm_jet;//!
+	vector<TH1D*> MB_norm_jet;//!
+	vector<TH1D*> TM_norm_jet;//!
+	vector<TH1D*> FS_norm_jet;//!
 
 	//Raw disitrbutions from random cones
-	vector<vector<TH2D*>> ff_raw_UE; //!
+	vector<vector<TH2D*>> ChPS_cone_UE; //!
 	vector<vector<TH2D*>> ChPS_MB_UE; //!
 	vector<vector<TH2D*>> ChPS_MB_UE_err; //!
-	vector<vector<TH2D*>> ChPS_MB_UE_truthjet; //!
 	vector<vector<TH2D*>> ChPS_FS_UE; //!
 	vector<vector<TH2D*>> ChPS_FNS_UE; //!
 	
 	//Truth distributions
-	vector<vector<TH2D*>> ff_truth; //!  
 	vector<vector<TH2D*>> ChPS_truth; //!
 	vector<vector<TH2D*>> ChPS_truth_deta; //!
 	vector<vector<TH2D*>> ChPS_truth_dphi; //!
 
 	//Truth matched distributions
-	//vector<vector<TH2D*>> ff_truth_matched; //!  
 	//vector<vector<TH2D*>> ChPS_truth_matched; //!
 	
 	//UE unmatched disitrbution
 	vector<vector<TH2D*>> ChPS_TM_UE; //!
-	vector<vector<TH2D*>> ChPS_TM_UE_truthjet; //!
-	vector<vector<TH3D*>> UE_distr; //!
 
 	vector<vector<TH1D*>> h_reco_jet_spectrum; //!
-	vector<vector<TH1D*>> h_reco_jet_spectrum_unW; //!
     vector<vector<TH1D*>> h_true_jet_spectrum; //!
-	vector<vector<TH1D*>> h_true_jet_spectrum_unW; //!
-	vector<vector<TH1D*>> h_true_jet_spectrum_matched; //!
-	vector<vector<TH1D*>> h_reco_jet_spectrum_matched; //!
+	vector<vector<TH1D*>> h_true_jet_spectrum_UE_norm; //!
 
-	//TODO to be enabled when needed
-   	//vector<vector<TH1D*>> h_reco_jet_spectrum_weighted; //!
-   	//vector<vector<TH1D*>> h_true_jet_spectrum_weighted; //!
-   	
+
    	//Responses
    	//4D
-   	vector<vector<RooUnfoldResponse *>> response_FF; //!
     vector<vector<RooUnfoldResponse *>> response_ChPS; //!
-	vector<vector<RooUnfoldResponse *>> response_ChPS_test_tr; //!
-	vector<vector<RooUnfoldResponse *>> response_ChPS_test_rt; //!
 
 	//2D
     vector<vector<RooUnfoldResponse *>> response_jet; //!
-
-	vector<vector<TH2D*>> reco_posRes_ChPS; //!
-	vector<vector<TH2D*>> rt_posRes_ChPS; //!
-	vector<vector<TH2D*>> tr_posRes_ChPS; //!
-	vector<vector<TH2D*>> truth_posRes_ChPS; //!
 
 
 	//2D for quick check
 	vector<vector<TH2D*>> ff_jetResponse; //!
 	vector<vector<TH3D*>> ff_trackpTResponse; //!
-	vector<vector<TH3D*>> ff_trackzResponse; //!
-	
-	vector<TH3D*> JES_v_max_z; //!
-	vector<TH3D*> JES_v_max_pT; //!
-	vector<TH3D*> h_jetpT_v_multiplicity; //!
-	vector<TH2D*> h_R2vR4; //!
-	vector<TH3D*> h_jet_pos_v_zmax; //!
-	vector<TH3D*> h_jet_pos_v_truth_zmax; //!
-	vector<TH3D*> h_jet_pos_v_ptmax; //!
-	vector<TH3D*> h_jet_pos_v_truth_ptmax; //!
-	vector<TH3D*> h_jet_pos_v_pt; //!
-	vector<TH3D*> h_jet_pos_v_truth_pt; //!
-	vector<TH1D*> h_renorm_mc_hp; //!
-	vector<TH1D*> h_renorm_mb_hp; //!
-	vector<TH1D*> h_renorm_comb; //!
-	vector<TH1D*> h_renorm_comb_inv; //!
+
+//	vector<TH3D*> h_jetpT_v_multiplicity; //!
 
 	TF1 *f_d0_cut; //!
 	

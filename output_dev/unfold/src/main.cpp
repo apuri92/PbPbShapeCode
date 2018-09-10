@@ -188,7 +188,12 @@ int main(int argc, char ** argv)
 			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH1* h_UE_uncert;
-			if (dataset_type == "PbPb") h_UE_uncert = (TH1*)((TH1*)UE_uncert->Get(Form("UE_uncert_4_cent%i", i_cent)))->Clone(Form("UE_uncert_4_cent%i_dR%i", i_cent, i_dR));
+			TH2* h_UE_cone;
+			if (dataset_type == "PbPb")
+			{
+				h_UE_cone = (TH2*)f_data->Get(Form("ChPS_cone_UE_dR%i_cent%i",i_dR, i_cent));;
+				h_UE_uncert = (TH1*)((TH1*)UE_uncert->Get(Form("UE_uncert_4_cent%i", i_cent)))->Clone(Form("UE_uncert_4_cent%i_dR%i", i_cent, i_dR));
+			}
 
 			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
 			h_final_UE->Reset();
@@ -201,13 +206,23 @@ int main(int argc, char ** argv)
 			TH2* h_UE_corr_factors;
 			h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
 
-			double n_jets_data = 1, n_jets_mc = 1;
+			double n_jets_data = 1, n_jets_mc = 1, n_jets_cone = 1;
 
 			TH1* h_reco_jet_spect_mc = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
 			h_reco_jet_spect_mc->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
 
 			TH1* h_reco_jet_spect_data = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
 			h_reco_jet_spect_data->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+
+			TH1* h_cone_jet_spectra;
+
+			if (dataset_type == "PbPb")
+			{
+				name = Form("cone_norm_jet_cent%i", i_cent);
+				h_cone_jet_spectra= (TH1*)((TH1*)f_data->Get(name.c_str()))->Clone(Form("cone_UE_norm_y4_c%i", i_cent));
+				h_cone_jet_spectra->SetName(Form("%s_data",name.c_str()));
+				h_cone_jet_spectra->Sumw2();
+			}
 
 			TH2* h_raw_subtr = (TH2*)h_raw->Clone(Form("h_raw_subtr_dR%i_c%i", i_dR, i_cent));
 			h_raw_subtr->Reset();
@@ -217,8 +232,9 @@ int main(int argc, char ** argv)
 			{
 				n_jets_mc = h_reco_jet_spect_mc->GetBinContent(i_jet_bin);
 				n_jets_data = h_reco_jet_spect_data->GetBinContent(i_jet_bin);
+				if (dataset_type == "PbPb") n_jets_cone = h_cone_jet_spectra->GetBinContent(i_jet_bin);
 
-				if (n_jets_mc == 0) continue;
+				if (n_jets_mc == 0 || n_jets_cone == 0) continue;
 
 
 				//if pp. Subtract only fakes (UE_TM|MC) for all pT. Need to normalize n_jets_data / n_jets_mc. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
@@ -226,7 +242,7 @@ int main(int argc, char ** argv)
 				//	if < 10 GeV: Subtract (UE_MB|data). No Need to normalize n_jets_w / n_jets_unw.
 				//	if >= 10 GeV: Subtract (UE_TM|MC). Need to normalize n_jets_data / n_jets_mv. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
 
-				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
+				for (int i_trk_bin = 1; i_trk_bin <= N_trkpt; i_trk_bin++)
 				{
 
 					double UE = 0, UE_err = 0, final_UE = 0, final_UE_err = 0;
@@ -276,8 +292,18 @@ int main(int argc, char ** argv)
 
 							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
 							UE_err = h_UE_MB_err->GetBinContent(i_trk_bin, i_jet_bin);
-							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //correct number of jets, correct for UE JER correlation
-							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
+							correction = 1; //not needed because using MC maps
+							correction_err = 0;
+
+//							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //correct number of jets, correct for UE JER correlation
+//							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
+
+//							//use for systematics
+//							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);
+//							UE_err = h_UE_cone->GetBinError(i_trk_bin, i_jet_bin);
+//							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin) *  n_jets_data / n_jets_cone; //correct number of jets
+//							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin);
+//
 
 							raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
 							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
@@ -316,18 +342,15 @@ int main(int argc, char ** argv)
 						}
 					}
 
-					if (verbose && subtr < 0 && (i_jet_bin >= 8 && i_jet_bin <= 11) && (i_trk_bin >=2 && i_trk_bin <= 9))
+
+					if (verbose && subtr < 0 && (i_jet_bin >= 9 && i_jet_bin <= 12) && (i_trk_bin >=4 && i_trk_bin <= 11))
 					{
-						double jet_lo = jetpT_binning->GetBinLowEdge(i_jet_bin);
-						double jet_hi = jetpT_binning->GetBinUpEdge(i_jet_bin);
+						std::string trk_label = Form("%1.1f < trk < %1.1f", trkpT_binning->GetBinLowEdge(i_trk_bin), trkpT_binning->GetBinUpEdge(i_trk_bin));
+						std::string jet_label = Form("%1.0f < jet < %1.0f", jetpT_binning->GetBinLowEdge(i_jet_bin), jetpT_binning->GetBinUpEdge(i_jet_bin));
+						std::string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
 
-						double trk_lo = trkpT_binning->GetBinLowEdge(i_trk_bin);
-						double trk_hi = trkpT_binning->GetBinUpEdge(i_trk_bin);
+						cout << Form("WARNING NEGATIVE CHPS at trk%i_cent%i_jet%i dR%i, %s, %s, %s, %s", i_trk_bin-1, i_cent, i_jet_bin-1, i_dR, trk_label.c_str(), jet_label.c_str(), dr_label.c_str(), num_to_cent(31,i_cent).c_str()) << endl;
 
-						double dr_lo = dR_binning->GetBinLowEdge(i_dR+1);
-						double dr_hi = dR_binning->GetBinUpEdge(i_dR+1);
-
-						cout << "oversubtraction WARNING " << Form("jet: %2.2f-%2.2f, trk: %2.2f-%2.2f, dr: %2.2f-%2.2f, cent%i ", jet_lo, jet_hi, trk_lo, trk_hi, dr_lo, dr_hi, i_cent) << endl;
 					}
 
 					h_final_UE->SetBinContent(i_trk_bin, i_jet_bin, final_UE);

@@ -1,12 +1,12 @@
 
-systematics=(19) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
+systematics=(67) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
 
 
 function unfold_draw_DpT {
 	echo "dataset_type: $1" > unfold_draw_DpT_auto.cfg
 	echo "isMC: $2" >> unfold_draw_DpT_auto.cfg
 	echo "sys_mode: $3" >> unfold_draw_DpT_auto.cfg
-	echo "verbose: 0" >> unfold_draw_DpT_auto.cfg
+	echo "verbose: 1" >> unfold_draw_DpT_auto.cfg
 	echo "draw_mode: 1" >> unfold_draw_DpT_auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
@@ -19,7 +19,7 @@ function unfold_draw_DpT {
 	root -b -q "draw_ChPS.c(\"unfold_draw_DpT_auto.cfg\")"
 	root -b -q "draw_spectra.c(\"unfold_draw_DpT_auto.cfg\")"
 
-	rm unfold_draw_DpT_auto.cfg
+	# rm unfold_draw_DpT_auto.cfg
 }
 
 function get_RDpT {
@@ -52,12 +52,12 @@ for i in ${systematics[@]}; do
 	mkdir -p output_pdf_$sys_path$i/pp
 
 
-	unfold_draw_DpT PbPb 0 $i
-	unfold_draw_DpT pp 0 $i
+	# unfold_draw_DpT PbPb 0 $i
+	# unfold_draw_DpT pp 0 $i
 	get_RDpT 0 $i
 
-	unfold_draw_DpT PbPb 1 $i
-	unfold_draw_DpT pp 1 $i
+	# unfold_draw_DpT PbPb 1 $i
+	# unfold_draw_DpT pp 1 $i
 	get_RDpT 1 $i
 done
 

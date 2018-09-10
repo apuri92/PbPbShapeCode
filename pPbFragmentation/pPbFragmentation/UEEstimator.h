@@ -35,11 +35,10 @@ class UEEstimator
 	TFile *_f_ShapeUE_v3;
 	TFile *_f_ShapeUE_tight;
 
-	vector<vector<vector<vector<vector<TH2*>>>>> h_UE_v3 = vector<vector<vector<vector<vector<TH2*>>>>> (13, vector<vector<vector<vector<TH2*>>>> (16, vector<vector<vector<TH2*>>> (6, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL)))));
+	vector<vector<vector<vector<vector<TH2*>>>>> h_UE_eta_phi_maps = vector<vector<vector<vector<vector<TH2*>>>>> (12, vector<vector<vector<vector<TH2*>>>> (7, vector<vector<vector<TH2*>>> (10, vector<vector<TH2*>> (6, vector<TH2*> (13)))));
 
-	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
 
-    TH3D * _h_v2_EP;    
+    TH3D * _h_v2_EP;
     TFile * _f_flowv2;
     TH3D * _h_v3_EP;    
     TFile * _f_flowv3;
@@ -75,7 +74,7 @@ class UEEstimator
 	  }
 
 		 TString path_to_UE = gSystem->GetFromPipe("echo $ROOTCOREBIN");
-		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps.root","READ");
+		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb.root","READ");
 		 _f_ShapeUE_tight = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_nov3_tight.root","READ");
 		 _f_ShapeUE_v3 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_v2_v3.root","READ");;
 
@@ -131,7 +130,9 @@ class UEEstimator
 	void initShapeUE(bool isMC, int uncert);
 	double getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
     double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
-    Int_t GetTrackpTBin(float pt) {
+	double getShapeUE(bool new_MC, int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, int i_jet, double &error);
+
+	Int_t GetTrackpTBin(float pt) {
     	Int_t bin=-1;
     		if (pt>0.2) bin=0; if (pt>1.) bin=1; if (pt>2.) bin=2; if (pt>3.) bin=3; if (pt>4.) bin=4; if (pt>5.) bin=5; 
     	return bin;

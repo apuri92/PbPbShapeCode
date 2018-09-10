@@ -76,26 +76,31 @@ void UE_factors(string config_file = "ff_config.cfg")
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
 
-			TH1* h_renorm = (TH1*)input_file->Get(Form("h_renorm_cent%i", i_cent));
-			double renorm = h_renorm->GetBinContent(1);
+			double renorm = 1;
 
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_MB_method = (TH2*)input_file->Get(name.c_str());
-//			name = Form("h_reco_jet_spectrum_unW_y4_cent%i", i_cent);
-//			TH1* h_jet_spectra_unW = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_jet_y4_unW_c%i", i_cent));
-//			h_jet_spectra_unW->Sumw2();
-
 
 			name = Form("ChPS_MB_UE_err_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_MB_method_err = (TH2*)input_file->Get(name.c_str());
 
+			name = Form("ChPS_cone_UE_dR%i_cent%i", i_dR, i_cent);
+			TH2* h_cone_method = (TH2*)input_file->Get(name.c_str());
 
 			name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_TM_method = (TH2*)input_file->Get(name.c_str());
+
+			name = Form("ChPS_FNS_UE_dR%i_cent%i", i_dR, i_cent);
+			TH2* h_FNS_method = (TH2*)input_file->Get(name.c_str());
+
 			name = Form("h_reco_jet_spectrum_y4_cent%i", i_cent);
 			TH1* h_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_jet_y4_c%i", i_cent));
 			h_jet_spectra->Sumw2();
 
+			name = Form("cone_norm_jet_cent%i", i_cent);
+			TH1* h_cone_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("cone_UE_norm_y4_c%i", i_cent));
+			h_cone_jet_spectra->SetName(Form("%s_mc",name.c_str()));
+			h_cone_jet_spectra->Sumw2();
 
 			//SET ERRORS FROM MB_ERR HISTOGRAM
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
@@ -110,29 +115,33 @@ void UE_factors(string config_file = "ff_config.cfg")
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 			{
 				double n_jets = h_jet_spectra->GetBinContent(i_jet_bin);
-//				double n_jets_unW = h_jet_spectra_unW->GetBinContent(i_jet_bin);
+				double n_jets_cone = h_cone_jet_spectra->GetBinContent(i_jet_bin);
 
-				if (n_jets == 0) continue;
+				if (n_jets == 0 || n_jets_cone == 0) continue;
 
 				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
 				{
-					double updated_UE_MB = h_MB_method->GetBinContent(i_trk_bin, i_jet_bin) * renorm / n_jets;
+					double updated_UE_MB = h_MB_method->GetBinContent(i_trk_bin, i_jet_bin) / n_jets;
 					double updated_UE_TM = h_TM_method->GetBinContent(i_trk_bin, i_jet_bin) / n_jets;
+					double updated_UE_cone = h_cone_method->GetBinContent(i_trk_bin, i_jet_bin) / n_jets_cone;
 
-					double updated_UE_MB_err = h_MB_method->GetBinError(i_trk_bin, i_jet_bin) * renorm / n_jets;
+					double updated_UE_MB_err = h_MB_method->GetBinError(i_trk_bin, i_jet_bin) / n_jets;
 					double updated_UE_TM_err = h_TM_method->GetBinError(i_trk_bin, i_jet_bin) / n_jets;
+					double updated_UE_cone_err = h_cone_method->GetBinError(i_trk_bin, i_jet_bin) / n_jets_cone;
 
 					h_MB_method->SetBinContent(i_trk_bin, i_jet_bin, updated_UE_MB);
 					h_TM_method->SetBinContent(i_trk_bin, i_jet_bin, updated_UE_TM);
+					h_cone_method->SetBinContent(i_trk_bin, i_jet_bin, updated_UE_cone);
 
 					h_MB_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_MB_err);
 					h_TM_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_TM_err);
+					h_cone_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_cone_err);
 				}
 			}
 
 			name = Form("ratio_dR%i_cent%i", i_dR, i_cent);
 			h_ratio[i_dR][i_cent] = (TH2*)h_TM_method->Clone(name.c_str());
-			h_ratio[i_dR][i_cent]->Divide(h_MB_method); //errors propagated assuming they are uncorrelated
+			h_ratio[i_dR][i_cent]->Divide(h_cone_method); //errors propagated assuming they are uncorrelated
 
 			UE_factors->cd();
 			name = Form("UE_ratio_dR%i_cent%i", i_dR, i_cent);
@@ -188,7 +197,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 		cout << "posres as Function of R" << endl;
 		TCanvas *c_pos_res = new TCanvas("c_pos_res","c_pos_res",900,600);
 
-		TLegend *legend_pos_res = new TLegend(0.55, 0.50, 0.75, 0.80, "","brNDC");
+		TLegend *legend_pos_res = new TLegend(0.55, 0.18, 0.75, 0.40, "","brNDC");
 		legend_pos_res->SetTextFont(43);
 		legend_pos_res->SetBorderSize(0);
 		legend_pos_res->SetTextSize(10);
@@ -215,15 +224,15 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 					if (jet_itr == 0 && i_cent == 0) legend_pos_res->AddEntry(h_ratio_1d_r[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
 
-					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0., 5);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0.9, 1.1);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0., r_max_range);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle("#it{r}");
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("Correction Factors");
 
 					c_pos_res->cd(i_cent+1);
-					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("p");
-					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
+					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("hist text");
+//					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
 					line->DrawLine(0, 1, r_max_range, 1);
 
 					trk_itr++;

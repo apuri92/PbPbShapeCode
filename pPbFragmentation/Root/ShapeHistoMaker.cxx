@@ -33,8 +33,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
     jetcorr->is_pp = (_dataset == 3);
 
 
-	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, dR_resBinsN;
-	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], finehitsBins[1000], dR_resBins[1000];
+	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, dR_resBinsN, PsiBinsN;
+	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], finehitsBins[1000], dR_resBins[1000], PsiBins[1000];
 
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
@@ -48,6 +48,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	SetupBinning(0, "resp", respBins, respBinsN);
 	SetupBinning(0, "hits_fine", finehitsBins, finehitsBinsN);
 	SetupBinning(0, "dr_fine", dR_resBins, dR_resBinsN);
+	SetupBinning(0, "PsiBins", PsiBins, PsiBinsN);
 
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
@@ -55,34 +56,25 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_fcal_change = new TH2D("h_fcal_change","h_fcal_change",10,0,10,10,0,10);
 	wk()->addOutput (h_fcal_change);
 
+	h_fcal_diff = new TH1D("h_fcal_diff","h_fcal_diff",400,-0.1,0.9);
+	wk()->addOutput (h_fcal_diff);
+	
 	//Axis histograms
 	h_jet_pt_eta_phi = new TH3D("h_jet_pt_eta_phi","h_jet_pt_eta_phi",ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, phiJetBinsN, phiJetBins);
 	h_trk_pt_eta_phi = new TH3D("h_trk_pt_eta_phi","h_trk_pt_eta_phi",ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins, phiTrkBinsN, phiTrkBins);
-	h_z_zfine_d0z0 = new TH3D("h_z_zfine_d0z0","h_z_zfine_d0z0",zBinsN, zBins, zBinsFineN, zBinsFine, d0z0BinsN, d0z0Bins);
-	h_resp_hitsfine_drfine = new TH3D("h_resp_hitsfine_drfine","h_resp_hitsfine_drfine",respBinsN, respBins, finehitsBinsN, finehitsBins, dR_resBinsN, dR_resBins);
 	wk()->addOutput (h_jet_pt_eta_phi);
 	wk()->addOutput (h_trk_pt_eta_phi);
-	wk()->addOutput (h_z_zfine_d0z0);
-	wk()->addOutput (h_resp_hitsfine_drfine);
 
+	h_tmp = new TH1D("h_tmp","h_tmp",10,0,10);
+	wk()->addOutput(h_tmp);
+
+	
 	//Debugging histograms
 	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)
 	{
-		temphist_3D = new TH3D(Form("h_reco_pre_truth_match_cent%i",i),Form("h_reco_pre_truth_match_cent%i",i),ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, etaJetBinsN, etaJetBins);
-		temphist_3D->Sumw2();
-		h_reco_pre_truth_match.push_back(temphist_3D);
-
-		temphist_3D = new TH3D(Form("h_reco_post_truth_match_cent%i",i),Form("h_reco_post_truth_match_cent%i",i),ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, etaJetBinsN, etaJetBins);
-		temphist_3D->Sumw2();
-		h_reco_post_truth_match.push_back(temphist_3D);
-
 		temphist_3D = new TH3D(Form("h_reco_truth_matched_cent%i",i),Form("h_reco_truth_matched_cent%i",i),ptJetBinsN, ptJetBins, ptJetBinsN, ptJetBins, dR_resBinsN, dR_resBins);
 		temphist_3D->Sumw2();
 		h_reco_truth_matched.push_back(temphist_3D);
-
-		temphist_3D = new TH3D(Form("h_reco_truth_comparison_cent%i",i),Form("h_reco_truth_comparison_cent%i",i), ptJetBinsN, ptJetBins, respBinsN, respBins, etaJetBinsN, etaJetBins);
-		temphist_3D->Sumw2();
-		h_reco_truth_comparison.push_back(temphist_3D);
 
 		temphist_3D = new TH3D(Form("h_jet_for_eff_cent%i",i),Form("h_jet_for_eff_cent%i",i), ptJetBinsN, ptJetBins, etaJetBinsN, etaJetBins, phiJetBinsN, phiJetBins);
 		temphist_3D->Sumw2();
@@ -100,12 +92,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_3D->Sumw2();
 		h_reco_jets.push_back(temphist_3D);
 
-
-
-		wk()->addOutput (h_reco_pre_truth_match.at(i));
-		wk()->addOutput (h_reco_post_truth_match.at(i));
 		wk()->addOutput (h_reco_truth_matched.at(i));
-		wk()->addOutput (h_reco_truth_comparison.at(i));
 		wk()->addOutput (h_jet_for_eff.at(i));
 		wk()->addOutput (h_jet_for_eff_full.at(i));
 		wk()->addOutput (h_jet_psi3.at(i));
@@ -115,6 +102,12 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	//Basic histograms
 	h_FCal_Et = new TH1D("h_FCal_Et",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et->Sumw2();
+
+	h_fcal_mc = new TH1D("h_fcal_mc",";FCal E_{T};N",1200,0.,6.);
+	h_fcal_mc->Sumw2();
+
+	h_fcal_mbov = new TH1D("h_fcal_mbov",";FCal E_{T};N",1200,0.,6.);
+	h_fcal_mbov->Sumw2();
 
 	h_FCal_Et_unw = new TH1D("h_FCal_Et_unw",";FCal E_{T};N",1200,0.,6.);
 	h_FCal_Et_unw->Sumw2();
@@ -127,6 +120,12 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 	h_centrality = new TH1D("Centrality","Centrality",10,0,10);
 	h_centrality->Sumw2();
+
+	h_cent_mc = new TH1D("h_cent_mc","h_cent_mc",10,0,10);
+	h_cent_mc->Sumw2();
+	
+	h_cent_mbov = new TH1D("h_cent_mbov","h_cent_mbov",10,0,10);
+	h_cent_mbov->Sumw2();
 
 	hET_ETsub = new TH3D("hET_ETsub","hET_ETsub",200,0,200,100,-5,5,200,-50,50);
 	hET_ETsub->Sumw2();
@@ -145,6 +144,11 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_reco_trk_map_nocuts->Sumw2();
 
 	wk()->addOutput (h_FCal_Et);
+	wk()->addOutput (h_fcal_mc);
+	wk()->addOutput (h_fcal_mbov);
+	wk()->addOutput (h_cent_mc);
+	wk()->addOutput (h_cent_mbov);
+
 	wk()->addOutput (h_FCal_Et_unw);
 	wk()->addOutput (h_FCal_Et_restr);
 	wk()->addOutput (h_RejectionHisto);
@@ -188,156 +192,100 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_2D->Sumw2();
 		h_z0sintheta.push_back(temphist_2D);
 
-		temphist_3D = new TH3D(Form("h_vx_cent%i",i),"h_vx;v_{x};v_{y};v_{z}",200,-2,2,200,-2,2,200,-200,200);
-		temphist_3D->Sumw2();
-		h_vx.push_back(temphist_3D);
+//		temphist_3D = new TH3D(Form("h_jetpT_v_multiplicity_cent%i",i),"h_jetpT_v_multiplicity;jet p_{T} GeV;p_{T}^{trk,min} [GeV];multiplicity",20,0,1000,6,0,6,50,0,50);
+//		h_jetpT_v_multiplicity.push_back(temphist_3D);
+//		h_jetpT_v_multiplicity.at(i)->Sumw2();
 
-		temphist_3D = new TH3D(Form("h_jetpT_v_multiplicity_cent%i",i),"h_jetpT_v_multiplicity;jet p_{T} GeV;p_{T}^{trk,min} [GeV];multiplicity",20,0,1000,6,0,6,50,0,50);
-		h_jetpT_v_multiplicity.push_back(temphist_3D);
-		h_jetpT_v_multiplicity.at(i)->Sumw2();
-
-		temphist_2D = new TH2D(Form("h_R2vR4_cent%i",i),Form("h_R2vR4_cent%i",i),40,100,500,80,-0.4,0.4);
-		temphist_2D->Sumw2();
-		h_R2vR4.push_back(temphist_2D);
-
-
-		temphist_1D = new TH1D(Form("h_renorm_mb_hp_cent%i",i),Form("h_renorm_mb_hp_cent%i",i),1, 0, 1);
-		temphist_1D->Sumw2();
-		h_renorm_mb_hp.push_back(temphist_1D);
-
-		temphist_1D = new TH1D(Form("h_renorm_mc_hp_cent%i",i),Form("h_renorm_mc_hp_cent%i",i),1, 0, 1);
-		temphist_1D->Sumw2();
-		h_renorm_mc_hp.push_back(temphist_1D);
-
-		temphist_1D = new TH1D(Form("h_renorm_comb_cent%i",i),Form("h_renorm_comb_cent%i",i),1, 0, 1);
-		temphist_1D->Sumw2();
-		h_renorm_comb.push_back(temphist_1D);
-
-		temphist_1D = new TH1D(Form("h_renorm_comb_inv_cent%i",i),Form("h_renorm_comb_inv_cent%i",i),1, 0, 1);
-		temphist_1D->Sumw2();
-		h_renorm_comb_inv.push_back(temphist_1D);
-
-		if (_data_switch==1){
-			temphist_3D = new TH3D(Form("JES_v_max_z_cent%i",i),Form("JES_v_max_z_cent%i",i),zBinsN, zBins,respBinsN,respBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			JES_v_max_z.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("JES_v_max_pT_cent%i",i),Form("JES_v_max_pT_cent%i",i),ptTrkBinsN, ptTrkBins, respBinsN,respBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			JES_v_max_pT.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("h_jet_pos_v_zmax_cent%i",i),Form("h_jet_pos_v_zmax_cent%i",i),zBinsN, zBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_zmax.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("h_jet_pos_v_truth_zmax_cent%i",i),Form("h_jet_pos_v_truth_zmax_cent%i",i),zBinsN, zBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_truth_zmax.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("h_jet_pos_v_ptmax_cent%i",i),Form("h_jet_pos_v_ptmax_cent%i",i),ptTrkBinsN, ptTrkBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_ptmax.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("h_jet_pos_v_truth_ptmax_cent%i",i),Form("h_jet_pos_v_truth_ptmax_cent%i",i),ptTrkBinsN, ptTrkBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_truth_ptmax.push_back(temphist_3D);
-
-			temphist_3D = new TH3D(Form("h_jet_pos_v_pt_cent%i",i),Form("h_jet_pos_v_pt_cent%i",i),ptTrkBinsN, ptTrkBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_pt.push_back(temphist_3D);
-			temphist_3D = new TH3D(Form("h_jet_pos_v_truth_pt_cent%i",i),Form("h_jet_pos_v_truth_pt_cent%i",i),ptTrkBinsN, ptTrkBins, dR_resBinsN,dR_resBins, ptJetBinsN, ptJetBins);
-			temphist_3D->Sumw2();
-			h_jet_pos_v_truth_pt.push_back(temphist_3D);
-		}
 
 		wk()->addOutput (h_PixHits.at(i));
 		wk()->addOutput (h_SCTHits.at(i));
 		wk()->addOutput (h_d0.at(i));
 		wk()->addOutput (h_z0sintheta.at(i));
-		wk()->addOutput (h_vx.at(i));
-
-		wk()->addOutput (h_R2vR4.at(i));
-
-		wk()->addOutput (h_jetpT_v_multiplicity.at(i));
-
-		wk()->addOutput (h_renorm_mc_hp.at(i));
-		wk()->addOutput (h_renorm_mb_hp.at(i));
-		wk()->addOutput (h_renorm_comb.at(i));
-		wk()->addOutput (h_renorm_comb_inv.at(i));
-
-
-		if (_data_switch==1){
-			wk()->addOutput (JES_v_max_pT.at(i));
-			wk()->addOutput (JES_v_max_z.at(i));
-			wk()->addOutput (h_jet_pos_v_zmax.at(i));
-			wk()->addOutput (h_jet_pos_v_truth_zmax.at(i));
-			wk()->addOutput (h_jet_pos_v_ptmax.at(i));
-			wk()->addOutput (h_jet_pos_v_truth_ptmax.at(i));
-		}
-		//wk()->addOutput (h_BL.at(i));
+//		wk()->addOutput (h_jetpT_v_multiplicity.at(i));
 
 	}
 
 
-
-	ff_raw =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ff_raw_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_raw =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_raw_truthjet =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 
-	ChPS_test_tt_tt_deta =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tt_tt_dphi =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-
-	ChPS_test_tt_tt =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tt_tt_mod =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-
-	ChPS_test_rt_tt =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tr_tt =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_rr_tt =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tt_rt =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tt_tr =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_tt_rr =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_test_rr_rr =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-
-
-
+	ChPS_cone_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_MB_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_MB_UE_err =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-	ChPS_MB_UE_truthjet =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FNS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	h_dR_change =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
-	UE_distr =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
-
 
 	h_reco_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
-	h_reco_jet_spectrum_unW =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
+
 	//in MC only
 	if (_data_switch==1)
 	{
 		ChPS_TM_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		ChPS_TM_UE_truthjet =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		ff_truth =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 		ChPS_truth =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		ChPS_truth_deta =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		ChPS_truth_dphi =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-
-		reco_posRes_ChPS =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		rt_posRes_ChPS =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		tr_posRes_ChPS =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
-		truth_posRes_ChPS =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 
 		ff_trackpTResponse =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(_nCentbins));
-		ff_trackzResponse =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(_nCentbins));
-		response_FF =  vector<vector<RooUnfoldResponse*> > (_ndRBins, vector<RooUnfoldResponse*>(_nCentbins));
 		response_ChPS =  vector<vector<RooUnfoldResponse*> > (_ndRBins, vector<RooUnfoldResponse*>(_nCentbins));
 
-		response_ChPS_test_rt =  vector<vector<RooUnfoldResponse*> > (_ndRBins, vector<RooUnfoldResponse*>(_nCentbins));
-		response_ChPS_test_tr =  vector<vector<RooUnfoldResponse*> > (_ndRBins, vector<RooUnfoldResponse*>(_nCentbins));
-
 		h_true_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
-		h_true_jet_spectrum_unW =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
-		h_true_jet_spectrum_matched =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
-		h_reco_jet_spectrum_matched =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 		ff_jetResponse =  vector<vector<TH2D*> > (_nJetYBins, vector<TH2D*>(_nCentbins));
 		response_jet =  vector<vector<RooUnfoldResponse*> > (_nJetYBins, vector<RooUnfoldResponse*>(_nCentbins));
 	}
 
+	//test UE histograms
+	cone_norm_jet = vector<TH1D*> (_nCentbins);
+	MB_norm_jet = vector<TH1D*> (_nCentbins);
+	TM_norm_jet = vector<TH1D*> (_nCentbins);
+	FS_norm_jet = vector<TH1D*> (_nCentbins);
+
+	h_UE_dNdEtadPhidpT =  vector<vector<vector<vector<TH3D*>>>> (ptJetBinsN, vector<vector<vector<TH3D*>>> (PsiBinsN, vector<vector<TH3D*>> (_nCentbins, vector<TH3D*>(_ndRBins))));
+	h_jet_v_Psi =  vector<vector<TH3D*>> (ptJetBinsN, vector<TH3D*>(_nCentbins));
+
+	for (int j=0;j<_nCentbins;j++)
+	{
+		temphist_1D = new TH1D(Form("cone_norm_jet_cent%i",j),Form("cone_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
+		cone_norm_jet.at(j) = temphist_1D;
+		wk()->addOutput (cone_norm_jet.at(j));
+
+		temphist_1D = new TH1D(Form("MB_norm_jet_cent%i",j),Form("MB_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
+		MB_norm_jet.at(j) = temphist_1D;
+		wk()->addOutput (MB_norm_jet.at(j));
+
+		temphist_1D = new TH1D(Form("TM_norm_jet_cent%i",j),Form("TM_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
+		TM_norm_jet.at(j) = temphist_1D;
+		wk()->addOutput (TM_norm_jet.at(j));
+
+		temphist_1D = new TH1D(Form("FS_norm_jet_cent%i",j),Form("FS_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
+		FS_norm_jet.at(j) = temphist_1D;
+		wk()->addOutput (FS_norm_jet.at(j));
+
+
+		for (int i=0;i<ptJetBinsN;i++)
+		{
+			if (j == _nCentbins - 1) continue;
+
+			temphist_3D = new TH3D(Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),PsiBinsN,PsiBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+			h_jet_v_Psi.at(i).at(j) = temphist_3D;
+			h_jet_v_Psi.at(i).at(j)->Sumw2();
+			wk()->addOutput (h_jet_v_Psi.at(i).at(j));
+
+//			//restrict to trk < 10 GeV, jet > 100, jet < 400, cent != 6
+//			if (i >= lo_jetpt_bin && i <= hi_jetpt_bin)
+//			{
+//				for (int m=0;m<10;m++) //psibins
+//				{
+//					for (int k=0;k<_ndRBins;k++)
+//					{
+//						temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+//						h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k) = temphist_3D;
+//						h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k)->Sumw2();
+//						wk()->addOutput (h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k));
+//					}
+//				}
+//			}
+		}
+
+
+	}
 
 	for (int j=0;j<_nCentbins;j++)
 	{
@@ -348,73 +296,23 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			h_dR_change.at(i).at(j) = temphist_3D;
 			h_dR_change.at(i).at(j)->Sumw2();
 			wk()->addOutput (h_dR_change.at(i).at(j));
-
-			temphist_3D = new TH3D(Form("h_UE_distr_jetpt%i_cent%i",i,j),Form("h_UE_distr_jetpt%i_cent%i",i,j),_ndRBins-1,trkcorr->dRrange, ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins);
-			UE_distr.at(i).at(j) = temphist_3D;
-			UE_distr.at(i).at(j)->Sumw2();
-			wk()->addOutput (UE_distr.at(i).at(j));
-
-
 		}
+
 
 		for (int i=0;i<_ndRBins;i++)
 		{
-			//D(z)
-			temphist_2D = new TH2D(Form("ff_raw_0_dR%i_cent%i",i,j),Form("ff_raw_0_dR%i_cent%i",i,j),zBinsN, zBins, ptJetBinsN, ptJetBins);
-			ff_raw.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ff_raw_1_dR%i_cent%i",i,j),Form("ff_raw_1_dR%i_cent%i",i,j),zBinsN, zBins, ptJetBinsN, ptJetBins);
-			ff_raw_UE.at(i).at(j) = temphist_2D;
-
 			//D(Pt)
 			temphist_2D = new TH2D(Form("ChPS_raw_0_dR%i_cent%i",i,j),Form("ChPS_raw_0_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_raw.at(i).at(j) = temphist_2D;
 
-			temphist_2D = new TH2D(Form("ChPS_raw_truthjet_dR%i_cent%i",i,j),Form("ChPS_raw_truthjet_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_raw_truthjet.at(i).at(j) = temphist_2D;
-
-			//testing
-			temphist_2D = new TH2D(Form("ChPS_test_tt_tt_deta%i_cent%i",i,j),Form("ChPS_test_tt_tt_deta%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_tt_deta.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_tt_dphi%i_cent%i",i,j),Form("ChPS_test_tt_tt_dphi%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_tt_dphi.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_tt_dR%i_cent%i",i,j),Form("ChPS_test_tt_tt_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_tt.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_tt_mod_dR%i_cent%i",i,j),Form("ChPS_test_tt_tt_mod_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_tt_mod.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_rt_tt_dR%i_cent%i",i,j),Form("ChPS_test_rt_tt_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_rt_tt.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tr_tt_dR%i_cent%i",i,j),Form("ChPS_test_tr_tt_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tr_tt.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_rr_tt_dR%i_cent%i",i,j),Form("ChPS_test_rr_tt_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_rr_tt.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_rt_dR%i_cent%i",i,j),Form("ChPS_test_tt_rt_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_rt.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_tr_dR%i_cent%i",i,j),Form("ChPS_test_tt_tr_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_tr.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_tt_rr_dR%i_cent%i",i,j),Form("ChPS_test_tt_rr_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_tt_rr.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_test_rr_rr_dR%i_cent%i",i,j),Form("ChPS_test_rr_rr_%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_test_rr_rr.at(i).at(j) = temphist_2D;
+			temphist_2D = new TH2D(Form("ChPS_cone_UE_dR%i_cent%i",i,j),Form("ChPS_cone_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_cone_UE.at(i).at(j) = temphist_2D;
 
 			temphist_2D = new TH2D(Form("ChPS_MB_UE_dR%i_cent%i",i,j),Form("ChPS_MB_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_MB_UE.at(i).at(j) = temphist_2D;
 
 			temphist_2D = new TH2D(Form("ChPS_MB_UE_err_dR%i_cent%i",i,j),Form("ChPS_MB_UE_err_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_MB_UE_err.at(i).at(j) = temphist_2D;
-
-			temphist_2D = new TH2D(Form("ChPS_MB_UE_truthjet_dR%i_cent%i",i,j),Form("ChPS_MB_UE_truthjet_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-			ChPS_MB_UE_truthjet.at(i).at(j) = temphist_2D;
 
 			temphist_2D = new TH2D(Form("ChPS_FS_UE_dR%i_cent%i",i,j),Form("ChPS_FS_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_FS_UE.at(i).at(j) = temphist_2D;
@@ -423,46 +321,17 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			ChPS_FNS_UE.at(i).at(j) = temphist_2D;
 
 
-			ff_raw.at(i).at(j)->Sumw2();
-			ff_raw_UE.at(i).at(j)->Sumw2();
-
 			ChPS_raw.at(i).at(j)->Sumw2();
-			ChPS_raw_truthjet.at(i).at(j)->Sumw2();
-			ChPS_test_tt_tt_deta.at(i).at(j)->Sumw2();
-			ChPS_test_tt_tt_dphi.at(i).at(j)->Sumw2();
-			ChPS_test_tt_tt.at(i).at(j)->Sumw2();
-			ChPS_test_tt_tt_mod.at(i).at(j)->Sumw2();
-			ChPS_test_rt_tt.at(i).at(j)->Sumw2();
-			ChPS_test_tr_tt.at(i).at(j)->Sumw2();
-			ChPS_test_rr_tt.at(i).at(j)->Sumw2();
-			ChPS_test_tt_rt.at(i).at(j)->Sumw2();
-			ChPS_test_tt_tr.at(i).at(j)->Sumw2();
-			ChPS_test_tt_rr.at(i).at(j)->Sumw2();
-			ChPS_test_rr_rr.at(i).at(j)->Sumw2();
+			ChPS_cone_UE.at(i).at(j)->Sumw2();
 			ChPS_MB_UE.at(i).at(j)->Sumw2();
 			ChPS_MB_UE_err.at(i).at(j)->Sumw2();
-			ChPS_MB_UE_truthjet.at(i).at(j)->Sumw2();
 			ChPS_FS_UE.at(i).at(j)->Sumw2();
 			ChPS_FNS_UE.at(i).at(j)->Sumw2();
 
-			wk()->addOutput (ff_raw.at(i).at(j));
-			wk()->addOutput (ff_raw_UE.at(i).at(j));
 			wk()->addOutput (ChPS_raw.at(i).at(j));
-			wk()->addOutput (ChPS_raw_truthjet.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_tt_deta.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_tt_dphi.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_tt.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_tt_mod.at(i).at(j));
-			wk()->addOutput (ChPS_test_tr_tt.at(i).at(j));
-			wk()->addOutput (ChPS_test_rt_tt.at(i).at(j));
-			wk()->addOutput (ChPS_test_rr_tt.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_tr.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_rt.at(i).at(j));
-			wk()->addOutput (ChPS_test_tt_rr.at(i).at(j));
-			wk()->addOutput (ChPS_test_rr_rr.at(i).at(j));
+			wk()->addOutput (ChPS_cone_UE.at(i).at(j));
 			wk()->addOutput (ChPS_MB_UE.at(i).at(j));
 			wk()->addOutput (ChPS_MB_UE_err.at(i).at(j));
-			wk()->addOutput (ChPS_MB_UE_truthjet.at(i).at(j));
 			wk()->addOutput (ChPS_FS_UE.at(i).at(j));
 			wk()->addOutput (ChPS_FNS_UE.at(i).at(j));
 
@@ -471,86 +340,29 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 				temphist_2D = new TH2D(Form("ChPS_TM_UE_dR%i_cent%i",i,j),Form("ChPS_TM_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 				ChPS_TM_UE.at(i).at(j) = temphist_2D;
 
-				temphist_2D = new TH2D(Form("ChPS_TM_UE_truthjet_dR%i_cent%i",i,j),Form("ChPS_TM_UE_truthjet_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				ChPS_TM_UE_truthjet.at(i).at(j) = temphist_2D;
-
-				//Truth
-				temphist_2D = new TH2D(Form("ff_truth_dR%i_cent%i",i,j),Form("ff_truth_dR%i_cent%i",i,j),zBinsN, zBins, ptJetBinsN, ptJetBins);
-				ff_truth.at(i).at(j) = temphist_2D;
 				temphist_2D = new TH2D(Form("ChPS_truth_dR%i_cent%i",i,j),Form("ChPS_truth_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 				ChPS_truth.at(i).at(j) = temphist_2D;
-				temphist_2D = new TH2D(Form("ChPS_truth_deta%i_cent%i",i,j),Form("ChPS_truth_deta%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				ChPS_truth_deta.at(i).at(j) = temphist_2D;
-				temphist_2D = new TH2D(Form("ChPS_truth_dphi%i_cent%i",i,j),Form("ChPS_truth_dphi%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				ChPS_truth_dphi.at(i).at(j) = temphist_2D;
-
-
-				temphist_3D = new TH3D(Form("ff_trackpTResponse_dR%i_cent%i",i,j),Form("ff_trackpTResponse_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins,ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				ff_trackpTResponse.at(i).at(j) = temphist_3D;
-				temphist_3D = new TH3D(Form("ff_trackzResponse_dR%i_cent%i",i,j),Form("ff_trackzResponse_dR%i_cent%i",i,j),zBinsN, zBins, zBinsN, zBins, ptJetBinsN, ptJetBins);
-				ff_trackzResponse.at(i).at(j) = temphist_3D;
-
-				//Responses
-				response_FF.at(i).at(j) = new RooUnfoldResponse(ff_raw.at(i).at(j),ff_truth.at(i).at(j));
-				response_ChPS.at(i).at(j) = new RooUnfoldResponse(ChPS_raw.at(i).at(j),ChPS_truth.at(i).at(j));
-
-				response_ChPS_test_rt.at(i).at(j) = new RooUnfoldResponse(ChPS_test_tt_rt.at(i).at(j),ChPS_truth.at(i).at(j));
-				response_ChPS_test_tr.at(i).at(j) = new RooUnfoldResponse(ChPS_test_tt_tr.at(i).at(j),ChPS_truth.at(i).at(j));
-
 
 				//Truth
-				temphist_2D = new TH2D(Form("reco_posRes_ChPS_dR%i_cent%i",i,j),Form("reco_posRes_ChPS_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				reco_posRes_ChPS.at(i).at(j) = temphist_2D;
+				temphist_3D = new TH3D(Form("ff_trackpTResponse_dR%i_cent%i",i,j),Form("ff_trackpTResponse_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins,ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+				ff_trackpTResponse.at(i).at(j) = temphist_3D;
 
-				temphist_2D = new TH2D(Form("rt_posRes_ChPS_dR%i_cent%i",i,j),Form("rt_posRes_ChPS_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				rt_posRes_ChPS.at(i).at(j) = temphist_2D;
+				//Responses
+				response_ChPS.at(i).at(j) = new RooUnfoldResponse(ChPS_raw.at(i).at(j),ChPS_truth.at(i).at(j));
 
-				temphist_2D = new TH2D(Form("tr_posRes_ChPS_dR%i_cent%i",i,j),Form("tr_posRes_ChPS_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				tr_posRes_ChPS.at(i).at(j) = temphist_2D;
-
-				temphist_2D = new TH2D(Form("truth_posRes_ChPS_dR%i_cent%i",i,j),Form("truth_posRes_ChPS_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				truth_posRes_ChPS.at(i).at(j) = temphist_2D;
-
+				//Truth
 				ChPS_TM_UE.at(i).at(j)->Sumw2();
-				ChPS_TM_UE_truthjet.at(i).at(j)->Sumw2();
-				ff_truth.at(i).at(j)->Sumw2();
 				ChPS_truth.at(i).at(j)->Sumw2();
-				ChPS_truth_deta.at(i).at(j)->Sumw2();
-				ChPS_truth_dphi.at(i).at(j)->Sumw2();
-
 				ff_trackpTResponse.at(i).at(j)->Sumw2();
-				ff_trackzResponse.at(i).at(j)->Sumw2();
-
-				reco_posRes_ChPS.at(i).at(j)->Sumw2();
-				rt_posRes_ChPS.at(i).at(j)->Sumw2();
-				tr_posRes_ChPS.at(i).at(j)->Sumw2();
-				truth_posRes_ChPS.at(i).at(j)->Sumw2();
 
 				wk()->addOutput (ChPS_TM_UE.at(i).at(j));
-				wk()->addOutput (ChPS_TM_UE_truthjet.at(i).at(j));
-				wk()->addOutput (ff_truth.at(i).at(j));
 				wk()->addOutput (ChPS_truth.at(i).at(j));
-				wk()->addOutput (ChPS_truth_deta.at(i).at(j));
-				wk()->addOutput (ChPS_truth_dphi.at(i).at(j));
-
 				wk()->addOutput (ff_trackpTResponse.at(i).at(j));
-				wk()->addOutput (ff_trackzResponse.at(i).at(j));
-
-				wk()->addOutput (response_FF.at(i).at(j));
 				wk()->addOutput (response_ChPS.at(i).at(j));
-				wk()->addOutput (response_ChPS_test_rt.at(i).at(j));
-				wk()->addOutput (response_ChPS_test_tr.at(i).at(j));
-
-				wk()->addOutput (reco_posRes_ChPS.at(i).at(j));
-				wk()->addOutput (rt_posRes_ChPS.at(i).at(j));
-				wk()->addOutput (tr_posRes_ChPS.at(i).at(j));
-				wk()->addOutput (truth_posRes_ChPS.at(i).at(j));
-
-
-
 			}
 
 		}
+
 
 		for (int i=0;i<_nJetYBins;i++)
 		{
@@ -558,59 +370,30 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			//Jet spectra
 			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 			h_reco_jet_spectrum.at(i).at(j) = temphist_1D;
-
-			temphist_1D = new TH1D(Form("h_reco_jet_spectrum_unW_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-			h_reco_jet_spectrum_unW.at(i).at(j) = temphist_1D;
-
-
 			h_reco_jet_spectrum.at(i).at(j)->Sumw2();
-			h_reco_jet_spectrum_unW.at(i).at(j)->Sumw2();
-
-
 			wk()->addOutput (h_reco_jet_spectrum.at(i).at(j));
-			wk()->addOutput (h_reco_jet_spectrum_unW.at(i).at(j));
-
 
 			//MC only
 			if (_data_switch==1)
 			{
-
 				//Truth
 				temphist_1D = new TH1D(Form("h_true_jet_spectrum_y%i_cent%i",i,j),Form("h_true_jet_spectrum_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
 				h_true_jet_spectrum.at(i).at(j) = temphist_1D;
 
-				temphist_1D = new TH1D(Form("h_true_jet_spectrum_unW_y%i_cent%i",i,j),Form("h_true_jet_spectrum_unW_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-				h_true_jet_spectrum_unW.at(i).at(j) = temphist_1D;
-
-				temphist_1D = new TH1D(Form("h_reco_jet_spectrum_matched_y%i_cent%i",i,j),Form("h_reco_jet_spectrum_matched_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-				h_reco_jet_spectrum_matched.at(i).at(j) = temphist_1D;
-
-				temphist_1D = new TH1D(Form("h_true_jet_spectrum_matched_y%i_cent%i",i,j),Form("h_true_jet_spectrum_matched_y%i_cent%i",i,j),ptJetBinsN, ptJetBins);
-				h_true_jet_spectrum_matched.at(i).at(j) = temphist_1D;
-
 				temphist_2D = new TH2D(Form("ff_jetResponse_y%i_cent%i",i,j),Form("ff_jetResponse_y%i_cent%i",i,j),ptJetBinsN, ptJetBins, ptJetBinsN, ptJetBins);
 				ff_jetResponse.at(i).at(j) = temphist_2D;
-
 				response_jet.at(i).at(j) = new RooUnfoldResponse(h_reco_jet_spectrum.at(i).at(j),h_true_jet_spectrum.at(i).at(j));
-
 
 				//Responses
 				h_true_jet_spectrum.at(i).at(j)->Sumw2();
-				h_true_jet_spectrum_unW.at(i).at(j)->Sumw2();
-				h_reco_jet_spectrum_matched.at(i).at(j)->Sumw2();
-				h_true_jet_spectrum_matched.at(i).at(j)->Sumw2();
-
 				ff_jetResponse.at(i).at(j)->Sumw2();
 
 				wk()->addOutput (h_true_jet_spectrum.at(i).at(j));
-				wk()->addOutput (h_true_jet_spectrum_unW.at(i).at(j));
-				wk()->addOutput (h_true_jet_spectrum_matched.at(i).at(j));
-				wk()->addOutput (h_reco_jet_spectrum_matched.at(i).at(j));
 				wk()->addOutput (ff_jetResponse.at(i).at(j));
 				wk()->addOutput (response_jet.at(i).at(j));
 			}
-
 		}
+
 	}
 
 	cout << " Histograms ready" << endl;

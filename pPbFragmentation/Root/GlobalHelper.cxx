@@ -257,6 +257,40 @@ int GetGlobalBin(Int_t centralityScheme, float FCal_Et, bool isMC)
 		
 		return -1;
 	}
+	else if (centralityScheme==36) // Pb+Pb 2015, narrow centrality bins
+	{
+		// nominal 85%, full Fcal
+		if ( 3.0 	<=centrality && centrality< 3.05  ) return 0;	// subset of 0-10%
+		if ( 2.06	<=centrality && centrality< 2.11  ) return 1;	// subset of 10-20%
+		if ( 1.38	<=centrality && centrality< 1.43  ) return 2;	// subset of 20-30%
+		if ( 0.9	<=centrality && centrality< 0.95  ) return 3;		// subset of 30-40%
+		if ( 0.30	<=centrality && centrality< 0.35  ) return 4;	// subset of 40-50%
+		if ( 0.09	<=centrality && centrality< 0.14 ) return 5;		// subset of 60-80%
+
+		// Hijing doesn't have the same FCal distribution as data, let's keep everything
+		if(isMC && centrality>= 6.0) return 0;
+		if(isMC && 0.0<=centrality && centrality<0.063719) return 5;
+
+		return -1;
+	}
+	else if (centralityScheme==37) // Pb+Pb 2015, narrow centrality bins
+	{
+		// nominal 85%, full Fcal
+		if ( 3.5 	<=centrality && centrality< 3.55  ) return 0;	// subset of 0-10%
+		if ( 2.4	<=centrality && centrality< 2.45  ) return 1;	// subset of 10-20%
+		if ( 1.55	<=centrality && centrality< 1.60  ) return 2;	// subset of 20-30%
+		if ( 1.01	<=centrality && centrality< 1.04  ) return 3;		// subset of 30-40%
+		if ( 0.72	<=centrality && centrality< 0.74  ) return 4;	// subset of 40-50%
+		if ( 0.15	<=centrality && centrality< 0.16 ) return 5;		// subset of 60-80%
+
+		// Hijing doesn't have the same FCal distribution as data, let's keep everything
+		if(isMC && centrality>= 6.0) return 0;
+		if(isMC && 0.0<=centrality && centrality<0.063719) return 5;
+
+		return -1;
+	}
+
+
 	else if (centralityScheme==20)	// p+Pb centrality
 	{
 		centrality = FCal_Et;
@@ -320,6 +354,8 @@ int GetCentralityNBins(Int_t centralityScheme)
 	if (centralityScheme==33) return 8;
 	if (centralityScheme==34) return 9;
 	if (centralityScheme==35) return 3;
+	if (centralityScheme==36) return 7;
+	if (centralityScheme==37) return 7;
 	if (centralityScheme==40) return 8;
 	if (centralityScheme==50) return 9;
 	
