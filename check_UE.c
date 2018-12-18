@@ -15,8 +15,8 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 //	TFile *input_file_data = new TFile(Form("./hist-local_mc.root"));
 
 
-//	TFile *input_file = new TFile(Form("hist-local_mc_c%i.root", sys_mode));
-//	TFile *input_file_data = new TFile(Form("hist-local_mc_c%i.root", sys_mode));
+//	TFile *input_file = new TFile(Form("hist-local_mc.root", sys_mode));
+//	TFile *input_file_data = new TFile(Form("hist-local_mc.root", sys_mode));
 	TFile *input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 	name = Form("./UE_%s.root", sys_path.c_str());
@@ -75,6 +75,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<TH2*>> h_cone_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_cone_data_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_MB_data_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
+	vector<vector<TH2*>> h_cone_data_MB_data_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_TM_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FNS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
@@ -82,6 +83,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<vector<TH1*>>> h_cone_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_cone_data_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_MB_data_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_cone_data_MB_data_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
@@ -90,6 +92,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<vector<TH1*>>> h_cone_data_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_MB_data_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
+	vector<vector<vector<TH1*>>> h_cone_data_MB_data_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FS_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 
@@ -132,6 +135,10 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				name = Form("h_MB_data_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_MB_data_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
+				name = Form("h_cone_data_MB_data_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_cone_data_MB_data_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
+
+
 				name = Form("h_cone_MB_r_1D_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_cone_MB_r_1D.at(i_jet).at(i_trk).at(i_cent) = new TH1D(name.c_str(), name.c_str(), N_dR, array_dr_bins);
 
@@ -173,8 +180,9 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		h_cone_jet_spectra_data->Sumw2();
 
 
-		if (sys_mode < 45) name = Form("h_true_jet_spectrum_matched_y4_cent%i", i_cent);
-		else name = Form("FS_norm_jet_cent%i", i_cent);
+//		if (sys_mode < 45) name = Form("h_true_jet_spectrum_matched_y4_cent%i", i_cent);
+//		else
+			name = Form("FS_norm_jet_cent%i", i_cent);
 		TH1* h_true_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("true_jet_UE_norm_y4_c%i", i_cent));
 		h_true_jet_spectra->Sumw2();
 
@@ -223,21 +231,21 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 			h_FNS_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
 
 
-			if (apply_correctionFactors)
-			{
-				TH2* h_UE_corr_factors;
-				h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
-
-				for (int i_jet = 1; i_jet <= N_jetpt; i_jet++)
-				{
-					for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
-					{
-						double orig = h_cone_data_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet);
-						double correction = h_UE_corr_factors->GetBinContent(i_trk, i_jet); //correct number of jets, correct for UE JER correlation
-						h_cone_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, orig*correction);
-					}
-				}
-			}
+//			if (1)
+//			{
+//				TH2* h_UE_corr_factors;
+//				h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
+//
+//				for (int i_jet = 1; i_jet <= N_jetpt; i_jet++)
+//				{
+//					for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
+//					{
+//						double orig = h_cone_data_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet);
+//						double correction = h_UE_corr_factors->GetBinContent(i_trk, i_jet); //correct number of jets, correct for UE JER correlation
+//						h_cone_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, orig*correction);
+//					}
+//				}
+//			}
 
 			for (int i_jet = 1; i_jet <= N_jetpt; i_jet++)
 			{
@@ -287,6 +295,24 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				}
 			}
 
+			//applying TM/x correction for x_data = cone method in data, x_data = MC method in data
+			{
+				TH2* h_cone_correction = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(Form("h_cone_correction_dR%i_cent%i",i_dR, i_cent));
+				h_cone_correction->Divide(h_cone_2D[i_dR][i_cent]);
+				h_cone_data_2D[i_dR][i_cent]->Multiply(h_cone_correction);
+
+				//MB correction not required since TM/MB_MC = 1
+//				TH2* h_MB_correction = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(Form("h_MB_correction_dR%i_cent%i",i_dR, i_cent));
+//				h_MB_correction->Divide(h_MB_2D[i_dR][i_cent]);
+//				h_MB_data_2D[i_dR][i_cent]->Multiply(h_MB_correction);
+
+				output_file->cd();
+				h_cone_correction->Write(Form("h_cone_correction_dR%i_cent%i",i_dR, i_cent));
+//				h_MB_correction->Write(Form("h_MB_correction_dR%i_cent%i",i_dR, i_cent));
+
+			}
+
+
 
 			//compare to MB
 			if (subtract)
@@ -302,6 +328,10 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				name = Form("sub_MB_data_MB_dR%i_cent%i", i_dR, i_cent);
 				h_MB_data_MB_2D[i_dR][i_cent] = (TH2*)h_MB_data_2D[i_dR][i_cent]->Clone(name.c_str());
 				h_MB_data_MB_2D[i_dR][i_cent]->Add(h_MB_2D[i_dR][i_cent],-1);
+
+				name = Form("sub_cone_data_MB_data_dR%i_cent%i", i_dR, i_cent);
+				h_cone_data_MB_data_2D[i_dR][i_cent] = (TH2*)h_cone_data_2D[i_dR][i_cent]->Clone(name.c_str());
+				h_cone_data_MB_data_2D[i_dR][i_cent]->Add(h_MB_data_2D[i_dR][i_cent],-1);
 
 				name = Form("sub_TM_MB_dR%i_cent%i", i_dR, i_cent);
 				h_TM_MB_2D[i_dR][i_cent] = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(name.c_str());
@@ -329,6 +359,10 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				name = Form("ratio_MB_data_MB_dR%i_cent%i", i_dR, i_cent);
 				h_MB_data_MB_2D[i_dR][i_cent] = (TH2*)h_MB_data_2D[i_dR][i_cent]->Clone(name.c_str());
 				h_MB_data_MB_2D[i_dR][i_cent]->Divide(h_MB_2D[i_dR][i_cent]);
+
+				name = Form("ratio_cone_data_MB_data_MB_dR%i_cent%i", i_dR, i_cent);
+				h_cone_data_MB_data_2D[i_dR][i_cent] = (TH2*)h_cone_data_2D[i_dR][i_cent]->Clone(name.c_str());
+				h_cone_data_MB_data_2D[i_dR][i_cent]->Divide(h_MB_data_2D[i_dR][i_cent]);
 
 				name = Form("ratio_TM_MB_dR%i_cent%i", i_dR, i_cent);
 				h_TM_MB_2D[i_dR][i_cent] = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(name.c_str());
@@ -380,6 +414,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				h_cone_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_cone_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_MB_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_data_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_data_MB_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_data_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_data_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_TM_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_MB_2D[i_dR][i_cent]->ProjectionX(Form("TM_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 				h_FNS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FNS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
@@ -389,6 +424,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 					h_cone_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 					h_MB_data_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
+					h_cone_data_MB_data_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 					h_TM_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 					h_FS_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 					h_FNS_MB_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
@@ -396,6 +432,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 					h_cone_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 					h_MB_data_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
+					h_cone_data_MB_data_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 					h_TM_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 					h_FS_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 					h_FNS_MB_1D[i_jet][i_dR][i_cent]->Scale(1./area);
@@ -449,6 +486,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_cone_data_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_cone_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_MB_data_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_cone_data_MB_data_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_TM_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FS_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetBinContent(i_trk+1));
@@ -456,6 +494,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_cone_data_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_cone_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_MB_data_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_cone_data_MB_data_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_TM_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FS_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->SetBinError(i_dR+1, h_FNS_MB_1D[i_jet][i_dR][i_cent]->GetBinError(i_trk+1));
@@ -463,6 +502,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetTitle("r");
@@ -470,6 +510,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
 					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("Ratio");
@@ -496,6 +537,27 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		name = Form("h_true_jet_spectrum_UE_norm_y4_cent%i", i_cent);
 		h_true_jet_spectra->Write(name.c_str());
 
+		for (int i_dR = 0; i_dR < N_dR; i_dR++)
+		{
+			h_cone_2D[i_dR][i_cent]->Write(Form("cone_2d_dR%i_cent%i",i_dR, i_cent ));
+			h_cone_data_2D[i_dR][i_cent]->Write(Form("cone_data_2d_dR%i_cent%i",i_dR, i_cent ));
+
+			h_TM_2D[i_dR][i_cent]->Write(Form("TM_2d_dR%i_cent%i",i_dR, i_cent ));
+
+			for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
+			{
+				name = Form("h_ChPS_UE_cone_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+//				TH1* h_tmp = (TH1*)h_cone_data_2D[i_dR][i_cent]->ProjectionX(name.c_str(), i_jet+1, i_jet+1);
+				h_cone_data_1D[i_jet][i_dR][i_cent]->Write(name.c_str());
+
+				name = Form("h_ChPS_UE_MB_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+//				TH1* h_tmp2 = (TH1*)h_MB_data_2D[i_dR][i_cent]->ProjectionX(name.c_str(), i_jet+1, i_jet+1);
+				h_MB_data_1D[i_jet][i_dR][i_cent]->Write(name.c_str());
+
+			}
+
+		}
+
 
 		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 		{
@@ -515,25 +577,27 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_cone_data_MB_indR_%s", name.c_str()));
 				h_cone_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_cone_MB_indR_%s", name.c_str()));
 				h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_MB_data_MB_indR_%s", name.c_str()));
+				h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_cone_data_MB_data_indR_%s", name.c_str()));
 				h_TM_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_TM_MB_indR_%s", name.c_str()));
 				h_FS_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_FS_MB_indR_%s", name.c_str()));
 				h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->SetName(Form("UE_FNS_MB_indR_%s", name.c_str()));
 
 
-				h_cone_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_indR_%s", name.c_str()));
+//				h_cone_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_indR_%s", name.c_str()));
 				h_cone_data_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_data_indR_%s", name.c_str()));
-				h_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_indR_%s", name.c_str()));
+//				h_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_indR_%s", name.c_str()));
 				h_MB_data_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_data_indR_%s", name.c_str()));
-				h_TM_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_indR_%s", name.c_str()));
-				h_FS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_indR_%s", name.c_str()));
-				h_FNS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_indR_%s", name.c_str()));
-
-				h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_data_MB_indR_%s", name.c_str()));
-				h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_MB_indR_%s", name.c_str()));
-				h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_data_MB_indR_%s", name.c_str()));
-				h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_MB_indR_%s", name.c_str()));
-				h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_MB_indR_%s", name.c_str()));
-				h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_MB_indR_%s", name.c_str()));
+//				h_TM_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_indR_%s", name.c_str()));
+//				h_FS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_indR_%s", name.c_str()));
+//				h_FNS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_indR_%s", name.c_str()));
+//
+//				h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_data_MB_indR_%s", name.c_str()));
+//				h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_MB_indR_%s", name.c_str()));
+//				h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_data_MB_indR_%s", name.c_str()));
+//				h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_data_MB_data_indR_%s", name.c_str()));
+//				h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_MB_indR_%s", name.c_str()));
+//				h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_MB_indR_%s", name.c_str()));
+//				h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_MB_indR_%s", name.c_str()));
 
 				
 
@@ -629,7 +693,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		}
 	}
 */
-	/*
+/*
 	{
 		//projecting over track pT
 		cout << "projecting over track pT" << endl;
@@ -746,6 +810,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		}
 	}
 */
+
 	/*
 	{
 		//as function of r
@@ -893,11 +958,17 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		cout << "Function of R" << endl;
 		TCanvas *c_x = new TCanvas("c_x","c_x",900,600);
 
-		TLegend *legend_x = new TLegend(0.20, 0.05, 0.70, 0.22, "","brNDC");
+		TLegend *legend_x = new TLegend(0.20, 0.05, 0.40, 0.35, "","brNDC");
 		legend_x->SetTextFont(43);
 		legend_x->SetBorderSize(0);
 		legend_x->SetTextSize(10);
-		legend_x->SetNColumns(2);
+		legend_x->SetNColumns(1);
+
+		TLegend *legend_y = new TLegend(0.50, 0.7, 0.60, 0.80, "","brNDC");
+		legend_y->SetTextFont(43);
+		legend_y->SetBorderSize(0);
+		legend_y->SetTextSize(10);
+		legend_y->SetNColumns(1);
 
 
 		for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -930,6 +1001,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					SetHStyle_smallify(h_MB_data_MB_r_1D[i_jet][i_trk][i_cent], 3, 1);
 					SetHStyle_smallify(h_cone_MB_r_1D[i_jet][i_trk][i_cent], 4, 1);
 					SetHStyle_smallify(h_cone_data_MB_r_1D[i_jet][i_trk][i_cent], 5, 1);
+					SetHStyle_smallify(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent], 6, 1);
 
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
@@ -938,30 +1010,39 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 						legend_x->AddEntry(h_cone_r_1D[i_jet][i_trk][i_cent],"cone","lp");
 						legend_x->AddEntry(h_cone_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}","lp");
+						legend_y->AddEntry(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}/MC_{data}","lp");
 //						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
 //						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
 					}
 
 					double low_range, hi_range;
-					low_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMinimum() * 0.85;
-					hi_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMaximum() * 1.2;
+					low_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMinimum() * 0.75;
+					hi_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMaximum() * 1.4;
 
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
-					if (i_cent == 0) {low_range = 60; hi_range = 80;}
+					if (i_cent == 0) {low_range = 60; hi_range = 100;}
 					if (i_cent == 1) {low_range = 40; hi_range = 60;}
 					if (i_cent == 2) {low_range = 20; hi_range = 40;}
 					if (i_cent == 3) {low_range = 15; hi_range = 25;}
 					if (i_cent == 4) {low_range = 5; hi_range = 15;}
 					if (i_cent == 5) {low_range = 1.5; hi_range = 4;}
-					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+//					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
+
+					double avg =(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(1) + h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(11))/2;
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(-0.5,0.5);
-					else h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.97,1.03);
+					else h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(avg*0.98, 1.02*avg);
 
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(505);
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(505);
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0,2);
+
+
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 
 
 					c_x->cd(i_cent+1);
@@ -972,11 +1053,12 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					gPad->SetTopMargin(0.05);
 					gPad->SetBottomMargin(0.0);
 					gPad->SetRightMargin(0);
+
 					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_cone_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_cone_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					gPad->SetLogy(0);
@@ -987,14 +1069,16 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 					gPad->SetBottomMargin(0.30);
 					gPad->SetRightMargin(0);
 
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+
 
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x - MB");
 					else  h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x / MC");
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("text hist");
+//					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetMarkerSize(5);
+//					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					if (subtract) line->DrawLine(0, 0, r_max_range, 0);
@@ -1010,6 +1094,8 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 				c_x->cd(1)->cd(1);
 				legend_x->Draw();
+				c_x->cd(1)->cd(2);
+				legend_y->Draw();
 
 
 				jet_itr++;
@@ -1025,7 +1111,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		}
 	}
 
- /*
+
 	{
 		//as function of trk
 		cout << "Function of trk" << endl;
@@ -1151,8 +1237,9 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 		}
 	}
- */
-/*	{
+
+	/*
+  {
 		//just the factors as function of r
 		cout << "posres as Function of R" << endl;
 		TCanvas *c_pos_res = new TCanvas("c_pos_res","c_pos_res",900,600);
@@ -1222,5 +1309,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 		}
 	}
-*/
+
+
+	*/
 }
