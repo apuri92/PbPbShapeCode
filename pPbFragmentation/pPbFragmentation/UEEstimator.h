@@ -17,9 +17,7 @@ class UEEstimator
   private:
     // meaning of these quantities is explained in the constructor where the default values are assigned
     Bool_t _bkgrCones[50];
-    Int_t _nEta;
-    Int_t _nPhi;
-    Int_t _maxNCones; 
+    Int_t _maxNCones;
     Int_t _w_ncones;
     Float_t _etaOfCone;
     Float_t _phiOfCone;
@@ -34,6 +32,9 @@ class UEEstimator
     TFile *_f_ShapeUE;
 	TFile *_f_ShapeUE_v3;
 	TFile *_f_ShapeUE_tight;
+	double cone_radius;
+
+	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
 
 	vector<vector<vector<vector<vector<TH2*>>>>> h_UE_eta_phi_maps = vector<vector<vector<vector<vector<TH2*>>>>> (12, vector<vector<vector<vector<TH2*>>>> (7, vector<vector<vector<TH2*>>> (10, vector<vector<TH2*>> (6, vector<TH2*> (13)))));
 
@@ -50,21 +51,63 @@ class UEEstimator
     Double_t Psi;
     Double_t Psi3;
     Float_t m_maxjetdeltaR;
+	Float_t cone_eta[30];
+	Float_t cone_phi[30];
+	double cone_eta_start = 0.;
+	double cone_phi_start = 0.;
+	double cone_phi_shift;
+	Int_t _nEta;
+	Int_t _nPhi;
 
     UEEstimator()
      {
-      _nEta = 5;			// number of cones in eta direction
-      _nPhi = 8;			// number of cones in phi direction
+		 cone_radius = 0.4;
+//		 cone_radius = 0.5;
+//		 cone_radius = 0.6;
+//		 cone_radius = 0.8;
+
+		 //r = 0.6 -> shift = 0.1, r = 0.5 -> shift = 0.1, r = 0.4 -> shift = 0.2,
+
+		 if (cone_radius == 0.8)
+		 {
+			 _nEta = 3;
+			 _nPhi = 3;
+			 cone_eta_start = -2.4;
+			 cone_phi_start = -2.4;
+		 }
+		 else if (cone_radius == 0.6)
+		 {
+			 _nEta = 4;
+			 _nPhi = 5;
+			 cone_eta_start = -2.4;
+			 cone_phi_start = -3.0;
+		 }
+		 else if (cone_radius == 0.5)
+		 {
+			 _nEta = 4;
+			 _nPhi = 6;
+			 cone_eta_start = -2.0;
+			 cone_phi_start = -3.0;
+		 }
+		 else if(cone_radius == 0.4)
+		 {
+			 _nEta = 6;
+			 _nPhi = 7;
+			 cone_eta_start = -2.4;
+			 cone_phi_start = -2.8;
+		 }
+
+
+
+
       _maxNCones=_nEta*_nPhi;		// ID will be covered by _nEta*_nPhi=40 cones
       _w_ncones = _maxNCones;		// number of active cones (to be specified in ExcludeCones)
-      for (int i=0; i<_maxNCones; i++) _bkgrCones[i] = 1;	// all cones can be used by default
-      for (int i=0; i<_maxNCones; i++) _bkgrCones_hpT[i] = 0;	// maximal track pT
       ptBkgrThreshold = 10;		// by default tracks with pt>4*GeV can be coming from a hard scattering event
       jetptBkgrThreshold = 90;		// remove random cones that overlap with a jet
-      m_maxjetdeltaR = 0.8;
-      
-      //parametrization from pPbCentrality 
-      
+      m_maxjetdeltaR = cone_radius*2;
+
+      //parametrization from pPbCentrality
+
       _f_weights = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_eta_weight_PbPb_2015.root","read");
       ptaxis = (TAxis*) _f_weights->Get("UE_track_pt"); 
       for(int i=ptaxis->FindBin(1.);i<=ptaxis->FindBin(15.);i++){ //First bin at 1 GeV last at 15 GeV
@@ -131,7 +174,7 @@ class UEEstimator
 	double getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
     double getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error);
 	double getShapeUE(bool new_MC, int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, int i_jet, double &error);
-
+	void InitCones();
 	Int_t GetTrackpTBin(float pt) {
     	Int_t bin=-1;
     		if (pt>0.2) bin=0; if (pt>1.) bin=1; if (pt>2.) bin=2; if (pt>3.) bin=3; if (pt>4.) bin=4; if (pt>5.) bin=5; 

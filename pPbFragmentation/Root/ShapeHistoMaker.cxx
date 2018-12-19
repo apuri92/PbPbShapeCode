@@ -65,10 +65,47 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	wk()->addOutput (h_jet_pt_eta_phi);
 	wk()->addOutput (h_trk_pt_eta_phi);
 
-	h_tmp = new TH1D("h_tmp","h_tmp",10,0,10);
-	wk()->addOutput(h_tmp);
 
-	
+	double tmp_finerBinsN = 300, tmp_rBinsN = 13, tmp_coneBinsN = 51;
+	double tmp_finerBins[400], tmp_rBins[200], tmp_coneBins[50];
+
+	tmp_rBins[0] = 0.; tmp_rBins[1] = 0.05; tmp_rBins[2] = 0.1; tmp_rBins[3] = 0.15; tmp_rBins[4] = 0.2; tmp_rBins[5] = 0.25; tmp_rBins[6] = 0.3; tmp_rBins[7] = 0.4; tmp_rBins[8] = 0.5; tmp_rBins[9] = 0.6; tmp_rBins[10] = 0.7; tmp_rBins[11] = 0.8; tmp_rBins[12] = 1.0; tmp_rBins[13] = 1.2;
+
+	for (int i = 0; i <= tmp_finerBinsN; i++)
+	{
+		tmp_finerBins[i] = -1.5+i*0.01;
+		cout << tmp_finerBins[i] << ", ";
+	}
+
+	cout << "cone bins" << endl;
+	for (int i = 0; i <= tmp_coneBinsN; i++)
+	{
+		tmp_coneBins[i] = -0.5+i;
+		cout << tmp_coneBins[i] << ", ";
+	}
+
+
+	cout << endl;
+
+	h_tmp_trk = new TH3D("h_tmp_trk","h_tmp_trk",ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins, phiTrkBinsN, phiTrkBins);
+	wk()->addOutput(h_tmp_trk);
+	h_tmp_dR = new TH1D("h_tmp_dR","h_tmp_dR",120,0,1.2);
+	wk()->addOutput(h_tmp_dR);
+	h_tmp_coneIndex = new TH1D("h_tmp_coneIndex","h_tmp_coneIndex",100,0,100);
+	wk()->addOutput(h_tmp_coneIndex);
+	h_tmp_dRBin = new TH1D("h_tmp_dRBin","h_tmp_dRBin",20,0,20);
+	wk()->addOutput(h_tmp_dRBin);
+	h_tmp_rdEtadPhi = new TH3D("h_tmp_rdEtadPhi","h_tmp_rdEtadPhi;r;#delta#eta;#delta#phi",tmp_rBinsN, tmp_rBins, tmp_finerBinsN, tmp_finerBins, tmp_finerBinsN, tmp_finerBins);
+	wk()->addOutput(h_tmp_rdEtadPhi);
+	h_tmp_cone_stats = new TH1D("h_tmp_cone_stats","h_tmp_cone_stats;# Valid Cone ; Events;",51,-0.5,50.5);
+	wk()->addOutput(h_tmp_cone_stats);
+//	h_tmp_cone_stats = new TH3D("h_tmp_cone_stats","h_tmp_cone_stats# Valid Cone;p_T^{Trk};p_T^{jet}",tmp_coneBinsN, tmp_coneBins, ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+//	wk()->addOutput(h_tmp_cone_stats);
+
+
+	h_cone_map = new TH3D("h_cone_map","h_cone_map;#phi shift;#eta_{cone};#phi_{cone}",240, -1.2, 1.2, 100, -2.5, 2.5, 140, -3.5, 3.5);
+	wk()->addOutput(h_cone_map);
+
 	//Debugging histograms
 	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)
 	{

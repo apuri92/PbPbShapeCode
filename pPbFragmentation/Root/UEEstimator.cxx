@@ -1,6 +1,5 @@
 #include "pPbFragmentation/UEEstimator.h"
 
-
 void UEEstimator::ExcludeConesByTrk(vector<float> &trk_pt,vector<float> &trk_eta,vector<float> &trk_phi)
 //@brief: this is to indentify which cones have to be excluded due to possibly containing a jet 
 {
@@ -14,11 +13,11 @@ void UEEstimator::ExcludeConesByTrk(vector<float> &trk_pt,vector<float> &trk_eta
 
       for (int iEta=0; iEta<_nEta; iEta++)
         {for (int iPhi=0; iPhi<_nPhi; iPhi++)
-           {Float_t thePhi = (iPhi*2./_nPhi -1 + 1./_nPhi)*TMath::Pi();
-            Float_t theEta = (iEta*2./_nEta -1 + 1./_nEta)*2.0;
+		{	Float_t thePhi = cone_phi[iPhi];
+			Float_t theEta = cone_eta[iEta];
             Float_t deltaR = DeltaR( trk_phi.at(j1), trk_eta.at(j1), thePhi, theEta );
             Int_t idx = _nEta * iPhi + iEta;
-            if (deltaR<0.4)
+            if (deltaR<cone_radius)
               {
                if (trk_pt.at(j1) > ptBkgrThreshold ) _bkgrCones[idx] = 0;   // disable this cone since there is a jet
                if (trk_pt.at(j1) > _bkgrCones_hpT[idx] ) _bkgrCones_hpT[idx]= trk_pt.at(j1);
@@ -45,8 +44,8 @@ void UEEstimator::ExcludeConesByJet(vector<float> &jet_pt,vector<float> &jet_eta
 
       for (int iEta=0; iEta<_nEta; iEta++)
         {for (int iPhi=0; iPhi<_nPhi; iPhi++)
-           {Float_t thePhi = (iPhi*2./_nPhi -1 + 1./_nPhi)*TMath::Pi();
-            Float_t theEta = (iEta*2./_nEta -1 + 1./_nEta)*2.0;
+		{	Float_t thePhi = cone_phi[iPhi];
+			Float_t theEta = cone_eta[iEta];
             Float_t deltaR = DeltaR( jet_phi.at(j1), jet_eta.at(j1), thePhi, theEta );
             Int_t idx = _nEta * iPhi + iEta;
             if (deltaR<m_maxjetdeltaR)
@@ -75,13 +74,14 @@ void UEEstimator::ExcludeConesByJetandTrack(vector<float> &trk_pt,vector<float> 
 
       for (int iEta=0; iEta<_nEta; iEta++)
         {for (int iPhi=0; iPhi<_nPhi; iPhi++)
-           {Float_t thePhi = (iPhi*2./_nPhi -1 + 1./_nPhi)*TMath::Pi();
-            Float_t theEta = (iEta*2./_nEta -1 + 1./_nEta)*2.0;
+		{	Float_t thePhi = cone_phi[iPhi];
+			Float_t theEta = cone_eta[iEta];
             Float_t deltaR = DeltaR( jet_phi.at(j1), jet_eta.at(j1), thePhi, theEta );
             Int_t idx = _nEta * iPhi + iEta;
             if (deltaR<m_maxjetdeltaR)
               {
                _bkgrCones[idx] = 0;                           // disable this cone since there is a jet
+//				  cout << Form("jet_%i: %f, %f, %f	cone: %f, %f	excluded:%i",j1, jet_eta.at(j1), jet_phi.at(j1), jet_pt.at(j1), theEta, thePhi, idx) << endl;
               }
            }
         }
@@ -92,13 +92,14 @@ void UEEstimator::ExcludeConesByJetandTrack(vector<float> &trk_pt,vector<float> 
 
       for (int iEta=0; iEta<_nEta; iEta++)
         {for (int iPhi=0; iPhi<_nPhi; iPhi++)
-           {Float_t thePhi = (iPhi*2./_nPhi -1 + 1./_nPhi)*TMath::Pi();
-            Float_t theEta = (iEta*2./_nEta -1 + 1./_nEta)*2.0;
+		{	Float_t thePhi = cone_phi[iPhi];
+			Float_t theEta = cone_eta[iEta];
             Float_t deltaR = DeltaR( trk_phi.at(j1), trk_eta.at(j1), thePhi, theEta );
             Int_t idx = _nEta * iPhi + iEta;
-            if (deltaR<0.4) 
+            if (deltaR<cone_radius)
               {
                _bkgrCones[idx] = 0;                           // disable this cone since there is a jet
+//				  cout << Form("trk_%i: %f, %f, %f	cone: %f, %f	excluded:%i",j1, trk_eta.at(j1), trk_phi.at(j1), trk_pt.at(j1), theEta, thePhi, idx) << endl;
                if (trk_pt.at(j1) > _bkgrCones_hpT[idx] ) _bkgrCones_hpT[idx]= trk_pt.at(j1);
               }
            }
@@ -119,9 +120,9 @@ void UEEstimator::FindCone(float trk_pt,float trk_eta,float trk_phi)
    for (int iEta=0; iEta<_nEta; iEta++)
      {for (int iPhi=0; iPhi<_nPhi; iPhi++)
         {if (! _bkgrCones[iPhi*_nEta+iEta]) continue;
-         Float_t thePhi = (iPhi*2./_nPhi -1 + 1./_nPhi)*TMath::Pi();
-         Float_t theEta = (iEta*2./_nEta -1 + 1./_nEta)*2.0;
-         Float_t deltaR = DeltaR( trk_phi, trk_eta, thePhi, theEta );
+			Float_t thePhi = cone_phi[iPhi];
+			Float_t theEta = cone_eta[iEta];
+			Float_t deltaR = DeltaR( trk_phi, trk_eta, thePhi, theEta );
          if (deltaR < deltaROrthMin)
            {deltaROrthMin = deltaR;
             _etaOfCone = theEta;
@@ -133,6 +134,7 @@ void UEEstimator::FindCone(float trk_pt,float trk_eta,float trk_phi)
      }
 
    _deltaRToConeAxis = deltaROrthMin;
+//	cout << Form("trk: %f, %f-%f, cone_%i, %f-%f, r: %f", trk_pt, trk_eta, trk_phi, _maxConeIndex, _etaOfCone, _phiOfCone, _deltaRToConeAxis) << endl;
 
 }
 
@@ -258,8 +260,8 @@ void UEEstimator::initShapeUE(bool isMC, int uncert)
 
 						std::string name;
 						name = Form("h_UE_new_MC_dR%i_dPsi%i_pt%i_cent%i_jet%i",i_dR, i_dPsi, i_pt+1, i_cent, i_jet);
-						if (uncert == 2) h_UE_eta_phi_maps[i_dR][i_dPsi][i_pt][i_cent] = (TH2*)_f_ShapeUE_tight->Get(name.c_str());
-						h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE->Get(name.c_str());
+						if (uncert == 2) h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE_tight->Get(name.c_str());
+						else h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE->Get(name.c_str());
 					}
 				}
 			}
@@ -276,14 +278,6 @@ double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_pt, int i_cent, doubl
 	return val;
 }
 
-double UEEstimator::getShapeUE(int i_dR, int i_dPsi, int i_dPsi3, int i_pt, int i_cent, double jet_eta, double jet_phi, double &error)
-{
-	int bin_eta = h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetXaxis()->FindBin(jet_eta);
-	int bin_phi = h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetYaxis()->FindBin(jet_phi);
-	double val =  h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinContent(bin_eta, bin_phi);
-	error =  h_UE_v3[i_dR][i_dPsi][i_dPsi3][i_pt][i_cent]->GetBinError(bin_eta, bin_phi);
-	return val;
-}
 
 double UEEstimator::getShapeUE(bool UE_MC, int i_dR, int i_dPsi, int i_pt, int i_cent, double jet_eta, double jet_phi, int i_jet, double &error)
 {
@@ -295,7 +289,19 @@ double UEEstimator::getShapeUE(bool UE_MC, int i_dR, int i_dPsi, int i_pt, int i
 }
 
 
+void UEEstimator::InitCones()
+{
 
+	cone_phi_shift = 0;
+
+	for (int iEta=0; iEta<_nEta; iEta++){ cone_eta[iEta] = ((cone_eta_start+cone_radius) + (2*cone_radius*iEta));}
+	for (int iPhi=0; iPhi<_nPhi; iPhi++){ cone_phi[iPhi] = ((cone_phi_start+cone_phi_shift+cone_radius) + (2*cone_radius*iPhi));}
+
+	for (int i=0; i<_maxNCones; i++) _bkgrCones[i] = 1;	// all cones can be used by default
+	for (int i=0; i<_maxNCones; i++) _bkgrCones_hpT[i] = 0;	// maximal track pT
+
+
+}
 
 
 

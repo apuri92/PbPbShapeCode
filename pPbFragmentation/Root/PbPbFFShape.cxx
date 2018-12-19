@@ -542,128 +542,108 @@ EL::StatusCode PbPbFFShape :: execute (){
 													_dR_truth_matching);
 
 
-	vector<double> cone_ue_eta, cone_ue_phi;
-	vector<bool> cone_ue_exclude;
-	vector<int> cone_ue_jetIndex;
 
-	//cone method
-	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++)
-	{
-		h_tmp->Fill(0.5); //total number of jets
+	std::vector<float> trk_good_eta;
+	std::vector<float> trk_good_phi;
+	std::vector<float> trk_good_pt;
+	uee->InitCones();
 
-		jet_pt = jet_pt_xcalib_vector.at(i);
-		jet_eta = jet_eta_vector.at(i);
-		jet_phi = jet_phi_vector.at(i);
+	//Loop over tracks to exclude UE cones
+	for (const auto& trk : *recoTracks) {
+		//get the tracks....
+		float pt = trk->pt()/1000.;
+		float eta = trk->eta();
+		float phi = trk->phi();
+		//correct the alignement
+		bool isMatchedToTruthParticle = false;
+		if (isMC) {
+			ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");
+			float mcprob =trk->auxdata<float>("truthMatchProbability");
+			if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
+		}
+		if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
+		if (fabs(eta) > 2.5) continue;
+		//deriv_val->Fill(pt,eventInfo->runNumber(),eventInfo->lumiBlock());
+		//Charge cut
+		if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue;
+		if (isMC && uncertprovider->uncert_class==5) uncertprovider->UncerTrackMomentum(pt, eta, phi, trk->charge() );
+		//if (pt < _pTtrkCut) continue; //min pT cut
+		double d0 = trk->d0();
+		double d0_cut = f_d0_cut->Eval(pt);
+		if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
+		if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
 
-		cone_ue_eta.push_back(jet_eta);
-		cone_ue_phi.push_back(DeltaPhi(jet_phi, TMath::Pi()));
-		cone_ue_exclude.push_back(0);
-		cone_ue_jetIndex.push_back(i);
+		//Additional track selection
+		//if (!trkcorr->PassTracktoJetBalance(pt, jet_pt, eta, jet_eta,cent_bin_fine)) continue;
 
-		cone_ue_eta.push_back(-jet_eta);
-		cone_ue_phi.push_back(jet_phi);
-		cone_ue_exclude.push_back(0);
-		cone_ue_jetIndex.push_back(i);
-
-		cone_ue_eta.push_back(-jet_eta);
-		cone_ue_phi.push_back(DeltaPhi(jet_phi, TMath::Pi()));
-		cone_ue_exclude.push_back(0);
-		cone_ue_jetIndex.push_back(i);
+		trk_good_eta.push_back(eta);
+		trk_good_phi.push_back(phi);
+		trk_good_pt.push_back(pt);
 	}
 
-
-	for (int i = 0; i < cone_ue_eta.size(); i++)
+	//Construct UE disitrbutions
+	uee->ExcludeConesByJetandTrack(trk_good_pt,trk_good_eta,trk_good_phi,jet_pt_xcalib_vector,jet_eta_vector,jet_phi_vector);
+	double phi_shift = uee->cone_phi_shift;
+	for (int iPhi=0; iPhi<uee->_nPhi; iPhi++)
 	{
-		h_tmp->Fill(1.5); //total number of cones
-
-		double cone_eta = cone_ue_eta.at(i);
-		double cone_phi = cone_ue_phi.at(i);
-
-		for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
+		for (int iEta=0; iEta<uee->_nEta; iEta++)
 		{
-			double jet_pt = jet_pt_xcalib_vector.at(j);
+			double cone_eta = uee->cone_eta[iEta];
+			double cone_phi = uee->cone_phi[iPhi];
 
-			double jet_eta = jet_eta_vector.at(j);
-			double jet_phi = jet_phi_vector.at(j);
-			double distance_to_cone = DeltaR(cone_phi, cone_eta, jet_phi, jet_eta);
+			h_cone_map->Fill(phi_shift, cone_eta, cone_phi);
+		}
+	}
 
-			if (distance_to_cone < 1.6 && jet_pt > 90.)
+	float n_cones = (uee->GetNConesWeight()>0)? 1./uee->GetNConesWeight() : 0;
+	float total = uee->_nPhi * uee->_nEta;
+
+	h_tmp_cone_stats->Fill(n_cones);
+
+
+	for (int i = 0; i <trk_good_pt.size() ; i++)
+	{
+		if (cent_bin != 0) continue;
+
+		double pt = trk_good_pt[i];
+		double eta = trk_good_eta[i];
+		double phi = trk_good_phi[i];
+
+		if (pt < 10.)
+		{
+			uee->FindCone(pt,eta,phi);
+
+			float deltaRBkgr = uee->GetDeltaRToConeAxis();
+
+			h_tmp_trk->Fill(pt, eta, phi);
+
+			int ConeIndex = uee->GetMaxConeIndex();
+			double cone_phi = uee->GetphiOfConeAxis();
+			double cone_eta = uee->GetetaOfConeAxis();
+
+			if (deltaRBkgr < uee->m_maxjetdeltaR/2.)
 			{
-				cone_ue_exclude.at(i) = 1;
-				break;
+
+				int dr_bin_UE = trkcorr->GetdRBin(deltaRBkgr);
+
+				float tmp_dEta = DeltaEta(eta, cone_eta);
+				float tmp_dPhi = DeltaPhi(phi, cone_phi);
+				float r = sqrt(tmp_dPhi*tmp_dPhi + tmp_dEta*tmp_dEta);
+
+				h_tmp_dR->Fill(deltaRBkgr);
+				h_tmp_coneIndex->Fill(ConeIndex);
+				h_tmp_dRBin->Fill(dr_bin_UE);
+				h_tmp_rdEtadPhi->Fill(r, tmp_dEta, tmp_dPhi);
+
 			}
 		}
+
+
 	}
 
-
-	int unused_cones = 0;
-	for (int i = 0; i < cone_ue_eta.size(); i++)
-	{
-
-		if (cone_ue_exclude.at(i))
-		{
-			h_tmp->Fill(2.5); //total number of excluded cones
-			unused_cones++;
-			continue;
-		}
-
-		h_tmp->Fill(3.5); //total number of used cones
-
-		float jet_weight = 1.;
-		jet_weight *=event_weight;
-
-		double cone_pt = jet_pt_xcalib_vector.at(cone_ue_jetIndex.at(i));
-
-		//normalization for cone_UE
-		double cone_eta = cone_ue_eta.at(i);
-		double cone_phi = cone_ue_phi.at(i);
-		cone_norm_jet.at(cent_bin)->Fill(cone_pt, jet_weight);
-
-		for (const auto& trk : *recoTracks)
-		{
-			//get the tracks....
-			float pt = trk->pt()/1000.;
-			float eta = trk->eta();
-			float phi = trk->phi();
-			bool isMatchedToTruthParticle = false;
-			if (isMC) {
-				ElementLink< xAOD::TruthParticleContainer > truthLink = trk->auxdata<ElementLink< xAOD::TruthParticleContainer > >("truthParticleLink");
-				float mcprob =trk->auxdata<float>("truthMatchProbability");
-				if(truthLink.isValid() && mcprob > _mcProbCut) isMatchedToTruthParticle = true;
-			}
-			if (_correctTrackpT && (!isMC || !isMatchedToTruthParticle)) trkcorr->correctChTrackpT(pt, eta, phi, trk->charge());
-			if (fabs(eta) >= 2.5) continue;
-			//Moving track pt in systematic variation  if needed
-			if (_useCharge!=0 && ((int)trk->charge())!=_useCharge) continue;
-			if (pt < _pTtrkCut) continue; //min pT cut
-
-			float R = DeltaR(phi,eta,cone_phi, cone_eta);
-			if (R > 1.5) continue; //broad cut on dR to remove unecessary effcorr warnings for tracks too far from the jet anwyay
-
-			double d0 = trk->d0();
-			double d0_cut = f_d0_cut->Eval(pt);
-			if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
-			if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
-
-			//Efficiency correction;
-			float eff_uncertainty = 0;
-			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
-
-
-			int dr_bin = trkcorr->GetdRBin(R);
-			ChPS_cone_UE.at(dr_bin).at(cent_bin)->Fill(pt, cone_pt, jet_weight*eff_weight);
-		}
-	}
-
-
-	if (jet_pt_xcalib_vector.size() > 0)
-	{
-		if (cone_ue_eta.size() == unused_cones)
-		{
-			h_tmp->Fill(4.5); //total number of events with ZERO cones and non-zero jets
-		}
-		h_tmp->Fill(5.5); //total number of events with non-zero jets
-	}
+	trk_good_eta.clear();
+	trk_good_phi.clear();
+	trk_good_pt.clear();
 
 
 
@@ -779,10 +759,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 
 		TM_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
+		cone_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
 
 		int jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,uee->Psi));
 
-		float z_max=0;
 		float pT_max=0;
 		int trk_multiplicity[10]; for (int nMultThreshold=0; nMultThreshold<trkcorr->nMultThresholds; nMultThreshold++) trk_multiplicity[nMultThreshold]=0;
 		for (const auto& trk : *recoTracks)
@@ -833,8 +813,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(jet_pt, jet_y, pt,eta, R, cent_bin);
 			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
 
-			double z = cos(R)*pt / jet_pt;
-
 			//required to be within jet, need to be separated for UEEstimator
 			int dr_bin = trkcorr->GetdRBin(R);
 			if (pass_reco_pt_cut)
@@ -850,13 +828,46 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			}
 
+			//UE distributions
+			if (pt < 10. && _dataset == 4)
+			{
+				uee->FindCone(pt,eta,phi);
+
+				float deltaRBkgr = uee->GetDeltaRToConeAxis();
+
+				int ConeIndex = uee->GetMaxConeIndex();
+				double tmp_phi = uee->GetphiOfConeAxis();
+				double tmp_eta = uee->GetetaOfConeAxis();
+
+				if (deltaRBkgr < uee->m_maxjetdeltaR/2.)
+				{
+					float w_eta  = uee->CalculateEtaWeight(pt,eta,jet_eta,cent_bin_fine);
+					float w_ncones = uee->GetNConesWeight();
+
+					float w_flow=1;
+					if (_dataset==4)
+					{
+						w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
+						w_flow = w_flow * uee->CalculateV3Weight( pt, eta, phi, jet_phi,  FCalEt );
+					}
+					float w_bkgr = w_eta * w_ncones * w_flow;
+					int dr_bin_UE = trkcorr->GetdRBin(deltaRBkgr);
+
+					h_tmp_coneIndex->Fill(ConeIndex);
+					h_tmp_dRBin->Fill(dr_bin_UE);
+
+					ChPS_cone_UE.at(dr_bin_UE).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight*w_bkgr);
+
+				}
+			}
+
+
 			if(_data_switch==1)
 			{
 				//look for truth tracks in MC, used for response matrices
 				//Only truth jets > 40 GeV and <2.1 in responses
 
 				float matched_truth_jet_pt = truth_jet_pt_vector.at(TruthJetIndex.at(i));
-
 
 				bool isFake=true;
 				bool isSecondary=false;
@@ -910,7 +921,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 							//Only for truth matched tracks
 							if (R < _dR_max)
 							{
-								if (z > z_max) z_max = z;
 								if (pt > pT_max && pass_reco_pt_cut) pT_max = pt;
 							}
 						}
@@ -999,7 +1009,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			h_jet_for_eff_full.at(n_cent_bins-1)->Fill(truth_jet_pt, fabs(truth_jet_eta), truth_jet_phi, jet_weight);
 
 			if (truth_jet_pt < _truthpTjetCut) continue;
-			if (fabs(truth_jet_eta)>(2.5 - _dR_max)) continue; //cut on rapidity 
+			if (fabs(truth_jet_eta)>(2.5 - _dR_max)) continue; //cut on rapidity
 
 			//TODO do we want to reweigth also truth spectrum?
 			//if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt,truth_jet_eta,cent_bin);
@@ -1012,7 +1022,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			xAOD::TruthParticleContainer::const_iterator truth_itr = particles->begin();
 			xAOD::TruthParticleContainer::const_iterator truth_end = particles->end();
 
-			double truth_z_max = 0.;
 			double truth_pt_max = 0.;
 
 			for( ; truth_itr!=truth_end; ++truth_itr)
@@ -1033,10 +1042,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 				float R = DeltaR(phi,eta,truth_jet_phi,truth_jet_eta);
 				if(R > _dR_max) continue;
 
-				//Get z
-				double truth_z = cos(R)*pt / truth_jet_pt;
-
-				if (truth_z > truth_z_max) truth_z_max = truth_z;
 				if (pt >  truth_pt_max ) truth_pt_max = pt;
 
 
@@ -1075,12 +1080,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 	jet_isolated_vector.clear();
 	truth_jet_isolated_vector.clear();
 
-	cone_ue_jetIndex.clear();
-	cone_ue_exclude.clear();
-	cone_ue_eta.clear();
-	cone_ue_phi.clear();
-
-
 	for (int j=0;j<_nTriggers;j++)
 	{
 		isTriggered[j].clear();
@@ -1100,11 +1099,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	jet_isolated_vector.shrink_to_fit();
 	truth_jet_isolated_vector.shrink_to_fit();
-
-	cone_ue_jetIndex.shrink_to_fit();
-	cone_ue_exclude.shrink_to_fit();
-	cone_ue_eta.shrink_to_fit();
-	cone_ue_phi.shrink_to_fit();
 
 
 	for (int j=0;j<_nTriggers;j++){

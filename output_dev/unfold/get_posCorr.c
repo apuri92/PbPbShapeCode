@@ -26,7 +26,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 	//	##############	Config done	##############"
 
-	double r_max_range = 1.2;
+	double r_max_range = 0.8;
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
 	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
@@ -311,6 +311,9 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					c0->cd(trk_iter+1);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth r");
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco r");
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
+
 //					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1e-9,1);
 					gPad->SetRightMargin(0.15);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("colz");
@@ -328,7 +331,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Reco dR");
 					SetHStyle(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-//					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
+					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-5, 1);
+					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend1->AddEntry(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
@@ -342,7 +346,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth dR");
 					SetHStyle(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-//					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
+					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-5, 1);
+					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend2->AddEntry(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
@@ -365,6 +370,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					if (diff> 1) diff = 0.5;
 					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1 - diff, 1 + diff);
 //					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(-4,5);
+					h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend3->AddEntry(h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("pe");
 					else h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same pe");
@@ -389,7 +395,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Purity");
 					SetHStyle(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
+					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
+					h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend4->AddEntry(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
@@ -405,7 +412,8 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Response Efficiency");
 					SetHStyle(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
+					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,1.2);
+					h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend5->AddEntry(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");

@@ -47,6 +47,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
 
+	//2D UE
 	vector<vector<TH2*>> h_cone_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_cone_data_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
@@ -55,6 +56,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<TH2*>> h_FS_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FNS_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 
+	//1D UE
 	vector<vector<vector<TH1*>>> h_cone_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_cone_data_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
@@ -63,6 +65,15 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<vector<TH1*>>> h_FS_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 
+	//2D UE injet
+	vector<TH2*> h_cone_injet_2D =  vector<TH2*> (n_cent_cuts);
+	vector<TH2*> h_cone_data_injet_2D = vector<TH2*> (n_cent_cuts);
+	vector<TH2*> h_MB_injet_2D = vector<TH2*> (n_cent_cuts);
+	vector<TH2*> h_MB_data_injet_2D = vector<TH2*> (n_cent_cuts);
+	vector<TH2*> h_TM_injet_2D = vector<TH2*> (n_cent_cuts);
+
+
+	//1D UE u nr
 	vector<vector<vector<TH1*>>> h_cone_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_cone_data_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
@@ -71,7 +82,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<vector<TH1*>>> h_FS_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 
-
+	//2D ratio
 	vector<vector<TH2*>> h_cone_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_cone_data_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_MB_data_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
@@ -80,6 +91,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<TH2*>> h_FS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 	vector<vector<TH2*>> h_FNS_MB_2D = vector<vector<TH2*>> (N_dR, vector<TH2*> (n_cent_cuts));
 
+	//1D ratio
 	vector<vector<vector<TH1*>>> h_cone_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_cone_data_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_MB_data_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
@@ -88,6 +100,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 	vector<vector<vector<TH1*>>> h_FS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_FNS_MB_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (n_cent_cuts)));
 
+	//1D ratio in r
 	vector<vector<vector<TH1*>>> h_cone_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_cone_data_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
 	vector<vector<vector<TH1*>>> h_TM_MB_r_1D =  vector<vector<vector<TH1*>>> (N_jetpt, vector<vector<TH1*>> (N_trkpt, vector<TH1*> (n_cent_cuts)));
@@ -98,6 +111,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
+
 
 
 	double array_dr_bins[N_dR+1];
@@ -206,6 +220,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
  h_true_jet_spectra->Sumw2();
  */
 
+
 		for (int i_dR = 0; i_dR < N_dR; i_dR++)
 		{
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
@@ -257,7 +272,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				double n_jets_true = h_true_jet_spectra->GetBinContent(i_jet);
 
 				if (n_jets == 0) continue;
-				
+
 
 				for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
 				{
@@ -383,15 +398,37 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 			double area = TMath::Pi() * ((dR_hi*dR_hi) - (dR_lo*dR_lo));
 
 
+			if (dR_binning->GetBinLowEdge(i_dR+1) < 0.4)
+			{
+
+				if (i_dR == 0)
+				{
+					h_cone_injet_2D[i_cent] = (TH2*)h_cone_2D[i_dR][i_cent]->Clone(Form("%s_injet",h_cone_2D[i_dR][i_cent]->GetName()));
+					h_cone_data_injet_2D[i_cent] = (TH2*)h_cone_data_2D[i_dR][i_cent]->Clone(Form("%s_injet",h_cone_data_2D[i_dR][i_cent]->GetName()));
+					h_MB_injet_2D[i_cent] = (TH2*)h_MB_2D[i_dR][i_cent]->Clone(Form("%s_injet",h_MB_2D[i_dR][i_cent]->GetName()));
+					h_MB_data_injet_2D[i_cent] = (TH2*)h_MB_data_2D[i_dR][i_cent]->Clone(Form("%s_injet",h_MB_data_2D[i_dR][i_cent]->GetName()));
+					h_TM_injet_2D[i_cent] = (TH2*)h_TM_2D[i_dR][i_cent]->Clone(Form("%s_injet",h_TM_2D[i_dR][i_cent]->GetName()));
+				}
+				else
+				{
+					h_cone_injet_2D[i_cent]->Add(h_cone_2D[i_dR][i_cent]);
+					h_cone_data_injet_2D[i_cent]->Add(h_cone_data_2D[i_dR][i_cent]);
+					h_MB_injet_2D[i_cent]->Add(h_MB_2D[i_dR][i_cent]);
+					h_MB_data_injet_2D[i_cent]->Add(h_MB_data_2D[i_dR][i_cent]);
+					h_TM_injet_2D[i_cent]->Add(h_TM_2D[i_dR][i_cent]);
+				}
+			}
+
+
 			for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 			{
-				h_cone_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_2D[i_dR][i_cent]->ProjectionX(Form("cone_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_cone_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_MB_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_data_2D[i_dR][i_cent]->ProjectionX(Form("MB_data_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_TM_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_2D[i_dR][i_cent]->ProjectionX(Form("TM_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_FS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_2D[i_dR][i_cent]->ProjectionX(Form("FS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_FNS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_2D[i_dR][i_cent]->ProjectionX(Form("FNS_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_2D[i_dR][i_cent]->ProjectionX(Form("cone_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MB_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_data_2D[i_dR][i_cent]->ProjectionX(Form("MB_data_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_TM_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_2D[i_dR][i_cent]->ProjectionX(Form("TM_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_FS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_2D[i_dR][i_cent]->ProjectionX(Form("FS_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_FNS_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_2D[i_dR][i_cent]->ProjectionX(Form("FNS_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 
 				h_cone_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
 				h_cone_data_1D[i_jet][i_dR][i_cent]->Scale(1.,"width");
@@ -409,15 +446,14 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				h_FS_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 				h_FNS_1D[i_jet][i_dR][i_cent]->Scale(1./area);
 
-
 				//dont scale ratios if dividing
-				h_cone_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_cone_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_MB_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_data_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_cone_data_MB_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_data_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_data_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_TM_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_MB_2D[i_dR][i_cent]->ProjectionX(Form("TM_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_FS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
-				h_FNS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FNS_MB_%i_%i_%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_MB_data_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_MB_data_MB_2D[i_dR][i_cent]->ProjectionX(Form("MB_data_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_cone_data_MB_data_1D[i_jet][i_dR][i_cent] = (TH1*)h_cone_data_MB_data_2D[i_dR][i_cent]->ProjectionX(Form("cone_data_MB_data_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_TM_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_TM_MB_2D[i_dR][i_cent]->ProjectionX(Form("TM_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_FS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FS_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
+				h_FNS_MB_1D[i_jet][i_dR][i_cent] = (TH1*)h_FNS_MB_2D[i_dR][i_cent]->ProjectionX(Form("FNS_MB_jet%i_dr%i_cent%i", i_jet, i_dR, i_cent), i_jet+1, i_jet+1);
 
 				if (subtract)
 				{
@@ -439,7 +475,6 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				}
 
 			}
-
 		}
 
 		//recast in terms of r
@@ -558,6 +593,12 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 		}
 
+		h_cone_injet_2D[i_cent]->Write();
+		h_cone_data_injet_2D[i_cent]->Write();
+		h_MB_injet_2D[i_cent]->Write();
+		h_MB_data_injet_2D[i_cent]->Write();
+		h_TM_injet_2D[i_cent]->Write();
+
 
 		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 		{
@@ -599,7 +640,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 //				h_FS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_MB_indR_%s", name.c_str()));
 //				h_FNS_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_MB_indR_%s", name.c_str()));
 
-				
+
 
 			}
 		}
@@ -1111,7 +1152,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 		}
 	}
 
-
+/*
 	{
 		//as function of trk
 		cout << "Function of trk" << endl;
@@ -1237,7 +1278,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 		}
 	}
-
+*/
 	/*
   {
 		//just the factors as function of r

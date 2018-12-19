@@ -670,9 +670,9 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
 	if ((scheme==0) && (variable=="dr_fine"))
 	{
 		printf("\n... R position res-binning : ");
-		num = 80;
+		num = 240;
 		array[0] = 0.;
-		array[num] = 0.4;
+		array[num] = 1.2;
 		double w = (array[num] - array[0])/num;
 		//		array[0] = 0.499375;
 		for (int i=1; i<=num; i++)

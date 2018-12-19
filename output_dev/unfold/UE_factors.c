@@ -93,7 +93,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 			name = Form("ChPS_FNS_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_FNS_method = (TH2*)input_file->Get(name.c_str());
 
-			name = Form("h_reco_jet_spectrum_y4_cent%i", i_cent);
+			name = Form("MB_norm_jet_cent%i", i_cent);
 			TH1* h_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("reco_jet_y4_c%i", i_cent));
 			h_jet_spectra->Sumw2();
 

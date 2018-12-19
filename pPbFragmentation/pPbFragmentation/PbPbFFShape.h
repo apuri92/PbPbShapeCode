@@ -84,7 +84,13 @@ class PbPbFFShape : public BaseClass{
 	TH1D *h_fcal_diff; //!
 
 
-	TH1D *h_tmp; //!
+	TH3D* h_tmp_trk; //!
+	TH1D* h_tmp_dR; //!
+	TH1D* h_tmp_coneIndex; //!
+	TH1D* h_tmp_dRBin; //!
+	TH3D* h_tmp_rdEtadPhi; //!
+	TH3D* h_cone_map; //!
+	TH1D* h_tmp_cone_stats; //!
 
 
 	//TH3F *deriv_val; //!
