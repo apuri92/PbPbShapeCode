@@ -593,11 +593,11 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 
 		}
 
-		h_cone_injet_2D[i_cent]->Write();
-		h_cone_data_injet_2D[i_cent]->Write();
-		h_MB_injet_2D[i_cent]->Write();
-		h_MB_data_injet_2D[i_cent]->Write();
-		h_TM_injet_2D[i_cent]->Write();
+		h_cone_injet_2D[i_cent]->Write(Form("Cone_Cent%i",i_cent));
+		h_cone_data_injet_2D[i_cent]->Write(Form("Cone_data_Cent%i",i_cent));
+		h_MB_injet_2D[i_cent]->Write(Form("MC_Cent%i",i_cent));
+		h_MB_data_injet_2D[i_cent]->Write(Form("MC_data_Cent%i",i_cent));
+		h_TM_injet_2D[i_cent]->Write(Form("TM_Cent%i",i_cent));
 
 
 		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
@@ -628,7 +628,7 @@ void check_UE(int sys_mode = 0, bool subtract = 1)
 				h_cone_data_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_cone_data_indR_%s", name.c_str()));
 //				h_MB_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_indR_%s", name.c_str()));
 				h_MB_data_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_MB_data_indR_%s", name.c_str()));
-//				h_TM_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_indR_%s", name.c_str()));
+				h_TM_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_TM_indR_%s", name.c_str()));
 //				h_FS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FS_indR_%s", name.c_str()));
 //				h_FNS_r_1D[i_jet][i_trk][i_cent]->Write(Form("UE_FNS_indR_%s", name.c_str()));
 //

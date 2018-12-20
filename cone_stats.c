@@ -1,8 +1,8 @@
-void cone_stats()
+void cone_stats(int config)
 {
 	SetAtlasStyle();
-	TFile *f_mc = new TFile("output_dev/raw_results/c21/FF_MC_out_histo_PbPb_5p02_r001.root");
-	TFile *f_data = new TFile("output_dev/raw_results/c21/FF_data_out_histo_PbPb_5p02_r001.root");
+	TFile *f_mc = new TFile(Form("output_dev/raw_results/c%i/FF_MC_out_histo_PbPb_5p02_r001.root",config));
+	TFile *f_data = new TFile(Form("output_dev/raw_results/c%i/FF_data_out_histo_PbPb_5p02_r001.root",config));
 
 
 	TH1* h_mc = (TH1*)f_mc->Get("h_tmp_cone_stats");
@@ -32,7 +32,7 @@ void cone_stats()
 	h_data->Scale(1./h_data->Integral());
 
 	c->cd();
-	h_mc->GetXaxis()->SetRangeUser(0.2,10);
+//	h_mc->GetXaxis()->SetRangeUser(0.2,10);
 	h_mc->GetYaxis()->SetRangeUser(0,0.25);
 	cout <<h_mc->GetXaxis()->GetNdivisions() << endl;
 	h_mc->GetXaxis()->SetNdivisions(020,kTRUE);
