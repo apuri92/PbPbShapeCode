@@ -84,9 +84,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		cout << tmp_coneBins[i] << ", ";
 	}
 
-
-	cout << endl;
-
 	h_tmp_trk = new TH3D("h_tmp_trk","h_tmp_trk",ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins, phiTrkBinsN, phiTrkBins);
 	wk()->addOutput(h_tmp_trk);
 	h_tmp_dR = new TH1D("h_tmp_dR","h_tmp_dR",120,0,1.2);
@@ -103,7 +100,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 //	wk()->addOutput(h_tmp_cone_stats);
 
 
-	h_cone_map = new TH3D("h_cone_map","h_cone_map;#phi shift;#eta_{cone};#phi_{cone}",240, -1.2, 1.2, 100, -2.5, 2.5, 140, -3.5, 3.5);
+	h_cone_map = new TH2D("h_cone_map","h_cone_map;#eta_{cone};#phi_{cone}",100, -2.5, 2.5, 140, -3.5, 3.5);
 	wk()->addOutput(h_cone_map);
 
 	//Debugging histograms

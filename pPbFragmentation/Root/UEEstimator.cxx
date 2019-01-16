@@ -153,7 +153,7 @@ Float_t UEEstimator::CalculateEtaWeight(float trk_pT, float trk_eta, float jet_e
    Float_t nearJetEta = jet_eta;
    Float_t deltaEtaOrthMin = trkEta - _etaOfCone;	// (old version: trkEta - theEta)
    deltaEtaOrthMin *= ((_etaOfCone!=0)&&(nearJetEta!=0))? ( ((_etaOfCone/fabs(_etaOfCone))==(nearJetEta/fabs(nearJetEta)))? 1:-1 ):1;
-   //cout << "trk_pT " << trk_pT << " pT_bin " << pT_bin << " cent " << icent << endl; 
+   //cout << "trk_pT " << trk_pT << " pT_bin " << pT_bin << " cent " << icent << endl;
     Float_t w_eta = _h_eta_w[pT_bin][icent]->Interpolate( nearJetEta + deltaEtaOrthMin ) / _h_eta_w[pT_bin][icent]->Interpolate( trkEta );
    //Float_t w_eta = _f1_trkEta[icent]->Eval( nearJetEta + deltaEtaOrthMin ) / _f1_trkEta[icent]->Eval( trkEta );
 
@@ -291,16 +291,11 @@ double UEEstimator::getShapeUE(bool UE_MC, int i_dR, int i_dPsi, int i_pt, int i
 
 void UEEstimator::InitCones()
 {
-
-	cone_phi_shift = 0;
-
 	for (int iEta=0; iEta<_nEta; iEta++){ cone_eta[iEta] = ((cone_eta_start+cone_radius) + (2*cone_radius*iEta));}
-	for (int iPhi=0; iPhi<_nPhi; iPhi++){ cone_phi[iPhi] = ((cone_phi_start+cone_phi_shift+cone_radius) + (2*cone_radius*iPhi));}
+	for (int iPhi=0; iPhi<_nPhi; iPhi++){ cone_phi[iPhi] = ((cone_phi_start+cone_radius) + (2*cone_radius*iPhi));}
 
 	for (int i=0; i<_maxNCones; i++) _bkgrCones[i] = 1;	// all cones can be used by default
 	for (int i=0; i<_maxNCones; i++) _bkgrCones_hpT[i] = 0;	// maximal track pT
-
-
 }
 
 

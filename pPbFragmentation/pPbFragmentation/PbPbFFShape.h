@@ -89,7 +89,7 @@ class PbPbFFShape : public BaseClass{
 	TH1D* h_tmp_coneIndex; //!
 	TH1D* h_tmp_dRBin; //!
 	TH3D* h_tmp_rdEtadPhi; //!
-	TH3D* h_cone_map; //!
+	TH2D* h_cone_map; //!
 	TH1D* h_tmp_cone_stats; //!
 
 

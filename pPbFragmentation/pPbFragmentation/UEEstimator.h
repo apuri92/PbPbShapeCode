@@ -55,7 +55,6 @@ class UEEstimator
 	Float_t cone_phi[30];
 	double cone_eta_start = 0.;
 	double cone_phi_start = 0.;
-	double cone_phi_shift;
 	Int_t _nEta;
 	Int_t _nPhi;
 
@@ -89,7 +88,7 @@ class UEEstimator
 			 cone_eta_start = -2.0;
 			 cone_phi_start = -3.0;
 		 }
-		 else if(cone_radius == 0.4)
+		 else if (cone_radius == 0.4)
 		 {
 			 _nEta = 6;
 			 _nPhi = 7;

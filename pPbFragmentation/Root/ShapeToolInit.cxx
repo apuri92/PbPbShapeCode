@@ -196,7 +196,7 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	uee = new UEEstimator();
 	uee->ptBkgrThreshold = _trkptBkgrThreshold;
 	uee->jetptBkgrThreshold = _jetptBkgrThreshold;
-	if (_dataset == 4) uee->initShapeUE(isMC, _uncert_index); //only run this if doing PbPb, not pp
+	if (_dataset == 4 && !derive_UE_mode) uee->initShapeUE(isMC, _uncert_index); //only run this if doing PbPb, not pp
 
 	//Uncert tool
 	uncertprovider = new UncertProvider(_uncert_index,_mcProbCut,_cut_level.c_str(), GetCentralityNBins(31)-1, _eff_jety);

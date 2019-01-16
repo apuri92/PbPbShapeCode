@@ -395,7 +395,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
 //		double bins[10] = {0.50, 0.63, 1.00, 1.58, 2.51, 3.98, 6.31, 15.85, 39.81, 100.00};
 
 		num = 10;
-		double bins[11] = {0.50, 0.63, 1.00, 1.58, 2.51, 3.98, 6.31, 10.00, 25.12, 63.09, 158.49};
+		double bins[11] = {0.50, 0.9, 1.00, 1.58, 2.51, 3.98, 6.31, 10.00, 25.12, 63.09, 158.49};
 
 		printf("\n... pt-trk-binning for shape : ");
 		for (int i=0; i<=num; i++)
