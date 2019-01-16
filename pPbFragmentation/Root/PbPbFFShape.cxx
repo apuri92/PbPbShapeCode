@@ -347,6 +347,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	//Jet vectors
 	vector<float> jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector, jet_y_vector, jet_TrigPresc_vector;
+	vector<float> cone_exclusion_jet_pt,cone_exclusion_jet_eta,cone_exclusion_jet_phi;
 	vector<bool> jet_isolated_vector, jet_IsTrig_vector;//, isFake_vector;
 	vector<float> truth_jet_eta_vector,truth_jet_phi_vector,truth_jet_pt_vector, truth_jet_y_vector;
 	vector<bool> truth_jet_isolated_vector;
@@ -497,8 +498,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 		float jet_m = newjet.m()*0.001;
 
 
-		if (fabs(jet_eta)> (2.5 - _dR_max)) continue;
 		if (jet_pt < 90.) continue;
+		cone_exclusion_jet_pt.push_back(jet_pt);
+		cone_exclusion_jet_eta.push_back(jet_eta);
+		cone_exclusion_jet_phi.push_back(jet_phi);
+
+		if (fabs(jet_eta)> (2.5 - _dR_max)) continue;
 
 		jet_pt_xcalib_vector.push_back(jet_pt);
 		jet_phi_vector.push_back(jet_phi);
@@ -582,8 +587,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 
 	//Construct UE disitrbutions
-	uee->ExcludeConesByJetandTrack(trk_good_pt,trk_good_eta,trk_good_phi,jet_pt_xcalib_vector,jet_eta_vector,jet_phi_vector);
-	double phi_shift = uee->cone_phi_shift;
+	uee->ExcludeConesByJetandTrack(trk_good_pt,trk_good_eta,trk_good_phi,cone_exclusion_jet_pt,cone_exclusion_jet_eta,cone_exclusion_jet_phi);
 	for (int iPhi=0; iPhi<uee->_nPhi; iPhi++)
 	{
 		for (int iEta=0; iEta<uee->_nEta; iEta++)
@@ -591,7 +595,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			double cone_eta = uee->cone_eta[iEta];
 			double cone_phi = uee->cone_phi[iPhi];
 
-			h_cone_map->Fill(phi_shift, cone_eta, cone_phi);
+			h_cone_map->Fill(cone_eta, cone_phi);
 		}
 	}
 
@@ -785,7 +789,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (pt < _pTtrkCut) continue; //min pT cut
 
 			float R = DeltaR(phi,eta,jet_phi,jet_eta);
-			if (R > 1.5) continue; //broad cut on dR to remove unecessary effcorr warnings for tracks too far from the jet anwyay
 
 			//Tracking validation histograms
 			if (jet_pt>80. && jet_pt<110. && R < _dR_max) {
@@ -852,12 +855,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 					}
 					float w_bkgr = w_eta * w_ncones * w_flow;
 					int dr_bin_UE = trkcorr->GetdRBin(deltaRBkgr);
-
-					h_tmp_coneIndex->Fill(ConeIndex);
-					h_tmp_dRBin->Fill(dr_bin_UE);
-
 					ChPS_cone_UE.at(dr_bin_UE).at(cent_bin)->Fill(pt, jet_pt, jet_weight*eff_weight*w_bkgr);
-
 				}
 			}
 
@@ -903,8 +901,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 						//R_trk_jet
 						float R_reco_reco = DeltaR(phi,eta,jet_phi,jet_eta); //(reco_reco and truth_reco) and (reco_truth and truth_truth) are same
 						float R_truth_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
-
-						float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
 
 						h_dR_change.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
 						h_dR_change.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
@@ -1070,6 +1066,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 	jet_eta_vector.clear();
 	jet_y_vector.clear();
 
+	cone_exclusion_jet_pt.clear();
+	cone_exclusion_jet_eta.clear();
+	cone_exclusion_jet_phi.clear();
+
 	truth_jet_indices.clear();
 	truth_jet_pt_vector.clear();
 	truth_jet_eta_vector.clear();
@@ -1088,6 +1088,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 	jet_pt_xcalib_vector.shrink_to_fit();
 	jet_phi_vector.shrink_to_fit();
 	jet_eta_vector.shrink_to_fit();
+
+	cone_exclusion_jet_pt.shrink_to_fit();
+	cone_exclusion_jet_eta.shrink_to_fit();
+	cone_exclusion_jet_phi.shrink_to_fit();
 
 	truth_jet_indices.shrink_to_fit();
 	truth_jet_pt_vector.shrink_to_fit();
