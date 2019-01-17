@@ -302,20 +302,23 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			h_jet_v_Psi.at(i).at(j)->Sumw2();
 			wk()->addOutput (h_jet_v_Psi.at(i).at(j));
 
-//			//restrict to trk < 10 GeV, jet > 100, jet < 400, cent != 6
-//			if (i >= lo_jetpt_bin && i <= hi_jetpt_bin)
-//			{
-//				for (int m=0;m<10;m++) //psibins
-//				{
-//					for (int k=0;k<_ndRBins;k++)
-//					{
-//						temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
-//						h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k) = temphist_3D;
-//						h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k)->Sumw2();
-//						wk()->addOutput (h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k));
-//					}
-//				}
-//			}
+			if (derive_UE_mode)
+			{
+				//restrict to trk < 10 GeV, jet > 100, jet < 400, cent != 6
+				if (i >= lo_jetpt_bin && i <= hi_jetpt_bin)
+				{
+					for (int m=0;m<10;m++) //psibins
+					{
+						for (int k=0;k<_ndRBins;k++)
+						{
+							temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+							h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k) = temphist_3D;
+							h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k)->Sumw2();
+							wk()->addOutput (h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k));
+						}
+					}
+				}
+			}
 		}
 
 

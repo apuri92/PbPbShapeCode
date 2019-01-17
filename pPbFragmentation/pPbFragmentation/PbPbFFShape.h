@@ -110,6 +110,8 @@ class PbPbFFShape : public BaseClass{
 	bool derive_UE_mode = 0;
 	int lo_jetpt_bin = 6;
 	int hi_jetpt_bin = 8;
+//	int lo_jetpt_bin = 9;
+//	int hi_jetpt_bin = 11;
 
 	//debugging histograms
 	vector<TH3D*> h_reco_truth_matched; //!

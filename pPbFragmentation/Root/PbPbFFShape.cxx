@@ -693,7 +693,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		}
 
 
-		if (_dataset == 4) //only run this if doing PbPb, not pp
+		if (_dataset == 4 && !derive_UE_mode) //only run this if doing PbPb, not pp
 		{
 			int i_dPsi = GetPsiBin(DeltaPsi(jet_phi, uee->Psi));
 			int jet_dPsi3_bin = GetPsiBin(GetDeltaPsi3(jet_phi, uee->Psi3));
@@ -767,7 +767,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 		int jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,uee->Psi));
 
-		float pT_max=0;
 		int trk_multiplicity[10]; for (int nMultThreshold=0; nMultThreshold<trkcorr->nMultThresholds; nMultThreshold++) trk_multiplicity[nMultThreshold]=0;
 		for (const auto& trk : *recoTracks)
 		{
@@ -814,7 +813,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 			//Efficiency correction;
 			float eff_uncertainty = 0;
 			if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(jet_pt, jet_y, pt,eta, R, cent_bin);
-			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
+//			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
+			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, jet_pt, jet_y, R); //TODO efficiency down to 1 GeV
 
 			//required to be within jet, need to be separated for UEEstimator
 			int dr_bin = trkcorr->GetdRBin(R);
@@ -913,12 +913,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 							response_ChPS.at(dr_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
 							response_ChPS.at(dr_bin).at(n_cent_bins-1)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-
-							//Only for truth matched tracks
-							if (R < _dR_max)
-							{
-								if (pt > pT_max && pass_reco_pt_cut) pT_max = pt;
-							}
 						}
 						isFake=false;
 						if (pass_reco_pt_cut) h_dR_binning->Fill(R_reco_reco);
@@ -965,7 +959,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 
 	//Loop over truth jets
-	if(_data_switch == 1)
+	if(_data_switch == 1 && !derive_UE_mode)
 	{
 		const xAOD::TruthParticleContainer * particles = 0;
 		EL_RETURN_CHECK("execute",event->retrieve( particles, "TruthParticles"));
@@ -1018,8 +1012,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 			xAOD::TruthParticleContainer::const_iterator truth_itr = particles->begin();
 			xAOD::TruthParticleContainer::const_iterator truth_end = particles->end();
 
-			double truth_pt_max = 0.;
-
 			for( ; truth_itr!=truth_end; ++truth_itr)
 			{
 				if (_useCharge!=0 && ((int)(*truth_itr)->charge())!=_useCharge) continue;
@@ -1037,9 +1029,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 				//Only tracks associated with a jet
 				float R = DeltaR(phi,eta,truth_jet_phi,truth_jet_eta);
 				if(R > _dR_max) continue;
-
-				if (pt >  truth_pt_max ) truth_pt_max = pt;
-
 
 				//alternative
 				//TVector3 jet3vector; jet3vector.SetPtEtaPhi(truth_jet_pt,truth_jet_eta,truth_jet_phi);
