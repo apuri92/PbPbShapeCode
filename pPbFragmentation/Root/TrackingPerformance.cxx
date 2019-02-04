@@ -1092,6 +1092,12 @@ EL::StatusCode TrackingPerformance :: execute (){
 			float R = DeltaR(phi,eta,jet_phi,jet_eta);
 			if(R > _dR_max) continue;
 
+			//in terms of r, yjet, pTjet, pTtrk, centraltity
+			int dR_bin = trkcorr->GetdRBin(R);
+			h_eff_dR_matched[dR_bin][cent_bin]->Fill(jet_pt, pt, fabs(rapidity) , event_weight);
+			h_eff_dR_matched[dR_bin][nCentBins-1]->Fill(jet_pt, pt, fabs(rapidity) , event_weight);
+
+
 			int deta_bin = trkcorr->GetdRBin(fabs(DeltaEta(eta,jet_eta)));
 			h_eff_deta_matched.at(deta_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 			h_eff_deta_matched.at(deta_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
@@ -1100,11 +1106,11 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_dphi_matched.at(dphi_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 			h_eff_dphi_matched.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
-			int dR_bin = trkcorr->GetdRBin(R);
+//			int dR_bin = trkcorr->GetdRBin(R);
 //			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 //			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
-			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
-			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+//			h_eff_dR_matched.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
+//			h_eff_dR_matched.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
 
 			h_trk_foreff_r_matched[cent_bin]->Fill(R, pt, eta, event_weight);
 			h_trk_foreff_r_matched[nCentBins-1]->Fill(R, pt, eta, event_weight);
@@ -1161,11 +1167,14 @@ EL::StatusCode TrackingPerformance :: execute (){
 			h_eff_dphi.at(dphi_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 
 			int dR_bin = trkcorr->GetdRBin(R);
+			h_eff_dR[dR_bin][cent_bin]->Fill(jet_pt, pt, fabs(rapidity) , event_weight);
+			h_eff_dR[dR_bin][nCentBins-1]->Fill(jet_pt, pt, fabs(rapidity) , event_weight);
+			h_eff_dR_entries[dR_bin][cent_bin]->Fill(jet_pt, pt, fabs(rapidity));
+
 //			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
 //			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt,pt,fabs(rapidity), event_weight);
-
-			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
-			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
+//			h_eff_dR.at(dR_bin).at(cent_bin)->Fill(jet_pt, pt, eta, event_weight);
+//			h_eff_dR.at(dR_bin).at(nCentBins-1)->Fill(jet_pt, pt, eta, event_weight);
 
 			h_trk_foreff_r_full[cent_bin]->Fill(R, pt, eta, event_weight);
 			h_trk_foreff_r_full[nCentBins-1]->Fill(R, pt, eta, event_weight);

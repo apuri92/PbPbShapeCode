@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void get_UE(int sys_mode = 18)
+void get_UE(int sys_mode = 26)
 {
 	gErrorIgnoreLevel = 3001;
 
@@ -11,7 +11,7 @@ void get_UE(int sys_mode = 18)
 
 	//c18 and 19 are the files that have the UE raw histos to be made into etaphi maps
 	input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
-	TFile *axis_file = new TFile(Form("output_dev/raw_results/c18/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+	TFile *axis_file = new TFile(Form("output_dev/raw_results/c18/FF_MC_out_histo_PbPb_5p02_r001.root"));
 
 	TFile *output_file = new TFile(Form("./UE_MC_maps_%s.root", sys_path.c_str()), "recreate");
 
@@ -50,12 +50,12 @@ void get_UE(int sys_mode = 18)
 	int jet_end = 12;
 
 
-	if (sys_mode == 18 )
+	if (sys_mode == 26 )
 	{
 		jet_start = 6;
 		jet_end = 9;
 	}
-	if (sys_mode == 19 )
+	if (sys_mode == 27 )
 	{
 		jet_start = 9;
 		jet_end = 12;

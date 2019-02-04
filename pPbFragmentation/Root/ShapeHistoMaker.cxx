@@ -247,6 +247,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	ChPS_MB_UE_err =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FNS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
+	ChPS_circ_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	h_dR_change =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
 
 	h_reco_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
@@ -357,6 +358,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_2D = new TH2D(Form("ChPS_FNS_UE_dR%i_cent%i",i,j),Form("ChPS_FNS_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_FNS_UE.at(i).at(j) = temphist_2D;
 
+			temphist_2D = new TH2D(Form("ChPS_circ_UE_dR%i_cent%i",i,j),Form("ChPS_circ_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_circ_UE.at(i).at(j) = temphist_2D;
+
 
 			ChPS_raw.at(i).at(j)->Sumw2();
 			ChPS_cone_UE.at(i).at(j)->Sumw2();
@@ -364,6 +368,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			ChPS_MB_UE_err.at(i).at(j)->Sumw2();
 			ChPS_FS_UE.at(i).at(j)->Sumw2();
 			ChPS_FNS_UE.at(i).at(j)->Sumw2();
+			ChPS_circ_UE.at(i).at(j)->Sumw2();
 
 			wk()->addOutput (ChPS_raw.at(i).at(j));
 			wk()->addOutput (ChPS_cone_UE.at(i).at(j));
@@ -371,6 +376,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			wk()->addOutput (ChPS_MB_UE_err.at(i).at(j));
 			wk()->addOutput (ChPS_FS_UE.at(i).at(j));
 			wk()->addOutput (ChPS_FNS_UE.at(i).at(j));
+			wk()->addOutput (ChPS_circ_UE.at(i).at(j));
 
 			if (_data_switch==1)
 			{

@@ -291,16 +291,16 @@ int main(int argc, char ** argv)
 							fake_err = 0;
 
 							//usign mc maps, no correction required
-							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
-							UE_err = h_UE_MB_err->GetBinContent(i_trk_bin, i_jet_bin);
-							correction = 1; //not needed because using MC maps
-							correction_err = 0;
+//							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
+//							UE_err = h_UE_MB_err->GetBinContent(i_trk_bin, i_jet_bin);
+//							correction = 1; //not needed because using MC maps
+//							correction_err = 0;
 
 							//using cone method
-//							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);
-//							UE_err = h_UE_cone->GetBinError(i_trk_bin, i_jet_bin);
-//							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //only correct for UE JER correlation, cones method is being used in data so #jets is correct
-//							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
+							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);
+							UE_err = h_UE_cone->GetBinError(i_trk_bin, i_jet_bin);
+							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //only correct for UE JER correlation, cones method is being used in data so #jets is correct
+							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
 
 //							//use for systematics
 //							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);

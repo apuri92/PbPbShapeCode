@@ -60,10 +60,10 @@ class UEEstimator
 
     UEEstimator()
      {
-		 cone_radius = 0.4;
+//		 cone_radius = 0.4;
 //		 cone_radius = 0.5;
 //		 cone_radius = 0.6;
-//		 cone_radius = 0.8;
+		 cone_radius = 0.8;
 
 		 //r = 0.6 -> shift = 0.1, r = 0.5 -> shift = 0.1, r = 0.4 -> shift = 0.2,
 
@@ -166,6 +166,7 @@ class UEEstimator
     void ExcludeConesByJetandTrack(vector<float> &trk_pt,vector<float> &trk_eta,vector<float> &trk_phi,vector<float> &jet_pt,vector<float> &jet_eta,vector<float> &jet_phi);   
     void FindCone(float trk_pt,float trk_eta,float trk_phi);
     Float_t CalculateEtaWeight(float trk_pT, float trk_eta, float jet_eta, Int_t icent);
+	Float_t CalculateEtaWeight_circle(float trk_pT, float trk_eta, float jet_eta, float circle_eta, Int_t icent);
     Float_t CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
     Float_t CalculateV3Weight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt);
     void initShapeUE(bool isMC);

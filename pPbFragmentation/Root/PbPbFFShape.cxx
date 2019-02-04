@@ -109,8 +109,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 	FCalEt = 0;
 	int cent_bin = 0;
 	int cent_bin_fine = 0;
-	double fcal_mbov = 0; int cent_bin_mc = -1;
-	double fcal_mc = 0; int cent_bin_mbov = -1;
+	int cent_bin_mc = -1;
+	double fcal_mc = 0;
 
 	double event_weight_fcal = 1;
 	int n_cent_bins = GetCentralityNBins(_centrality_scheme);
@@ -135,57 +135,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 		//cout << "Psi 1: " << GetEventPlane(hiclus) << " Psi 2: " << GetEventPlane(calos) << endl;
 		uee->Psi = GetEventPlane(calos);
 		uee->Psi3 = GetEventPlane(calos, 3);
-
-
 	}
-
-//	if (_dataset == 4 && isMC)
-//	{
-//		int run_number = eventInfo->runNumber();
-//		int event_number = eventInfo->eventNumber();
-//		float new_Fcal = -1;
-//		int tree_cent_bin = -1;
-//
-//		for (int i = 0; i < run_numbers.size(); i++)
-//		{
-//			if (run_number == run_numbers.at(i))
-//			{
-//				TTree *tree = (TTree*)fcal_trees.at(i)->Get("tree_output");
-//				float tree_Fcal;
-//				int tree_eventNumber;
-//				int tree_runNumber;
-//				tree->SetBranchAddress("FCalEt",&tree_Fcal);
-//				tree->SetBranchAddress("run_n",&tree_runNumber);
-//				tree->SetBranchAddress("event_n",&tree_eventNumber);
-//
-//				for (int i_entry = 0; i_entry < tree->GetEntries(); i_entry++)
-//				{
-//					tree->GetEntry(i_entry);
-//					if (event_number == tree_eventNumber)
-//					{
-//						new_Fcal = tree_Fcal;
-//						tree_cent_bin = GetCentralityBin(_centrality_scheme, new_Fcal,  isHIJING );
-//
-//						fcal_mbov = new_Fcal;
-//						cent_bin_mbov = tree_cent_bin;
-//						break;
-//					}
-//				}
-//				break;
-//			}
-//		}
-//		cent_bin = tree_cent_bin;
-//		FCalEt = new_Fcal;
-//		event_weight_fcal = jetcorr->GetFCalWeight(FCalEt, 4);
-//
-//	}
 
 	if (cent_bin < 0 || event_weight_fcal == 0) {
 		if(cent_bin==-2) Error("execute()", "Unknown centrality scheme" );
 		h_RejectionHisto->Fill(1.5);
 		keep = false;
 	}
-
 
 	// GRL
 	if(!isMC)
@@ -298,40 +254,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 	h_centrality->Fill(cent_bin);
 	//if pp, fill centbin 6 since offline code uses cent6 for pp
 	if (_dataset == 3) 	h_centrality->Fill(n_cent_bins-1);
-
-	//diagnostic
-	h_fcal_mc->Fill(fcal_mc);
-	h_cent_mc->Fill(cent_bin_mc);
-	h_fcal_mbov->Fill(fcal_mbov);
-	h_cent_mbov->Fill(cent_bin_mbov);
-	h_fcal_change->Fill(cent_bin_mc, cent_bin_mbov);
-	h_fcal_diff->Fill(fcal_mc - fcal_mbov);
-
-//	if(_data_switch == 1)
-//	{
-//		const xAOD::JetContainer * truthjets = 0;
-//
-//		bool skip_event = false;
-//		EL_RETURN_CHECK("execute()",event->retrieve( truthjets, _truth_jet_collection.c_str() ));
-//
-//		xAOD::JetContainer::const_iterator jet_itr = truthjets->begin();
-//		xAOD::JetContainer::const_iterator jet_end = truthjets->end();
-//		for( ; jet_itr != jet_end; ++jet_itr )
-//		{
-//			xAOD::JetFourMom_t jet_truth_4mom = (*jet_itr)->jetP4();
-//			double pt    = (jet_truth_4mom.pt() * 0.001 );
-//			double eta    = (jet_truth_4mom.eta());
-//
-//			if (pt > 20. && fabs(eta) > 3. ) skip_event = true;
-//		}
-//
-//		if (skip_event)
-//		{
-//			h_FCal_Et_restr->Fill(FCalEt, event_weight_fcal); //filled here to get proper event weight
-//			return EL::StatusCode::SUCCESS;
-//		}
-//	}
-
 
 	//Tracks
 	const xAOD::TrackParticleContainer* recoTracks = 0;
@@ -645,9 +567,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	}
 
-	trk_good_eta.clear();
-	trk_good_phi.clear();
-	trk_good_pt.clear();
+//	trk_good_eta.clear();
+//	trk_good_phi.clear();
+//	trk_good_pt.clear();
+
 
 
 
@@ -665,6 +588,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 		jet_eta = jet_eta_vector.at(i);
 		jet_y = jet_y_vector.at(i);
 		jet_phi = jet_phi_vector.at(i);
+		if(!jet_isolated_vector.at(i)) continue;
 
 		bool pass_reco_pt_cut = true;
 		if (jet_pt <= _pTjetCut) pass_reco_pt_cut = false;
@@ -692,6 +616,52 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
 		}
 
+
+		//new circle UE method
+		{
+			int circle_itr = 0;
+			TRandom3 rand;
+			rand.SetSeed(0);
+			bool good_circle = false;
+			int Ncircles = 30;
+			while (circle_itr < Ncircles)
+			{
+				double circle_eta = rand.Uniform(-2.5+_dR_max,2.5-_dR_max);
+				double circle_phi = jet_phi;
+				for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
+				{
+					double circle_jet_r = DeltaR(circle_phi,circle_eta,jet_phi_vector.at(j),jet_eta_vector.at(j));
+					if (circle_jet_r < 1.6) break;
+					else good_circle = true;
+				}
+
+				if (good_circle)
+				{
+					for (int i_trk = 0; i_trk < trk_good_pt.size(); i_trk++)
+					{
+						double pt = trk_good_pt[i_trk];
+						double eta = trk_good_eta[i_trk];
+						double phi = trk_good_phi[i_trk];
+						if (pt > 10.) continue;
+						double circle_trk_r = DeltaR(circle_phi,circle_eta,phi, eta);
+						if (circle_trk_r > 0.8) continue;
+						float w_eta = uee->CalculateEtaWeight_circle(pt,eta,jet_eta,circle_eta, cent_bin_fine);
+						float w_ncones = 1./Ncircles;
+						float w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
+						float eff_circle = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+
+						float w_bkgr = w_eta * w_ncones * w_flow;
+						int dr_bin_circle = trkcorr->GetdRBin(circle_trk_r);
+
+						ChPS_circ_UE[dr_bin_circle][cent_bin]->Fill(pt,jet_pt, jet_weight*eff_circle*w_bkgr);
+
+						float tmp_dEta = DeltaEta(eta, circle_eta);
+						float tmp_dPhi = DeltaPhi(phi, circle_phi);
+					}
+					circle_itr++;
+				}
+			}
+		}
 
 		if (_dataset == 4 && !derive_UE_mode) //only run this if doing PbPb, not pp
 		{
@@ -810,11 +780,13 @@ EL::StatusCode PbPbFFShape :: execute (){
 			if(fabs(d0) > d0_cut) continue; //pT dependant d0 cut
 			if(!m_trackSelectorTool->accept(*trk)) continue; //track selector tool
 
+			//Additional track selection
+			if (!trkcorr->PassTracktoJetBalance(pt, jet_pt, eta, jet_eta,cent_bin)) continue;
+
 			//Efficiency correction;
 			float eff_uncertainty = 0;
 			if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(jet_pt, jet_y, pt,eta, R, cent_bin);
-//			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
-			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, jet_pt, jet_y, R); //TODO efficiency down to 1 GeV
+			float eff_weight = trkcorr->get_effcorr(pt, eta, cent_bin, eff_uncertainty, _dataset);
 
 			//required to be within jet, need to be separated for UEEstimator
 			int dr_bin = trkcorr->GetdRBin(R);
@@ -953,6 +925,9 @@ EL::StatusCode PbPbFFShape :: execute (){
 //		for (int nMultThreshold=0;nMultThreshold<trkcorr->nMultThresholds;nMultThreshold++) {h_jetpT_v_multiplicity.at(cent_bin)->Fill(jet_pt,nMultThreshold,trk_multiplicity[nMultThreshold]);}
 	}// end reco jet loop
 
+	trk_good_eta.clear();
+	trk_good_phi.clear();
+	trk_good_pt.clear();
 
 	std::vector<int> RecoJetIndex;
 

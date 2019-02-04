@@ -24,7 +24,7 @@
 #include "TAxis.h"
 #include "TEnv.h"
 #include "TPaveText.h"
-
+#include "TLegend.h"
 #include "functions.c"
 #include "hstyle.c"
 

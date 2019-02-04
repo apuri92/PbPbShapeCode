@@ -160,6 +160,28 @@ Float_t UEEstimator::CalculateEtaWeight(float trk_pT, float trk_eta, float jet_e
    return w_eta;
 }
 
+Float_t UEEstimator::CalculateEtaWeight_circle(float trk_pT, float trk_eta, float jet_eta, float circle_eta, Int_t icent)
+//@brief: calculate a weight that is due to a difference in the yield(eta) between a jet
+//@       position and a position of a given particle that is used to estimate the UE
+//@note:  naming of some variable is not optimal as we don't want to deviate from previous codes
+{
+
+	float pT_temp = trk_pT;
+	if (pT_temp < 1.) pT_temp = 1.; // weight in bin bellow 1 GeV is taken as weight at 1 GeV
+	int pT_bin=ptaxis->FindBin(pT_temp);
+	//cout << "pt: " << trk_pT <<  " Pt bin" << pT_bin << " eta trk " <<  trk_eta << " jet eta" << jet_eta <<  " cent " << icent <<  " Period " << period << endl;
+	Float_t trkEta = trk_eta;
+	Float_t nearJetEta = jet_eta;
+	Float_t deltaEtaOrthMin = trkEta - circle_eta;	// (old version: trkEta - theEta)
+	deltaEtaOrthMin *= ((circle_eta!=0)&&(nearJetEta!=0))? ( ((circle_eta/fabs(circle_eta))==(nearJetEta/fabs(nearJetEta)))? 1:-1 ):1;
+	//cout << "trk_pT " << trk_pT << " pT_bin " << pT_bin << " cent " << icent << endl;
+	Float_t w_eta = _h_eta_w[pT_bin][icent]->Interpolate( nearJetEta + deltaEtaOrthMin ) / _h_eta_w[pT_bin][icent]->Interpolate( trkEta );
+	//Float_t w_eta = _f1_trkEta[icent]->Eval( nearJetEta + deltaEtaOrthMin ) / _f1_trkEta[icent]->Eval( trkEta );
+
+	return w_eta;
+}
+
+
 Float_t UEEstimator::CalculateFlowWeight(float trk_pt,float trk_eta,float trk_phi, float nearJetPhi, float FCalEt)
 //@brief: calculate a weight that is due to a difference in the flow between a jet 
 //@       position and a position of a given particle that is used to estimate the UE

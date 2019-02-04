@@ -13,6 +13,7 @@
 #include <TCanvas.h>
 #include <TSystem.h>
 #include <TMath.h>
+#include <TRandom3.h>
 
 #include "BaseClass.h"
 
@@ -141,7 +142,8 @@ class PbPbFFShape : public BaseClass{
 	vector<vector<TH2D*>> ChPS_MB_UE_err; //!
 	vector<vector<TH2D*>> ChPS_FS_UE; //!
 	vector<vector<TH2D*>> ChPS_FNS_UE; //!
-	
+	vector<vector<TH2D*>> ChPS_circ_UE; //!
+
 	//Truth distributions
 	vector<vector<TH2D*>> ChPS_truth; //!
 	vector<vector<TH2D*>> ChPS_truth_deta; //!

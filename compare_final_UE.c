@@ -3,8 +3,8 @@
 void compare_final_UE()
 {
 	SetAtlasStyle();
-	TFile *file_MC_method = new TFile("final_ChPS_data_PbPb_c21_UEMCmethod.root");
-	TFile *file_cone_method = new TFile("final_ChPS_data_PbPb_c21_UEconemethod.root");
+	TFile *file_MC_method = new TFile("final_ChPS_data_PbPb_c25_UEMCmethod.root");
+	TFile *file_cone_method = new TFile("final_ChPS_data_PbPb_c25_UEconemethod.root");
 
 	TAxis* dR_binning = (TAxis*)file_MC_method->Get("dR_binning");
 	TAxis* jetpT_binning = (TAxis*)file_MC_method->Get("jetpT_binning");
