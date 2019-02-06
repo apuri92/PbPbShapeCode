@@ -15,6 +15,7 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 //	TFile *input_file = new TFile(Form("hist-local_mc.root", sys_mode));
 //	TFile *input_file_data = new TFile(Form("hist-local_mc.root", sys_mode));
 	TFile *input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	TH1* h_tmp = (TH1*)input_file->Get("h_event_rN");
 	h_tmp->Scale(1./h_tmp->Integral());
@@ -143,29 +144,35 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 			TM_rN_norm_jet_2D->Sumw2();
 			TH1* TM_rN_norm_jet = (TH1*)TM_rN_norm_jet_2D->ProjectionY(Form("%s_mc_rN%i",name.c_str(), i_run), i_run,i_run);
 
+			name = Form("TM_norm_jet_rN_cent%i", i_cent);
+			TH2* data_jet_2D = (TH2*)((TH2*)input_file_data->Get(name.c_str()))->Clone(Form("data_jet_c%i", i_cent));
+			data_jet_2D->SetName(Form("data_jet_c%i",i_cent));
+			data_jet_2D->Sumw2();
+			TH1* data_jet = (TH1*)data_jet_2D->ProjectionY(Form("data_jet_rN%i_cent%i", i_run, i_cent), i_run,i_run);
 
-			if (i_cent == 0 && run_itr == 0)
-			{
-				legend_jet_run_dep->AddEntry(TM_norm_jet, "Combined", "lp");
-				legend_jet_run_dep->AddEntry(TM_rN_norm_jet, Form("run %i: %1.0f", i_run, run_binning->GetBinLowEdge(i_run)), "lp");
-			}
-			//drawing jets
-			c_run_dep_jets->cd(i_cent+1);
-			SetHStyle_smallify(TM_norm_jet,0,1);
-			SetHStyle_smallify(TM_rN_norm_jet,1,1);
-			TM_rN_norm_jet->GetYaxis()->SetRangeUser(1E-9,1);
-			TM_rN_norm_jet->DrawCopy("");
-			TM_norm_jet->DrawCopy("same");
-			gPad->SetLogx();
-			gPad->SetLogy();
 
+//			if (i_cent == 0 && run_itr == 0)
+//			{
+//				legend_jet_run_dep->AddEntry(TM_norm_jet, "Combined", "lp");
+//				legend_jet_run_dep->AddEntry(TM_rN_norm_jet, Form("run %i: %1.0f", i_run, run_binning->GetBinLowEdge(i_run)), "lp");
+//			}
+//			//drawing jets
+//			c_run_dep_jets->cd(i_cent+1);
+//			SetHStyle_smallify(TM_norm_jet,0,1);
+//			SetHStyle_smallify(TM_rN_norm_jet,1,1);
+//			TM_rN_norm_jet->GetYaxis()->SetRangeUser(1E-9,1);
+//			TM_rN_norm_jet->DrawCopy("");
+//			TM_norm_jet->DrawCopy("same");
+//			gPad->SetLogx();
+//			gPad->SetLogy();
+//
 //			if (i_run == run_start)
-			{
-				c_run_dep_jets->cd(i_cent+1);
-				ltx->DrawLatexNDC(0.92,0.90,cent_label.c_str());
-				legend_jet_run_dep->Draw();
-
-			}
+//			{
+//				c_run_dep_jets->cd(i_cent+1);
+//				ltx->DrawLatexNDC(0.92,0.90,cent_label.c_str());
+//				legend_jet_run_dep->Draw();
+//
+//			}
 			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 			{
 				name = Form("ChPS_TM_UE_dR%i_cent%i", i_dR, i_cent);
@@ -268,8 +275,8 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 //				name = Form("ChPS_TM_UE_dR%i_cent%i_run%i", i_dR, i_cent,i_run);
 //				h_TM_2D[i_dR][i_cent]->Write(name.c_str());
 //
-				name = Form("ChPS_TM_rN_UE_dR%i_cent%i_run%i", i_dR, i_cent,i_run);
-				h_TM_rN_2D[i_dR][i_cent]->Write(name.c_str());
+//				name = Form("ChPS_TM_rN_UE_dR%i_cent%i_run%i", i_dR, i_cent,i_run);
+//				h_TM_rN_2D[i_dR][i_cent]->Write(name.c_str());
 
 
 				delete h_TM_rN_3D;
@@ -312,7 +319,10 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 
 			name = Form("TM_rN_norm_jet_cent%i_run%i", i_cent,i_run);
 			TM_rN_norm_jet->Write(name.c_str());
-//
+
+			name = Form("data_jet_cent%i_run%i", i_cent,i_run);
+			data_jet->Write(name.c_str());
+
 //			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 //			{
 //				for (int i_jet = jet_pt_start-1; i_jet < jet_pt_end; i_jet++)
@@ -472,13 +482,11 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 //			delete legend_y;
 //		}
 
-
-
-		name = "";
-		if (i_run == run_start) name = "(";
-		else if (i_run == run_end) name = ")";
-		c_run_dep_jets->Print(Form("run_dep/jet_pt_run_c%i.pdf%s", sys_mode, name.c_str()));
-		legend_jet_run_dep->Clear();
+//		name = "";
+//		if (i_run == run_start) name = "(";
+//		else if (i_run == run_end) name = ")";
+//		c_run_dep_jets->Print(Form("run_dep/jet_pt_run_c%i.pdf%s", sys_mode, name.c_str()));
+//		legend_jet_run_dep->Clear();
 
 	}
 
