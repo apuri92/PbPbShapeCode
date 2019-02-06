@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void get_UE(int sys_mode = 26)
+void get_UE(int sys_mode = 34)
 {
 	gErrorIgnoreLevel = 3001;
 
@@ -11,15 +11,14 @@ void get_UE(int sys_mode = 26)
 
 	//c18 and 19 are the files that have the UE raw histos to be made into etaphi maps
 	input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
-	TFile *axis_file = new TFile(Form("output_dev/raw_results/c18/FF_MC_out_histo_PbPb_5p02_r001.root"));
 
 	TFile *output_file = new TFile(Form("./UE_MC_maps_%s.root", sys_path.c_str()), "recreate");
 
 	cout << "Using file " << input_file->GetName() << endl;
 
-	TAxis* dR_binning = (TAxis*)((TH3*)axis_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
-	TAxis* jetpT_binning = (TAxis*)((TH3*)axis_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
-	TAxis* trkpT_binning = (TAxis*)((TH3*)axis_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
+	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
+	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
+	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
 	TAxis* psi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetXaxis();
 	TAxis* eta_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetYaxis();
 	TAxis* phi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetZaxis();
@@ -50,12 +49,12 @@ void get_UE(int sys_mode = 26)
 	int jet_end = 12;
 
 
-	if (sys_mode == 26 )
+	if (sys_mode == 34 )
 	{
 		jet_start = 6;
 		jet_end = 9;
 	}
-	if (sys_mode == 27 )
+	if (sys_mode == 35 )
 	{
 		jet_start = 9;
 		jet_end = 12;

@@ -54,7 +54,6 @@ EL::StatusCode PbPbFFShape :: changeInput (bool firstFile)
 EL::StatusCode PbPbFFShape :: execute (){
 
 	xAOD::TEvent* event = wk()->xaodEvent();
-
 	// Event counter
 	int statSize=1;
 	//For testing
@@ -266,6 +265,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 	//
 	//	std::pair< xAOD::ElectronContainer*, xAOD::ShallowAuxContainer* > electrons_shallowCopy;
 	//	electrons_shallowCopy = xAOD::shallowCopyContainer( *electrons );
+
+
+	//nevents per run number:
+	h_event_rN->Fill(eventInfo->runNumber());
 
 	//Jet vectors
 	vector<float> jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector, jet_y_vector, jet_TrigPresc_vector;
@@ -734,6 +737,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 		TM_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
 		cone_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
+		TM_norm_jet_rN.at(cent_bin)->Fill(eventInfo->runNumber(), jet_pt, jet_weight);
+
 
 		int jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,uee->Psi));
 
@@ -902,6 +907,9 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 					ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
 					ChPS_TM_UE.at(dr_bin).at(n_cent_bins-1)->Fill(pt,jet_pt, jet_weight*eff_weight);
+
+					ChPS_TM_UE_rN.at(dr_bin).at(cent_bin)->Fill(eventInfo->runNumber(), pt,jet_pt, jet_weight*eff_weight);
+					ChPS_TM_UE_rN.at(dr_bin).at(n_cent_bins-1)->Fill(eventInfo->runNumber(), pt,jet_pt, jet_weight*eff_weight);
 
 					float R_reco_truth = DeltaR(phi,eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 					int dr_bin_reco_truth = trkcorr->GetdRBin(R_reco_truth);

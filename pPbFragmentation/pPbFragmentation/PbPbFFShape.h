@@ -94,7 +94,7 @@ class PbPbFFShape : public BaseClass{
 	TH1D* h_tmp_cone_stats; //!
 
 
-	//TH3F *deriv_val; //!
+	TH1 *h_event_rN; //!
 	TH1 *h_fcal_mc; //!
 	TH1 *h_fcal_mbov; //!
 	TH1 *h_cent_mc; //!
@@ -109,10 +109,10 @@ class PbPbFFShape : public BaseClass{
 	vector<vector<TH3D*>> h_dR_change; //!
 
 	bool derive_UE_mode = 0;
-	int lo_jetpt_bin = 6;
-	int hi_jetpt_bin = 8;
-//	int lo_jetpt_bin = 9;
-//	int hi_jetpt_bin = 11;
+//	int lo_jetpt_bin = 6;
+//	int hi_jetpt_bin = 8;
+	int lo_jetpt_bin = 9;
+	int hi_jetpt_bin = 11;
 
 	//debugging histograms
 	vector<TH3D*> h_reco_truth_matched; //!
@@ -134,6 +134,7 @@ class PbPbFFShape : public BaseClass{
 	vector<TH1D*> cone_norm_jet;//!
 	vector<TH1D*> MB_norm_jet;//!
 	vector<TH1D*> TM_norm_jet;//!
+	vector<TH2D*> TM_norm_jet_rN;//!
 	vector<TH1D*> FS_norm_jet;//!
 
 	//Raw disitrbutions from random cones
@@ -154,6 +155,7 @@ class PbPbFFShape : public BaseClass{
 	
 	//UE unmatched disitrbution
 	vector<vector<TH2D*>> ChPS_TM_UE; //!
+	vector<vector<TH3D*>> ChPS_TM_UE_rN; //!
 
 	vector<vector<TH1D*>> h_reco_jet_spectrum; //!
     vector<vector<TH1D*>> h_true_jet_spectrum; //!
