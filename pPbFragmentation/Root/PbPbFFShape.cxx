@@ -143,7 +143,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 	}
 
 	// GRL
-	if(!isMC)
+	if(_dataset == 4 || !isMC)
 	{
 		if(!m_grl->passRunLB(*eventInfo))
 		{

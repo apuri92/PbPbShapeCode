@@ -17,23 +17,20 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 	TFile *input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
-	TH1* h_tmp = (TH1*)input_file->Get("h_event_rN");
-	h_tmp->Scale(1./h_tmp->Integral());
+	TH1* h_tmp_mc = (TH1*)input_file->Get("h_event_rN");
+//	h_tmp->Scale(1./h_tmp->Integral());
 
-	double sum = 0;
-	for (int i = 1; i <= h_tmp->GetXaxis()->GetNbins() ;i++)
-	{
-		if (h_tmp->GetBinContent(i) < 0.03) continue;
-//		cout << h_tmp->GetBinLowEdge(i) << " " << i << " " << h_tmp->GetBinContent(i) << endl;
-		sum += h_tmp->GetBinContent(i);
-	}
+	TH1* h_tmp_data = (TH1*)input_file_data->Get("h_event_rN");
+//	h_tmp_data->Scale(1./h_tmp_data->Integral());
+
 
 	name = Form("./run_dep/run_dep_UE_%s.root", sys_path.c_str());
 	TFile *output_file = new TFile(name.c_str(), "recreate");
 
 	cout << "Using file " << input_file->GetName() << endl;
 	output_file->cd();
-	h_tmp->Write("EventPercentages");
+	h_tmp_mc->Write("EventPercentages_mc");
+	h_tmp_data->Write("EventPercentages_data");
 
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
