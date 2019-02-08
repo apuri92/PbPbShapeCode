@@ -18,9 +18,11 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	TH1* h_tmp_mc = (TH1*)input_file->Get("h_event_rN");
+	h_tmp_mc->SetName("h_event_rN_mc");
 //	h_tmp->Scale(1./h_tmp->Integral());
 
 	TH1* h_tmp_data = (TH1*)input_file_data->Get("h_event_rN");
+	h_tmp_data->SetName("h_event_rN_data");
 //	h_tmp_data->Scale(1./h_tmp_data->Integral());
 
 
@@ -312,12 +314,18 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 
 			output_file->cd();
 			name = Form("TM_norm_jet_cent%i_run%i", i_cent, i_run);
+			TM_norm_jet->SetName(name.c_str());
+			TM_norm_jet->SetTitle(name.c_str());
 			TM_norm_jet->Write(name.c_str());
 
 			name = Form("TM_rN_norm_jet_cent%i_run%i", i_cent,i_run);
+			TM_rN_norm_jet->SetName(name.c_str());
+			TM_rN_norm_jet->SetTitle(name.c_str());
 			TM_rN_norm_jet->Write(name.c_str());
 
 			name = Form("data_jet_cent%i_run%i", i_cent,i_run);
+			data_jet->SetName(name.c_str());
+			data_jet->SetTitle(name.c_str());
 			data_jet->Write(name.c_str());
 
 //			for (int i_dR = 0; i_dR < N_dR; i_dR++)
@@ -354,6 +362,7 @@ void run_dep(int sys_mode = 37, bool subtract = 0)
 
 			delete TM_norm_jet;
 			delete TM_rN_norm_jet_2D;
+			delete data_jet;
 
 		}
 

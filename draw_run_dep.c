@@ -53,8 +53,11 @@ void draw_run_dep(int config = 37)
 		h_eventPercentage_data->SetBinContent(i,h_tmp_data->GetBinContent(i));
 	}
 
+	h_eventPercentage_mc->Scale(1./h_eventPercentage_mc->Integral());
+	h_eventPercentage_data->Scale(1./h_eventPercentage_data->Integral());
 
-	TCanvas *c_x = new TCanvas("c_x","c_x",900,600);
+
+	TCanvas *c_x = new TCanvas("c_x","c_x",1200,600);
 	TCanvas *c_y = new TCanvas("c_y","c_y",900,600);
 	TLegend *legend_x = new TLegend(0.20, 0.6, 0.40, 0.7, "","brNDC");
 	legend_x->SetTextFont(43);
@@ -72,8 +75,8 @@ void draw_run_dep(int config = 37)
 	SetHStyle_smallify(h_eventPercentage_mc, 1, 1);
 	h_eventPercentage_mc->LabelsOption("v");
 	h_eventPercentage_data->LabelsOption("v");
-	h_eventPercentage_data->Draw("hist");
-	h_eventPercentage_mc->Draw("hist same");
+	h_eventPercentage_mc->Draw("hist");
+	h_eventPercentage_data->Draw("hist same");
 	legend_x->AddEntry(h_eventPercentage_data,"Data","lp");
 	legend_x->AddEntry(h_eventPercentage_mc,"MC","lp");
 	legend_x->Draw();
@@ -94,7 +97,7 @@ void draw_run_dep(int config = 37)
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
-			h_jet_run_dep_data[i_jet][i_cent] = (TH1*)h_eventPercentage_mc->Clone(Form("jet_run_dep_jet%i_cent%i", i_jet, i_cent));
+			h_jet_run_dep_data[i_jet][i_cent] = (TH1*)h_eventPercentage_data->Clone(Form("jet_run_dep_jet%i_cent%i", i_jet, i_cent));
 			h_jet_run_dep_data[i_jet][i_cent]->Reset();
 			h_jet_run_dep_data[i_jet][i_cent]->GetYaxis()->SetTitle("dN/dp_{T} [Data]");
 
@@ -131,34 +134,30 @@ void draw_run_dep(int config = 37)
 			{
 				int run_number = h_tmp_mc->GetBinLowEdge(i_run);
 				double lumi = luminosity[run_number];
-				if (lumi < 0.0001)  continue; //this ensures run is in GRL and has a finite non zero luminosity
+				if (lumi < 0.0001) continue; //this ensures run is in GRL and has a finite non zero luminosity
 
 				name = Form("data_jet_cent%i_run%i", i_cent,i_run);
-				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1);
-				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1);
-				val = val/lumi;
-				err = err/lumi;
+				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1) / lumi;
+				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1) / lumi;
 				h_jet_run_dep_data[i_jet][i_cent]->SetBinContent(i_run, val);
 				h_jet_run_dep_data[i_jet][i_cent]->SetBinError(i_run, err);
 
 				name = Form("TM_rN_norm_jet_cent%i_run%i", i_cent,i_run);
-				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1);
-				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1);
-				val = val/lumi;
-				err = err/lumi;
-				h_jet_run_dep_mc[i_jet][i_cent]->SetBinContent(i_run, val/lumi);
-				h_jet_run_dep_mc[i_jet][i_cent]->SetBinError(i_run, err/lumi);
+				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1) / lumi;
+				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1) / lumi;
+				h_jet_run_dep_mc[i_jet][i_cent]->SetBinContent(i_run, val);
+				h_jet_run_dep_mc[i_jet][i_cent]->SetBinError(i_run, err);
 			}
 
-//			h_jet_run_dep_data[i_jet][i_cent]->Scale(1./h_jet_run_dep_data[i_jet][i_cent]->Integral());
-//			h_jet_run_dep_mc[i_jet][i_cent]->Scale(1./h_jet_run_dep_mc[i_jet][i_cent]->Integral());
+			h_jet_run_dep_data[i_jet][i_cent]->Scale(1./h_jet_run_dep_data[i_jet][i_cent]->Integral());
+			h_jet_run_dep_mc[i_jet][i_cent]->Scale(1./h_jet_run_dep_mc[i_jet][i_cent]->Integral());
 
 			c_x->cd(i_cent+1);
 			SetHStyle_smallify(h_jet_run_dep_data[i_jet][i_cent],0,1);
 			SetHStyle_smallify(h_jet_run_dep_mc[i_jet][i_cent],1,1);
 
-			h_jet_run_dep_data[i_jet][i_cent]->Draw("hist");
-			h_jet_run_dep_mc[i_jet][i_cent]->Draw("hist same");
+			h_jet_run_dep_mc[i_jet][i_cent]->Draw("hist");
+			h_jet_run_dep_data[i_jet][i_cent]->Draw("hist same");
 
 			if (i_jet == jet_pt_start-1 && i_cent == 0)
 			{
@@ -239,6 +238,7 @@ void draw_run_dep(int config = 37)
 					if (i_cent == 0)
 					{
 						c_y->cd();
+						h_UE_run_dep[i_jet][i_trk][i_dR][i_cent]->GetYaxis()->SetRangeUser(0,100);
 						h_UE_run_dep[i_jet][i_trk][i_dR][i_cent]->Draw("");
 
 						func_UE_run_dep[i_jet][i_trk][i_dR][i_cent] = new TF1(Form("f_c%i",i_cent), "pol1");// h_UE_run_dep[i_jet][i_trk][i_dR][i_cent]->GetFunction();
