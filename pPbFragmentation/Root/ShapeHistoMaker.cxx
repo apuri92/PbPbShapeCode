@@ -248,6 +248,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 	ChPS_cone_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_MB_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
+	ChPS_MB_UE_rN =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(_nCentbins));
 	ChPS_MB_UE_err =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FNS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
@@ -274,6 +275,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	//test UE histograms
 	cone_norm_jet = vector<TH1D*> (_nCentbins);
 	MB_norm_jet = vector<TH1D*> (_nCentbins);
+	MB_norm_jet_rN = vector<TH2D*> (_nCentbins);
 	TM_norm_jet = vector<TH1D*> (_nCentbins);
 	TM_norm_jet_rN = vector<TH2D*> (_nCentbins);
 	FS_norm_jet = vector<TH1D*> (_nCentbins);
@@ -290,6 +292,10 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_1D = new TH1D(Form("MB_norm_jet_cent%i",j),Form("MB_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
 		MB_norm_jet.at(j) = temphist_1D;
 		wk()->addOutput (MB_norm_jet.at(j));
+
+		temphist_2D = new TH2D(Form("MB_norm_jet_rN_cent%i",j),Form("MB_norm_jet_rN_cent%i",j),RunBinsN, RunBins, ptJetBinsN, ptJetBins);
+		MB_norm_jet_rN.at(j) = temphist_2D;
+		wk()->addOutput (MB_norm_jet_rN.at(j));
 
 		temphist_1D = new TH1D(Form("TM_norm_jet_cent%i",j),Form("TM_norm_jet_cent%i",j),ptJetBinsN, ptJetBins);
 		TM_norm_jet.at(j) = temphist_1D;
@@ -359,6 +365,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_2D = new TH2D(Form("ChPS_MB_UE_dR%i_cent%i",i,j),Form("ChPS_MB_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_MB_UE.at(i).at(j) = temphist_2D;
 
+			temphist_3D = new TH3D(Form("ChPS_MB_UE_rN_dR%i_cent%i",i,j),Form("ChPS_MB_UE_rN_dR%i_cent%i",i,j), RunBinsN, RunBins, ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+			ChPS_MB_UE_rN.at(i).at(j) = temphist_3D;
+
 			temphist_2D = new TH2D(Form("ChPS_MB_UE_err_dR%i_cent%i",i,j),Form("ChPS_MB_UE_err_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_MB_UE_err.at(i).at(j) = temphist_2D;
 
@@ -375,6 +384,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			ChPS_raw.at(i).at(j)->Sumw2();
 			ChPS_cone_UE.at(i).at(j)->Sumw2();
 			ChPS_MB_UE.at(i).at(j)->Sumw2();
+			ChPS_MB_UE_rN.at(i).at(j)->Sumw2();
 			ChPS_MB_UE_err.at(i).at(j)->Sumw2();
 			ChPS_FS_UE.at(i).at(j)->Sumw2();
 			ChPS_FNS_UE.at(i).at(j)->Sumw2();
@@ -383,6 +393,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			wk()->addOutput (ChPS_raw.at(i).at(j));
 			wk()->addOutput (ChPS_cone_UE.at(i).at(j));
 			wk()->addOutput (ChPS_MB_UE.at(i).at(j));
+			wk()->addOutput (ChPS_MB_UE_rN.at(i).at(j));
 			wk()->addOutput (ChPS_MB_UE_err.at(i).at(j));
 			wk()->addOutput (ChPS_FS_UE.at(i).at(j));
 			wk()->addOutput (ChPS_FNS_UE.at(i).at(j));

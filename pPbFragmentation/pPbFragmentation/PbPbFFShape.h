@@ -133,6 +133,7 @@ class PbPbFFShape : public BaseClass{
 	//test UE
 	vector<TH1D*> cone_norm_jet;//!
 	vector<TH1D*> MB_norm_jet;//!
+	vector<TH2D*> MB_norm_jet_rN;//!
 	vector<TH1D*> TM_norm_jet;//!
 	vector<TH2D*> TM_norm_jet_rN;//!
 	vector<TH1D*> FS_norm_jet;//!
@@ -140,6 +141,7 @@ class PbPbFFShape : public BaseClass{
 	//Raw disitrbutions from random cones
 	vector<vector<TH2D*>> ChPS_cone_UE; //!
 	vector<vector<TH2D*>> ChPS_MB_UE; //!
+	vector<vector<TH3D*>> ChPS_MB_UE_rN; //!
 	vector<vector<TH2D*>> ChPS_MB_UE_err; //!
 	vector<vector<TH2D*>> ChPS_FS_UE; //!
 	vector<vector<TH2D*>> ChPS_FNS_UE; //!

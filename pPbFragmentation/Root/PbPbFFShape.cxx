@@ -673,6 +673,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			//UE normalization
 			MB_norm_jet.at(cent_bin)->Fill(jet_pt, jet_weight);
+			MB_norm_jet_rN.at(cent_bin)->Fill(eventInfo->runNumber(), jet_pt, jet_weight);
 
 			//psi3 jet distro
 			h_jet_psi3.at(cent_bin)->Fill(jet_pt, fabs(jet_eta), GetDeltaPsi3(jet_phi, uee->Psi3) );
@@ -697,6 +698,9 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 					ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
 					ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
+
+					ChPS_MB_UE_rN.at(i_dR).at(cent_bin)->Fill(eventInfo->runNumber(), trk_bin_center,jet_pt, UE_val*jet_weight);
+					ChPS_MB_UE_rN.at(i_dR).at(n_cent_bins-1)->Fill(eventInfo->runNumber(), trk_bin_center,jet_pt, UE_val*jet_weight);
 				}
 			}
 		}
