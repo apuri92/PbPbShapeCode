@@ -77,6 +77,12 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	const xAOD::EventInfo* eventInfo = 0;
 	EL_RETURN_CHECK("execute",event->retrieve( eventInfo, "EventInfo"));
+	//Do only the run number specified in config file if number set in config > 0
+	if (_Run_Number > 0)
+	{
+		if (eventInfo->runNumber() != _Run_Number) return EL::StatusCode::SUCCESS;
+	}
+
 
 	// check if the event is data or MC
 	bool isMC = false;
@@ -678,7 +684,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			//psi3 jet distro
 			h_jet_psi3.at(cent_bin)->Fill(jet_pt, fabs(jet_eta), GetDeltaPsi3(jet_phi, uee->Psi3) );
 
-			for (int i_dR = 0; i_dR < 13; i_dR++)
+			for (int i_dR = 0; i_dR < 11; i_dR++)
 			{
 				for (int i_pt = 0; i_pt < 7; i_pt++)
 				{
@@ -904,8 +910,17 @@ EL::StatusCode PbPbFFShape :: execute (){
 				//Fake/UE tracks
 				if (isFake)
 				{
-					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin)
+//					fill_variable[0] = jet_pt;
+//					fill_variable[1] = DeltaPsi(jet_phi,uee->Psi);
+//					fill_variable[2] = R;
+//					fill_variable[3] = pt;
+//					fill_variable[4] = jet_eta;
+//					fill_variable[5] = jet_phi;
+//					fill_variable[6] = eventInfo->runNumber();
+
+					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin && R < 0.8)
 					{
+//						h_UE_dNdEtadPhidpT->Fill(fill_variable, jet_weight*eff_weight);
 						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
@@ -931,7 +946,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			}
 		} // end reco track loop
 
-		h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(DeltaPsi(jet_phi,uee->Psi),jet_eta,jet_phi, jet_weight);
+		if (derive_UE_mode) h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(DeltaPsi(jet_phi,uee->Psi),jet_eta,jet_phi, jet_weight);
 
 		//JES plots
 //		for (int nMultThreshold=0;nMultThreshold<trkcorr->nMultThresholds;nMultThreshold++) {h_jetpT_v_multiplicity.at(cent_bin)->Fill(jet_pt,nMultThreshold,trk_multiplicity[nMultThreshold]);}

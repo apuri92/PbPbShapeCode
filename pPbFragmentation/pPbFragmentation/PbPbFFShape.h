@@ -14,6 +14,7 @@
 #include <TSystem.h>
 #include <TMath.h>
 #include <TRandom3.h>
+//#include <THnSparse.h>
 
 #include "BaseClass.h"
 
@@ -128,6 +129,8 @@ class PbPbFFShape : public BaseClass{
 	//UE
 	vector<vector<vector<vector<TH3D*>>>> h_UE_dNdEtadPhidpT; //!
 	vector<vector<TH3D*>> h_jet_v_Psi; //!
+//	THnSparse* h_UE_dNdEtadPhidpT; //!
+//	double fill_variable[7]; //!
 
 
 	//test UE

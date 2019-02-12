@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void check_UE(int sys_mode = 0, bool subtract = 0)
+void check_UE(int sys_mode = 38, bool subtract = 0)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -254,7 +254,6 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 				double n_jets = h_jet_spectra->GetBinContent(i_jet);
 				double n_jets_true = h_true_jet_spectra->GetBinContent(i_jet);
 
-				if (n_jets == 0) continue;
 
 
 				for (int i_trk = 1; i_trk <= N_trkpt; i_trk++)
@@ -267,16 +266,25 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_MB_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_MB);
 						h_MB_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_MB_err);
 					}
-					else h_MB_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_MB_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_MB_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 					if (n_jets_data != 0)
 					{
+
 						double updated_UE_MB_data = h_MB_data_2D[i_dR][i_cent]->GetBinContent(i_trk, i_jet) / n_jets_data;
 						double updated_UE_MB_data_err = h_MB_data_2D[i_dR][i_cent]->GetBinError(i_trk, i_jet) / n_jets_data;
 						h_MB_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_MB_data);
 						h_MB_data_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_MB_data_err);
 					}
-					else h_MB_data_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_MB_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_MB_data_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 					if (n_jets_cone != 0)
 					{
@@ -285,7 +293,12 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_cone_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_cone);
 						h_cone_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_cone_err);
 					}
-					else h_cone_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_cone_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_cone_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
+
 
 					if (n_jets_cone_data != 0)
 					{
@@ -294,7 +307,11 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_cone_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_cone_data);
 						h_cone_data_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_cone_data_err);
 					}
-					else h_cone_data_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_cone_data_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_cone_data_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 					if (n_jets != 0)
 					{
@@ -303,7 +320,11 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_TM_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_TM);
 						h_TM_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_TM_err);
 					}
-					else h_TM_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_TM_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_TM_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 					if (n_jets_true != 0)
 					{
@@ -312,7 +333,11 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_FS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_FS);
 						h_FS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_FS_err);
 					}
-					else h_FS_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_FS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_FS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 					if (n_jets_true != 0)
 					{
@@ -321,7 +346,11 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 						h_FNS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, updated_UE_FNS);
 						h_FNS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, updated_UE_FNS_err);
 					}
-					else h_FNS_2D[i_dR][i_cent]->Reset();
+					else
+					{
+						h_FNS_2D[i_dR][i_cent]->SetBinContent(i_trk, i_jet, 0);
+						h_FNS_2D[i_dR][i_cent]->SetBinError(i_trk, i_jet, 0);
+					}
 
 				}
 			}
@@ -1086,7 +1115,19 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 					if (i_cent == 4) {low_range = 5; hi_range = 15;}
 					if (i_cent == 5) {low_range = 1.5; hi_range = 4;}
 
-					if (i_jet == jet_pt_start && i_trk == 2) h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					if (i_jet == jet_pt_start && i_trk == 2) h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+
+					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_cone_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_cone_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_FS_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_FNS_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+
 
 
 					double avg =(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(1) + h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(11))/2;
@@ -1099,9 +1140,6 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.88,1.12);
 
 
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.85, 1.15);
 					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(505);
 
@@ -1115,10 +1153,10 @@ void check_UE(int sys_mode = 0, bool subtract = 0)
 					gPad->SetBottomMargin(0.0);
 					gPad->SetRightMargin(0);
 
-					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-//					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
-					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
+//					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist text");
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist text");
+//					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_cone_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FNS_r_1D[i_jet][i_trk][i_cent]->Draw("same");

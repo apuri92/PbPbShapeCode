@@ -3,6 +3,7 @@
 #include <EventLoop/Job.h>
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
+//#include <THnSparse.h>
 
 using namespace std;
 using namespace MTCorrector;
@@ -310,23 +311,51 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		wk()->addOutput (FS_norm_jet.at(j));
 
 
-		for (int i=0;i<ptJetBinsN;i++)
+		if (derive_UE_mode)
 		{
-			if (j == _nCentbins - 1) continue;
+//			vector<double> psi_bins;
+//			for (float dPsi=0.2;dPsi<=TMath::Pi();dPsi=dPsi+0.2){
+//				psi_bins.push_back(dPsi);
+//			}
+//			int n_psi_bins = psi_bins.size();
+//
+//			vector<int> n_bins = {ptJetBinsN, n_psi_bins, _ndRBins-1, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, RunBinsN}; //6 ptjet, 10 psi, 10 r, 6 pttrk, 50 etatrk, 64 phitrk, 30+x runs
+//
+//			vector<double> tmp_bins_min;
+//			vector<double> tmp_bins_max;
+//			int n_dim = n_bins.size();
+//
+//			for (int i = 0; i < n_dim; i++)
+//			{
+//				tmp_bins_min.push_back(0);
+//				tmp_bins_max.push_back(1);
+//			}
+//
+//			h_UE_dNdEtadPhidpT = new THnSparseD("h_UE_dNdEtadPhidpT","h_UE_dNdEtadPhidpT",n_dim, &n_bins[0], &tmp_bins_min[0], &tmp_bins_max[0]);
+//
+//			h_UE_dNdEtadPhidpT->GetAxis(0)->Set(n_bins[0], &ptJetBins[0]);
+//			h_UE_dNdEtadPhidpT->GetAxis(1)->Set(n_bins[1], &psi_bins[0]);
+//			h_UE_dNdEtadPhidpT->GetAxis(2)->Set(n_bins[2], trkcorr->dRrange);
+//			h_UE_dNdEtadPhidpT->GetAxis(3)->Set(n_bins[3], &ptTrkBins[0]);
+//			h_UE_dNdEtadPhidpT->GetAxis(4)->Set(n_bins[4], &etaTrkBins[0]);
+//			h_UE_dNdEtadPhidpT->GetAxis(5)->Set(n_bins[5], &phiTrkBins[0]);
+//			h_UE_dNdEtadPhidpT->GetAxis(6)->Set(n_bins[6], &RunBins[0]);
 
-			temphist_3D = new TH3D(Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),PsiBinsN,PsiBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
-			h_jet_v_Psi.at(i).at(j) = temphist_3D;
-			h_jet_v_Psi.at(i).at(j)->Sumw2();
-			wk()->addOutput (h_jet_v_Psi.at(i).at(j));
-
-			if (derive_UE_mode)
+			for (int i=0;i<ptJetBinsN;i++)
 			{
+				if (j == _nCentbins - 1) continue;
+
+				temphist_3D = new TH3D(Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),PsiBinsN,PsiBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+				h_jet_v_Psi.at(i).at(j) = temphist_3D;
+				h_jet_v_Psi.at(i).at(j)->Sumw2();
+				wk()->addOutput (h_jet_v_Psi.at(i).at(j));
+
 				//restrict to trk < 10 GeV, jet > 100, jet < 400, cent != 6
 				if (i >= lo_jetpt_bin && i <= hi_jetpt_bin)
 				{
 					for (int m=0;m<10;m++) //psibins
 					{
-						for (int k=0;k<_ndRBins;k++)
+						for (int k=0;k<11;k++) // upto r = 0.8 is 11 bins,
 						{
 							temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
 							h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k) = temphist_3D;

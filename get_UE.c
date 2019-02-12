@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void get_UE(int sys_mode = 34)
+void get_UE(int sys_mode = 43)
 {
 	gErrorIgnoreLevel = 3001;
 
@@ -49,12 +49,12 @@ void get_UE(int sys_mode = 34)
 	int jet_end = 12;
 
 
-	if (sys_mode == 34 )
+	if (sys_mode == 43 )
 	{
 		jet_start = 6;
 		jet_end = 9;
 	}
-	if (sys_mode == 35 )
+	if (sys_mode == 44 )
 	{
 		jet_start = 9;
 		jet_end = 12;
@@ -80,7 +80,7 @@ void get_UE(int sys_mode = 34)
 				}
 
 
-				for (int i_dR = 0; i_dR < N_dR; i_dR++)
+				for (int i_dR = 0; i_dR < 11; i_dR++)
 				{
 					name = Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i_jet, i_psi, i_cent, i_dR);
 					h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR] = (TH3*)input_file->Get(name.c_str());
