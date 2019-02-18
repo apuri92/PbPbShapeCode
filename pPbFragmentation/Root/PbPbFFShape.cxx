@@ -80,7 +80,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 	//Do only the run number specified in config file if number set in config > 0
 	if (_Run_Number > 0)
 	{
-		if (eventInfo->runNumber() != _Run_Number) return EL::StatusCode::SUCCESS;
+		//use [286711 - 287259], [287270 - 287632], and [287706 - 287931] for run selections
+		//if (eventInfo->runNumber() > 287259) return EL::StatusCode::SUCCESS;
+		//if (eventInfo->runNumber() < 287270 ||  eventInfo->runNumber() > 287632) return EL::StatusCode::SUCCESS;
+		//if (eventInfo->runNumber() < 287706 ) return EL::StatusCode::SUCCESS;
 	}
 
 
@@ -275,6 +278,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 	//nevents per run number:
 	h_event_rN->Fill(eventInfo->runNumber());
+	h_cent_rN->Fill(eventInfo->runNumber(), FCalEt);
 
 	//Jet vectors
 	vector<float> jet_pt_xcalib_vector,jet_phi_vector,jet_eta_vector, jet_y_vector, jet_TrigPresc_vector;
@@ -753,6 +757,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 		int jet_dPsi_bin = GetPsiBin(DeltaPsi(jet_phi,uee->Psi));
 
 		int trk_multiplicity[10]; for (int nMultThreshold=0; nMultThreshold<trkcorr->nMultThresholds; nMultThreshold++) trk_multiplicity[nMultThreshold]=0;
+
+		h_dPsi_rN.at(cent_bin)->Fill(eventInfo->runNumber(),DeltaPsi(jet_phi,uee->Psi));
+		h_jet_rN.at(cent_bin)->Fill(eventInfo->runNumber(), jet_pt );
+
 		for (const auto& trk : *recoTracks)
 		{
 			//get the tracks....
@@ -910,18 +918,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 				//Fake/UE tracks
 				if (isFake)
 				{
-//					fill_variable[0] = jet_pt;
-//					fill_variable[1] = DeltaPsi(jet_phi,uee->Psi);
-//					fill_variable[2] = R;
-//					fill_variable[3] = pt;
-//					fill_variable[4] = jet_eta;
-//					fill_variable[5] = jet_phi;
-//					fill_variable[6] = eventInfo->runNumber();
-
 					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin && R < 0.8)
-					{
-//						h_UE_dNdEtadPhidpT->Fill(fill_variable, jet_weight*eff_weight);
-						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
+					{						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
 					ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);

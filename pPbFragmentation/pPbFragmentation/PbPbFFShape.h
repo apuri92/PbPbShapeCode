@@ -96,6 +96,7 @@ class PbPbFFShape : public BaseClass{
 
 
 	TH1 *h_event_rN; //!
+	TH2 *h_cent_rN; //!
 	TH1 *h_fcal_mc; //!
 	TH1 *h_fcal_mbov; //!
 	TH1 *h_cent_mc; //!
@@ -109,11 +110,11 @@ class PbPbFFShape : public BaseClass{
 
 	vector<vector<TH3D*>> h_dR_change; //!
 
-	bool derive_UE_mode = 0;
-//	int lo_jetpt_bin = 6;
-//	int hi_jetpt_bin = 8;
-	int lo_jetpt_bin = 9;
-	int hi_jetpt_bin = 11;
+	bool derive_UE_mode = 1;
+	int lo_jetpt_bin = 6;
+	int hi_jetpt_bin = 8;
+//	int lo_jetpt_bin = 9;
+//	int hi_jetpt_bin = 11;
 
 	//debugging histograms
 	vector<TH3D*> h_reco_truth_matched; //!
@@ -129,8 +130,8 @@ class PbPbFFShape : public BaseClass{
 	//UE
 	vector<vector<vector<vector<TH3D*>>>> h_UE_dNdEtadPhidpT; //!
 	vector<vector<TH3D*>> h_jet_v_Psi; //!
-//	THnSparse* h_UE_dNdEtadPhidpT; //!
-//	double fill_variable[7]; //!
+	vector<TH2D*> h_dPsi_rN; //!
+	vector<TH2D*> h_jet_rN; //!
 
 
 	//test UE

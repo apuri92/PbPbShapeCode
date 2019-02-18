@@ -26,12 +26,6 @@ void run_dep(int sys_mode = 38)
 //	h_tmp_data->Scale(1./h_tmp_data->Integral());
 	double j = 0;
 
-	for (int i = 1; i <= h_tmp_data->GetXaxis()->GetNbins(); i++)
-	{
-		j = j + h_tmp_data->GetBinContent(i);
-	}
-	cout << j <<  "<--------------" << endl;
-
 	name = Form("./run_dep/run_dep_UE_%s.root", sys_path.c_str());
 	TFile *output_file = new TFile(name.c_str(), "recreate");
 
@@ -121,6 +115,9 @@ void run_dep(int sys_mode = 38)
 	{
 		cout << Form("Run %i: %1.0f", i_run, run_binning->GetBinLowEdge(i_run)) << endl;
 
+		double n_evts = h_tmp_data->GetBinContent(i_run);
+		if (n_evts < 1) continue;
+		
 		int run_itr = 0;
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
@@ -142,7 +139,7 @@ void run_dep(int sys_mode = 38)
 			MB_norm_jet->SetName(Form("%s_data",name.c_str()));
 			MB_norm_jet->Sumw2();
 
-			name = Form("TM_norm_jet_rN_cent%i", i_cent); //TM = MB for jet spectra, done because I forgot to fill MB_jet_norm_rN on condor
+			name = Form("MB_norm_jet_rN_cent%i", i_cent);
 			TH2* MB_rN_norm_jet_2D = (TH2*)((TH2*)input_file_data->Get(name.c_str()))->Clone(Form("MB_rN_norm_jet_c%i", i_cent));
 			MB_rN_norm_jet_2D->SetName(Form("%s_data",name.c_str()));
 			MB_rN_norm_jet_2D->Sumw2();

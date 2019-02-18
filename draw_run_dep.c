@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void draw_run_dep(int config = 38)
+void draw_run_dep(int config = 47)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -41,7 +41,7 @@ void draw_run_dep(int config = 38)
 
 	TH1* h_tmp_mc = (TH1*)input_file->Get("EventPercentages_mc");
 	TH1* h_tmp_data = (TH1*)input_file->Get("EventPercentages_data");
-	for (int i = 1; i <= h_eventPercentage_data->GetNbinsX(); i=i+5)
+	for (int i = 1; i <= h_eventPercentage_data->GetNbinsX(); i=i+1)
 	{
 		h_eventPercentage_mc->GetXaxis()->SetBinLabel(i,Form("%1.0f",h_tmp_mc->GetBinLowEdge(i)));
 		h_eventPercentage_data->GetXaxis()->SetBinLabel(i,Form("%1.0f",h_tmp_data->GetBinLowEdge(i)));
@@ -55,8 +55,8 @@ void draw_run_dep(int config = 38)
 
 	h_eventPercentage_mc->Scale(1./h_eventPercentage_mc->Integral());
 	h_eventPercentage_data->Scale(1./h_eventPercentage_data->Integral());
-
-
+	h_tmp_mc->Scale(1./h_tmp_mc->Integral());
+	h_tmp_data->Scale(1./h_tmp_data->Integral());
 
 	TCanvas *c_x = new TCanvas("c_x","c_x",1200,600);
 	TCanvas *c_y = new TCanvas("c_y","c_y",900,600);
@@ -76,16 +76,15 @@ void draw_run_dep(int config = 38)
 	SetHStyle_smallify(h_eventPercentage_data, 0, 0);
 	SetHStyle_smallify(h_eventPercentage_mc, 1, 1);
 	h_eventPercentage_mc->LabelsOption("v");
-	h_eventPercentage_data->LabelsOption("u");
+	h_eventPercentage_data->LabelsOption("v");
 	h_eventPercentage_data->GetYaxis()->SetTitleOffset(0.8);
-	h_eventPercentage_data->Draw("hist");
-//	h_eventPercentage_mc->Draw("hist same");
-//	legend_x->AddEntry(h_eventPercentage_data,"Data","lp");
-//	legend_x->AddEntry(h_eventPercentage_mc,"MC","lp");
+	h_eventPercentage_mc->Draw("hist");
+	h_eventPercentage_data->Draw("hist same");
+	legend_x->AddEntry(h_eventPercentage_data,"Data","lp");
+	legend_x->AddEntry(h_eventPercentage_mc,"MC","lp");
 	legend_x->Draw();
 
-
-	c_x->Print("run_dep/EventPercentages.pdf");
+	c_x->Print(Form("run_dep/EventPercentages_c%i.pdf",config));
 
 	vector<vector<vector<vector<TH1*>>>> h_UE_TM_run_dep = vector<vector<vector<vector<TH1*>>>> (N_jetpt, vector<vector<vector<TH1*>>> (N_trkpt, vector<vector<TH1*>> (N_dR, vector<TH1*> (6)))); //histos from run_dep.c are such that h_XXX_run(i) where i is bin number (so starting at 1)
 	vector<vector<vector<vector<TF1*>>>> func_UE_TM_run_dep = vector<vector<vector<vector<TF1*>>>> (N_jetpt, vector<vector<vector<TF1*>>> (N_trkpt, vector<vector<TF1*>> (N_dR, vector<TF1*> (6)))); //histos from run_dep.c are such that h_XXX_run(i) where i is bin number (so starting at 1)
@@ -102,7 +101,7 @@ void draw_run_dep(int config = 38)
 
 
 	name = Form("jet%i_trk%i_cent%i", 8, 4, 0);
-	name = Form("UE_MB_indR_%s_run%i", name.c_str(), 1);
+	name = Form("UE_MB_indR_%s_run%i", name.c_str(), 6);
 	TH1* h_tmp = (TH1*)input_file->Get(name.c_str())->Clone("h_tmp");
 
 
@@ -161,19 +160,16 @@ void draw_run_dep(int config = 38)
 			string cent_label = num_to_cent(31,i_cent).c_str();
 			for (int i_run = 1; i_run <= N_runs; i_run++)
 			{
-				int run_number = h_tmp_mc->GetBinLowEdge(i_run);
-				double lumi = 1;//luminosity[run_number];
-				if (lumi < 0.0001) continue; //this ensures run is in GRL and has a finite non zero luminosity
 
 				name = Form("MB_rN_norm_jet_cent%i_run%i", i_cent,i_run);
-				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1) / lumi;
-				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1) / lumi;
+				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1);
+				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1);
 				h_jet_run_dep_data[i_jet][i_cent]->SetBinContent(i_run, val);
 				h_jet_run_dep_data[i_jet][i_cent]->SetBinError(i_run, err);
 
 				name = Form("TM_rN_norm_jet_cent%i_run%i", i_cent,i_run);
-				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1) / lumi;
-				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1) / lumi;
+				val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_jet+1);
+				err = ((TH1*)input_file->Get(name.c_str()))->GetBinError(i_jet+1);
 				h_jet_run_dep_mc[i_jet][i_cent]->SetBinContent(i_run, val);
 				h_jet_run_dep_mc[i_jet][i_cent]->SetBinError(i_run, err);
 			}
@@ -188,18 +184,18 @@ void draw_run_dep(int config = 38)
 			SetHStyle_smallify(h_eventPercentage_data,3,1);
 
 
-//			h_jet_run_dep_mc[i_jet][i_cent]->Draw("hist ");
-			h_jet_run_dep_data[i_jet][i_cent]->Draw("hist");
-//			h_eventPercentage_mc->Draw("hist same");
+			h_jet_run_dep_mc[i_jet][i_cent]->Draw("hist");
+			h_jet_run_dep_data[i_jet][i_cent]->Draw("hist same");
+			h_eventPercentage_mc->Draw("hist same");
 			h_eventPercentage_data->Draw("hist same");
 
 			if (i_jet == jet_pt_start-1 && i_cent == 0)
 			{
 				legend_x->Clear();
 				legend_x->AddEntry(h_jet_run_dep_data[i_jet][i_cent],"Data Jets","lp");
-//				legend_x->AddEntry(h_jet_run_dep_mc[i_jet][i_cent],"MC Jets","lp");
-//				legend_x->AddEntry(h_eventPercentage_mc,"MC Events","lp");
 				legend_x->AddEntry(h_eventPercentage_data,"Data Events","lp");
+				legend_x->AddEntry(h_eventPercentage_mc,"MC Events","lp");
+				legend_x->AddEntry(h_jet_run_dep_mc[i_jet][i_cent],"MC Jets","lp");
 			}
 			legend_x->Draw();
 
@@ -215,7 +211,7 @@ void draw_run_dep(int config = 38)
 		if (i_jet == jet_pt_start-1) name = "(";
 		if (i_jet == jet_pt_end-1) name = ")";
 
-		c_x->Print(Form("run_dep/jet_run_dep.pdf%s",name.c_str()),Form("Title: jet%i", i_jet));
+		c_x->Print(Form("run_dep/JetEvent_run_dep_c%i.pdf%s",config, name.c_str()),Form("Title: jet%i", i_jet));
 	}
 
 
@@ -253,8 +249,6 @@ void draw_run_dep(int config = 38)
 						double jet_weights = h_jet_run_dep_data[i_jet][i_cent]->GetBinContent(i_run);
 						double evt_weights = h_eventPercentage_data->GetBinContent(i_run);
 
-//						if (lumi < 0.001)  continue;
-
 						name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
 						name = Form("UE_TM_rN_indR_%s_run%i", name.c_str(), i_run);
 						val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_dR+1);
@@ -273,43 +267,32 @@ void draw_run_dep(int config = 38)
 						evt_w_UE = evt_w_UE + evt_weights*val;
 						sum_jet_w = sum_jet_w + jet_weights;
 						sum_evt_w = sum_evt_w + evt_weights;
-
-//						cout << Form("%1.2f * %1.5f = %1.5f, Running Total: %1.5f, Running SumW: %1.4f", val, jet_weights, jet_weights*val, jet_w_UE, sum_jet_w) << endl;
-//						cout << Form("%1.2f * %1.5f = %1.5f, Running Total: %1.5f, Running SumW: %1.4f", val, evt_weights, evt_weights*val, evt_w_UE, sum_evt_w) << endl;
-
 					}
-//					cout <<  "--------------------" << endl;
-//					h_eventPercentage_data->Print("all");
-//					h_jet_run_dep_data[i_jet][i_cent]->Print("all");
-//					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->Print("all");
-//					cout <<  "--------------------" << endl;
-
-
-
-
 					jet_weighted_UE_MB[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, jet_w_UE/sum_jet_w);
 					evt_weighted_UE_MB[i_jet][i_trk][i_cent]->SetBinContent(i_dR+1, evt_w_UE/sum_evt_w);
 					jet_weighted_UE_MB[i_jet][i_trk][i_cent]->Sumw2();
 					evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Sumw2();
 
+
+					name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
+					name = Form("UE_MB_indR_%s_run%i", name.c_str(), 6);
+					double nominal_val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_dR+1);
+
 					c_x->cd(i_cent+1);
 					SetHStyle_smallify(h_UE_TM_run_dep[i_jet][i_trk][i_dR][i_cent],0,1);
 					SetHStyle_smallify(h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent],1,1);
-//					h_UE_TM_run_dep[i_jet][i_trk][i_dR][i_cent]->Draw("");
-					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->Draw("");
+					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->GetYaxis()->SetRangeUser(nominal_val*0.5,nominal_val*1.5);
+					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->Draw("hist");
 
-
-					name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
-					name = Form("UE_MB_indR_%s_run%i", name.c_str(), 1);
-					double nominal_val = ((TH1*)input_file->Get(name.c_str()))->GetBinContent(i_dR+1);
-					//					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->Scale(1./nominal_val);
-					h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->GetYaxis()->SetRangeUser(0.8,1.2);
-					//					double x1 = h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->GetBinLowEdge(1);
-					//					double x2 = h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent]->GetBinLowEdge(30);
-					//					line->DrawLine(x2,nominal_val,x2,nominal_val);
+					line->SetLineStyle(1);
+					line->SetLineColor(kBlack);
+					line->DrawLine(0,nominal_val,32,nominal_val);
+					line->SetLineStyle(3);
+					line->SetLineColor(kBlue);
+					line->DrawLine(0,jet_w_UE/sum_jet_w,32,jet_w_UE/sum_jet_w);
 
 					legend_x->Clear();
-					//						legend_x->AddEntry(h_UE_TM_run_dep[i_jet][i_trk][i_dR][i_cent],"UE_{TM}^{MC}","lp");
+					legend_x->AddEntry(h_UE_TM_run_dep[i_jet][i_trk][i_dR][i_cent],"UE_{TM}^{MC}","lp");
 					legend_x->AddEntry(h_UE_MB_run_dep[i_jet][i_trk][i_dR][i_cent],"UE_{MB}^{Data}","lp");
 					legend_x->Draw();
 
@@ -328,41 +311,33 @@ void draw_run_dep(int config = 38)
 						c_y->cd(i_cent+1);
 
 						name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
-						name = Form("UE_MB_indR_%s_run%i", name.c_str(), 1);
+						name = Form("UE_MB_indR_%s_run%i", name.c_str(), 6);
 						TH1* h_MB_nominal = ((TH1*)input_file->Get(name.c_str()));
-//						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->Divide(h_MB_nominal);
-						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Divide(h_MB_nominal);
-//						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Divide(jet_weighted_UE_MB[i_jet][i_trk][i_cent]);
 
-						SetHStyle_smallify(jet_weighted_UE_MB[i_jet][i_trk][i_cent],2,1);
-						SetHStyle_smallify(evt_weighted_UE_MB[i_jet][i_trk][i_cent],1,1);
+						SetHStyle_smallify(jet_weighted_UE_MB[i_jet][i_trk][i_cent],1,1);
+						SetHStyle_smallify(evt_weighted_UE_MB[i_jet][i_trk][i_cent],2,1);
 						SetHStyle_smallify(h_MB_nominal,0,1);
 
 
 						h_MB_nominal->GetXaxis()->SetRangeUser(0,r_max_range);
 						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0,r_max_range);
 						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0,r_max_range);
-						h_MB_nominal->GetYaxis()->SetRangeUser(0,100);
 
 						double max = h_MB_nominal->GetBinContent(1)*1.20;
 						double min = h_MB_nominal->GetBinContent(8)*0.6;
-						h_MB_nominal->GetYaxis()->SetRangeUser(min, max);
-						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.99,1.01);
+						h_MB_nominal->GetYaxis()->SetRangeUser(0,100);
+						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.99,1.01);
 
-//						h_MB_nominal->Draw("");
-						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Draw("hist text");
-//						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->Draw("hist text");
-						
+						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->Divide(h_MB_nominal);
+						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Divide(h_MB_nominal);
 
+						jet_weighted_UE_MB[i_jet][i_trk][i_cent]->Draw("");
+						evt_weighted_UE_MB[i_jet][i_trk][i_cent]->Draw("same");
 
-						if (i_jet == jet_pt_start-1 && i_cent == 0 && i_trk == trk_pt_start-1)
-						{
-							legend_x->Clear();
-							legend_x->AddEntry(h_MB_nominal,"UE_{MB}^{Nominal}","lp");
-							legend_x->AddEntry(evt_weighted_UE_MB[i_jet][i_trk][i_cent],"UE_{MB}^{SysEvtW}","lp");
-							//							legend_x->AddEntry(jet_weighted_UE_MB[i_jet][i_trk][i_cent],"UE_{MB}^{SysJetW}","lp");
-						}
-//						legend_x->Draw();
+						legend_x->Clear();
+						legend_x->AddEntry(evt_weighted_UE_MB[i_jet][i_trk][i_cent],"UE_{MB}^{SysEvtW}/Nominal","lp");
+						legend_x->AddEntry(jet_weighted_UE_MB[i_jet][i_trk][i_cent],"UE_{MB}^{SysJetW}/Nominal","lp");
+						legend_x->Draw();
 
 						y_position = 0.24;
 						x_position = 0.92;
@@ -423,120 +398,19 @@ void draw_run_dep(int config = 38)
 				name = "";
 				if (i_trk == trk_pt_start-1 && i_jet == jet_pt_start-1 && i_dR == 0) name = "(";
 				if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1 && i_dR == N_dR-3) name = ")";
-				c_x->Print(Form("run_dep/chps_UE_run_dep.pdf%s",name.c_str()),Form("Title: jet%i_trk%i_dR%i", i_jet, i_trk, i_dR));
+				c_x->Print(Form("run_dep/chps_UE_run_dep_c%i.pdf%s",config, name.c_str()),Form("Title: jet%i_trk%i_dR%i", i_jet, i_trk, i_dR));
 
 
 				if (i_dR == N_dR -3)
 				{
 					if (i_trk == trk_pt_start-1 && i_jet == jet_pt_start-1 && i_dR == N_dR-3) name = "(";
 					if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1 && i_dR == N_dR-3) name = ")";
-					c_y->Print(Form("run_dep/chps_w_UE.pdf%s",name.c_str()),Form("Title: jet%i_trk%i_dR%i", i_jet, i_trk, i_dR));
+					c_y->Print(Form("run_dep/chps_weighted_UE_c%i.pdf%s",config, name.c_str()),Form("Title: jet%i_trk%i_dR%i", i_jet, i_trk, i_dR));
 				}
 
 
 			}
 		}
 	}
-
-
-
-
-/*
-	for (int i_jet = jet_pt_start-1; i_jet < jet_pt_end; i_jet++)
-	{
-		for (int i_trk = trk_pt_start-1; i_trk < trk_pt_end; i_trk++)
-		{
-			string trk_label = Form("%1.1f < p_{T}^{Trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-
-			c_x->cd();
-			c_x->Clear();
-			c_x->Divide(3,2);
-
-
-			for (int i_cent = 0; i_cent < 6; i_cent++)
-			{
-				string cent_label = num_to_cent(31,i_cent).c_str();
-
-				int run_itr = 1;
-
-
-				for (int i_run = run_start; i_run <= run_end; i_run++)
-				{
-					name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
-					name = Form("UE_TM_indR_%s_run%i", name.c_str(), i_run);
-					h_UE_TM[i_run] = (TH1*)input_file->Get(name.c_str())->Clone(Form("%s_clone",name.c_str()));
-
-					name = Form("jet%i_trk%i_cent%i", i_jet, i_trk, i_cent);
-					name = Form("UE_TM_rN_indR_%s_run%i", name.c_str(), i_run);
-					h_UE_run_dep[i_run] = (TH1*)input_file->Get(name.c_str())->Clone(Form("%s_clone",name.c_str()));
-
-					h_ratio[i_run] = (TH1*)h_UE_run_dep[i_run]->Clone(Form("ratio_run%i",i_run));
-					h_ratio[i_run]->Divide(h_UE_TM[i_run]);
-
-					if (!doRuns[i_run]) continue;
-
-					SetHStyle_smallify(h_UE_TM[i_run], 0, 1);
-					SetHStyle_smallify(h_UE_run_dep[i_run], run_itr, 1);
-					SetHStyle_smallify(h_ratio[i_run], run_itr, 1);
-
-					if (i_trk == trk_pt_start-1 && i_jet == jet_pt_start-1 && i_cent == 0)
-					{
-						if (run_itr==1) legend_x->AddEntry(h_UE_TM[i_run], "Combined", "lp");
-						legend_x->AddEntry(h_UE_run_dep[i_run], Form("run %1.0f (%i)",run_binning->GetBinLowEdge(i_run), i_run), "lp");
-					}
-
-					double low_range = h_UE_TM[i_run]->GetMinimum() * 0.75;
-					double hi_range = h_UE_TM[i_run]->GetMaximum() * 1.4;
-
-
-					h_UE_TM[i_run]->GetXaxis()->SetRangeUser(0,r_max_range);
-					h_UE_TM[i_run]->GetYaxis()->SetNdivisions(504);
-
-					h_ratio[i_run]->GetXaxis()->SetRangeUser(0,r_max_range);
-					h_ratio[i_run]->GetYaxis()->SetRangeUser(0.8,1.2);
-					h_ratio[i_run]->GetYaxis()->SetNdivisions(504);
-
-					if (run_itr == 1)
-					{
-						c_x->cd(i_cent+1);
-						gPad->Divide(1,2);
-
-						c_x->cd(i_cent+1)->cd(1);
-						gPad->SetPad(0,0.40,0.99,0.99);
-						gPad->SetTopMargin(0.05);
-						gPad->SetBottomMargin(0.0);
-						gPad->SetRightMargin(0);
-
-						c_x->cd(i_cent+1)->cd(2);
-						gPad->SetPad(0,0.0,0.99,0.40);
-						gPad->SetTopMargin(0.0);
-						gPad->SetBottomMargin(0.30);
-						gPad->SetRightMargin(0);
-					}
-
-					c_x->cd(i_cent+1)->cd(1);
-
-					if (run_itr == 1) h_UE_TM[i_run]->DrawCopy();
-					h_UE_run_dep[i_run]->DrawCopy("same");
-
-					c_x->cd(i_cent+1)->cd(2);
-					if (run_itr == 1) h_ratio[i_run]->DrawCopy();
-					else h_ratio[i_run]->DrawCopy("same");
-
-					run_itr++;
-				}
-
-			}
-			legend_x->Draw();
-
-			name = "";
-			if (i_trk == trk_pt_start-1 && i_jet == jet_pt_start-1) name = "(";
-			if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) name = ")";
-			c_x->Print(Form("run_dep/chps_UE_run_dep.pdf%s",name.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
-		}
-	}
-*/
-
 
 }

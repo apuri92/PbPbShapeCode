@@ -1,9 +1,9 @@
-#include "output_dev/functions/global_variables.h"
+//#include "output_dev/functions/global_variables.h"
 
-void get_UE(int sys_mode = 43)
+void get_UE(int sys_mode = 60)
 {
 	gErrorIgnoreLevel = 3001;
-
+	int n_cent_cuts = 6;
 	string sys_path;
 	sys_path = Form("c%i", sys_mode);
 
@@ -19,9 +19,9 @@ void get_UE(int sys_mode = 43)
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
-	TAxis* psi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetXaxis();
-	TAxis* eta_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetYaxis();
-	TAxis* phi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt9"))->GetZaxis();
+	TAxis* psi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt8"))->GetXaxis();
+	TAxis* eta_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt8"))->GetYaxis();
+	TAxis* phi_binning = (TAxis*)((TH3*)input_file->Get("h_jet_v_Psi_cent0_jetpt8"))->GetZaxis();
 
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
@@ -49,18 +49,22 @@ void get_UE(int sys_mode = 43)
 	int jet_end = 12;
 
 
-	if (sys_mode == 43 )
+	if (sys_mode == 60 )
 	{
 		jet_start = 6;
 		jet_end = 9;
 	}
-	if (sys_mode == 44 )
+	if (sys_mode == 61 )
 	{
 		jet_start = 9;
 		jet_end = 12;
 	}
 
-	for (int i_cent = 0; i_cent < n_cent_cuts-1; i_cent++)
+	double orig, orig_err; //= h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1);
+	double normalized, normalized_err;// = orig/n_jets[i_eta][i_phi];
+
+	int empty_bins = 0, total_bins = 0;
+	for (int i_cent = 0; i_cent < 1; i_cent++)
 	{
 		for (int i_jet = jet_start; i_jet < jet_end; i_jet++)
 		{
@@ -68,6 +72,7 @@ void get_UE(int sys_mode = 43)
 			name = Form("h_jet_v_Psi_cent%i_jetpt%i",i_cent, i_jet);
 			h_jet_v_Psi[i_jet][i_cent] = (TH3*)input_file->Get(name.c_str());
 
+			cout << "Done " << name << " cent: " << i_cent <<  endl;
 			for (int i_psi = 0; i_psi < 10; i_psi++)
 			{
 
@@ -95,15 +100,27 @@ void get_UE(int sys_mode = 43)
 							{
 
 								if (trkpT_binning->GetBinLowEdge(i_trk+1) >= 10.) continue;
+								if (	h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1) == 0)
+								{
+									cout << h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1) << endl;
+									empty_bins =  empty_bins+1;
+								}
+								total_bins = total_bins+1;
+
 								if (n_jets[i_eta][i_phi] == 0)
 								{
 									h_UE_dNdEtadPhidpT_norm[i_jet][i_psi][i_cent][i_dR]->SetBinContent(i_trk+1, i_eta+1, i_phi+1, 0);
 								}
 								else
 								{
-									double orig = h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1);
-									double normalized = orig/n_jets[i_eta][i_phi];
+									orig = h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1);
+									normalized = orig/n_jets[i_eta][i_phi];
 									h_UE_dNdEtadPhidpT_norm[i_jet][i_psi][i_cent][i_dR]->SetBinContent(i_trk+1, i_eta+1, i_phi+1, normalized);
+
+									orig_err = h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinError(i_trk+1, i_eta+1, i_phi+1);
+									normalized_err = orig_err/n_jets[i_eta][i_phi];
+									h_UE_dNdEtadPhidpT_norm[i_jet][i_psi][i_cent][i_dR]->SetBinError(i_trk+1, i_eta+1, i_phi+1, normalized_err);
+
 								}
 							}
 
@@ -113,7 +130,7 @@ void get_UE(int sys_mode = 43)
 					for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 					{
 						if (trkpT_binning->GetBinLowEdge(i_trk+1) >= 10.) continue;
-						
+
 						h_UE_dNdEtadPhidpT_norm[i_jet][i_psi][i_cent][i_dR]->GetXaxis()->SetRange(i_trk+1,i_trk+1);
 						h_UE_eta_phi_maps[i_jet][i_trk][i_psi][i_cent][i_dR] = (TH2*)h_UE_dNdEtadPhidpT_norm[i_jet][i_psi][i_cent][i_dR]->Project3D("zy");
 
@@ -121,7 +138,7 @@ void get_UE(int sys_mode = 43)
 						string dr_label = Form("%1.2f < r < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
 						string psi_label = Form("%1.2f < psi < %1.2f", psi_binning->GetBinLowEdge(i_psi+1), psi_binning->GetBinUpEdge(i_psi+1));
 						string trk_label = Form("%1.2f < p_{T}^{Trk} < %1.2f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-						string cent_label = num_to_cent(31,i_cent);
+						string cent_label = Form("cent%i", i_cent);
 
 						h_UE_eta_phi_maps[i_jet][i_trk][i_psi][i_cent][i_dR]->SetTitle(Form("UE: %s, %s, %s, %s",dr_label.c_str(), psi_label.c_str(), trk_label.c_str(), cent_label.c_str()));
 
@@ -138,6 +155,8 @@ void get_UE(int sys_mode = 43)
 		}
 		cout << Form("Done cent%i", i_cent) << endl;
 	}
+
+	cout << Form("empty/total = %i/%i = %1.4f", empty_bins, total_bins, double(empty_bins)/total_bins) << endl;
 
 }
 

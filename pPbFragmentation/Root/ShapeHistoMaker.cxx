@@ -182,6 +182,13 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	h_event_rN = new TH1D("h_event_rN","h_event_rN",RunBinsN, RunBins);
 	h_event_rN->Sumw2();
 
+	int cent_binsN = 6;
+	double cent_bins[7] = {0,1,2,3,4,5,6};
+
+	h_cent_rN = new TH2D("h_cent_rN","h_cent_rN",RunBinsN, RunBins, cent_binsN, cent_bins );
+	h_cent_rN->Sumw2();
+	wk()->addOutput (h_cent_rN);
+
 	wk()->addOutput (h_FCal_Et);
 	wk()->addOutput (h_fcal_mc);
 	wk()->addOutput (h_fcal_mbov);
@@ -313,33 +320,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 		if (derive_UE_mode)
 		{
-//			vector<double> psi_bins;
-//			for (float dPsi=0.2;dPsi<=TMath::Pi();dPsi=dPsi+0.2){
-//				psi_bins.push_back(dPsi);
-//			}
-//			int n_psi_bins = psi_bins.size();
-//
-//			vector<int> n_bins = {ptJetBinsN, n_psi_bins, _ndRBins-1, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, RunBinsN}; //6 ptjet, 10 psi, 10 r, 6 pttrk, 50 etatrk, 64 phitrk, 30+x runs
-//
-//			vector<double> tmp_bins_min;
-//			vector<double> tmp_bins_max;
-//			int n_dim = n_bins.size();
-//
-//			for (int i = 0; i < n_dim; i++)
-//			{
-//				tmp_bins_min.push_back(0);
-//				tmp_bins_max.push_back(1);
-//			}
-//
-//			h_UE_dNdEtadPhidpT = new THnSparseD("h_UE_dNdEtadPhidpT","h_UE_dNdEtadPhidpT",n_dim, &n_bins[0], &tmp_bins_min[0], &tmp_bins_max[0]);
-//
-//			h_UE_dNdEtadPhidpT->GetAxis(0)->Set(n_bins[0], &ptJetBins[0]);
-//			h_UE_dNdEtadPhidpT->GetAxis(1)->Set(n_bins[1], &psi_bins[0]);
-//			h_UE_dNdEtadPhidpT->GetAxis(2)->Set(n_bins[2], trkcorr->dRrange);
-//			h_UE_dNdEtadPhidpT->GetAxis(3)->Set(n_bins[3], &ptTrkBins[0]);
-//			h_UE_dNdEtadPhidpT->GetAxis(4)->Set(n_bins[4], &etaTrkBins[0]);
-//			h_UE_dNdEtadPhidpT->GetAxis(5)->Set(n_bins[5], &phiTrkBins[0]);
-//			h_UE_dNdEtadPhidpT->GetAxis(6)->Set(n_bins[6], &RunBins[0]);
 
 			for (int i=0;i<ptJetBinsN;i++)
 			{
@@ -370,8 +350,21 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 
 	}
 
+	h_dPsi_rN =  vector<TH2D*>(_nCentbins);
+	h_jet_rN =  vector<TH2D*>(_nCentbins);
+
 	for (int j=0;j<_nCentbins;j++)
 	{
+
+		temphist_2D = new TH2D(Form("h_dPsi_rN_cent%i",j),Form("h_dPsi_rN_cent%i",j),RunBinsN, RunBins, PsiBinsN,PsiBins);
+		h_dPsi_rN.at(j) = temphist_2D;
+		h_dPsi_rN.at(j)->Sumw2();
+		wk()->addOutput (h_dPsi_rN.at(j));
+
+		temphist_2D = new TH2D(Form("h_jet_rN_cent%i",j),Form("h_jet_rN_cent%i",j),RunBinsN, RunBins, ptJetBinsN, ptJetBins);
+		h_jet_rN.at(j) = temphist_2D;
+		h_jet_rN.at(j)->Sumw2();
+		wk()->addOutput (h_jet_rN.at(j));
 
 		for (int i=0;i<ptJetBinsN;i++)
 		{
