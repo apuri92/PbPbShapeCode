@@ -271,7 +271,7 @@ void UEEstimator::initShapeUE(bool isMC, int uncert)
 	//UE with only v2 initialization
 	for (int i_dR = 0; i_dR < 13; i_dR++)
 	{
-		for (int i_dPsi = 0; i_dPsi < 1; i_dPsi++)
+		for (int i_dPsi = 0; i_dPsi < 10; i_dPsi++)
 		{
 			for (int i_pt = 0; i_pt < 7; i_pt++)
 			{

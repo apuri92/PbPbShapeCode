@@ -698,7 +698,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 					if (jetpt_bin >= 6 && jetpt_bin < 12)
 					{
-						UE_val = uee->getShapeUE(1, i_dR, 0, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
+						UE_val = uee->getShapeUE(1, i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
 					}
 
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
@@ -920,8 +920,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 				if (isFake)
 				{
 					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin && R < 0.8)
-					{
-						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(0).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
+					{						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
 					ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);
@@ -946,7 +945,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			}
 		} // end reco track loop
 
-		if (derive_UE_mode) h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(0,jet_eta,jet_phi, jet_weight);
+		if (derive_UE_mode) h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(DeltaPsi(jet_phi,uee->Psi),jet_eta,jet_phi, jet_weight);
 
 		//JES plots
 //		for (int nMultThreshold=0;nMultThreshold<trkcorr->nMultThresholds;nMultThreshold++) {h_jetpT_v_multiplicity.at(cent_bin)->Fill(jet_pt,nMultThreshold,trk_multiplicity[nMultThreshold]);}
