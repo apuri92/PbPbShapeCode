@@ -194,15 +194,15 @@ float TrackCorrector::get_effcorr(float pt, float eta, int centrality, float unc
 //	bool test = true;
 	if ((weight < 0.1 || weight>10.) || test)
 	{
-        cout << Form("Probably efficiency problem, weight: %f, eff: %f, pt: %f, eta: %f, etabin: %i, centrality: %i",
-                     weight,
-                     eff,
-                     pt,
-                     eta,
-                     etabin,
-                     centrality) << endl;
+//        cout << Form("Probably efficiency problem, weight: %f, eff: %f, pt: %f, eta: %f, etabin: %i, centrality: %i",
+//                     weight,
+//                     eff,
+//                     pt,
+//                     eta,
+//                     etabin,
+//                     centrality) << endl;
 
-		if (!test) cout << "Warning: Setting eff weight to 1" << endl;
+//		if (!test) cout << "Warning: Setting eff weight to 1" << endl;
 		if (!test) weight=1;
 	}
 	return weight;

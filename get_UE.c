@@ -11,6 +11,7 @@ void get_UE(int sys_mode = 60)
 
 	//c18 and 19 are the files that have the UE raw histos to be made into etaphi maps
 	input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+//	input_file = new TFile(Form("hist-local_mc.root", sys_path.c_str()));
 
 	TFile *output_file = new TFile(Form("./UE_MC_maps_%s.root", sys_path.c_str()), "recreate");
 
@@ -26,7 +27,7 @@ void get_UE(int sys_mode = 60)
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
-	int N_Psi = psi_binning->GetNbins();
+	int N_Psi = 1;//psi_binning->GetNbins();
 	int N_eta = eta_binning->GetNbins();
 	int N_phi = phi_binning->GetNbins();
 
@@ -64,7 +65,7 @@ void get_UE(int sys_mode = 60)
 	double normalized, normalized_err;// = orig/n_jets[i_eta][i_phi];
 
 	int empty_bins = 0, total_bins = 0;
-	for (int i_cent = 0; i_cent < 1; i_cent++)
+	for (int i_cent = 0; i_cent < 6; i_cent++)
 	{
 		for (int i_jet = jet_start; i_jet < jet_end; i_jet++)
 		{
@@ -73,7 +74,7 @@ void get_UE(int sys_mode = 60)
 			h_jet_v_Psi[i_jet][i_cent] = (TH3*)input_file->Get(name.c_str());
 
 			cout << "Done " << name << " cent: " << i_cent <<  endl;
-			for (int i_psi = 0; i_psi < 10; i_psi++)
+			for (int i_psi = 0; i_psi < N_Psi; i_psi++)
 			{
 
 				for (int i_eta = 0; i_eta < N_eta; i_eta++)
@@ -102,7 +103,6 @@ void get_UE(int sys_mode = 60)
 								if (trkpT_binning->GetBinLowEdge(i_trk+1) >= 10.) continue;
 								if (	h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1) == 0)
 								{
-									cout << h_UE_dNdEtadPhidpT[i_jet][i_psi][i_cent][i_dR]->GetBinContent(i_trk+1, i_eta+1, i_phi+1) << endl;
 									empty_bins =  empty_bins+1;
 								}
 								total_bins = total_bins+1;
@@ -155,7 +155,7 @@ void get_UE(int sys_mode = 60)
 		}
 		cout << Form("Done cent%i", i_cent) << endl;
 	}
-
+	cout << "Output: " << output_file->GetName() << endl;
 	cout << Form("empty/total = %i/%i = %1.4f", empty_bins, total_bins, double(empty_bins)/total_bins) << endl;
 
 }

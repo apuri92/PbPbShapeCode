@@ -441,7 +441,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
     if ((scheme==0) && (variable=="eta-trk"))
      {
-      printf("\n... eta-trk-binning : four simple bins ");
+      printf("\n... eta-trk-binning : ");
       num = 50;
       double value=-2.500;
       for (int i=0; i<=num; i++)
@@ -453,7 +453,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
      if ((scheme==0) && (variable=="phi-trk"))
      {
-      printf("\n... phi-trk-binning : four simple bins ");
+      printf("\n... phi-trk-binning : ");
       num = 64;
       Float_t value=-TMath::Pi(); 
       for (int i=0; i<=num; i++)
@@ -465,9 +465,9 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
      if ((scheme==0) && (variable=="eta-trk-coars"))
      {
-      printf("\n... eta-trk-binning : four simple bins ");
-      num = 21;
-      double value=-2.1;
+      printf("\n... eta-trk-binning : coarse ");
+      num = 25;
+      double value=-2.5;
       for (int i=0; i<=num; i++)
         {
          array[i] = value;
@@ -477,7 +477,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
      if ((scheme==0) && (variable=="phi-trk-coars"))
      {
-      printf("\n... phi-trk-binning : four simple bins ");
+      printf("\n... phi-trk-binning : coarse ");
       num = 32;
       Float_t value=-TMath::Pi(); 
       for (int i=0; i<=num; i++)
@@ -489,7 +489,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
      if ((scheme==0) && (variable=="eta-trk-fine"))
      {
-      printf("\n... eta-trk-binning : four simple bins ");
+      printf("\n... eta-trk-binning : fine ");
       num = 100;
       double value=-2.500;
       for (int i=0; i<=num; i++)
@@ -501,7 +501,7 @@ void MTCorrector::SetupBinning(Int_t scheme, string variable, Double_t array[100
      }
      if ((scheme==0) && (variable=="phi-trk-fine"))
      {
-      printf("\n... phi-trk-binning : four simple bins ");
+      printf("\n... phi-trk-binning : fine ");
       num = 128;
       Float_t value=-TMath::Pi(); 
       for (int i=0; i<=num; i++)

@@ -34,8 +34,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
     jetcorr->is_pp = (_dataset == 3);
 
 
-	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, dR_resBinsN, PsiBinsN, RunBinsN;
-	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], finehitsBins[1000], dR_resBins[1000], PsiBins[1000], RunBins[50];
+	int ptJetBinsN, etaJetBinsN, phiJetBinsN, ptTrkBinsN, etaTrkBinsN, phiTrkBinsN, zBinsN, zBinsFineN, d0z0BinsN, respBinsN, finehitsBinsN, dR_resBinsN, PsiBinsN, RunBinsN, etaTrkBinsWideN, phiTrkBinsWideN;
+	double ptJetBins[1000], etaJetBins[1000], phiJetBins[1000], ptTrkBins[1000], etaTrkBins[1000], phiTrkBins[1000], zBins[1000], zBinsFine[1000],d0z0Bins[1000], respBins[1000], finehitsBins[1000], dR_resBins[1000], PsiBins[1000], RunBins[50], etaTrkBinsWide[1000], phiTrkBinsWide[1000];
 
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
@@ -51,6 +51,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	SetupBinning(0, "dr_fine", dR_resBins, dR_resBinsN);
 	SetupBinning(0, "PsiBins", PsiBins, PsiBinsN);
 	SetupBinning(0, "PbPb_runs", RunBins, RunBinsN);
+	SetupBinning(0, "eta-trk-coars", etaTrkBinsWide, etaTrkBinsWideN);
+	SetupBinning(0, "phi-trk-coars", phiTrkBinsWide, phiTrkBinsWideN);
 
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
@@ -288,7 +290,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	TM_norm_jet_rN = vector<TH2D*> (_nCentbins);
 	FS_norm_jet = vector<TH1D*> (_nCentbins);
 
-	h_UE_dNdEtadPhidpT =  vector<vector<vector<vector<TH3D*>>>> (ptJetBinsN, vector<vector<vector<TH3D*>>> (PsiBinsN, vector<vector<TH3D*>> (_nCentbins, vector<TH3D*>(_ndRBins))));
+	h_UE_dNdEtadPhidpT =  vector<vector<vector<vector<TH3D*>>>> (ptJetBinsN, vector<vector<vector<TH3D*>>> (1, vector<vector<TH3D*>> (_nCentbins, vector<TH3D*>(_ndRBins))));
 	h_jet_v_Psi =  vector<vector<TH3D*>> (ptJetBinsN, vector<TH3D*>(_nCentbins));
 
 	for (int j=0;j<_nCentbins;j++)
@@ -325,7 +327,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			{
 				if (j == _nCentbins - 1) continue;
 
-				temphist_3D = new TH3D(Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),PsiBinsN,PsiBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+				temphist_3D = new TH3D(Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),Form("h_jet_v_Psi_cent%i_jetpt%i",j, i),PsiBinsN,PsiBins,etaTrkBinsWideN,etaTrkBinsWide,phiTrkBinsWideN,phiTrkBinsWide);
 				h_jet_v_Psi.at(i).at(j) = temphist_3D;
 				h_jet_v_Psi.at(i).at(j)->Sumw2();
 				wk()->addOutput (h_jet_v_Psi.at(i).at(j));
@@ -333,11 +335,11 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 				//restrict to trk < 10 GeV, jet > 100, jet < 400, cent != 6
 				if (i >= lo_jetpt_bin && i <= hi_jetpt_bin)
 				{
-					for (int m=0;m<10;m++) //psibins
+					for (int m=0;m<1;m++) //psibins
 					{
 						for (int k=0;k<11;k++) // upto r = 0.8 is 11 bins,
 						{
-							temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsN,etaTrkBins,phiTrkBinsN,phiTrkBins);
+							temphist_3D = new TH3D(Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),Form("h_UE_jetpt%i_dPsi%i_cent%i_dR%i",i,m,j,k),ptTrkBinsN, ptTrkBins,etaTrkBinsWideN,etaTrkBinsWide,phiTrkBinsWideN,phiTrkBinsWide);
 							h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k) = temphist_3D;
 							h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k)->Sumw2();
 							wk()->addOutput (h_UE_dNdEtadPhidpT.at(i).at(m).at(j).at(k));
