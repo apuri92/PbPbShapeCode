@@ -26,7 +26,7 @@ void systematics(string config_file = "sys_config.cfg")
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
-	double r_max_range = 1.2;
+	double r_max_range = 0.8;
 	if (mode == "RDpT") dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
@@ -64,33 +64,35 @@ void systematics(string config_file = "sys_config.cfg")
 	vector<string> sys_names;
 	vector<string> combined_sys_names;
 
-	sys_names.push_back("sys101"); //JER
-	sys_names.push_back("sys102"); //Sign
-	sys_names.push_back("sys103"); //Unfolding
-	sys_names.push_back("sys105"); //MCProbCut
-	sys_names.push_back("sys106"); //HIJES_1_P
-	sys_names.push_back("sys107"); //HIJES_2_P
-	sys_names.push_back("sys108"); //HIJES_1_N
-	sys_names.push_back("sys109"); //HIJES_2_N
-	sys_names.push_back("sys110"); //Material_P
-	sys_names.push_back("sys111"); //Material_N
-	sys_names.push_back("sys114"); //Tracking
-	sys_names.push_back("sys115"); //TrackingRes
-	sys_names.push_back("sys116"); //CentHIJES_P
-	sys_names.push_back("sys117"); //CentHIJES_N
-	sys_names.push_back("sys118"); //ppJES_P
-	sys_names.push_back("sys119"); //ppJES_N
-	sys_names.push_back("sys200"); //UE
-//	sys_names.push_back("sys201"); //Fakes
-	sys_names.push_back("sys202"); //MC_NonClosure
+//	sys_names.push_back("sys1"); //JER
+//	sys_names.push_back("sys2"); //Sign
+//	sys_names.push_back("sys3"); //Unfolding
+//	sys_names.push_back("sys5"); //MCProbCut
+//	sys_names.push_back("sys6"); //HIJES_1_P
+//	sys_names.push_back("sys7"); //HIJES_2_P
+//	sys_names.push_back("sys8"); //HIJES_1_N
+//	sys_names.push_back("sys9"); //HIJES_2_N
+//	sys_names.push_back("sys10"); //Material_P
+//	sys_names.push_back("sys11"); //Material_N
+//	sys_names.push_back("sys14"); //Tracking
+//	sys_names.push_back("sys15"); //TrackingRes
+//	sys_names.push_back("sys16"); //CentHIJES_P
+//	sys_names.push_back("sys17"); //CentHIJES_N
+//	sys_names.push_back("sys18"); //ppJES_P
+//	sys_names.push_back("sys19"); //ppJES_N
+	sys_names.push_back("sys20"); //UE Cone method
+//	sys_names.push_back("sys21"); //Fakes
+//	sys_names.push_back("sys22"); //MC_NonClosure
+	sys_names.push_back("sys23"); //UE_RunDep
 
 
-	combined_sys_names.push_back("JER");
-	combined_sys_names.push_back("JES");
+
+//	combined_sys_names.push_back("JER");
+//	combined_sys_names.push_back("JES");
 	combined_sys_names.push_back("UE");
-	combined_sys_names.push_back("Tracking");
-	combined_sys_names.push_back("Unfolding");
-	combined_sys_names.push_back("MCNonClosure");
+//	combined_sys_names.push_back("Tracking");
+//	combined_sys_names.push_back("Unfolding");
+//	combined_sys_names.push_back("MCNonClosure");
 
 
 	vector<vector<vector<TH1*>>> h_nom (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -176,8 +178,8 @@ void systematics(string config_file = "sys_config.cfg")
 						double tmp = h_sys[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
 						//special rules
-						//symmetrize for JER, UE
-						if (sys_names[i_sys] == "sys101" || sys_names[i_sys] == "sys200" || sys_names[i_sys] == "sys201")
+						//symmetrize for JER, fakes, UE_ConeMethod and UE_RunDep
+						if (sys_names[i_sys] == "sys1" || sys_names[i_sys] == "sys21" || sys_names[i_sys] == "sys20" || sys_names[i_sys] == "sys23" )
 						{
 							h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, fabs(tmp));
 							h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -fabs(tmp));
@@ -193,9 +195,6 @@ void systematics(string config_file = "sys_config.cfg")
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
-
-//					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_nonSmooth", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
-//					h_non_smooth->Write(name.c_str());
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_p", mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
 					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
@@ -233,11 +232,9 @@ void systematics(string config_file = "sys_config.cfg")
 
 							//each systematic is by itself
 							if (
-
-								(sys_names[i_sys] == "sys101" && combined_sys_names[i_comb_sys] == "JER") ||
-								(sys_names[i_sys] == "sys103" && combined_sys_names[i_comb_sys] == "Unfolding") ||
-								(sys_names[i_sys] == "sys200" && combined_sys_names[i_comb_sys] == "UE") ||
-								(sys_names[i_sys] == "sys202" && combined_sys_names[i_comb_sys] == "MCNonClosure")
+								(sys_names[i_sys] == "sys1" && combined_sys_names[i_comb_sys] == "JER") ||
+								(sys_names[i_sys] == "sys3" && combined_sys_names[i_comb_sys] == "Unfolding") ||
+								(sys_names[i_sys] == "sys22" && combined_sys_names[i_comb_sys] == "MCNonClosure")
 								)
 							{
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
@@ -254,54 +251,49 @@ void systematics(string config_file = "sys_config.cfg")
 							if (
 
 								(
-								 (sys_names[i_sys] == "sys106" ||
-								  sys_names[i_sys] == "sys107" ||
-								  sys_names[i_sys] == "sys108" ||
-								  sys_names[i_sys] == "sys109" ||
-								  sys_names[i_sys] == "sys116" ||
-								  sys_names[i_sys] == "sys117" ||
-								  sys_names[i_sys] == "sys118" ||
-								  sys_names[i_sys] == "sys119" ) &&
+								 (sys_names[i_sys] == "sys6" ||
+								  sys_names[i_sys] == "sys7" ||
+								  sys_names[i_sys] == "sys8" ||
+								  sys_names[i_sys] == "sys9" ||
+								  sys_names[i_sys] == "sys16" ||
+								  sys_names[i_sys] == "sys17" ||
+								  sys_names[i_sys] == "sys18" ||
+								  sys_names[i_sys] == "sys19" ) &&
 								 combined_sys_names[i_comb_sys] == "JES"
 								 )
 
 								||
 
 								(
-								 (sys_names[i_sys] == "sys102" ||
-								  sys_names[i_sys] == "sys105" ||
-								  sys_names[i_sys] == "sys110" ||
-								  sys_names[i_sys] == "sys111" ||
-								  sys_names[i_sys] == "sys114" ||
-								  sys_names[i_sys] == "sys115" ||
-								  sys_names[i_sys] == "sys201" ) &&
+								 (sys_names[i_sys] == "sys2" ||
+								  sys_names[i_sys] == "sys5" ||
+								  sys_names[i_sys] == "sys10" ||
+								  sys_names[i_sys] == "sys11" ||
+								  sys_names[i_sys] == "sys14" ||
+								  sys_names[i_sys] == "sys15" ||
+								  sys_names[i_sys] == "sys21" ) &&
 								 combined_sys_names[i_comb_sys] == "Tracking"
 								 )
 
+								||
+
+								(
+								 (sys_names[i_sys] == "sys20" ||
+								  sys_names[i_sys] == "sys23" ) &&
+								 combined_sys_names[i_comb_sys] == "UE"
+								 )
 								)
 							{
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
 //								cout << Form("%s --> %s", sys_names[i_sys].c_str(), combined_sys_names[i_comb_sys].c_str()) << endl;
 
-								if (sys_names[i_sys] == "sys106" ||
-									sys_names[i_sys] == "sys102")
-								{
-									tmp = pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+								tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+								tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
 
-									tmp = pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
-								}
-								else
-								{
-									tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
-
-									tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									tmp = tmp + pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
-									h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
-								}
+								tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+								tmp = tmp + pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
 
 							}
 
@@ -492,6 +484,9 @@ void systematics(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 					c_sys->cd(i_cent+1);
+					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
+					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
+
 					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
 					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
 				}

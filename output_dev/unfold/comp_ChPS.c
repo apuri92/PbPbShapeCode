@@ -27,7 +27,8 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("_nominal");
-	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("_c%i", sys_mode);
+	else sys_path = Form("_sys%i", sys_mode);
+//	if (sys_mode > 0 && sys_mode < 100)
 	if (sys_mode > 100) sys_path = Form("_sys%i", sys_mode);
 
 	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";

@@ -18,8 +18,9 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
-	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
+	else sys_path = Form("sys%i", sys_mode);
+//	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
+//	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
 	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	cout << "Using file:" << endl;

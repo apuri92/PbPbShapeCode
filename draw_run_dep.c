@@ -5,7 +5,7 @@ void draw_run_dep()
 	gErrorIgnoreLevel = 3001;
 
 	TFile *f_nominal = new TFile("UE_c67.root");
-	TFile *f_UE_sys = new TFile("UE_sys.root","recreate");
+	TFile *f_UE_sys = new TFile("UE_RunDependentSys.root","recreate");
 
 	vector<TFile*> f_run_UE;
 
@@ -18,7 +18,7 @@ void draw_run_dep()
 	vector<TH1*> h_run_UE = vector<TH1*> (f_run_UE.size());
 
 	string name;
-	TCanvas *c = new TCanvas("c","c",800,600);
+	TCanvas *c = new TCanvas("c","c",900,600);
 
 	TLegend *legend_MB = new TLegend(0.19, 0.70, 0.40, 0.82, "","brNDC");
 	legend_MB->SetTextFont(43);
@@ -26,9 +26,12 @@ void draw_run_dep()
 	legend_MB->SetTextSize(10);
 	TLine *line = new TLine();
 
-	for (int i_jet = 7; i_jet < 11; i_jet++)
+	//i_jet is the vector index, corresponds to bin = i_jet+1, i_jet = 6 -> Bin 7 for 100-126, i_jet = 11 -> bin 12 for 316 - 398
+	for (int i_jet = 6; i_jet < 12; i_jet++)
 	{
-		for (int i_trk = 2; i_trk < 7; i_trk++)
+
+		//i_trk is the vector index, corresponds to bin = i_trk+1, i_trk = 1 -> Bin 2 for 0.9-1, i_trk = 6 -> bin 7 for 6.3 - 10
+		for (int i_trk = 1; i_trk < 7; i_trk++)
 		{
 			c->cd();
 			c->Clear();
@@ -65,17 +68,14 @@ void draw_run_dep()
 
 				for (int i_dR = 1; i_dR <= h_systematic->GetXaxis()->GetNbins() ; i_dR++)
 				{
-					double max_delta = -999;
+					double max = 0;
 					for (int i_run = 0; i_run < f_run_UE.size(); i_run++)
 					{
-						double delta = abs(h_run_UE[i_run]->GetBinContent(i_dR)-h_nominal->GetBinContent(i_dR))  ;
-						if (delta > max_delta)
-						{
-							max_delta = delta;
-
-						}
+						//max delta % = (max deviation from nominal/ nominal, do 1+maxDelta% or 1-maxDelta%
+						double delta = abs(h_run_UE[i_run]->GetBinContent(i_dR) - h_nominal->GetBinContent(i_dR)) / h_nominal->GetBinContent(i_dR);
+						if (delta > max) max = delta;
 					}
-					h_systematic->SetBinContent(i_dR, max_delta);
+					h_systematic->SetBinContent(i_dR, 1+max);
 				}
 
 
@@ -93,31 +93,33 @@ void draw_run_dep()
 
 
 				//Drawing
-				double min = 0.5;
-				double max = 1.5;
+				double min = 0.95;//h_nominal->GetBinContent(7) * 0.6;// 0.5;
+				double max = 1.05;//h_nominal->GetBinContent(1) * 1.4;// 0.5;
+//				double min = h_nominal->GetBinContent(7) * 0.6;// 0.5;
+//				double max = h_nominal->GetBinContent(1) * 1.4;// 0.5;
 
 				if (i_cent == 0 && i_trk == 2 && i_jet == 7)
 				{
-					legend_MB->AddEntry(h_nominal,"Nominal", "lp");
-					legend_MB->AddEntry(h_combined,"Combined", "lp");
+//					legend_MB->AddEntry(h_nominal,"Nominal", "lp");
+//					legend_MB->AddEntry(h_combined,"Combined", "lp");
 
 					for (int i_run = 0; i_run < f_run_UE.size(); i_run++) legend_MB->AddEntry(h_run_UE[i_run],f_run_UE[i_run]->GetName(), "lp");
 				}
 				c->cd(i_cent+1);
-				h_combined->GetXaxis()->SetRangeUser(0, r_max_range);
-				h_combined->GetYaxis()->SetRangeUser(min, max);
+				h_nominal->GetXaxis()->SetRangeUser(0, r_max_range);
+				h_nominal->GetYaxis()->SetRangeUser(min, max);
 				SetHStyle_smallify(h_nominal,1,1);
 				SetHStyle_smallify(h_combined,0,1);
 
-//				h_nominal->DrawCopy("");
+				h_nominal->DrawCopy("");
 				for (int i_run = 0; i_run < f_run_UE.size(); i_run++)
 				{
 					SetHStyle_smallify(h_run_UE[i_run],i_run+2,1);
 					h_run_UE[i_run]->Divide(h_nominal);
-//					h_run_UE[i_run]->DrawCopy("same");
+					h_run_UE[i_run]->DrawCopy("same");
 				}
-				h_combined->Divide(h_nominal);
-				h_combined->Draw("same hist text");
+//				h_combined->Divide(h_nominal);
+//				h_combined->Draw("same hist text");
 
 				line->DrawLine(0,1,0.8,1);
 

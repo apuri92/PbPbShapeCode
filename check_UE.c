@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void check_UE(int sys_mode = 50, bool subtract = 0)
+void check_UE(int sys_mode = 47, bool subtract = 0)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -205,9 +205,11 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 		{
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			h_MB_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
+			h_MB_2D[i_dR][i_cent]->SetName(Form("ChPS_MB_MC_data_UE_dR%i_cent%i", i_dR, i_cent));
 
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
-			h_MB_data_2D[i_dR][i_cent] = (TH2*)(TH2*)input_file_data->Get(name.c_str())->Clone(Form("ChPS_MB_data_UE_dR%i_cent%i", i_dR, i_cent));
+			h_MB_data_2D[i_dR][i_cent] = (TH2*)(TH2*)input_file_data->Get(name.c_str());
+			h_MB_data_2D[i_dR][i_cent]->SetName(Form("ChPS_MB_data_data_UE_dR%i_cent%i", i_dR, i_cent));
 
 			name = Form("ChPS_cone_UE_dR%i_cent%i", i_dR, i_cent);
 			h_cone_2D[i_dR][i_cent] = (TH2*)input_file->Get(name.c_str());
@@ -607,13 +609,10 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 			for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
 			{
 				name = Form("h_ChPS_UE_cone_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-//				TH1* h_tmp = (TH1*)h_cone_data_2D[i_dR][i_cent]->ProjectionX(name.c_str(), i_jet+1, i_jet+1);
 				h_cone_data_1D[i_jet][i_dR][i_cent]->Write(name.c_str());
 
 				name = Form("h_ChPS_UE_MB_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
-//				TH1* h_tmp2 = (TH1*)h_MB_data_2D[i_dR][i_cent]->ProjectionX(name.c_str(), i_jet+1, i_jet+1);
 				h_MB_data_1D[i_jet][i_dR][i_cent]->Write(name.c_str());
-
 			}
 
 		}
@@ -732,10 +731,10 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
-						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MC","lp");
+//						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MC","lp");
 						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MC_{data}","lp");
-						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
-						legend_x->AddEntry(h_cone_r_1D[i_jet][i_trk][i_cent],"cone","lp");
+//						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
+//						legend_x->AddEntry(h_cone_r_1D[i_jet][i_trk][i_cent],"cone","lp");
 						legend_x->AddEntry(h_cone_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}","lp");
 						legend_y->AddEntry(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}/MC_{data}","lp");
 //						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
@@ -747,7 +746,7 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 					hi_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMaximum() * 1.4;
 
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
 					if (i_cent == 0) {low_range = 30; hi_range = 100;}
 					if (i_cent == 1) {low_range = 20; hi_range = 60;}
@@ -795,9 +794,9 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 					gPad->SetRightMargin(0);
 
 //					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0,100);
-					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
-					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist same ");
-					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist same");
+//					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist same ");
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("");
 //					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_cone_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -815,8 +814,8 @@ void check_UE(int sys_mode = 50, bool subtract = 0)
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x - MB");
 					else  h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x / MC");
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist text");
-					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same hist text");
-//					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist same text");
+//					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same hist text");
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist same text");
 //					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetMarkerSize(5);
 //					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist");
 //					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");

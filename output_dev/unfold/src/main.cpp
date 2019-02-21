@@ -44,22 +44,20 @@ int main(int argc, char ** argv)
 	std::string did = "data";
 	if (isMC) did = "MC";
 
-	int apply_UE_uncert = 0;
-	if (sys_mode == 200 && dataset_type == "PbPb") apply_UE_uncert = 1;
-
 	int apply_fake_uncert = 0;
-	if (sys_mode == 201) apply_fake_uncert = 1;
+	if (sys_mode == 21) apply_fake_uncert = 1;
 
 	int apply_MC_nonClos = 0;
-	if (sys_mode == 202) apply_MC_nonClos = 1;
+	if (sys_mode == 22) apply_MC_nonClos = 1;
 
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
-	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
+	else sys_path = Form("sys%i", sys_mode);
+//	if (sys_mode > 0 && sys_mode < 100)
+//	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
 	TFile *f_data = new TFile(Form("../raw_results/%s/FF_%s_out_histo_%s_5p02_r001.root",sys_path.c_str(), did.c_str(), dataset_type.c_str()));
@@ -70,8 +68,7 @@ int main(int argc, char ** argv)
 
 	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
 	TFile *dr_factors = new TFile(Form("output_pdf%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
-	TFile *UE_factors = new TFile(Form("output_pdf%s/root/UE_factors.root", sys_path.c_str()));
-	TFile *UE_uncert = new TFile(Form("UE_uncert.root"));
+	TFile *UE_uncert = new TFile(Form("../../UE_RunDependentSys.root"));
 	TFile *f_output = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
 	int N_Y = 5;
@@ -94,7 +91,7 @@ int main(int argc, char ** argv)
 
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
-		cout << Form("Done cent%i", i_cent) << endl;
+		cout << Form("Starting cent%i...", i_cent) << endl;
 
 		TH1 *h_reco_jet, *h_truth_jet, *h_reco_unfolded;
 		if (dataset_type == "PbPb" && i_cent == 6) continue;
@@ -185,14 +182,20 @@ int main(int argc, char ** argv)
 
 			//setup UE/fakes
 			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_MB_UE_dR%i_cent%i",i_dR, i_cent));;
-			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
+//			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
-			TH1* h_UE_uncert;
-			TH2* h_UE_cone;
+			TH2* h_UE_corrected_cone;
 			if (dataset_type == "PbPb")
 			{
-				h_UE_cone = (TH2*)f_data->Get(Form("ChPS_cone_UE_dR%i_cent%i",i_dR, i_cent));;
-				h_UE_uncert = (TH1*)((TH1*)UE_uncert->Get(Form("UE_uncert_4_cent%i", i_cent)))->Clone(Form("UE_uncert_4_cent%i_dR%i", i_cent, i_dR));
+				TH2* h_UE_cone_MC = (TH2*)f_mc->Get(Form("ChPS_cone_UE_dR%i_cent%i",i_dR, i_cent));;
+				h_UE_cone_MC->SetName((Form("ChPS_cone_UE_MC_dR%i_cent%i",i_dR, i_cent)));
+
+				TH2* h_UE_cone_data = (TH2*)f_data->Get(Form("ChPS_cone_UE_dR%i_cent%i",i_dR, i_cent));;
+				h_UE_cone_data->SetName(Form("ChPS_cone_UE_data_dR%i_cent%i",i_dR, i_cent));
+
+				h_UE_corrected_cone = (TH2*)h_UE_cone_data->Clone(Form("ChPS_cone_UE_data_corrected_dR%i_cent%i",i_dR, i_cent));
+				h_UE_corrected_cone->Multiply(h_UE_TM);
+				h_UE_corrected_cone->Divide(h_UE_cone_MC);
 			}
 
 			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
@@ -203,10 +206,8 @@ int main(int argc, char ** argv)
 			h_final_fake->Reset();
 			h_final_fake->Sumw2();
 
-			TH2* h_UE_corr_factors;
-			h_UE_corr_factors = (TH2*)UE_factors->Get(Form("UE_ratio_dR%i_cent%i",i_dR, i_cent));;
 
-			double n_jets_data = 1, n_jets_mc = 1, n_jets_cone = 1;
+			double n_jets_data = 1, n_jets_mc = 1;
 
 			TH1* h_reco_jet_spect_mc = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
 			h_reco_jet_spect_mc->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
@@ -228,13 +229,15 @@ int main(int argc, char ** argv)
 			h_raw_subtr->Reset();
 			h_raw_subtr->Sumw2();
 
+			//USING i_jet_bin AS BIN NUMBER
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 			{
+				if (i_jet_bin < h_reco_jet_spect_mc->FindBin(100) || i_jet_bin > h_reco_jet_spect_mc->FindBin(390)) continue;
 				n_jets_mc = h_reco_jet_spect_mc->GetBinContent(i_jet_bin);
 				n_jets_data = h_reco_jet_spect_data->GetBinContent(i_jet_bin);
-				if (dataset_type == "PbPb") n_jets_cone = h_cone_jet_spectra->GetBinContent(i_jet_bin);
+				//cone method uses same number of jets as n_jets_data
 
-				if (n_jets_mc == 0 || n_jets_cone == 0) continue;
+				if (n_jets_mc == 0) continue;
 
 
 				//if pp. Subtract only fakes (UE_TM|MC) for all pT. Need to normalize n_jets_data / n_jets_mc. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
@@ -242,6 +245,7 @@ int main(int argc, char ** argv)
 				//	if < 10 GeV: Subtract (UE_MB|data). No Need to normalize n_jets_w / n_jets_unw.
 				//	if >= 10 GeV: Subtract (UE_TM|MC). Need to normalize n_jets_data / n_jets_mv. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
 
+				//USING i_trk_bin AS BIN NUMBER
 				for (int i_trk_bin = 1; i_trk_bin <= N_trkpt; i_trk_bin++)
 				{
 
@@ -290,33 +294,32 @@ int main(int argc, char ** argv)
 							fake = 0;
 							fake_err = 0;
 
-							//usign mc maps, no correction required
-//							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
-//							UE_err = h_UE_MB_err->GetBinContent(i_trk_bin, i_jet_bin);
-//							correction = 1; //not needed because using MC maps
-//							correction_err = 0;
+							//using mc maps, no correction required
+							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
+							UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
+							correction = 1;
 
-							//using cone method
-							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);
-							UE_err = h_UE_cone->GetBinError(i_trk_bin, i_jet_bin);
-							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin); //only correct for UE JER correlation, cones method is being used in data so #jets is correct
-							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin); //no error on number of jets, errors have been properly calculated in UE_factors.c, scale errors by factor
+							//run systematic:
+							if (sys_mode == 20)
+							{
+								UE = h_UE_corrected_cone->GetBinContent(i_trk_bin, i_jet_bin);
+								UE_err = h_UE_corrected_cone->GetBinError(i_trk_bin, i_jet_bin); //corrected for UE-JER above
+							}
+							if (sys_mode == 23)
+							{
+								correction = ((TH1*)UE_uncert->Get(Form("UE_MB_data_indR_jet%i_trk%i_cent%i_SYS", i_jet_bin-1, i_trk_bin-1, i_cent)))->GetBinContent(i_dR+1);
+								UE = UE*correction;
+								UE_err = UE_err*correction;
+							}
 
-//							//use for systematics
-//							UE = h_UE_cone->GetBinContent(i_trk_bin, i_jet_bin);
-//							UE_err = h_UE_cone->GetBinError(i_trk_bin, i_jet_bin);
-//							correction = h_UE_corr_factors->GetBinContent(i_trk_bin, i_jet_bin) *  n_jets_data / n_jets_cone; //correct number of jets
-//							correction_err = h_UE_corr_factors->GetBinError(i_trk_bin, i_jet_bin);
-//
 
 							raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
 							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 
-							final_UE = UE * correction; //reduces to TM method for MC
-							if (apply_UE_uncert && !isMC) final_UE = final_UE / h_UE_uncert->GetBinContent(i_trk_bin);
+							final_UE = UE; //reduces to TM method for MC
 
 							if (isMC) final_UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin); //use errors from TM method
-							else final_UE_err = sqrt(pow(UE_err,2) + pow(correction_err,2)); //uncorrelated errors
+							else final_UE_err = UE_err; //handled internally or by scaling factor for sys mode 23
 
 							subtr = raw - final_UE;
 							if (isMC) subtr_err = sqrt( fabs( pow(raw_err,2) - pow(final_UE_err,2) ) ); //errors fully correlated
@@ -347,7 +350,7 @@ int main(int argc, char ** argv)
 					}
 
 
-					if (verbose && subtr < 0 && (i_jet_bin >= 9 && i_jet_bin <= 12) && (i_trk_bin >=4 && i_trk_bin <= 11))
+					if (verbose && subtr < 0 && (i_jet_bin >= 7 && i_jet_bin <= 12) && (i_trk_bin >=2 && i_trk_bin <= 10))
 					{
 						std::string trk_label = Form("%1.1f < trk < %1.1f", trkpT_binning->GetBinLowEdge(i_trk_bin), trkpT_binning->GetBinUpEdge(i_trk_bin));
 						std::string jet_label = Form("%1.0f < jet < %1.0f", jetpT_binning->GetBinLowEdge(i_jet_bin), jetpT_binning->GetBinUpEdge(i_jet_bin));
@@ -435,48 +438,65 @@ int main(int argc, char ** argv)
 				double n_jets_unf = h_reco_unfolded->GetBinContent(i_jet_bin+1);
 				double n_jets_tru = h_truth_jet->GetBinContent(i_jet_bin+1);
 
-				if (n_jets_raw == 0 || n_jets_unf == 0 ||
-					n_jets_tru == 0) continue;
-
 				for (int i_trk_bin = 0; i_trk_bin < N_trkpt; i_trk_bin++)
 				{
+					double updated_raw = 0, updated_raw_err = 0, updated_raw_subtr = 0, updated_raw_subtr_err = 0, updated_UE = 0, updated_UE_err = 0, updated_fake = 0, updated_fake_err = 0;
+					double updated_raw_subtr_unf = 0, updated_raw_subtr_unf_err = 0, updated_raw_subtr_unf_bbb = 0, updated_raw_subtr_unf_bbb_err = 0;
+					double updated_truth = 0, updated_truth_err = 0;
 
-					//ChPS_raw
-					double updated_raw = h_raw->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_raw_subtr = h_raw_subtr->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_raw_subtr_unf = h_raw_subtr_unf->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
-					double updated_raw_subtr_unf_bbb = h_raw_subtr_unf_bbb->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
+					if (n_jets_raw != 0)
+					{
+						updated_raw = h_raw->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_raw_err = h_raw->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_raw_subtr = h_raw_subtr->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_raw_subtr_err = h_raw_subtr->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_UE = h_final_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_UE_err = h_final_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_fake = h_final_fake->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+						updated_fake_err = h_final_fake->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
+					}
 
-					double updated_raw_err = h_raw->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_raw_subtr_err = h_raw_subtr->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_raw_subtr_unf_err = h_raw_subtr_unf->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
-					double updated_raw_subtr_unf_bbb_err = h_raw_subtr_unf_bbb->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
-
+					//ChPS_final - norm by raw
 					h_raw->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw);
-					h_raw_subtr->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr);
-					h_raw_subtr_unf->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf);
-					h_raw_subtr_unf_bbb->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_bbb);
-
 					h_raw->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_err);
+
+					//ChPS_subtr - norm by raw
+					h_raw_subtr->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr);
 					h_raw_subtr->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_err);
-					h_raw_subtr_unf->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_err);
-					h_raw_subtr_unf_bbb->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_bbb_err);
 
 					//UE
-					double updated_UE = h_final_UE->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_UE_err = h_final_UE->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
 					h_final_UE->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_UE);
 					h_final_UE->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_UE_err);
 
 					//Fakes
-					double updated_fake = h_final_fake->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
-					double updated_fake_err = h_final_fake->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_raw;
 					h_final_fake->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_fake);
 					h_final_fake->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_fake_err);
 
+
+					if (n_jets_unf != 0)
+					{
+						updated_raw_subtr_unf = h_raw_subtr_unf->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
+						updated_raw_subtr_unf_err = h_raw_subtr_unf->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
+						updated_raw_subtr_unf_bbb = h_raw_subtr_unf_bbb->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
+						updated_raw_subtr_unf_bbb_err = h_raw_subtr_unf_bbb->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_unf;
+					}
+
+					//ChPS_unf - norm by unfolded
+					h_raw_subtr_unf->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf);
+					h_raw_subtr_unf->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_err);
+
+					//ChPS_final - norm by unfolded
+					h_raw_subtr_unf_bbb->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_bbb);
+					h_raw_subtr_unf_bbb->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_raw_subtr_unf_bbb_err);
+
+
+					if (n_jets_tru != 0)
+					{
+						updated_truth = h_truth->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
+						updated_truth_err = h_truth->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
+					}
+
 					//ChPS_truth
-					double updated_truth = h_truth->GetBinContent(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
-					double updated_truth_err = h_truth->GetBinError(i_trk_bin+1,i_jet_bin+1) / n_jets_tru;
 					h_truth->SetBinContent(i_trk_bin+1,i_jet_bin+1, updated_truth);
 					h_truth->SetBinError(i_trk_bin+1,i_jet_bin+1, updated_truth_err);
 				}

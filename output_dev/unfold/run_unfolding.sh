@@ -1,5 +1,5 @@
 	
-systematics=(36) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
+systematics=(20) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
 
 
 function unfold_draw_DpT {
@@ -12,7 +12,7 @@ function unfold_draw_DpT {
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
 		root -b -q "get_posCorr.c(\"unfold_draw_DpT_auto.cfg\")"
-		root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")"
+		# root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")"
 		./analysis unfold_draw_DpT_auto.cfg
 	fi
 
@@ -41,11 +41,11 @@ for i in ${systematics[@]}; do
 	echo "************************************"
 
 
-	if [[ $i -gt 100 ]]; then
-		sys_path="sys"
-	elif [[ $i -lt 100 ]]; then
-			sys_path="c"
-	fi
+	# if [[ $i -gt 100 ]]; then
+	sys_path="sys"
+	# elif [[ $i -lt 100 ]]; then
+			# sys_path="c"
+	# fi
 
 	mkdir -p output_pdf_$sys_path$i/root
 	mkdir -p output_pdf_$sys_path$i/PbPb
@@ -54,9 +54,9 @@ for i in ${systematics[@]}; do
 
 	unfold_draw_DpT PbPb 0 $i
 	# unfold_draw_DpT pp 0 $i
-	# get_RDpT 0 $i
+	get_RDpT 0 $i
 
-	unfold_draw_DpT PbPb 1 $i
+	# unfold_draw_DpT PbPb 1 $i
 	# unfold_draw_DpT pp 1 $i
 	# get_RDpT 1 $i
 done
