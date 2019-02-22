@@ -28,7 +28,7 @@ class JetCorrector
 	vector<double> range_lo;
 	vector<double> range_hi;
 	vector<int> centiles;
-	
+
 	TFile * _f_JER;
     TH1F* _h_JER[8][8];
     Int_t _nEta_JER;
@@ -37,7 +37,11 @@ class JetCorrector
     
     TFile * _f_reweighting;
     TAxis * jet_pt_binning;
+	TAxis * trk_pt_binning;
     TF1 *jet_spectra_weight[8][8];
+	TH1 *shape_JetSpectra_weights[7];
+	TH1 *shape_ChPSSpectra_weights[13][7][16];
+
 	TH1D *FF_weight[8][8][20];
 	TH1D *CHPS_weight[8][8][20];
 	TH1D *FF_weight_fine[8][8][20];
@@ -55,13 +59,14 @@ class JetCorrector
 	std::string _centrality_weight_file;
 	std:: string _HP_v_MB_FCAl_weight_file;
 	std:: string _eta_weight_file;
+	std:: string _ReweighingFile;
 
 	float min_jet_pt;
 	float max_jet_pt;
 	bool m_isMB;
 	bool is_pp;
 
-    JetCorrector() 
+    JetCorrector(int isPbPb = 0, int ff_shape_mode = 0)
      {
 
          m_isMB = false;
@@ -81,26 +86,54 @@ class JetCorrector
 		 }
          
          //Reweighting
-         _nCent_reweighting = 7;			// number of centrality bins      
-		 _f_reweighting = new TFile(xfn + "/../pPbFragmentation/data/spectra_weights_PbPb.root","read");
-		 jet_pt_binning = (TAxis*) ((TH1F*)_f_reweighting->Get("h_reco_jet_spectrum_4_cent0_system_0_PbPb"))->GetXaxis(); 
-		 		 
-		 //Now inclusive in eta 
-		 //for(int etabin=0;etabin<nJetYBins;etabin++){
-		 int etabin=4;
-			for(int j=0;j<_nCent_reweighting;j++){
-				//Spectra weights
-				jet_spectra_weight[etabin][j]=(TF1*)_f_reweighting->Get(Form("jet_spectra_weight_%i_cent%i_PbPb",etabin,j));
-				for(int k=1;k<=jet_pt_binning->GetNbins();k++){
-					//FF weights
-					FF_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
-					CHPS_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
-					FF_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
-					CHPS_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
-				}
-			}				
-		 //}
-         
+         _nCent_reweighting = 7;			// number of centrality bins
+		 _ReweighingFile = "spectra_weights_PbPb.root";
+		 if (ff_shape_mode) _ReweighingFile = "shape_spectra_weights.root";
+		 TString reweighing = xfn + "/../pPbFragmentation/data/"+ _ReweighingFile;
+		 _f_reweighting = new TFile(reweighing.Data(),"read");
+
+		 if (ff_shape_mode)
+		 {
+			 std::string data_type = "pp";
+			 if (isPbPb) data_type = "PbPb";
+			 jet_pt_binning = (TAxis*) ((TH1*)_f_reweighting->Get("jet_weight_PbPb_y4_c0"))->GetXaxis();
+			 trk_pt_binning = (TAxis*) ((TH1*)_f_reweighting->Get("CHPS_weight_PbPb_dR0_cent0_jet7"))->GetXaxis();
+			 for (int i_cent = 0; i_cent < 7; i_cent++)
+			 {
+				 if (!isPbPb && i_cent != 6) continue;
+				 if (isPbPb && i_cent == 6) continue;
+
+				 shape_JetSpectra_weights[i_cent] = (TH1*)_f_reweighting->Get(Form("jet_weight_%s_y4_c%i",data_type.c_str(), i_cent));
+				 for (int i_dR = 0 ; i_dR < 13; i_dR++)
+				 {
+					 for (int i_jet = 0; i_jet < jet_pt_binning->GetNbins(); i_jet++)
+					 {
+						 shape_ChPSSpectra_weights[i_dR][i_cent][i_jet] = (TH1*)_f_reweighting->Get(Form("CHPS_weight_%s_dR%i_cent%i_jet%i", data_type.c_str(), i_dR, i_cent, i_jet));
+					 }
+				 }
+
+			 }
+		 }
+		 else
+		 {
+			 jet_pt_binning = (TAxis*) ((TH1F*)_f_reweighting->Get("h_reco_jet_spectrum_4_cent0_system_0_PbPb"))->GetXaxis();
+
+			 //Now inclusive in eta
+			 //for(int etabin=0;etabin<nJetYBins;etabin++){
+			 int etabin=4;
+			 for(int j=0;j<_nCent_reweighting;j++){
+				 //Spectra weights
+				 jet_spectra_weight[etabin][j]=(TF1*)_f_reweighting->Get(Form("jet_spectra_weight_%i_cent%i_PbPb",etabin,j));
+				 for(int k=1;k<=jet_pt_binning->GetNbins();k++){
+					 //FF weights
+					 FF_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+					 CHPS_weight[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+					 FF_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("ff_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+					 CHPS_weight_fine[etabin][j][k] = (TH1D*)_f_reweighting->Get(Form("CHPS_weight_fine_%i_cent%i_system_0_PbPb_jet_pt%i",etabin,j,k));
+				 }
+			 }
+		 }
+
          //Event weights
          _HP_v_MB_FCAl_weight_file="fcal_weights.root";
          _weight_file="Powheg.reweight.root";
@@ -162,8 +195,10 @@ class JetCorrector
 	bool MCJetJERClean(float truth_jet_pt,float reco_jet_pt, float truth_jet_eta, int cent);
 	float GetJER(float truth_jet_pt, float truth_jet_eta, int cent);
 	float GetJetReweightingFactor(double pt, double eta, int cent);
+	float GetJetReweightingFactor(double pt, int cent);
 	float GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine);
 	float GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent, bool isFine);
+	float GetCHPSReweightingFactor(double pt, double jet_pt, int dR_bin, int cent);
 	float GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent);
     ~JetCorrector() {}
 };

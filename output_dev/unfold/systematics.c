@@ -445,8 +445,8 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(1);
 
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
@@ -456,6 +456,9 @@ void systematics(string config_file = "sys_config.cfg")
 
 
 				c_sys->cd(i_cent+1);
+//				double max = h_total_sys_p[i_trk][i_cent][i_jet]->GetMaximum() * 1.2;
+//				cout << max << endl;
+//				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-max, max);
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
 				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l same");
 

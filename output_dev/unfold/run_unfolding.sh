@@ -1,5 +1,5 @@
 	
-systematics=(20) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
+systematics=(73) # (0 101 102 105 106 107 108 109 110 111 114 115 116 117 118 119 200 201 202)
 
 
 function unfold_draw_DpT {
@@ -40,12 +40,10 @@ for i in ${systematics[@]}; do
 	echo "****** Running Version $i *******"
 	echo "************************************"
 
-
-	# if [[ $i -gt 100 ]]; then
-	sys_path="sys"
-	# elif [[ $i -lt 100 ]]; then
-			# sys_path="c"
-	# fi
+	sys_path="c"
+	if [[ $i -lt 24 ]]; then
+		sys_path="sys"
+	fi
 
 	mkdir -p output_pdf_$sys_path$i/root
 	mkdir -p output_pdf_$sys_path$i/PbPb
@@ -53,12 +51,12 @@ for i in ${systematics[@]}; do
 
 
 	unfold_draw_DpT PbPb 0 $i
-	# unfold_draw_DpT pp 0 $i
+	unfold_draw_DpT pp 0 $i
 	get_RDpT 0 $i
 
-	# unfold_draw_DpT PbPb 1 $i
-	# unfold_draw_DpT pp 1 $i
-	# get_RDpT 1 $i
+	unfold_draw_DpT PbPb 1 $i
+	unfold_draw_DpT pp 1 $i
+	get_RDpT 1 $i
 done
 
 

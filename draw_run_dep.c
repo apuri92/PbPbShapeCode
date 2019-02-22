@@ -2,8 +2,10 @@
 
 void draw_run_dep()
 {
+	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
+	TFile *f_nominal_full = new TFile("UE_c47.root");
 	TFile *f_nominal = new TFile("UE_c67.root");
 	TFile *f_UE_sys = new TFile("UE_RunDependentSys.root","recreate");
 
@@ -19,12 +21,19 @@ void draw_run_dep()
 
 	string name;
 	TCanvas *c = new TCanvas("c","c",900,600);
+	TCanvas *c1 = new TCanvas("c1","c1",900,600);
+	TCanvas *c2 = new TCanvas("c2","c2",900,600);
 
 	TLegend *legend_MB = new TLegend(0.19, 0.70, 0.40, 0.82, "","brNDC");
 	legend_MB->SetTextFont(43);
 	legend_MB->SetBorderSize(0);
 	legend_MB->SetTextSize(10);
 	TLine *line = new TLine();
+
+	std::map<std::string, std::string> m;
+	m["UE_c68.root"] = "Period I";
+	m["UE_c69.root"] = "Period II";
+	m["UE_c70.root"] = "Period III";
 
 	//i_jet is the vector index, corresponds to bin = i_jet+1, i_jet = 6 -> Bin 7 for 100-126, i_jet = 11 -> bin 12 for 316 - 398
 	for (int i_jet = 6; i_jet < 12; i_jet++)
@@ -36,6 +45,14 @@ void draw_run_dep()
 			c->cd();
 			c->Clear();
 			c->Divide(3,2);
+
+			c1->cd();
+			c1->Clear();
+			c1->Divide(3,2);
+
+			c2->cd();
+			c2->Clear();
+			c2->Divide(3,2);
 
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
@@ -66,17 +83,50 @@ void draw_run_dep()
 				}
 				h_combined->Scale(1./total);
 
+				TH1* h_nominal_full = (TH1*)f_nominal_full->Get(which_UE.c_str());
+				h_nominal_full->SetTitle("UE_{All Runs (Full map)}");
+				h_nominal->SetTitle("UE_{All Runs (Reduced map)}");
+				TH1* h_up = (TH1*)h_nominal_full->Clone("h_up");
+				h_up->SetTitle("UE_{Shifted Up}");
+				TH1* h_down = (TH1*)h_nominal_full->Clone("h_down");
+				h_down->SetTitle("UE_{Shifted Down}");
+
 				for (int i_dR = 1; i_dR <= h_systematic->GetXaxis()->GetNbins() ; i_dR++)
 				{
-					double max = 0;
+					double max = 0, delta = 0;
 					for (int i_run = 0; i_run < f_run_UE.size(); i_run++)
 					{
 						//max delta % = (max deviation from nominal/ nominal, do 1+maxDelta% or 1-maxDelta%
-						double delta = abs(h_run_UE[i_run]->GetBinContent(i_dR) - h_nominal->GetBinContent(i_dR)) / h_nominal->GetBinContent(i_dR);
+						delta = abs(h_run_UE[i_run]->GetBinContent(i_dR) - h_nominal->GetBinContent(i_dR)) / h_nominal->GetBinContent(i_dR);
 						if (delta > max) max = delta;
 					}
+					h_up->SetBinContent(i_dR,h_nominal_full->GetBinContent(i_dR)*(1+max));
+					h_down->SetBinContent(i_dR,h_nominal_full->GetBinContent(i_dR)*(1-max));
 					h_systematic->SetBinContent(i_dR, 1+max);
 				}
+
+
+				c1->cd(i_cent+1);
+				SetHStyle_smallify(h_nominal_full,0,1);
+				SetHStyle_smallify(h_up,1,1);
+				SetHStyle_smallify(h_down,2,1);
+				h_nominal_full->GetYaxis()->SetRangeUser(h_nominal_full->GetMaximum()*0.85, h_nominal_full->GetMaximum()*1.08);
+				h_nominal_full->GetXaxis()->SetRangeUser(0,0.8);
+				h_nominal_full->DrawCopy();
+				h_up->DrawCopy("same");
+				h_down->DrawCopy("same");
+				gPad->BuildLegend();
+//				gPad->BuildLegend(0.5,0.67,0.88,0.88,"","NDC");
+
+
+				c2->cd(i_cent+1);
+
+				SetHStyle_smallify(h_nominal_full,0,1);
+				SetHStyle_smallify(h_nominal,1,1);
+				h_nominal_full->DrawCopy("");
+				h_nominal->DrawCopy("same");
+				gPad->BuildLegend();
+
 
 
 				f_UE_sys->cd();
@@ -100,10 +150,7 @@ void draw_run_dep()
 
 				if (i_cent == 0 && i_trk == 2 && i_jet == 7)
 				{
-//					legend_MB->AddEntry(h_nominal,"Nominal", "lp");
-//					legend_MB->AddEntry(h_combined,"Combined", "lp");
-
-					for (int i_run = 0; i_run < f_run_UE.size(); i_run++) legend_MB->AddEntry(h_run_UE[i_run],f_run_UE[i_run]->GetName(), "lp");
+					for (int i_run = 0; i_run < f_run_UE.size(); i_run++) legend_MB->AddEntry(h_run_UE[i_run],m[f_run_UE[i_run]->GetName()].c_str(), "lp");
 				}
 				c->cd(i_cent+1);
 				h_nominal->GetXaxis()->SetRangeUser(0, r_max_range);
@@ -123,21 +170,6 @@ void draw_run_dep()
 
 				line->DrawLine(0,1,0.8,1);
 
-
-
-//				for (int i_run = 0; i_run < f_run_UE.size(); i_run++)
-//				{
-//
-//					h_run_UE[i_run] = (TH1*)f_run_UE[i_run]->Get(name.c_str());
-//					SetHStyle_smallify(h_run_UE[i_run],i_run+1,1);
-//					h_run_UE[i_run]->Draw("same hist");
-//
-//					if (i_cent == 0 && i_trk == 2 && i_jet == 7)
-//					{
-//						legend_MB->AddEntry(h_run_UE[i_run],Form("%s",f_run_UE[i_run]->GetName()) , "lp");
-//					}
-//
-//				}
 			}
 
 			c->cd(1);
@@ -145,8 +177,10 @@ void draw_run_dep()
 			c->cd();
 			string pdf_label = "";
 			if (i_jet == 7 && i_trk == 2) pdf_label = "(";
-			if (i_jet == 10 && i_trk == 6) pdf_label = ")";
+			if (i_jet == 11 && i_trk == 6) pdf_label = ")";
 			c->Print(Form("weightedRuns.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
+			c1->Print(Form("weightedRuns_v_Nominal.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
+			c2->Print(Form("Nominal_full_v_reducedMaps.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
 
 		}
 	}

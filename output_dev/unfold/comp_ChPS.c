@@ -26,10 +26,9 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 	std::string sys_path = "";
-	if (sys_mode == 0) sys_path = Form("_nominal");
-	else sys_path = Form("_sys%i", sys_mode);
-//	if (sys_mode > 0 && sys_mode < 100)
-	if (sys_mode > 100) sys_path = Form("_sys%i", sys_mode);
+	if (sys_mode == 0) sys_path = Form("nominal");
+	else if (sys_mode > 24) sys_path = Form("c%i", sys_mode);
+	else sys_path = Form("sys%i", sys_mode);
 
 	string rdptr_label = "#it{R}_{#it{D} (p_{#it{T}}, #it{r})}";
 	string dptr_label = "#it{D} (p_{#it{T}}, #it{r}) [GeV^{-1}]";
@@ -37,9 +36,9 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 
 	cout << Form("Doing in %s mode", did.c_str()) << endl;
 
-	TFile *f_PbPb = new TFile(Form("output_pdf%s/root/final_ChPS_%s_PbPb.root", sys_path.c_str(), did.c_str()));
-	TFile *f_pp = new TFile(Form("output_pdf%s/root/final_ChPS_%s_pp.root", sys_path.c_str(), did.c_str()));
-	TFile *f_RDpT = new TFile(Form("output_pdf%s/root/final_RDpT_%s.root", sys_path.c_str(), did.c_str()), "recreate");
+	TFile *f_PbPb = new TFile(Form("output_pdf_%s/root/final_ChPS_%s_PbPb.root", sys_path.c_str(), did.c_str()));
+	TFile *f_pp = new TFile(Form("output_pdf_%s/root/final_ChPS_%s_pp.root", sys_path.c_str(), did.c_str()));
+	TFile *f_RDpT = new TFile(Form("output_pdf_%s/root/final_RDpT_%s.root", sys_path.c_str(), did.c_str()), "recreate");
 
 	cout << "Using files:" << endl;
 	cout << f_PbPb->GetName() << endl;
@@ -531,11 +530,11 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";
 				if (i_jet == jet_pt_end-1) pdf_label = ")";
-				c_ChPS_raw_indR->Print(Form("output_pdf%s/ChPS_raw_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-				c_ChPS_raw_subtr_indR->Print(Form("output_pdf%s/ChPS_raw_subtr_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-				c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf%s/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-				c_ChPS_final_indR->Print(Form("output_pdf%s/ChPS_final_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
-				c_ChPS_final_diff_indR->Print(Form("output_pdf%s/ChPS_final_diff_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_raw_indR->Print(Form("output_pdf_%s/ChPS_raw_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_raw_subtr_indR->Print(Form("output_pdf_%s/ChPS_raw_subtr_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_raw_subtr_unf_indR->Print(Form("output_pdf_%s/ChPS_raw_subtr_unf_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_final_indR->Print(Form("output_pdf_%s/ChPS_final_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_final_diff_indR->Print(Form("output_pdf_%s/ChPS_final_diff_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 				jet_itr++;
 			} //end jet loop
@@ -628,7 +627,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 					pdf_label = "";
 					if (i_jet == jet_pt_start && i_trk == 2) pdf_label = "(";
 					if (i_jet == jet_pt_end-1 && i_trk == 8) pdf_label = ")";
-					c_ChPS_fol_unf_indR->Print(Form("output_pdf%s/ChPS_fol_unf_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jet%i_trk%i", i_jet, i_trk));
+					c_ChPS_fol_unf_indR->Print(Form("output_pdf_%s/ChPS_fol_unf_ratio_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jet%i_trk%i", i_jet, i_trk));
 					
 					trk_itr++;
 				} //end trk loop
@@ -908,9 +907,9 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				if (i_jet == jet_pt_start) pdf_label = "(";
 				if (i_jet == jet_pt_end-1) pdf_label = ")";
 				
-				c_ChPS_final_injet->Print(Form("output_pdf%s/ChPS_FF_final_injet_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
-				c_ChPS_final_PbPb_injet->Print(Form("output_pdf%s/PbPb/ChPS_FF_final_injet_PbPb_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
-				c_ChPS_final_pp_injet->Print(Form("output_pdf%s/pp/ChPS_FF_final_injet_pp_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
+				c_ChPS_final_injet->Print(Form("output_pdf_%s/ChPS_FF_final_injet_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
+				c_ChPS_final_PbPb_injet->Print(Form("output_pdf_%s/PbPb/ChPS_FF_final_injet_PbPb_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
+				c_ChPS_final_pp_injet->Print(Form("output_pdf_%s/pp/ChPS_FF_final_injet_pp_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()));
 				jet_itr++;
 				
 			} //end jet loop
@@ -1044,9 +1043,9 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (i_dR == 0) pdf_label = "(";
 				if (i_dR == N_dR-1) pdf_label = ")";
-				//			c_ChPS_raw_subtr->Print(Form("output_pdf%s/ChPS_raw_subtr_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-				//			c_ChPS_raw_subtr_unf->Print(Form("output_pdf%s/ChPS_raw_subtr_unf_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
-				c_ChPS_final->Print(Form("output_pdf%s/ChPS_final_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+				//			c_ChPS_raw_subtr->Print(Form("output_pdf_%s/ChPS_raw_subtr_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+				//			c_ChPS_raw_subtr_unf->Print(Form("output_pdf_%s/ChPS_raw_subtr_unf_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
+				c_ChPS_final->Print(Form("output_pdf_%s/ChPS_final_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 			} //end dr loop
 		}
 
@@ -1112,7 +1111,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";
 				if (i_jet == jet_pt_end-1) pdf_label = ")";
-				c_ChPS_final_indR_cent->Print(Form("output_pdf%s/ChPS_final_ratio_cent_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_final_indR_cent->Print(Form("output_pdf_%s/ChPS_final_ratio_cent_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 				jet_itr++;
 			} //end jet loop
@@ -1184,7 +1183,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";
 				if (i_jet == jet_pt_end-1) pdf_label = ")";
-				c_ChPS_final_indR->Print(Form("output_pdf%s/ChPS_final_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
+				c_ChPS_final_indR->Print(Form("output_pdf_%s/ChPS_final_dR_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:jetpt%i", i_jet));
 
 				jet_itr++;
 			} //end jet loop

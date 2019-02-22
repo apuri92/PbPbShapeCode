@@ -55,9 +55,8 @@ int main(int argc, char ** argv)
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
+	else if (sys_mode > 24) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
-//	if (sys_mode > 0 && sys_mode < 100)
-//	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
 	TFile *f_data = new TFile(Form("../raw_results/%s/FF_%s_out_histo_%s_5p02_r001.root",sys_path.c_str(), did.c_str(), dataset_type.c_str()));

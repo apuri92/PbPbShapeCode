@@ -626,56 +626,60 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			if (!jetcorr->MCJetJERClean(truth_jet_pt_vector.at(truthindex),jet_pt,truth_jet_eta_vector.at(truthindex),cent_bin_fine) ) continue; //cut on JER balance
 			//Reweighting
-			if (_applyReweighting) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),truth_jet_eta_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
+			if (_applyReweighting)
+			{
+				if (_dataset == 4) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
+				if (_dataset == 3) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),6); //TODO cent_bin_fine -> cent_bin when available
+			}
 		}
 
 
 		//new circle UE method
-		if (_dataset == 4)
-		{
-			int circle_itr = 0;
-			TRandom3 rand;
-			rand.SetSeed(0);
-			bool good_circle = false;
-			int Ncircles = 30;
-			while (circle_itr < Ncircles)
-			{
-				double circle_eta = rand.Uniform(-2.5+_dR_max,2.5-_dR_max);
-				double circle_phi = jet_phi;
-				for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
-				{
-					double circle_jet_r = DeltaR(circle_phi,circle_eta,jet_phi_vector.at(j),jet_eta_vector.at(j));
-					if (circle_jet_r < 1.6) break;
-					else good_circle = true;
-				}
-
-				if (good_circle)
-				{
-					for (int i_trk = 0; i_trk < trk_good_pt.size(); i_trk++)
-					{
-						double pt = trk_good_pt[i_trk];
-						double eta = trk_good_eta[i_trk];
-						double phi = trk_good_phi[i_trk];
-						if (pt > 10.) continue;
-						double circle_trk_r = DeltaR(circle_phi,circle_eta,phi, eta);
-						if (circle_trk_r > 0.8) continue;
-						float w_eta = uee->CalculateEtaWeight_circle(pt,eta,jet_eta,circle_eta, cent_bin_fine);
-						float w_ncones = 1./Ncircles;
-						float w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
-						float eff_circle = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
-
-						float w_bkgr = w_eta * w_ncones * w_flow;
-						int dr_bin_circle = trkcorr->GetdRBin(circle_trk_r);
-
-						ChPS_circ_UE[dr_bin_circle][cent_bin]->Fill(pt,jet_pt, jet_weight*eff_circle*w_bkgr);
-
-						float tmp_dEta = DeltaEta(eta, circle_eta);
-						float tmp_dPhi = DeltaPhi(phi, circle_phi);
-					}
-					circle_itr++;
-				}
-			}
-		}
+//		if (_dataset == 4)
+//		{
+//			int circle_itr = 0;
+//			TRandom3 rand;
+//			rand.SetSeed(0);
+//			bool good_circle = false;
+//			int Ncircles = 30;
+//			while (circle_itr < Ncircles)
+//			{
+//				double circle_eta = rand.Uniform(-2.5+_dR_max,2.5-_dR_max);
+//				double circle_phi = jet_phi;
+//				for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
+//				{
+//					double circle_jet_r = DeltaR(circle_phi,circle_eta,jet_phi_vector.at(j),jet_eta_vector.at(j));
+//					if (circle_jet_r < 1.6) break;
+//					else good_circle = true;
+//				}
+//
+//				if (good_circle)
+//				{
+//					for (int i_trk = 0; i_trk < trk_good_pt.size(); i_trk++)
+//					{
+//						double pt = trk_good_pt[i_trk];
+//						double eta = trk_good_eta[i_trk];
+//						double phi = trk_good_phi[i_trk];
+//						if (pt > 10.) continue;
+//						double circle_trk_r = DeltaR(circle_phi,circle_eta,phi, eta);
+//						if (circle_trk_r > 0.8) continue;
+//						float w_eta = uee->CalculateEtaWeight_circle(pt,eta,jet_eta,circle_eta, cent_bin_fine);
+//						float w_ncones = 1./Ncircles;
+//						float w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
+//						float eff_circle = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
+//
+//						float w_bkgr = w_eta * w_ncones * w_flow;
+//						int dr_bin_circle = trkcorr->GetdRBin(circle_trk_r);
+//
+//						ChPS_circ_UE[dr_bin_circle][cent_bin]->Fill(pt,jet_pt, jet_weight*eff_circle*w_bkgr);
+//
+//						float tmp_dEta = DeltaEta(eta, circle_eta);
+//						float tmp_dPhi = DeltaPhi(phi, circle_phi);
+//					}
+//					circle_itr++;
+//				}
+//			}
+//		}
 
 		if (_dataset == 4 && !derive_UE_mode) //only run this if doing PbPb, not pp
 		{
@@ -887,11 +891,10 @@ EL::StatusCode PbPbFFShape :: execute (){
 						double z_truth = cos(R_truth)*track_mc_pt / matched_truth_jet_pt;
 
 						float dpT_weight =1.;
-						float z_weight =1.;
 						if (_applyReweighting)
 						{
-//							dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
-//							z_weight = jetcorr->GetFFReweightingFactor(z_truth, matched_truth_jet_pt, truth_jet_eta_vector.at(TruthJetIndex.at(i)), cent_bin_fine,0); //TODO cent_bin_fine -> cent_bin when available
+							if (_dataset == 4) dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, cent_bin);
+							if (_dataset == 3) dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, 6);
 						}
 
 						//R_trk_jet
@@ -920,7 +923,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 				if (isFake)
 				{
 					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin && R < 0.8)
-					{						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
+					{
+						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
 					ChPS_TM_UE.at(dr_bin).at(cent_bin)->Fill(pt,jet_pt, jet_weight*eff_weight);

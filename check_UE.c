@@ -741,22 +741,6 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 //						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
 					}
 
-					double low_range, hi_range;
-					low_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMinimum() * 0.75;
-					hi_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMaximum() * 1.4;
-
-					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-
-					if (i_cent == 0) {low_range = 30; hi_range = 100;}
-					if (i_cent == 1) {low_range = 20; hi_range = 60;}
-					if (i_cent == 2) {low_range = 10; hi_range = 40;}
-					if (i_cent == 3) {low_range = 5; hi_range = 25;}
-					if (i_cent == 4) {low_range = 5; hi_range = 15;}
-					if (i_cent == 5) {low_range = 1.5; hi_range = 4;}
-
-//					if (i_jet == jet_pt_start && i_trk == 2) h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
-
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
@@ -767,8 +751,6 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
-
-
 
 					double avg =(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(1) + h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(11))/2;
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(-0.5,0.5);
@@ -793,10 +775,28 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 					gPad->SetBottomMargin(0.0);
 					gPad->SetRightMargin(0);
 
-//					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0,100);
-//					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					double low_range, hi_range;
+					low_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMinimum() * 0.75;
+					hi_range = h_TM_r_1D[i_jet][i_trk][i_cent]->GetMaximum() * 1.4;
+
+					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+
+					if (i_cent == 0) {low_range = 30; hi_range = 100;}
+					if (i_cent == 1) {low_range = 20; hi_range = 60;}
+					if (i_cent == 2) {low_range = 10; hi_range = 40;}
+					if (i_cent == 3) {low_range = 5; hi_range = 25;}
+					if (i_cent == 4) {low_range = 5; hi_range = 15;}
+					if (i_cent == 5) {low_range = 1.5; hi_range = 4;}
+
+//					if (i_jet == jet_pt_start && i_trk == 2)
+					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+
+
+//					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(50,100);
+					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
 //					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist same ");
-					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("");
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 					h_cone_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_FS_r_1D[i_jet][i_trk][i_cent]->Draw("same");

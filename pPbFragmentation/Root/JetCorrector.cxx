@@ -108,6 +108,13 @@ float JetCorrector::GetJetReweightingFactor(double pt, double eta, int cent){
 	return jet_spectra_weight[jet_eta_bin][cent]->Eval(pt);
 }
 
+float JetCorrector::GetJetReweightingFactor(double pt, int cent){
+//	cout << shape_JetSpectra_weights[cent]->GetName() << " pt: " << pt << " cent: " << cent ;
+	int pt_bin = shape_JetSpectra_weights[cent]->FindBin(pt);
+//	cout << " jet w: " << shape_JetSpectra_weights[cent]->GetBinContent(pt_bin) << " pt: " << pt << " cent: " << cent << endl;
+	return shape_JetSpectra_weights[cent]->GetBinContent(pt_bin);
+}
+
 float JetCorrector::GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine){
 	//int jet_eta_bin = GetJetYBin(jet_eta);
 	int jet_eta_bin = 4;
@@ -139,6 +146,17 @@ float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, double je
 	//cout << " CHPS w: " << CHPS_weight[7][cent][jet_pt_bin]->GetBinContent(pt_bin) << " jet pt: " << jet_pt << " cent: " << cent << endl;
 	if (isFine) return CHPS_weight_fine[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
 	else return CHPS_weight[jet_eta_bin][cent][jet_pt_bin]->GetBinContent(pt_bin);
+}
+
+float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, int dR_bin, int cent){
+	if (dR_bin > 12) return 1;
+	if (jet_pt < min_jet_pt) jet_pt = min_jet_pt; //Minimum reco pT
+	if (jet_pt > max_jet_pt) jet_pt = max_jet_pt; //Maximum reco pT
+	int jet_pt_bin = jet_pt_binning->FindBin(jet_pt)-1;
+	int trk_pt_bin = trk_pt_binning->FindBin(pt);;
+//	cout << " jet pt: " << jet_pt << " trk_pt " << pt << " cent: " << cent << " dr: " << dR_bin;
+//	cout << " CHPS w: " << shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetName() << " " << shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetBinContent(trk_pt_bin) << endl;
+	return shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetBinContent(trk_pt_bin);
 }
 
 float JetCorrector::GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent)

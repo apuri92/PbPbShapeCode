@@ -23,12 +23,12 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	trkcorr->InitdRBinRange();
 
 	//Jet corrector
-	jetcorr = new JetCorrector();
+	jetcorr = new JetCorrector((_dataset == 4), 1);
 	int _nJetYBins = jetcorr->nJetYBins;
 	int _ndRBins = trkcorr->ndRBins + 1;
 
 	jetcorr->JERcut = _JERBalancecut;
-	jetcorr->min_jet_pt = _pTjetCut+1;
+	jetcorr->min_jet_pt = _pTjetCut;
 	jetcorr->max_jet_pt = 500.; //Maximum jet pt for reweighting
 	jetcorr->m_isMB = _isMB;
     jetcorr->is_pp = (_dataset == 3);
@@ -51,8 +51,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	SetupBinning(0, "dr_fine", dR_resBins, dR_resBinsN);
 	SetupBinning(0, "PsiBins", PsiBins, PsiBinsN);
 	SetupBinning(0, "PbPb_runs", RunBins, RunBinsN);
-//	SetupBinning(0, "eta-trk-coars", etaTrkBinsWide, etaTrkBinsWideN);
-//	SetupBinning(0, "phi-trk-coars", phiTrkBinsWide, phiTrkBinsWideN);
+	SetupBinning(0, "eta-trk-coars", etaTrkBinsWide, etaTrkBinsWideN);
+	SetupBinning(0, "phi-trk-coars", phiTrkBinsWide, phiTrkBinsWideN);
 
 	Double_t PVBins[3]={0,1,2};
 	int PVBinsN=2;
