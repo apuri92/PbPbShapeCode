@@ -625,61 +625,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			truth_jetpt_bin = jetcorr->GetJetpTBin(matched_truth_jet_pt, (TAxis*)ChPS_raw.at(0).at(0)->GetYaxis());
 
 			if (!jetcorr->MCJetJERClean(truth_jet_pt_vector.at(truthindex),jet_pt,truth_jet_eta_vector.at(truthindex),cent_bin_fine) ) continue; //cut on JER balance
-			//Reweighting
-			if (_applyReweighting)
-			{
-				if (_dataset == 4) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),cent_bin); //TODO cent_bin_fine -> cent_bin when available
-				if (_dataset == 3) jet_weight*=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),6); //TODO cent_bin_fine -> cent_bin when available
-			}
 		}
-
-
-		//new circle UE method
-//		if (_dataset == 4)
-//		{
-//			int circle_itr = 0;
-//			TRandom3 rand;
-//			rand.SetSeed(0);
-//			bool good_circle = false;
-//			int Ncircles = 30;
-//			while (circle_itr < Ncircles)
-//			{
-//				double circle_eta = rand.Uniform(-2.5+_dR_max,2.5-_dR_max);
-//				double circle_phi = jet_phi;
-//				for (int j = 0; j < jet_pt_xcalib_vector.size(); j++)
-//				{
-//					double circle_jet_r = DeltaR(circle_phi,circle_eta,jet_phi_vector.at(j),jet_eta_vector.at(j));
-//					if (circle_jet_r < 1.6) break;
-//					else good_circle = true;
-//				}
-//
-//				if (good_circle)
-//				{
-//					for (int i_trk = 0; i_trk < trk_good_pt.size(); i_trk++)
-//					{
-//						double pt = trk_good_pt[i_trk];
-//						double eta = trk_good_eta[i_trk];
-//						double phi = trk_good_phi[i_trk];
-//						if (pt > 10.) continue;
-//						double circle_trk_r = DeltaR(circle_phi,circle_eta,phi, eta);
-//						if (circle_trk_r > 0.8) continue;
-//						float w_eta = uee->CalculateEtaWeight_circle(pt,eta,jet_eta,circle_eta, cent_bin_fine);
-//						float w_ncones = 1./Ncircles;
-//						float w_flow = uee->CalculateFlowWeight( pt, eta, phi, jet_phi,  FCalEt );
-//						float eff_circle = trkcorr->get_effcorr(pt, eta, cent_bin, 0, _dataset);
-//
-//						float w_bkgr = w_eta * w_ncones * w_flow;
-//						int dr_bin_circle = trkcorr->GetdRBin(circle_trk_r);
-//
-//						ChPS_circ_UE[dr_bin_circle][cent_bin]->Fill(pt,jet_pt, jet_weight*eff_circle*w_bkgr);
-//
-//						float tmp_dEta = DeltaEta(eta, circle_eta);
-//						float tmp_dPhi = DeltaPhi(phi, circle_phi);
-//					}
-//					circle_itr++;
-//				}
-//			}
-//		}
 
 		if (_dataset == 4 && !derive_UE_mode) //only run this if doing PbPb, not pp
 		{
@@ -700,19 +646,27 @@ EL::StatusCode PbPbFFShape :: execute (){
 					double UE_err = -1;
 					double UE_val = 0;
 
-					if (jetpt_bin >= 6 && jetpt_bin < 12)
-					{
-						UE_val = uee->getShapeUE(1, i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
-					}
-
 					double trk_bin_center = ChPS_raw.at(0).at(0)->GetXaxis()->GetBinCenter(i_pt+1);
 					double r_bin_center = h_dR_change.at(0).at(0)->GetXaxis()->GetBinCenter(i_dR+1);
 
 					double eff_uncertainty = 0;
 					if (_uncert_index > 0 && uncertprovider->uncert_class==4) eff_uncertainty = uncertprovider->CorrectTrackEff(jet_pt, jet_y, trk_bin_center,jet_eta, i_dR, cent_bin);
 
+					if (jetpt_bin >= 6 && jetpt_bin < 12)
+					{
+//						UE_val = uee->getShapeUE(1, i_dR, 0, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
+						UE_val = uee->getShapeUE(1, i_dR, i_dPsi, i_pt, cent_bin, jet_eta, jet_phi, jetpt_bin, UE_err);
+
+						if (_uncert_index == 42 && uncertprovider->uncert_class == 7)
+						{
+							std::vector<double> UE_sys_values = uncertprovider->UEE_Uncert(UE_val, UE_err);
+							for (int i = 0; i < UE_sys_values.size(); i++) ChPS_MB_UE_sys.at(i).at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_sys_values[i]*jet_weight);
+
+							UE_sys_values.clear();
+						}
+					}
+
 					ChPS_MB_UE.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_val*jet_weight);
-					ChPS_MB_UE_err.at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_err*jet_weight);
 
 					ChPS_MB_UE_rN.at(i_dR).at(cent_bin)->Fill(eventInfo->runNumber(), trk_bin_center,jet_pt, UE_val*jet_weight);
 					ChPS_MB_UE_rN.at(i_dR).at(n_cent_bins-1)->Fill(eventInfo->runNumber(), trk_bin_center,jet_pt, UE_val*jet_weight);
@@ -736,15 +690,24 @@ EL::StatusCode PbPbFFShape :: execute (){
 		{
 			if (pass_reco_pt_cut)
 			{
-				ff_jetResponse.at(y_bin).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				ff_jetResponse.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				ff_jetResponse.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				ff_jetResponse.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
+				double spectrum_rw = 1;
+				//Reweighting
+				if (_applyReweighting)
+				{
+					int truthindex=TruthJetIndex.at(i);
 
-				response_jet.at(y_bin).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				response_jet.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				response_jet.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
-				response_jet.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight );
+					if (_dataset == 4) spectrum_rw=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),cent_bin);
+					if (_dataset == 3) spectrum_rw=jetcorr->GetJetReweightingFactor(truth_jet_pt_vector.at(truthindex),6);
+				}
+				ff_jetResponse.at(y_bin).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				ff_jetResponse.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				ff_jetResponse.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				ff_jetResponse.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+
+				response_jet.at(y_bin).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				response_jet.at(jetcorr->nJetYBins - 1).at(cent_bin)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				response_jet.at(y_bin).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
+				response_jet.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, truth_jet_pt_vector.at(TruthJetIndex.at(i)), jet_weight*spectrum_rw );
 			}
 			truth_jet_y = truth_jet_y_vector.at(TruthJetIndex.at(i));
 			int y_truth_bin = jetcorr->GetJetYBin(truth_jet_y);
@@ -890,7 +853,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 						float R_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 						double z_truth = cos(R_truth)*track_mc_pt / matched_truth_jet_pt;
 
-						float dpT_weight =1.;
+						float dpT_weight = 1.;
 						if (_applyReweighting)
 						{
 							if (_dataset == 4) dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, cent_bin);
@@ -924,6 +887,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 				{
 					if (derive_UE_mode && jetpt_bin >= lo_jetpt_bin && jetpt_bin <= hi_jetpt_bin && R < 0.8)
 					{
+//						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(0).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 						h_UE_dNdEtadPhidpT.at(jetpt_bin).at(jet_dPsi_bin).at(cent_bin).at(dr_bin)->Fill(pt,jet_eta,jet_phi, jet_weight*eff_weight);
 					}
 
@@ -949,6 +913,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 			}
 		} // end reco track loop
 
+//		if (derive_UE_mode) h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(0,jet_eta,jet_phi, jet_weight);
 		if (derive_UE_mode) h_jet_v_Psi.at(jetpt_bin).at(cent_bin)->Fill(DeltaPsi(jet_phi,uee->Psi),jet_eta,jet_phi, jet_weight);
 
 		//JES plots

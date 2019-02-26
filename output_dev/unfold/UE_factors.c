@@ -81,9 +81,6 @@ void UE_factors(string config_file = "ff_config.cfg")
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_MB_method = (TH2*)input_file->Get(name.c_str());
 
-			name = Form("ChPS_MB_UE_err_dR%i_cent%i", i_dR, i_cent);
-			TH2* h_MB_method_err = (TH2*)input_file->Get(name.c_str());
-
 			name = Form("ChPS_cone_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_cone_method = (TH2*)input_file->Get(name.c_str());
 
@@ -101,16 +98,6 @@ void UE_factors(string config_file = "ff_config.cfg")
 			TH1* h_cone_jet_spectra = (TH1*)((TH1*)input_file->Get(name.c_str()))->Clone(Form("cone_UE_norm_y4_c%i", i_cent));
 			h_cone_jet_spectra->SetName(Form("%s_mc",name.c_str()));
 			h_cone_jet_spectra->Sumw2();
-
-			//SET ERRORS FROM MB_ERR HISTOGRAM
-			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
-			{
-				for (int i_trk_bin = 1; i_trk_bin <= N_jetpt; i_trk_bin++)
-				{
-					double updated_UE_MB_err = h_MB_method_err->GetBinContent(i_trk_bin, i_jet_bin);
-					h_MB_method->SetBinError(i_trk_bin, i_jet_bin, updated_UE_MB_err);
-				}
-			}
 
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 			{

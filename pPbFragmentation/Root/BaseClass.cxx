@@ -90,6 +90,7 @@ BaseClass :: BaseClass (const BaseClass& base)  {
 	_PythiaPowheg = base._PythiaPowheg;
 	_isOverlay = base._isOverlay;
 	_addmuons = base._addmuons;
+	_rndm_seed=base._rndm_seed;
 }
 
 

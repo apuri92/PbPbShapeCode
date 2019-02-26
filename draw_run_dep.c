@@ -120,12 +120,16 @@ void draw_run_dep()
 
 
 				c2->cd(i_cent+1);
-
-				SetHStyle_smallify(h_nominal_full,0,1);
-				SetHStyle_smallify(h_nominal,1,1);
-				h_nominal_full->DrawCopy("");
-				h_nominal->DrawCopy("same");
+				TH1* h_ratio_full_reduced = (TH1*)h_nominal->Clone("h_ratio_full_reduced");
+				h_ratio_full_reduced->Divide(h_nominal_full);
+				h_ratio_full_reduced->SetTitle("Reduced Maps / Full Maps");
+				SetHStyle_smallify(h_ratio_full_reduced,1,1);
+				h_ratio_full_reduced->GetYaxis()->SetTitle("Ratio");
+				h_ratio_full_reduced->GetXaxis()->SetRangeUser(0,0.8);
+				h_ratio_full_reduced->GetYaxis()->SetRangeUser(0.94,1.06);
+				h_ratio_full_reduced->DrawCopy("");
 				gPad->BuildLegend();
+				line->DrawLine(0,1,0.8,1);
 
 
 

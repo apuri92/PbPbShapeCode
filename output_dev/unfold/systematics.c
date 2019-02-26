@@ -462,7 +462,18 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
 				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l same");
 
-
+//				for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
+//				{
+//					SetHStyle_smallify(h_sys_p[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
+//					SetHStyle_smallify(h_sys_n[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
+//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
+//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
+//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+//					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_names[i_sys].c_str(),"l");
+//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
+//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
+//				}
 				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
 				{
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);

@@ -1,5 +1,17 @@
 #include "pPbFragmentation/UncertProvider.h"
 
+std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err)
+{
+	std::vector<double> UE_sys_values;
+	while (UE_sys_values.size() < 10)
+	{
+		//make sure UE values are not negative
+		double ue_sys = r.Gaus(nominalUE, UE_err);
+		if (ue_sys >= 0) UE_sys_values.push_back(ue_sys);
+	}
+	return UE_sys_values;
+}
+
 void UncertProvider::CorrectJet(xAOD::Jet * reco, xAOD::Jet * truth = 0, int cent = 0, float FCalEt=0){
 	switch (uncert_class){
 		case 1:
@@ -221,10 +233,11 @@ float UncertProvider::GetMCProb(){
 void UncertProvider::GetTrackUncert(){         
    if (uncert_index==1) uncert_class=3; //JER uncert
    else if (uncert_index>5 && uncert_index<10) uncert_class=2; //HI JES  
-   else if (uncert_index>17) uncert_class=1; //intrincis JES
+   else if (uncert_index>17 && uncert_index < 42) uncert_class=1; //intrincis JES
    else if (uncert_index>9 && uncert_index < 15) uncert_class=4; //tracking efficiency
    else if (uncert_index ==15) uncert_class=5; //Trk resolution
    else if (uncert_index ==16 || uncert_index ==17) uncert_class=6; //Trk resolution
+   else if (uncert_index == 42) uncert_class=7; //UE map stats
    //else if (uncert_index ==18) uncert_class=7; //Trk charge scale for preliminary only
    else uncert_class = 0;
    cout << "Uncertainty class... " << uncert_class << endl; 
@@ -273,6 +286,8 @@ string UncertProvider::GetSysName(int uncert){
 		case 18: UncertLabel="JES_Intrinsic_P";
 		break;
 		case 19: UncertLabel="JES_Intrinsic_P";
+		break;
+	   	case 42: UncertLabel="UE Map Statistics";
 		break;
 
 

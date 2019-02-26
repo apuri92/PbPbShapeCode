@@ -118,7 +118,7 @@ class UncertProvider
 		}
      	//***Tracking uncertainties
      	//Efficiency <->fit not needed now
-     	  
+
 		  _f_eff = new TFile(xfn + "/../pPbFragmentation/data/mc_eff_fits_pt_exclusive_" + _cutlevel + ".root","read");
 		  jety_bins = (TAxis*) _f_eff ->Get("jet_y_binning"); 
 		  jetpt_bins=(TAxis*)_f_eff->Get("jet_pt_binning");
@@ -157,6 +157,7 @@ class UncertProvider
 	void UncerTrackMomentum(float &pT, float eta, float phi, int charge);
 	float UncerEffFit(float jet_pt, float jety, float pt, int centrality);
 	float GetMCProb();
+	std::vector<double> UEE_Uncert(double nominalUE, double UE_err);
 	//CorrectTrack(xAODJet * reco);
     ~UncertProvider() {
     }

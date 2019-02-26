@@ -167,7 +167,7 @@ EL::StatusCode PbPbFFShape :: initialize ()
     //EL_RETURN_CHECK("initialize()",jesProv->setProperty("JetDefinition","AntiKt4EMTopo"));
     //EL_RETURN_CHECK("initialize()",jesProv->setProperty("MCType","MC15"));
     //EL_RETURN_CHECK("initialize()",jesProv->setProperty("ConfigFile","JES_2015/ICHEP2016/JES2015_19NP.config"));
-	
+
 	//JER
 	jerTool = new JERTool("JERTool");
 	smearTool = new JERSmearingTool("JERSmearingTool");
@@ -205,7 +205,7 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	//uncertprovider->JES_tool=jesProv;
 	
 	//Pileup tool
-	
+
 	// ZDCAnalysisTool
 	m_zdcTools = new ZDC::ZdcAnalysisTool("ZdcAnalysisTool");
 	// HIPileupTool
