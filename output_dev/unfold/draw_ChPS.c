@@ -30,7 +30,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 24) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_input = new TFile(Form("output_pdf_%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));

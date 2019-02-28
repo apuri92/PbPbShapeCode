@@ -44,18 +44,27 @@ int main(int argc, char ** argv)
 	std::string did = "data";
 	if (isMC) did = "MC";
 
-	int apply_fake_uncert = 0;
-	if (sys_mode == 21) apply_fake_uncert = 1;
-
 	int apply_MC_nonClos = 0;
 	if (sys_mode == 22) apply_MC_nonClos = 1;
+
+	int apply_fake_uncert = 0;
+	if (sys_mode == 45) apply_fake_uncert = 1;
+
+	int apply_UE_mapStatSys = 0;
+	if (sys_mode == 42) apply_UE_mapStatSys = 1;
+
+	int apply_UE_RunDep = 0;
+	if (sys_mode == 43) apply_UE_RunDep = 1;
+
+	int apply_UE_ConeMethod = 0;
+	if (sys_mode == 44) apply_UE_ConeMethod = 1;
 
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 24) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
@@ -67,7 +76,9 @@ int main(int argc, char ** argv)
 
 	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
 	TFile *dr_factors = new TFile(Form("output_pdf%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
-	TFile *UE_uncert = new TFile(Form("../../UE_RunDependentSys.root"));
+	TFile *UE_uncert;
+	if (apply_UE_RunDep) UE_uncert = new TFile(Form("UE_RunDependentSys.root"));
+	if (apply_UE_mapStatSys) UE_uncert = new TFile(Form("UE_MapSystematic.root"));
 	TFile *f_output = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
 	int N_Y = 5;
@@ -181,7 +192,6 @@ int main(int argc, char ** argv)
 
 			//setup UE/fakes
 			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_MB_UE_dR%i_cent%i",i_dR, i_cent));;
-//			TH2* h_UE_MB_err = (TH2*)f_data->Get(Form("ChPS_MB_UE_err_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_corrected_cone;
 			if (dataset_type == "PbPb")
@@ -299,14 +309,26 @@ int main(int argc, char ** argv)
 							correction = 1;
 
 							//run systematic:
-							if (sys_mode == 20)
+							if (apply_UE_ConeMethod)
 							{
 								UE = h_UE_corrected_cone->GetBinContent(i_trk_bin, i_jet_bin);
 								UE_err = h_UE_corrected_cone->GetBinError(i_trk_bin, i_jet_bin); //corrected for UE-JER above
 							}
-							if (sys_mode == 23)
+							if (apply_UE_mapStatSys || apply_UE_RunDep)
 							{
-								correction = ((TH1*)UE_uncert->Get(Form("UE_MB_data_indR_jet%i_trk%i_cent%i_SYS", i_jet_bin-1, i_trk_bin-1, i_cent)))->GetBinContent(i_dR+1);
+								if (apply_UE_RunDep)
+								{
+									TH1* h_corr = (TH1*)UE_uncert->Get(Form("UE_MB_data_indR_jet%i_trk%i_cent%i_SYS", i_jet_bin-1, i_trk_bin-1, i_cent));
+									correction = h_corr->GetBinContent(i_dR+1);
+									delete h_corr;
+								}
+								if (apply_UE_mapStatSys)
+								{
+									TH2* h_corr = (TH2*)UE_uncert->Get(Form("ChPS_MB_UE_dR%i_cent%i_statSys", i_dR, i_cent));
+									correction = h_corr->GetBinContent(i_trk_bin, i_jet_bin);
+									delete h_corr;
+								}
+
 								UE = UE*correction;
 								UE_err = UE_err*correction;
 							}
@@ -516,7 +538,6 @@ int main(int argc, char ** argv)
 						double correction = h_MC_nonClosure->GetBinContent(i_trk_bin+1);
 						double orig = h_raw_subtr_unf_bbb->GetBinContent(i_trk_bin+1,i_jet_bin+1);
 						double orig_err = h_raw_subtr_unf_bbb->GetBinError(i_trk_bin+1,i_jet_bin+1);
-						cout << correction << endl;
 
 						h_raw_subtr_unf_bbb->SetBinContent(i_trk_bin+1,i_jet_bin+1, orig/correction);
 						h_raw_subtr_unf_bbb->SetBinError(i_trk_bin+1,i_jet_bin+1, orig_err/correction);

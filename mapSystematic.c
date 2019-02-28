@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void mapSystematic(int sys_mode = 85)
+void mapSystematic(int sys_mode = 87)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -38,13 +38,10 @@ void mapSystematic(int sys_mode = 85)
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
 
-	//2D UE
-
-
 	int N_sys = 100;
 	for (int i_cent = 0; i_cent < 6; i_cent++)
 	{
-		for (int i_dR = 0; i_dR < 11; i_dR++)
+		for (int i_dR = 0; i_dR < N_dR; i_dR++)
 		{
 			name = Form("ChPS_MB_UE_dR%i_cent%i", i_dR, i_cent);
 			TH2* h_nom = (TH2*)input_file_data->Get(name.c_str());
@@ -57,14 +54,14 @@ void mapSystematic(int sys_mode = 85)
 					double nominal = h_nom->GetBinContent(i_trk, i_jet);
 					if (nominal == 0) continue;
 
-					TH1* h_gaus = new TH1D("h_gaus","h_gaus",400,0,2);
+					TH1* h_gaus = new TH1D("h_gaus","h_gaus",500,-2,2);
 
 					//get gaussian for each bin using systematic variations
 					for (int i_sys = 0; i_sys < N_sys; i_sys++)
 					{
 						name = Form("ChPS_MB_UE_sys%i_dR%i_cent%i",i_sys, i_dR, i_cent);
 						TH2* h_sys = (TH2*)input_file_data->Get(name.c_str());
-						double sys = h_sys->GetBinContent(i_trk, i_jet)/nominal;
+						double sys = (h_sys->GetBinContent(i_trk, i_jet) - nominal)/nominal;
 						h_gaus->Fill(sys);
 						delete h_sys;
 					}
@@ -76,7 +73,7 @@ void mapSystematic(int sys_mode = 85)
 					TF1* f_gaus = new TF1("fit","gaus");
 					h_gaus->Fit(f_gaus,"Q","");
 
-					h_sys_multiplier->SetBinContent(i_trk, i_jet,f_gaus->GetParameter(1));
+					h_sys_multiplier->SetBinContent(i_trk, i_jet,f_gaus->GetParameter(2)+1); //+1 to get relative error using width in terms of percentage
 					output_file->cd();
 					name = Form("ChPS_MB_UE_dR%i_cent%i_bins_trk%i_jet%i", i_dR, i_cent, i_trk, i_jet);
 					h_gaus->Write(name.c_str());

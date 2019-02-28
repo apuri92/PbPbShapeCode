@@ -80,10 +80,13 @@ void systematics(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys17"); //CentHIJES_N
 //	sys_names.push_back("sys18"); //ppJES_P
 //	sys_names.push_back("sys19"); //ppJES_N
-	sys_names.push_back("sys20"); //UE Cone method
-//	sys_names.push_back("sys21"); //Fakes
 //	sys_names.push_back("sys22"); //MC_NonClosure
-	sys_names.push_back("sys23"); //UE_RunDep
+	sys_names.push_back("sys42"); //UE Map stat
+	sys_names.push_back("sys43"); //UE run dep
+	sys_names.push_back("sys44"); //UE Cone method
+//	sys_names.push_back("sys45"); //Fakes
+
+	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_2_P" }, { "sys8" , "HIJES_1_N" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "Tracking" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P" }, { "sys19" , "ppJES_N" }, { "sys22" , "MC NonClosure" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
 
 
 
@@ -178,8 +181,12 @@ void systematics(string config_file = "sys_config.cfg")
 						double tmp = h_sys[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
 						//special rules
-						//symmetrize for JER, fakes, UE_ConeMethod and UE_RunDep
-						if (sys_names[i_sys] == "sys1" || sys_names[i_sys] == "sys21" || sys_names[i_sys] == "sys20" || sys_names[i_sys] == "sys23" )
+						//symmetrize for JER, fakes, UE_ConeMethod and UE_RunDep, UE map stat
+						if (sys_names[i_sys] == "sys1" ||
+							sys_names[i_sys] == "sys42" ||
+							sys_names[i_sys] == "sys43" ||
+							sys_names[i_sys] == "sys44" ||
+							sys_names[i_sys] == "sys45" )
 						{
 							h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, fabs(tmp));
 							h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -fabs(tmp));
@@ -278,8 +285,9 @@ void systematics(string config_file = "sys_config.cfg")
 								||
 
 								(
-								 (sys_names[i_sys] == "sys20" ||
-								  sys_names[i_sys] == "sys23" ) &&
+								 (sys_names[i_sys] == "sys42" ||
+								  sys_names[i_sys] == "sys43" ||
+								  sys_names[i_sys] == "sys44" ) &&
 								 combined_sys_names[i_comb_sys] == "UE"
 								 )
 								)
@@ -462,18 +470,18 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
 				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l same");
 
-//				for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
-//				{
-//					SetHStyle_smallify(h_sys_p[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
-//					SetHStyle_smallify(h_sys_n[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
-//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
-//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
-//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
-//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
-//					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_names[i_sys].c_str(),"l");
-//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
-//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
-//				}
+				for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
+				{
+					SetHStyle_smallify(h_sys_p[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
+					SetHStyle_smallify(h_sys_n[i_sys][i_trk][i_cent][i_jet],i_sys+1,1);
+					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
+					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
+					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_i_name[sys_names[i_sys]].c_str(),"l");
+					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
+					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
+				}
 				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
 				{
 					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);

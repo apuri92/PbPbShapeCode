@@ -27,7 +27,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 24) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 
 
@@ -275,7 +275,7 @@ void draw_spectra(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			if (i_y == 0) pdf_label = "(";
 			if (i_y == N_JET_Y) pdf_label = ")";
-			c_spect_closure->Print(Form("output_pd_f%s/%s/spect_closure_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
+			c_spect_closure->Print(Form("output_pdf_%s/%s/spect_closure_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 			c_resp_matrix->Print(Form("output_pdf_%s/%s/resp_matrix_jet_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:y%i", i_y));
 
 			if (i_y == 0)
