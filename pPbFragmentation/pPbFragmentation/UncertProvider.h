@@ -157,7 +157,7 @@ class UncertProvider
 	void UncerTrackMomentum(float &pT, float eta, float phi, int charge);
 	float UncerEffFit(float jet_pt, float jety, float pt, int centrality);
 	float GetMCProb();
-	std::vector<double> UEE_Uncert(double nominalUE, double UE_err);
+	std::vector<double> UEE_Uncert(double nominalUE, double UE_err, int size);
 	//CorrectTrack(xAODJet * reco);
     ~UncertProvider() {
     }

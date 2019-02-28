@@ -1,13 +1,12 @@
 #include "pPbFragmentation/UncertProvider.h"
 
-std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err)
+std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err, int size)
 {
 	std::vector<double> UE_sys_values;
-	while (UE_sys_values.size() < 10)
+	while (UE_sys_values.size() < size)
 	{
-		//make sure UE values are not negative
 		double ue_sys = r.Gaus(nominalUE, UE_err);
-		if (ue_sys >= 0) UE_sys_values.push_back(ue_sys);
+		UE_sys_values.push_back(ue_sys);
 	}
 	return UE_sys_values;
 }

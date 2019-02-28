@@ -659,9 +659,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 						if (_uncert_index == 42 && uncertprovider->uncert_class == 7)
 						{
-							std::vector<double> UE_sys_values = uncertprovider->UEE_Uncert(UE_val, UE_err);
-							for (int i = 0; i < UE_sys_values.size(); i++) ChPS_MB_UE_sys.at(i).at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_sys_values[i]*jet_weight);
-
+							std::vector<double> UE_sys_values = uncertprovider->UEE_Uncert(UE_val, UE_err, ChPS_MB_UE_sys.size());
+							for (int i_sys = 0; i_sys < UE_sys_values.size(); i_sys++) ChPS_MB_UE_sys.at(i_sys).at(i_dR).at(cent_bin)->Fill(trk_bin_center, jet_pt, UE_sys_values[i_sys]*jet_weight);
 							UE_sys_values.clear();
 						}
 					}
