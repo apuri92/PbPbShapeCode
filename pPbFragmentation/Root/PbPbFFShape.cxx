@@ -421,7 +421,24 @@ EL::StatusCode PbPbFFShape :: execute (){
 				dRmin=R;
 			}
 			if (dRmin<_dR_truth_matching) {
-				uncertprovider->CorrectJet(&newjet,truthMjet,cent_bin_fine,FCalEt);
+				if (uncertprovider->uncert_class == 1)
+				{
+					Float_t significance=uncertprovider->GetSysShift(_uncert_index);
+					Int_t component = uncertprovider->GetJESSysComponent(_uncert_index);
+					Float_t uncertainty=0;
+					Float_t jetPt_n = newjet.pt();
+					Float_t jetEta_n = newjet.eta();
+					Float_t jetPhi_n = newjet.phi();
+					Float_t jetM_n = newjet.m();
+
+					uncertainty = 1+ significance * (jesProv_new->getUncertainty(component,(newjet)));
+					newjet.setJetP4( xAOD::JetFourMom_t(jetPt_n*uncertainty,jetEta_n,jetPhi_n,jetM_n) ) ;
+				}
+				else
+				{
+					uncertprovider->CorrectJet(&newjet,truthMjet,cent_bin_fine,FCalEt);
+				}
+				
 				//truthMjet.releasePrivateStore();
 			}
 			//if (truthMjet) delete truthMjet;
@@ -1122,13 +1139,11 @@ EL::StatusCode PbPbFFShape :: finalize (){
 	}
 
 	//cleaning jets
-	/*
-	 if(jesProv)
-	 {
-	 delete jesProv;
-	 jesProv=0;
-	 }
-	 */
+	if(jesProv_new)
+	{
+		delete jesProv_new;
+		jesProv_new=0;
+	}
 	if(jerTool)
 	{
 		delete jerTool;

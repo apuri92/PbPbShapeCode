@@ -1,5 +1,14 @@
 #include "pPbFragmentation/UncertProvider.h"
 
+void UncertProvider::InitJESTool()
+{
+	jesProv = new JetUncertaintiesTool("JESProvider");
+	jesProv->setProperty("JetDefinition","AntiKt4EMTopo");
+	jesProv->setProperty("MCType","MC15");
+	jesProv->setProperty("ConfigFile","JES_2015/ICHEP2016/JES2015_SR_Scenario1.config");
+	jesProv->initialize();
+}
+
 std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err, int size)
 {
 	std::vector<double> UE_sys_values;
@@ -94,18 +103,12 @@ void UncertProvider::UncerJESIntrinsic(xAOD::Jet* recon)
    Float_t jetEta = recon->eta();
    Float_t jetPhi = recon->phi();
    Float_t jetM = recon->m();
-   
-   //cout << "jet pt " << jetPt << " jet eta " << jetEta << " jet phi " << jetPhi << " jet m" << jetM << endl;  
-   if (uncert_index>19) uncertainty = 1+ significance * (jesProv.getUncertainty(component,(*recon)));
-   //Combine all JES2015_19NP
-   else {
-   	 float total=0.;
-   	 for (int unc=20;unc<42;unc++){
-   	 	if (unc%2==1) continue;
-   	 	total+=pow( jesProv.getUncertainty(GetJESSysComponent(unc),(*recon) ), 2  );
-   	 }
-   	 uncertainty = 1+ significance * sqrt(total);  
-   }
+
+	//stupid tool requires first index to be called, it fails otherwise
+//	double tmp = jesProv->getUncertainty(0,(*recon));
+
+	uncertainty = 1+ significance * (jesProv->getUncertainty(component,(*recon)));
+//	uncertainty = 1+ significance * (jesProv.getUncertainty(component,(*recon)));
    //cout << "Uncert 0: " <<  (jesProv.getUncertainty(0,(*recon))) << endl;
    //cout << "Uncert 1: " <<  (jesProv.getUncertainty(1,(*recon))) << endl ;
    //cout << "Uncert 18: " <<  (jesProv.getUncertainty(18,(*recon))) << endl ;
@@ -232,7 +235,7 @@ float UncertProvider::GetMCProb(){
 void UncertProvider::GetTrackUncert(){         
    if (uncert_index==1) uncert_class=3; //JER uncert
    else if (uncert_index>5 && uncert_index<10) uncert_class=2; //HI JES  
-   else if (uncert_index>17 && uncert_index < 42) uncert_class=1; //intrincis JES
+   else if (uncert_index>17 && uncert_index < 42) uncert_class=1; //intrincis JES [SR is done from 18-23]
    else if (uncert_index>9 && uncert_index < 15) uncert_class=4; //tracking efficiency
    else if (uncert_index ==15) uncert_class=5; //Trk resolution
    else if (uncert_index ==16 || uncert_index ==17) uncert_class=6; //Trk resolution
@@ -282,9 +285,17 @@ string UncertProvider::GetSysName(int uncert){
 		break;
 		case 17: UncertLabel="JES_HIC_N";
 		break;
-		case 18: UncertLabel="JES_Intrinsic_P";
+		case 18: UncertLabel="JES_Intrinsic_P_comp101";
 		break;
-		case 19: UncertLabel="JES_Intrinsic_P";
+		case 19: UncertLabel="JES_Intrinsic_N_comp101";
+		break;
+	   	case 20: UncertLabel="JES_Intrinsic_P_comp101";
+		break;
+	   	case 21: UncertLabel="JES_Intrinsic_N_comp101";
+		break;
+	   	case 22: UncertLabel="JES_Intrinsic_P_comp101";
+		break;
+	   	case 23: UncertLabel="JES_Intrinsic_N_comp101";
 		break;
 	   	case 42: UncertLabel="UE Map Statistics";
 		break;
@@ -307,8 +318,8 @@ int UncertProvider::GetSysShift(int uncert){
 //Return JES components
 int UncertProvider::GetJESSysComponent(int uncert){   
    int Component=0;
-   int lastNonJES=19;
-   if (uncert<lastNonJES){
+   int lastNonJES=17;
+   if (uncert<=lastNonJES){
 	   switch(uncert){
 			case 6: Component=1;
 			break;
@@ -320,10 +331,26 @@ int UncertProvider::GetJESSysComponent(int uncert){
 			break;
 		}
 	}
-	//insitu components needed for HI with JES2015_19NP.config (no pileup an b-jets)
+
 	//TODO do it in better way 
-	if (uncert>lastNonJES){   
+	if (uncert>lastNonJES){
 	   switch(uncert){
+		   //using SR1 configuration for JES Uncertainties: all pileup and flavor is in group 100 (see config file) this corresponds to component 0, so we skip component 0 and do only components 1-3
+		   case 18: Component=1;//2
+			   break;
+		   case 19: Component=1;//2
+			   break;
+		   case 20: Component=2;//3
+			   break;
+		   case 21: Component=2;//3
+			   break;
+		   case 22: Component=3;//4
+			   break;
+		   case 23: Component=3;//4
+			   break;
+
+			   
+/* //insitu components needed for HI with JES2015_19NP.config (no pileup an b-jets)
 			case 20: Component=0;//1
 			break;
 			case 21: Component=0;//1
@@ -368,6 +395,7 @@ int UncertProvider::GetJESSysComponent(int uncert){
 			break;
 			case 41: Component=16;//17
 			break;
+ */
 		}
     }
    return Component;

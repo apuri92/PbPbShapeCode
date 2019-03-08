@@ -35,6 +35,19 @@ void draw_run_dep()
 	m["UE_c69.root"] = "Period II";
 	m["UE_c70.root"] = "Period III";
 
+	TAxis* dR_binning = (TAxis*)f_nominal->Get("dR_binning");
+	TAxis* jetpT_binning = (TAxis*)f_nominal->Get("jetpT_binning");
+	TAxis* trkpT_binning = (TAxis*)f_nominal->Get("trkpT_binning");
+
+	int N_dR = dR_binning->GetNbins();
+	int N_jetpt = jetpT_binning->GetNbins();
+	int N_trkpt = trkpT_binning->GetNbins();
+
+	TLatex *ltx = new TLatex();
+	ltx->SetTextFont(43);
+	ltx->SetTextSize(12);
+	ltx->SetTextAlign(12);
+
 	//i_jet is the vector index, corresponds to bin = i_jet+1, i_jet = 6 -> Bin 7 for 100-126, i_jet = 11 -> bin 12 for 316 - 398
 	for (int i_jet = 6; i_jet < 12; i_jet++)
 	{
@@ -42,6 +55,12 @@ void draw_run_dep()
 		//i_trk is the vector index, corresponds to bin = i_trk+1, i_trk = 1 -> Bin 2 for 0.9-1, i_trk = 6 -> bin 7 for 6.3 - 10
 		for (int i_trk = 1; i_trk < 7; i_trk++)
 		{
+
+			string trk_label = Form("%1.1f < p_{T}^{Trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+			string jet_label = Form("%1.0f < p_{T}^{Jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+
 			c->cd();
 			c->Clear();
 			c->Divide(3,2);
@@ -162,6 +181,7 @@ void draw_run_dep()
 				SetHStyle_smallify(h_nominal,1,1);
 				SetHStyle_smallify(h_combined,0,1);
 
+				h_nominal->GetYaxis()->SetTitle("Period_{i} / Nominal");
 				h_nominal->DrawCopy("");
 				for (int i_run = 0; i_run < f_run_UE.size(); i_run++)
 				{
@@ -172,6 +192,10 @@ void draw_run_dep()
 //				h_combined->Divide(h_nominal);
 //				h_combined->Draw("same hist text");
 
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.92,0.92,num_to_cent(31,i_cent).c_str());
+				ltx->DrawLatexNDC(0.92,0.86,jet_label.c_str());
+				ltx->DrawLatexNDC(0.92,0.80,trk_label.c_str());
 				line->DrawLine(0,1,0.8,1);
 
 			}

@@ -36,7 +36,7 @@ void cone_stats(int config)
 	c->cd();
 //	h_mc->GetXaxis()->SetRangeUser(0.2,10);
 	if (config == 24) h_mc->GetXaxis()->SetRangeUser(25,45);
-	if (config == 25) h_mc->GetXaxis()->SetRangeUser(0,10);
+	if (config == 47) h_mc->GetXaxis()->SetRangeUser(0,10);
 
 	h_mc->GetYaxis()->SetRangeUser(0,0.3);
 

@@ -184,7 +184,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 		cout << "posres as Function of R" << endl;
 		TCanvas *c_pos_res = new TCanvas("c_pos_res","c_pos_res",900,600);
 
-		TLegend *legend_pos_res = new TLegend(0.55, 0.18, 0.75, 0.40, "","brNDC");
+		TLegend *legend_pos_res = new TLegend(0.55, 0.50, 0.75, 0.80, "","brNDC");
 		legend_pos_res->SetTextFont(43);
 		legend_pos_res->SetBorderSize(0);
 		legend_pos_res->SetTextSize(10);
@@ -211,15 +211,15 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 					if (jet_itr == 0 && i_cent == 0) legend_pos_res->AddEntry(h_ratio_1d_r[i_trk][i_cent][i_jet],trk_label.c_str(),"lp");
 
-					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0.9, 1.1);
+					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0., 5);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0., r_max_range);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle("#it{r}");
 					h_ratio_1d_r[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle("Correction Factors");
 
 					c_pos_res->cd(i_cent+1);
-					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("hist text");
-//					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
+					if (trk_itr == 0) h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("p");
+					else h_ratio_1d_r[i_trk][i_cent][i_jet]->Draw("same p");
 					line->DrawLine(0, 1, r_max_range, 1);
 
 					trk_itr++;

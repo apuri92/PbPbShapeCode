@@ -67,6 +67,7 @@ void systematics(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys1"); //JER
 //	sys_names.push_back("sys2"); //Sign
 //	sys_names.push_back("sys3"); //Unfolding
+//	sys_names.push_back("sys4"); //MC_NonClosure
 //	sys_names.push_back("sys5"); //MCProbCut
 //	sys_names.push_back("sys6"); //HIJES_1_P
 //	sys_names.push_back("sys7"); //HIJES_2_P
@@ -80,14 +81,21 @@ void systematics(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys17"); //CentHIJES_N
 //	sys_names.push_back("sys18"); //ppJES_P
 //	sys_names.push_back("sys19"); //ppJES_N
-//	sys_names.push_back("sys22"); //MC_NonClosure
 	sys_names.push_back("sys42"); //UE Map stat
-	sys_names.push_back("sys43"); //UE run dep
+//	sys_names.push_back("sys43"); //UE run dep
 	sys_names.push_back("sys44"); //UE Cone method
 //	sys_names.push_back("sys45"); //Fakes
 
-	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_2_P" }, { "sys8" , "HIJES_1_N" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "Tracking" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P" }, { "sys19" , "ppJES_N" }, { "sys22" , "MC NonClosure" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
+	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_2_P" }, { "sys8" , "HIJES_1_N" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "Tracking" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P" }, { "sys19" , "ppJES_N" }, { "sys4" , "MC NonClosure" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
 
+
+	(sys_names[i_sys] == "sys2" ||
+	 sys_names[i_sys] == "sys5" ||
+	 sys_names[i_sys] == "sys10" ||
+	 sys_names[i_sys] == "sys11" ||
+	 sys_names[i_sys] == "sys14" ||
+	 sys_names[i_sys] == "sys15" ||
+	 sys_names[i_sys] == "sys21" ) &&
 
 
 //	combined_sys_names.push_back("JER");
@@ -241,7 +249,7 @@ void systematics(string config_file = "sys_config.cfg")
 							if (
 								(sys_names[i_sys] == "sys1" && combined_sys_names[i_comb_sys] == "JER") ||
 								(sys_names[i_sys] == "sys3" && combined_sys_names[i_comb_sys] == "Unfolding") ||
-								(sys_names[i_sys] == "sys22" && combined_sys_names[i_comb_sys] == "MCNonClosure")
+								(sys_names[i_sys] == "sys4" && combined_sys_names[i_comb_sys] == "MCNonClosure")
 								)
 							{
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
@@ -277,8 +285,7 @@ void systematics(string config_file = "sys_config.cfg")
 								  sys_names[i_sys] == "sys10" ||
 								  sys_names[i_sys] == "sys11" ||
 								  sys_names[i_sys] == "sys14" ||
-								  sys_names[i_sys] == "sys15" ||
-								  sys_names[i_sys] == "sys21" ) &&
+								  sys_names[i_sys] == "sys15" ) &&
 								 combined_sys_names[i_comb_sys] == "Tracking"
 								 )
 
@@ -457,16 +464,14 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 
 				c_sys->cd(i_cent+1);
-//				double max = h_total_sys_p[i_trk][i_cent][i_jet]->GetMaximum() * 1.2;
-//				cout << max << endl;
-//				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-max, max);
+//				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-2, 2);
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("l");
 				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("l same");
 
@@ -500,8 +505,8 @@ void systematics(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%]",rdptr_label.c_str()));
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 

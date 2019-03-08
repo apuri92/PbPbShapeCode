@@ -12,7 +12,7 @@ function unfold_draw_DpT {
 	if [[ $mode == "unfold" ]]; then
 		echo "getting UE and posCorr factors"
 		root -b -q "get_posCorr.c(\"unfold_draw_DpT_auto.cfg\")"
-		# root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")"
+		root -b -q "UE_factors.c(\"unfold_draw_DpT_auto.cfg\")"
 		./analysis unfold_draw_DpT_auto.cfg
 	fi
 

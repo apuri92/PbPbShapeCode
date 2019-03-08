@@ -687,13 +687,13 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 		TLegend *legend_x = new TLegend(0.20, 0.45, 0.40, 0.75, "","brNDC");
 		legend_x->SetTextFont(43);
 		legend_x->SetBorderSize(0);
-		legend_x->SetTextSize(10);
+		legend_x->SetTextSize(14);
 		legend_x->SetNColumns(1);
 
-		TLegend *legend_y = new TLegend(0.50, 0.4, 0.65, 0.450, "","brNDC");
+		TLegend *legend_y = new TLegend(0.20, 0.4, 0.65, 0.450, "","brNDC");
 		legend_y->SetTextFont(43);
 		legend_y->SetBorderSize(0);
-		legend_y->SetTextSize(10);
+		legend_y->SetTextSize(14);
 		legend_y->SetNColumns(1);
 
 
@@ -732,11 +732,11 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 					if (jet_itr == 0 && i_trk == 2 && i_cent == 0)
 					{
 //						legend_x->AddEntry(h_MB_r_1D[i_jet][i_trk][i_cent],"MC","lp");
-						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"MC_{data}","lp");
+						legend_x->AddEntry(h_MB_data_r_1D[i_jet][i_trk][i_cent],"UE_{Map Method}","lp");
 //						legend_x->AddEntry(h_TM_r_1D[i_jet][i_trk][i_cent],"TM","lp");
 //						legend_x->AddEntry(h_cone_r_1D[i_jet][i_trk][i_cent],"cone","lp");
-						legend_x->AddEntry(h_cone_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}","lp");
-						legend_y->AddEntry(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent],"cone_{data}/MC_{data}","lp");
+						legend_x->AddEntry(h_cone_data_r_1D[i_jet][i_trk][i_cent],"UE_{Cone Method}","lp");
+						legend_y->AddEntry(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent],"UE_{Cone Method}/UE_{Map Method}","lp");
 //						legend_x->AddEntry(h_FS_r_1D[i_jet][i_trk][i_cent],"FS","lp");
 //						legend_x->AddEntry(h_FNS_r_1D[i_jet][i_trk][i_cent],"FNS","lp");
 					}
@@ -755,11 +755,10 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 					double avg =(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(1) + h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(11))/2;
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(-0.5,0.5);
 //					else h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(avg*0.98, 1.02*avg);
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.9,1.1);
+//					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.92,1.08);
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(504);
 					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(505);
 					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetNdivisions(505);
-//					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.88,1.12);
 
 
 					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.85, 1.15);
@@ -782,19 +781,26 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 					h_TM_r_1D[i_jet][i_trk][i_cent]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
 
-					if (i_cent == 0) {low_range = 30; hi_range = 100;}
-					if (i_cent == 1) {low_range = 20; hi_range = 60;}
-					if (i_cent == 2) {low_range = 10; hi_range = 40;}
-					if (i_cent == 3) {low_range = 5; hi_range = 25;}
-					if (i_cent == 4) {low_range = 5; hi_range = 15;}
+					if (i_cent == 0) {low_range = 60; hi_range = 90;}
+					if (i_cent == 1) {low_range = 40; hi_range = 60;}
+					if (i_cent == 2) {low_range = 25; hi_range = 40;}
+					if (i_cent == 3) {low_range = 17; hi_range = 25;}
+					if (i_cent == 4) {low_range = 7; hi_range = 15;}
 					if (i_cent == 5) {low_range = 1.5; hi_range = 4;}
 
 //					if (i_jet == jet_pt_start && i_trk == 2)
-					h_TM_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(low_range, hi_range);
+					low_range = fabs(fabs(h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetBinContent(1))-1);
+//					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(1-2*low_range, 1+2*low_range);
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.97,1.03);
 
+					if (i_cent == 4 || i_cent == 5)
+					{
+						h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(0.85,1.15);
+					}
 
 //					h_MB_data_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetRangeUser(50,100);
-					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
+//					h_TM_r_1D[i_jet][i_trk][i_cent]->Draw("");
 //					h_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist same ");
 					h_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("same");
 //					h_cone_r_1D[i_jet][i_trk][i_cent]->Draw("same");
@@ -813,9 +819,9 @@ void check_UE(int sys_mode = 47, bool subtract = 0)
 
 					if (subtract) h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x - MB");
 					else  h_TM_MB_r_1D[i_jet][i_trk][i_cent]->GetYaxis()->SetTitle("x / MC");
-					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist text");
+//					h_TM_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist text");
 //					h_MB_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same hist text");
-					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist same text");
+					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->Draw("hist");
 //					h_cone_data_MB_data_r_1D[i_jet][i_trk][i_cent]->SetMarkerSize(5);
 //					h_cone_MB_r_1D[i_jet][i_trk][i_cent]->Draw("hist");
 //					h_cone_data_MB_r_1D[i_jet][i_trk][i_cent]->Draw("same");
