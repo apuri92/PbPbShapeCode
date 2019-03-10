@@ -3,6 +3,10 @@
 # package="$scp_bnl:/direct/usatlas+u/apuri/Work/pPb_analysis/jetFragmentation_pPb_xAOD/pPbFragmentation"
 package="apuri@acas0003:/direct/usatlas+u/apuri/Work/pPb_analysis/jetFragmentation_pPb_xAOD/pPbFragmentation"
 
+if [[ $2 = "test" ]] ; then
+	package="apuri@acas0003:/direct/usatlas+u/apuri/testing_ground/jetFragmentation_pPb_xAOD/pPbFragmentation"
+fi
+
 #package="apuri@lxplus.cern.ch:/afs/cern.ch/user/a/apuri/private/jetFragmentation_pPb_xAOD/pPbFragmentation/"
 #package="apuri@lxplus.cern.ch:/afs/cern.ch/user/a/apuri/private/tmp/jetFragmentation_pPb_xAOD/pPbFragmentation/"
 
@@ -24,9 +28,9 @@ elif [[ $1 = "Link" ]] ; then
 	echo "sending $1 to analysis"
 	scp ./pPbFragmentation/Root/LinkDef.h $package/Root/
 elif [[ $1 = "all" ]] ; then
-	source send.sh "*.cxx"
+	source send.sh "*.cxx" $2
 	# source send.sh "Link"
-	source send.sh "*.h"
+	source send.sh "*.h" $2
 	# source send.sh "util"
 	# source send.sh "cfg"
 

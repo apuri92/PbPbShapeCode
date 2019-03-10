@@ -388,7 +388,7 @@ EL::StatusCode PbPbFragmentation :: execute (){
 				dRmin=R;
 			}
 			if (dRmin<_dR_truth_matching) {
-				uncertprovider->CorrectJet(&newjet,truthMjet,cent_bin_fine,FCalEt);
+				uncertprovider->CorrectJet(eventInfo, &newjet,truthMjet, cent_bin_fine,FCalEt);
 				//truthMjet.releasePrivateStore();
 			}
 			//if (truthMjet) delete truthMjet;				

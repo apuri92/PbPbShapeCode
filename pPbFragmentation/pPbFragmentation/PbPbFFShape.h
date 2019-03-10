@@ -70,7 +70,6 @@ class PbPbFFShape : public BaseClass{
 	UEEstimator* uee; //!
 	
 	UncertProvider* uncertprovider; //!
-	JetUncertaintiesTool *jesProv_new; //!
 
 	TrackCorrector* trkcorr; //!
 	JetCorrector* jetcorr; //!

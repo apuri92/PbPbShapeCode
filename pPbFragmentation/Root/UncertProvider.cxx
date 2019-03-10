@@ -1,14 +1,5 @@
 #include "pPbFragmentation/UncertProvider.h"
 
-void UncertProvider::InitJESTool()
-{
-	jesProv = new JetUncertaintiesTool("JESProvider");
-	jesProv->setProperty("JetDefinition","AntiKt4EMTopo");
-	jesProv->setProperty("MCType","MC15");
-	jesProv->setProperty("ConfigFile","JES_2015/ICHEP2016/JES2015_SR_Scenario1.config");
-	jesProv->initialize();
-}
-
 std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err, int size)
 {
 	std::vector<double> UE_sys_values;
@@ -20,11 +11,11 @@ std::vector<double> UncertProvider::UEE_Uncert(double nominalUE, double UE_err, 
 	return UE_sys_values;
 }
 
-void UncertProvider::CorrectJet(xAOD::Jet * reco, xAOD::Jet * truth = 0, int cent = 0, float FCalEt=0){
+void UncertProvider::CorrectJet(const xAOD::EventInfo *eInfo, xAOD::Jet * reco, xAOD::Jet * truth = 0, int cent = 0, float FCalEt=0){
 	switch (uncert_class){
 		case 1:
 		{	 
-			 UncerJESIntrinsic(reco);
+			 UncerJESIntrinsic(reco, eInfo);
 			 break;
 		}	 	 	 	  	 
 		case 2:
@@ -91,7 +82,7 @@ void UncertProvider::UncerJERIntrinsic_Gaus(xAOD::Jet* recon, xAOD::Jet* truth, 
 
 
 //JES uncert
-void UncertProvider::UncerJESIntrinsic(xAOD::Jet* recon)
+void UncertProvider::UncerJESIntrinsic(xAOD::Jet* recon, const xAOD::EventInfo* eInfo)
 //@brief: applies JES shift based on the JES uncertainty provider tool
 //@note: significance should be +/- 1
 {
@@ -104,15 +95,9 @@ void UncertProvider::UncerJESIntrinsic(xAOD::Jet* recon)
    Float_t jetPhi = recon->phi();
    Float_t jetM = recon->m();
 
-	//stupid tool requires first index to be called, it fails otherwise
-//	double tmp = jesProv->getUncertainty(0,(*recon));
+	//added eventinfo to prevent memory issues
+	uncertainty = 1+ significance * (jesProv_UncerProv.getUncertainty(component, *recon, *eInfo));
 
-	uncertainty = 1+ significance * (jesProv->getUncertainty(component,(*recon)));
-//	uncertainty = 1+ significance * (jesProv.getUncertainty(component,(*recon)));
-   //cout << "Uncert 0: " <<  (jesProv.getUncertainty(0,(*recon))) << endl;
-   //cout << "Uncert 1: " <<  (jesProv.getUncertainty(1,(*recon))) << endl ;
-   //cout << "Uncert 18: " <<  (jesProv.getUncertainty(18,(*recon))) << endl ;
-   //cout << "Uncert 19: " <<  (jesProv.getUncertainty(19,(*recon))) << endl ;
    recon->setJetP4( xAOD::JetFourMom_t(jetPt*uncertainty,jetEta,jetPhi,jetM) ) ;
 }
 

@@ -162,12 +162,6 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	EL_RETURN_CHECK("initialize()",m_jetCleaning->initialize());
 
 	//Uncertainty
-	//JES
-    jesProv_new = new JetUncertaintiesTool("JESProvider_new");
-    EL_RETURN_CHECK("initialize()",jesProv_new->setProperty("JetDefinition","AntiKt4EMTopo"));
-    EL_RETURN_CHECK("initialize()",jesProv_new->setProperty("MCType","MC15"));
-    EL_RETURN_CHECK("initialize()",jesProv_new->setProperty("ConfigFile","JES_2015/ICHEP2016/JES2015_SR_Scenario1.config"));
-	EL_RETURN_CHECK("initialize()",jesProv_new->initialize());
 
 	//JER
 	jerTool = new JERTool("JERTool");
@@ -202,10 +196,6 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	//Uncert tool
 	uncertprovider = new UncertProvider(_uncert_index,_mcProbCut,_cut_level.c_str(), GetCentralityNBins(31)-1, _eff_jety);
 	_mcProbCut = uncertprovider->GetMCProb();
-	if (_uncert_index )
-	{
-//		uncertprovider->InitJESTool();
-	}
 	cout << "mc prob: " << _mcProbCut <<endl;
 	//uncertprovider->JES_tool=jesProv;
 	
