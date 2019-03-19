@@ -265,6 +265,11 @@ void UEEstimator::initShapeUE(bool isMC)
 
 void UEEstimator::initShapeUE(bool isMC, int uncert)
 {
+	_f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb.root","READ");
+	if (uncert >= 10 && uncert <= 15 || uncert == 2)
+	{
+		_f_ShapeUE = new TFile(Form("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb_sys%i.root",sys_uncert),"READ");
+	}
 
 	cout << "Using UE file: " << _f_ShapeUE->GetName() << endl;
 
@@ -282,8 +287,7 @@ void UEEstimator::initShapeUE(bool isMC, int uncert)
 
 						std::string name;
 						name = Form("h_UE_new_MC_dR%i_dPsi%i_pt%i_cent%i_jet%i",i_dR, i_dPsi, i_pt+1, i_cent, i_jet);
-						if (uncert == 2) h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE_tight->Get(name.c_str());
-						else h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE->Get(name.c_str());
+						h_UE_eta_phi_maps[i_jet][i_pt][i_dPsi][i_cent][i_dR] = (TH2*)_f_ShapeUE->Get(name.c_str());
 					}
 				}
 			}

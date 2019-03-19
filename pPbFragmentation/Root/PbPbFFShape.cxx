@@ -852,11 +852,23 @@ EL::StatusCode PbPbFFShape :: execute (){
 						float R_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 						double z_truth = cos(R_truth)*track_mc_pt / matched_truth_jet_pt;
 
-						float dpT_weight = 1.;
+						double dpT_weight = 1.;
+						double spectrum_rw = 1.;
+
 						if (_applyReweighting)
 						{
-							if (_dataset == 4) dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, cent_bin);
-							if (_dataset == 3) dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, 6);
+
+							if (_dataset == 4)
+							{
+								spectrum_rw=jetcorr->GetJetReweightingFactor(matched_truth_jet_pt,cent_bin);
+								dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, cent_bin);
+							}
+							if (_dataset == 3)
+							{
+								spectrum_rw=jetcorr->GetJetReweightingFactor(matched_truth_jet_pt,6);
+								dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, 6);
+							}
+
 						}
 
 						//R_trk_jet
@@ -869,11 +881,11 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 						if (pass_reco_pt_cut)
 						{
-							ff_trackpTResponse.at(dr_bin).at(cent_bin)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-							ff_trackpTResponse.at(dr_bin).at(n_cent_bins-1)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
+							ff_trackpTResponse.at(dr_bin).at(cent_bin)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight*spectrum_rw );
+							ff_trackpTResponse.at(dr_bin).at(n_cent_bins-1)->Fill(pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight*spectrum_rw );
 
-							response_ChPS.at(dr_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
-							response_ChPS.at(dr_bin).at(n_cent_bins-1)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight );
+							response_ChPS.at(dr_bin).at(cent_bin)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight*spectrum_rw );
+							response_ChPS.at(dr_bin).at(n_cent_bins-1)->Fill(pt, jet_pt, track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight*dpT_weight*spectrum_rw );
 						}
 						isFake=false;
 						if (pass_reco_pt_cut) h_dR_binning->Fill(R_reco_reco);
@@ -1100,18 +1112,6 @@ EL::StatusCode PbPbFFShape :: finalize (){
 	if( m_jetCleaning ) {
 		delete m_jetCleaning;
 		m_jetCleaning = 0;
-	}
-
-	//cleaning electrons
-	if(m_EgammaCalibrationAndSmearingTool)
-	{
-		delete m_EgammaCalibrationAndSmearingTool;
-		m_EgammaCalibrationAndSmearingTool=0;
-	}
-	if(m_LHToolTight2015)
-	{
-		delete m_LHToolTight2015;
-		m_LHToolTight2015=0;
 	}
 
 

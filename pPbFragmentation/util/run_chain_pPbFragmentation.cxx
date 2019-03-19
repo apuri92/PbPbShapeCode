@@ -279,7 +279,7 @@ int main(int argc, char *argv[])
 
 	// Get input file (! be careful about path -- not to include last folder !)
 	if (!isGridJob){
-		SH::ScanDir().filePattern("*").scan(sh, input_directory);
+		SH::readFileList (sh, "testdir", input_directory.c_str());
 	}
 	else {
 		SH::scanDQ2 (sh, InDS.c_str());

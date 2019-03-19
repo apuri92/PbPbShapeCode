@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 	if (isMC) did = "MC";
 
 	int apply_MC_nonClos = 0;
-	if (sys_mode == 22) apply_MC_nonClos = 1;
+	if (sys_mode == 4) apply_MC_nonClos = 1;
 
 	int apply_fake_uncert = 0;
 	if (sys_mode == 45) apply_fake_uncert = 1;

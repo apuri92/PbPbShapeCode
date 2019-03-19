@@ -109,10 +109,8 @@ float JetCorrector::GetJetReweightingFactor(double pt, double eta, int cent){
 }
 
 float JetCorrector::GetJetReweightingFactor(double pt, int cent){
-//	cout << shape_JetSpectra_weights[cent]->GetName() << " pt: " << pt << " cent: " << cent ;
-	int pt_bin = shape_JetSpectra_weights[cent]->FindBin(pt);
-//	cout << " jet w: " << shape_JetSpectra_weights[cent]->GetBinContent(pt_bin) << " pt: " << pt << " cent: " << cent << endl;
-	return shape_JetSpectra_weights[cent]->GetBinContent(pt_bin);
+//	cout << " jet w: " << shape_JetSpectra_weights[cent]->Eval(pt) << " pt: " << pt << " cent: " << cent << endl;
+	return shape_JetSpectra_weights[cent]->Eval(pt);
 }
 
 float JetCorrector::GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine){

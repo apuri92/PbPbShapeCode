@@ -99,24 +99,6 @@ EL::StatusCode PbPbFFShape :: initialize ()
 	TrackHelperTools::SetCutLevel(m_trackSelectorTool, _cut_level.c_str());
 	EL_RETURN_CHECK("initialize()",m_trackSelectorTool->initialize());
 
-	//Setup the electron calibration tool
-	m_EgammaCalibrationAndSmearingTool  = new CP::EgammaCalibrationAndSmearingTool("EgammaCalibrationAndSmearingTool");
-	EL_RETURN_CHECK("initialize()", m_EgammaCalibrationAndSmearingTool->setProperty("ESModel", "es2015PRE") );
-	EL_RETURN_CHECK("initialize()", m_EgammaCalibrationAndSmearingTool->setProperty("ResolutionType", "SigmaEff90") );
-	EL_RETURN_CHECK("initialize()", m_EgammaCalibrationAndSmearingTool->setProperty("decorrelationModel", "FULL_v1") );
-	EL_RETURN_CHECK("initialize()", m_EgammaCalibrationAndSmearingTool->initialize() );
-
-	m_LHToolTight2015= new AsgElectronLikelihoodTool ("m_LHToolTight2015");
-
-	// initialize the primary vertex container for the tool to have access
-	// to the number of vertices used to adapt cuts based on the pileup
-	EL_RETURN_CHECK("initialize()", m_LHToolTight2015->setProperty("primaryVertexContainer","PrimaryVertices") );
-
-	// define the config files
-	std::string confDir = "ElectronPhotonSelectorTools/offline/mc15_20150712/";
-	EL_RETURN_CHECK("initialize()", m_LHToolTight2015->setProperty("ConfigFile",confDir+"ElectronLikelihoodTightOfflineConfig2015.conf" ) );
-	EL_RETURN_CHECK("initialize()", m_LHToolTight2015->initialize() );
-
 	// GRL
 	TString xfn = gSystem->GetFromPipe("echo $ROOTCOREBIN");
 	TString xmlfile = xfn + "/../pPbFragmentation/data/"+ _GRL;

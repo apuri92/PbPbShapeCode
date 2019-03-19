@@ -116,7 +116,7 @@ class UEEstimator
 	  }
 
 		 TString path_to_UE = gSystem->GetFromPipe("echo $ROOTCOREBIN");
-		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb.root","READ");
+//		 _f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb.root","READ");
 		 _f_ShapeUE_tight = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_nov3_tight.root","READ");
 		 _f_ShapeUE_v3 = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/f_UE_maps_v2_v3.root","READ");;
 

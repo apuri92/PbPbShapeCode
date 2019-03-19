@@ -260,7 +260,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	ChPS_MB_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_MB_UE_rN =  vector<vector<TH3D*> > (_ndRBins, vector<TH3D*>(_nCentbins));
 	ChPS_MB_UE_sys =  vector<vector<vector<TH2D*> > > (100, vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins)));
-//	ChPS_MB_UE_err =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_FNS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_circ_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
@@ -397,14 +396,15 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			temphist_3D = new TH3D(Form("ChPS_MB_UE_rN_dR%i_cent%i",i,j),Form("ChPS_MB_UE_rN_dR%i_cent%i",i,j), RunBinsN, RunBins, ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
 			ChPS_MB_UE_rN.at(i).at(j) = temphist_3D;
 
-			for (int i_sys = 0; i_sys < ChPS_MB_UE_sys.size(); i_sys++)
+			if (_uncert_index == 42)
 			{
-				temphist_2D = new TH2D(Form("ChPS_MB_UE_sys%i_dR%i_cent%i",i_sys,i,j),Form("ChPS_MB_UE_sys%i_dR%i_cent%i", i_sys,i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-				ChPS_MB_UE_sys.at(i_sys).at(i).at(j) = temphist_2D;
-				ChPS_MB_UE_sys.at(i_sys).at(i).at(j)->Sumw2();
-				wk()->addOutput (ChPS_MB_UE_sys.at(i_sys).at(i).at(j));
-
-
+				for (int i_sys = 0; i_sys < ChPS_MB_UE_sys.size(); i_sys++)
+				{
+					temphist_2D = new TH2D(Form("ChPS_MB_UE_sys%i_dR%i_cent%i",i_sys,i,j),Form("ChPS_MB_UE_sys%i_dR%i_cent%i", i_sys,i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+					ChPS_MB_UE_sys.at(i_sys).at(i).at(j) = temphist_2D;
+					ChPS_MB_UE_sys.at(i_sys).at(i).at(j)->Sumw2();
+					wk()->addOutput (ChPS_MB_UE_sys.at(i_sys).at(i).at(j));
+				}
 			}
 
 			temphist_2D = new TH2D(Form("ChPS_FS_UE_dR%i_cent%i",i,j),Form("ChPS_FS_UE_dR%i_cent%i",i,j),ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);

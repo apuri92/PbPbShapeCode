@@ -39,7 +39,7 @@ class JetCorrector
     TAxis * jet_pt_binning;
 	TAxis * trk_pt_binning;
     TF1 *jet_spectra_weight[8][8];
-	TH1 *shape_JetSpectra_weights[7];
+	TF1 *shape_JetSpectra_weights[7];
 	TH1 *shape_ChPSSpectra_weights[13][7][16];
 
 	TH1D *FF_weight[8][8][20];
@@ -103,7 +103,7 @@ class JetCorrector
 				 if (!isPbPb && i_cent != 6) continue;
 				 if (isPbPb && i_cent == 6) continue;
 
-				 shape_JetSpectra_weights[i_cent] = (TH1*)_f_reweighting->Get(Form("jet_weight_%s_y4_c%i",data_type.c_str(), i_cent));
+				 shape_JetSpectra_weights[i_cent] = (TF1*)_f_reweighting->Get(Form("fit_jet_weight_%s_y4_c%i",data_type.c_str(), i_cent));
 				 for (int i_dR = 0 ; i_dR < 13; i_dR++)
 				 {
 					 for (int i_jet = 0; i_jet < jet_pt_binning->GetNbins(); i_jet++)

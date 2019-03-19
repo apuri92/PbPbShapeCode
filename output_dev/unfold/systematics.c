@@ -67,43 +67,38 @@ void systematics(string config_file = "sys_config.cfg")
 //	sys_names.push_back("sys1"); //JER
 //	sys_names.push_back("sys2"); //Sign
 //	sys_names.push_back("sys3"); //Unfolding
-//	sys_names.push_back("sys4"); //MC_NonClosure
+////	sys_names.push_back("sys4"); //MC_NonClosure
 //	sys_names.push_back("sys5"); //MCProbCut
-//	sys_names.push_back("sys6"); //HIJES_1_P
-//	sys_names.push_back("sys7"); //HIJES_2_P
-//	sys_names.push_back("sys8"); //HIJES_1_N
-//	sys_names.push_back("sys9"); //HIJES_2_N
-//	sys_names.push_back("sys10"); //Material_P
-//	sys_names.push_back("sys11"); //Material_N
-//	sys_names.push_back("sys14"); //Tracking
-//	sys_names.push_back("sys15"); //TrackingRes
+	sys_names.push_back("sys6"); //HIJES_1_P
+	sys_names.push_back("sys7"); //HIJES_1_N
+	sys_names.push_back("sys8"); //HIJES_2_P
+	sys_names.push_back("sys9"); //HIJES_2_N
+//////	sys_names.push_back("sys10"); //Material_P
+//////	sys_names.push_back("sys11"); //Material_N
+//////	sys_names.push_back("sys14"); //Tracking
+//////	sys_names.push_back("sys15"); //TrackingRes
 //	sys_names.push_back("sys16"); //CentHIJES_P
 //	sys_names.push_back("sys17"); //CentHIJES_N
-//	sys_names.push_back("sys18"); //ppJES_P
-//	sys_names.push_back("sys19"); //ppJES_N
-	sys_names.push_back("sys42"); //UE Map stat
-//	sys_names.push_back("sys43"); //UE run dep
-	sys_names.push_back("sys44"); //UE Cone method
-//	sys_names.push_back("sys45"); //Fakes
+//	sys_names.push_back("sys18"); //ppJES_P_101
+//	sys_names.push_back("sys19"); //ppJES_N_101
+//	sys_names.push_back("sys20"); //ppJES_P_102
+//	sys_names.push_back("sys21"); //ppJES_N_102
+//	sys_names.push_back("sys22"); //ppJES_P_103
+//	sys_names.push_back("sys23"); //ppJES_N_103
+//	sys_names.push_back("sys42"); //UE Map stat
+////	sys_names.push_back("sys43"); //UE run dep
+//	sys_names.push_back("sys44"); //UE Cone method
+////	sys_names.push_back("sys45"); //Fakes
 
-	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_2_P" }, { "sys8" , "HIJES_1_N" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "Tracking" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P" }, { "sys19" , "ppJES_N" }, { "sys4" , "MC NonClosure" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
-
-
-	(sys_names[i_sys] == "sys2" ||
-	 sys_names[i_sys] == "sys5" ||
-	 sys_names[i_sys] == "sys10" ||
-	 sys_names[i_sys] == "sys11" ||
-	 sys_names[i_sys] == "sys14" ||
-	 sys_names[i_sys] == "sys15" ||
-	 sys_names[i_sys] == "sys21" ) &&
+	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys4" , "MC NonClosure" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_1_N" }, { "sys8" , "HIJES_2_P" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "Tracking" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P_101" }, { "sys19" , "ppJES_N_101" }, { "sys20" , "ppJES_P_102" },{ "sys21" , "ppJES_N_102" }, { "sys22" , "ppJES_P_103" }, { "sys23" , "ppJES_P_103" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
 
 
 //	combined_sys_names.push_back("JER");
-//	combined_sys_names.push_back("JES");
-	combined_sys_names.push_back("UE");
+	combined_sys_names.push_back("JES");
+//	combined_sys_names.push_back("UE");
 //	combined_sys_names.push_back("Tracking");
 //	combined_sys_names.push_back("Unfolding");
-//	combined_sys_names.push_back("MCNonClosure");
+////	combined_sys_names.push_back("MCNonClosure");
 
 
 	vector<vector<vector<TH1*>>> h_nom (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -273,7 +268,11 @@ void systematics(string config_file = "sys_config.cfg")
 								  sys_names[i_sys] == "sys16" ||
 								  sys_names[i_sys] == "sys17" ||
 								  sys_names[i_sys] == "sys18" ||
-								  sys_names[i_sys] == "sys19" ) &&
+								  sys_names[i_sys] == "sys19" ||
+								  sys_names[i_sys] == "sys20" ||
+								  sys_names[i_sys] == "sys21" ||
+								  sys_names[i_sys] == "sys22" ||
+								  sys_names[i_sys] == "sys23" ) &&
 								 combined_sys_names[i_comb_sys] == "JES"
 								 )
 
@@ -285,7 +284,8 @@ void systematics(string config_file = "sys_config.cfg")
 								  sys_names[i_sys] == "sys10" ||
 								  sys_names[i_sys] == "sys11" ||
 								  sys_names[i_sys] == "sys14" ||
-								  sys_names[i_sys] == "sys15" ) &&
+								  sys_names[i_sys] == "sys15" ||
+								  sys_names[i_sys] == "sys45" ) &&
 								 combined_sys_names[i_comb_sys] == "Tracking"
 								 )
 
@@ -347,11 +347,11 @@ void systematics(string config_file = "sys_config.cfg")
 					}
 
 					//remove fluctuations in JES uncert
-					if (combined_sys_names[i_comb_sys] == "JES")
-					{
-						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
-						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
-					}
+//					if (combined_sys_names[i_comb_sys] == "JES")
+//					{
+//						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
+//						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Smooth(1,"");
+//					}
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_p",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetTitle(name.c_str());
@@ -424,14 +424,16 @@ void systematics(string config_file = "sys_config.cfg")
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
-	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.30, 0.45, "","brNDC");
+	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.80, 0.45, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
 	legend_sys->SetTextSize(14);
+	legend_sys->SetNColumns(2);
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
 	ltx->SetTextSize(12);
+	TLine *line = new TLine();
 
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
@@ -460,7 +462,7 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(1);
 
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.08,0.08);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
@@ -483,9 +485,13 @@ void systematics(string config_file = "sys_config.cfg")
 					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
 					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
 					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
-					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_i_name[sys_names[i_sys]].c_str(),"l");
-					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
-					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Draw("l same");
+					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetMarkerSize(0.3);
+					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetMarkerSize(0.3);
+
+					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_i_name[sys_names[i_sys]].c_str(),"lp");
+					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("lp same");
+					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Draw("lp same");
+
 				}
 				for (int i_comb_sys = 0; i_comb_sys < combined_sys_names.size(); i_comb_sys++)
 				{
@@ -493,13 +499,15 @@ void systematics(string config_file = "sys_config.cfg")
 					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(2);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(2);
 
 					bool empty_hist_p = false;
 					bool empty_hist_n = false;
 					if (h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetMaximum() == 0 && h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetMinimum() == 0) empty_hist_p = true;
 					if (h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetMaximum() == 0 && h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetMinimum() == 0) empty_hist_n = true;
 
-					if (cent_first_pass) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"l");
+					if (cent_first_pass) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
@@ -511,11 +519,10 @@ void systematics(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
 					c_sys->cd(i_cent+1);
-					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
-					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineStyle(3);
-
-					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
-					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("l same");
+//					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("lp same");
+//					if (!empty_hist_n) h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Draw("lp same");
+//					line->SetLineColor(kWhite);
+//					line->DrawLine(0,0, 0.8,0.);
 				}
 
 

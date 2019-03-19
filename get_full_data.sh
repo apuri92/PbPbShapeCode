@@ -1,5 +1,10 @@
-echo "pbpb/pp	data/mc	perf/ff	config"
-read input_data input_did input_type config
+# echo "pbpb/pp	data/mc	perf/ff	config"
+# read input_data input_did input_type config
+
+input_data=$1
+input_did=$2
+input_type=$3
+config=$4
 
 # echo "data or mc?"
 # read input_did
@@ -59,7 +64,7 @@ fi
 
 mkdir -p /Users/Akshat/Box\ Sync/Research/Analysis/jetFragmentation/PbPbShapeCode/output_dev/raw_results/c$config
 
-files=/usatlas/u/apuri/usatlasdata/output/PbPbFFShape/processed_$data_type/config$config/$file_name
+files=/atlasgpfs01/usatlas/data/apuri/output/PbPbFFShape//processed_$data_type/config$config/$file_name
 local_area=/Users/Akshat/Box\ Sync/Research/Analysis/jetFragmentation/PbPbShapeCode/output_dev/raw_results/c$config
 echo -e "$files \n -> \n $local_area"
 

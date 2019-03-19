@@ -11,13 +11,14 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 	TEnv *m_config = new TEnv();
 	m_config->ReadFile("perf_config.cfg", EEnvLevel(1));
 
+	int config = 0; config = m_config->GetValue("config", config);
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	//	##############	Config done	##############"
 
 	//output root file
-	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
+	name = Form("perf_output_c%i/mc_eff_%s_trketa_jetptinc_%s.root",config, dataset_type.c_str(), tracking_cut.c_str());
 	TFile *output_file = new TFile(Form("%s",name.c_str()),"recreate");
 	cout << Form("Efficiency root file: %s", output_file->GetName()) << endl;
 
@@ -198,13 +199,13 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
 					vec_hi_e.at(i_files).at(i_bin) = h_ratio->GetBinError(i_bin+1);
 				}
 
-				h_matched_3d->Reset();
-				h_matched_1d->Reset();
+				delete h_matched_3d;
+				delete h_matched_1d;
 
-				h_total_3d->Reset();
-				h_total_1d->Reset();
+				delete h_total_3d;
+				delete h_total_1d;
 
-				h_ratio->Reset();
+				delete h_ratio;
 			}
 
 			for (int i_bin = 0; i_bin < h_efficiency.at(i_cent_cuts).at(i_eta_cuts)->GetNbinsX(); i_bin++)

@@ -57,6 +57,7 @@ void get_ChPS_weights(string dataset_type, TFile *f_weights)
 	vector<vector<TH1*>> h_jet_data (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
 	vector<vector<TH1*>> h_jet_ratio (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
 
+	c->Print(Form("tmpfit_%s.pdf(", dataset_type.c_str()),"Title: start");
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
 		if (dataset_type == "PbPb" && i_cent == 6) continue;
@@ -97,15 +98,28 @@ void get_ChPS_weights(string dataset_type, TFile *f_weights)
 
 			h_jet_ratio[i_cent][i_y] = (TH1*)h_jet_data[i_cent][i_y]->Clone(Form("%s_ratio", name.c_str()));
 			h_jet_ratio[i_cent][i_y]->Divide(h_jet_MC[i_cent][i_y]);
+
+			TF1* f_fit = new TF1("fit","[0] + [1]*log(x) + [2]*pow(log(x),2)", 100,400);
+			h_jet_ratio[i_cent][i_y]->Fit(f_fit,"qR","");
+
+			c->cd();
+			h_jet_ratio[i_cent][i_y]->GetYaxis()->SetRangeUser(0,2);
+			h_jet_ratio[i_cent][i_y]->Draw("hist text");
+			gPad->SetLogx();
+			c->Print(Form("tmpfit_%s.pdf", dataset_type.c_str()),Form("Title: %s", name.c_str()));
+
 			f_weights->cd();
 			name = Form("jet_weight_%s_y%i_c%i",dataset_type.c_str(), i_y, i_cent);
 			h_jet_ratio[i_cent][i_y]->SetName(name.c_str());
 			h_jet_ratio[i_cent][i_y]->SetTitle(name.c_str());
 			h_jet_ratio[i_cent][i_y]->Write(name.c_str());
+			f_fit->Write(Form("fit_%s",name.c_str()));
 		}
 
-
 	}
+
+	c->Print(Form("tmpfit_%s.pdf)", dataset_type.c_str()),"Title: start");
+
 }
 
 void get_weights_dev()

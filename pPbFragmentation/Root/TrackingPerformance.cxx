@@ -1005,7 +1005,7 @@ EL::StatusCode TrackingPerformance :: execute (){
 		int truthindex=TruthJetIndex.at(i);
 		if (truthindex<0) continue; //Reco jet must be matched to truth jet
 		if (jet_pt < _pTjetCut)  continue;
-		if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity) //removed 12/8 for tracking efficienciy
+//		if (fabs(jet_y) > (2.5 - _dR_max)) continue; //cut on rapidity (simultaniously with 2.5-drmax on pseudorapidity) //removed 12/8 for tracking efficienciy
 
 		h_reco_jet_map.at(cent_bin)->Fill(jet_pt, jet_eta, jet_phi, event_weight);
 		h_reco_jet_map.at(nCentBins-1)->Fill(jet_pt, jet_eta, jet_phi, event_weight);
