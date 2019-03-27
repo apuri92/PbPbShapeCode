@@ -266,9 +266,9 @@ void UEEstimator::initShapeUE(bool isMC)
 void UEEstimator::initShapeUE(bool isMC, int uncert)
 {
 	_f_ShapeUE = new TFile("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb.root","READ");
-	if (uncert >= 10 && uncert <= 15 || uncert == 2)
+	if ((uncert >= 10 && uncert <= 15) || uncert == 2 || uncert == 5)
 	{
-		_f_ShapeUE = new TFile(Form("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb_sys%i.root",sys_uncert),"READ");
+		_f_ShapeUE = new TFile(Form("$ROOTCOREBIN/../pPbFragmentation/data/UE_MC_comb_sys%i.root",uncert),"READ");
 	}
 
 	cout << "Using UE file: " << _f_ShapeUE->GetName() << endl;
@@ -278,7 +278,7 @@ void UEEstimator::initShapeUE(bool isMC, int uncert)
 	{
 		for (int i_dPsi = 0; i_dPsi < 10; i_dPsi++)
 		{
-			for (int i_pt = 0; i_pt < 7; i_pt++)
+			for (int i_pt = 0; i_pt < 10; i_pt++)
 			{
 				for (int i_cent = 0; i_cent < 6; i_cent++)
 				{

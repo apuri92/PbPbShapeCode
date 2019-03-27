@@ -33,7 +33,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
 	TAxis* trkpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetXaxis();
 
-	double r_max_range = 1.2;
+	double r_max_range = 0.8;
 
 	string name;
 	TCanvas *c1 = new TCanvas("c1","c1",800,400);

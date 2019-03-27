@@ -5,9 +5,13 @@ void runStats(int config = 47)
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 	double r_max_range = 0.8;
+	string sys_path = "";
+	if (config == 0) sys_path = Form("nominal");
+	if (config > 0 && config < 100) sys_path = Form("sys%i", config);
+	if (config > 100) sys_path = Form("c%i", config);
 
-	TFile *input_file = new TFile(Form("output_dev/raw_results/c%i/FF_MC_out_histo_PbPb_5p02_r001.root", config));
-	TFile *input_file_data = new TFile(Form("output_dev/raw_results/c%i/FF_data_out_histo_PbPb_5p02_r001.root", config));
+	TFile *input_file = new TFile(Form("output_dev/raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
+	TFile *input_file_data = new TFile(Form("output_dev/raw_results/%s/FF_data_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
 	TAxis* jetpT_binning = (TAxis*)((TH3*)input_file->Get("ChPS_raw_0_dR0_cent0"))->GetYaxis();
@@ -85,6 +89,6 @@ void runStats(int config = 47)
 	legend_x->AddEntry(h_eventPercentage_mc,"MC","lp");
 	legend_x->Draw();
 
-	c_x->Print(Form("EventPercentages_c%i.pdf",config));
+	c_x->Print(Form("misc_conf_plots/EventPercentages_c%i.pdf",config));
 
 }

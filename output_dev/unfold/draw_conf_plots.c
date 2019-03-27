@@ -54,7 +54,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
-	doubel r_max_range = 1.2;
+	double r_max_range = 0.8;
 	//indR
 	vector<vector<vector<TH1*>>> h_RDpT_final_ratio_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_RDpT_final_sys_Totalpos_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -97,7 +97,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 	double opacity = 0.7;
 
-	int trk_select1 = 3;
+	int trk_select1 = 2;
 	int trk_select2 = 6;
 
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -190,7 +190,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 					if (i_trk == 8 && i_jet == 9 && i_dR >= 4 && i_cent == 5)
 					{
-						cout << "VERY SPECIFIC CUT" << endl;
+						cout << "VERY SPECIFIC CUT: " << nom << endl;
 						nom = -1;
 					}
 					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
@@ -445,7 +445,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 //			if (i_cent != 0 && i_cent != 5) continue;
 
-			canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_ratio_dR_CONF_%s_trk_cent%i.pdf", did.c_str(), i_cent));
+			canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_ratio_dR_CONF_%s_trk%i_%i_cent%i.pdf", did.c_str(), trk_select1, trk_select2, i_cent));
 
 			first_pass_cent = false;
 		} //end jet loop
@@ -683,7 +683,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 			ltx->DrawLatexNDC(0.17, 0.74, Form("%s", jet_label.c_str()));
 			ltx->DrawLatexNDC(0.17, 0.69, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
-			canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_dR_CONF_%s_cent_jet%i.pdf",did.c_str(), i_jet));
+			canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_dR_CONF_%s_cent_trk%i_%i_jet%i.pdf",did.c_str(), trk_select1, trk_select2, i_jet));
 
 			jet_itr++;
 		} //end jet loop

@@ -1,16 +1,16 @@
 #include "output_dev/functions/global_variables.h"
 
-void check_UE(int sys_mode = 47, bool subtract = 0)
+void check_UE(int sys_mode = 0, bool subtract = 0)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 	string name;
 
-	string sys_path;
+	string sys_path = Form("c%i",sys_mode);
 	double r_max_range = 0.8;
 	if (sys_mode == 0) sys_path = Form("nominal");
-	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("c%i", sys_mode);
-	if (sys_mode > 100) sys_path = Form("sys%i", sys_mode);
+	if (sys_mode > 0 && sys_mode < 100) sys_path = Form("sys%i", sys_mode);
+	if (sys_mode > 100) sys_path = Form("c%i", sys_mode);
 //	TFile *input_file = new TFile(Form("./hist-local_mc.root"));
 //	TFile *input_file_data = new TFile(Form("./hist-local_mc.root"));
 

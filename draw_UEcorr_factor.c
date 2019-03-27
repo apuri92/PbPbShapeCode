@@ -1,8 +1,9 @@
 #include "output_dev/functions/global_variables.h"
 
+//DUPLICATE OF output_dev/unfold/UE_FACTORS.C
 void draw_UEcorr_factor()
 {
-	TFile *file = new TFile("UE_c21.root");
+	TFile *file = new TFile("UE_nominal.root");
 	TAxis* dR_binning = (TAxis*)file->Get("dR_binning");
 	TAxis* jetpT_binning = (TAxis*)file->Get("jetpT_binning");
 	TAxis* trkpT_binning = (TAxis*)file->Get("trkpT_binning");
@@ -28,10 +29,6 @@ void draw_UEcorr_factor()
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
 			TH2* h_corr = (TH2*)file->Get(Form("h_cone_correction_dR%i_cent%i",i_dR, i_cent));
-
-			TH2* h_tmp = (TH2*)h_corr->Clone("tmp");
-			h_corr->Divide(h_tmp);
-			h_corr->Divide(h_tmp);
 
 			c->cd(i_cent+1);
 			h_corr->GetXaxis()->SetRangeUser(1,10);
@@ -60,7 +57,7 @@ void draw_UEcorr_factor()
 		if (i_dR == 0) name = "(";
 		else if (i_dR == N_dR - 1) name = ")";
 
-		c->Print(Form("CorrFactorComparison.pdf%s",name.c_str()),Form("Title: r%i, %s",i_dR, dr_label.c_str()));
+		c->Print(Form("misc_conf_plots/CorrFactorComparison.pdf%s",name.c_str()),Form("Title: r%i, %s",i_dR, dr_label.c_str()));
 
 	}
 

@@ -5,7 +5,7 @@ void draw_run_dep()
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 
-	TFile *f_nominal_full = new TFile("UE_c47.root");
+	TFile *f_nominal_full = new TFile("UE_nominal.root");
 	TFile *f_nominal = new TFile("UE_c67.root");
 	TFile *f_UE_sys = new TFile("UE_RunDependentSys.root","recreate");
 
@@ -206,9 +206,9 @@ void draw_run_dep()
 			string pdf_label = "";
 			if (i_jet == 7 && i_trk == 2) pdf_label = "(";
 			if (i_jet == 11 && i_trk == 6) pdf_label = ")";
-			c->Print(Form("weightedRuns.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
-			c1->Print(Form("weightedRuns_v_Nominal.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
-			c2->Print(Form("Nominal_full_v_reducedMaps.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
+			c->Print(Form("misc_conf_plots/weightedRuns.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
+			c1->Print(Form("misc_conf_plots/weightedRuns_v_Nominal.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
+			c2->Print(Form("misc_conf_plots/Nominal_full_v_reducedMaps.pdf%s",pdf_label.c_str()),Form("Title: jet%i_trk%i", i_jet, i_trk));
 
 		}
 	}

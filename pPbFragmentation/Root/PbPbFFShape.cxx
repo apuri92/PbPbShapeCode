@@ -641,7 +641,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			for (int i_dR = 0; i_dR < 11; i_dR++)
 			{
-				for (int i_pt = 0; i_pt < 7; i_pt++)
+				for (int i_pt = 0; i_pt < 10; i_pt++)
 				{
 					double UE_err = -1;
 					double UE_val = 0;

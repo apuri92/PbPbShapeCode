@@ -11,6 +11,7 @@ void draw_eff_trketa()
 	m_config->ReadFile("perf_config.cfg", EEnvLevel(1));
 	m_config->Print();
 	
+	int config = 0; config = m_config->GetValue("config", config);
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	std::string tracking_cut = "ppTight"; tracking_cut = m_config->GetValue("tracking_cut", tracking_cut.c_str());
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
@@ -18,7 +19,7 @@ void draw_eff_trketa()
 
 
 	//reading from raw efficiency file
-	name = Form("mc_eff_%s_trketa_jetptinc_%s.root",dataset_type.c_str(), tracking_cut.c_str());
+	name = Form("perf_output_c%i/mc_eff_%s_trketa_jetptinc_%s.root",config, dataset_type.c_str(), tracking_cut.c_str());
 	TFile *input_file = new TFile(name.c_str());
 
 //	TAxis* trk_pt_binning = (TAxis*)input_file->Get("trk_pt_binning");
@@ -108,7 +109,7 @@ void draw_eff_trketa()
 	else canvas1->cd();
 	legend->Draw();
 
-	name = Form("output_pdf/eff_cent_trketa_%s_%s.pdf", dataset_type.c_str(), tracking_cut.c_str());
+	name = Form("perf_output_c%i/eff_cent_trketa_%s_%s.pdf",config, dataset_type.c_str(), tracking_cut.c_str());
 	canvas1->Print(name.c_str());
 
 

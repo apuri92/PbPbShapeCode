@@ -18,4 +18,4 @@ run ChPS PbPb 0
 run ChPS pp 0
 run RDpT x 0
 
-# root -b -q "draw_conf_plots.c(\"tmp.cfg\")"
+root -b -q "draw_conf_plots.c(\"tmp.cfg\")"

@@ -76,9 +76,10 @@ int main(int argc, char ** argv)
 
 	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
 	TFile *dr_factors = new TFile(Form("output_pdf%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
-	TFile *UE_uncert;
+	TFile *UE_uncert, *fake_uncert;
 	if (apply_UE_RunDep) UE_uncert = new TFile(Form("UE_RunDependentSys.root"));
 	if (apply_UE_mapStatSys) UE_uncert = new TFile(Form("UE_MapSystematic.root"));
+	if (apply_fake_uncert) fake_uncert = new TFile(Form("../raw_results/nominal/FF_MC_out_histo_pp_5p02_r001.root"));
 	TFile *f_output = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
 	int N_Y = 5;
@@ -193,8 +194,17 @@ int main(int argc, char ** argv)
 			//setup UE/fakes
 			TH2* h_UE_MB = (TH2*)f_data->Get(Form("ChPS_MB_UE_dR%i_cent%i",i_dR, i_cent));;
 			TH2* h_UE_TM = (TH2*)f_mc->Get(Form("ChPS_TM_UE_dR%i_cent%i",i_dR, i_cent));;
-			TH2* h_UE_corrected_cone;
-			if (dataset_type == "PbPb")
+
+			TH1* h_reco_jet_spect_mc = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_mc->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
+
+			TH1* h_reco_jet_spect_data = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+			h_reco_jet_spect_data->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
+
+
+			TH2* h_UE_corrected_cone, *h_map_stat, *h_fake_rate;
+			TH1* h_pp_MC_jets;
+			if (dataset_type == "PbPb" && apply_UE_ConeMethod)
 			{
 				TH2* h_UE_cone_MC = (TH2*)f_mc->Get(Form("ChPS_cone_UE_dR%i_cent%i",i_dR, i_cent));;
 				h_UE_cone_MC->SetName((Form("ChPS_cone_UE_MC_dR%i_cent%i",i_dR, i_cent)));
@@ -205,6 +215,21 @@ int main(int argc, char ** argv)
 				h_UE_corrected_cone = (TH2*)h_UE_cone_data->Clone(Form("ChPS_cone_UE_data_corrected_dR%i_cent%i",i_dR, i_cent));
 				h_UE_corrected_cone->Multiply(h_UE_TM);
 				h_UE_corrected_cone->Divide(h_UE_cone_MC);
+				delete h_UE_cone_MC;
+				delete h_UE_cone_data;
+			}
+
+			if (dataset_type == "PbPb" && apply_UE_mapStatSys)
+			{
+				h_map_stat = (TH2*)UE_uncert->Get(Form("ChPS_MB_UE_dR%i_cent%i_statSys", i_dR, i_cent));
+			}
+
+			if (apply_fake_uncert)
+			{
+				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_TM_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
+				h_fake_rate->SetName(Form("fake_dR%i_cent%i", i_dR, i_cent));
+				h_pp_MC_jets = (TH1*)fake_uncert->Get(Form("h_reco_jet_spectrum_y4_cent6"))->Clone(Form("fake_norm_%i",i_cent));
+				h_pp_MC_jets->SetName(Form("fake_norm_%i",i_cent));
 			}
 
 			TH2* h_final_UE = (TH2*)h_UE_MB->Clone(Form("final_UE_%i_cent%i",i_dR, i_cent));;
@@ -215,25 +240,6 @@ int main(int argc, char ** argv)
 			h_final_fake->Reset();
 			h_final_fake->Sumw2();
 
-
-			double n_jets_data = 1, n_jets_mc = 1;
-
-			TH1* h_reco_jet_spect_mc = (TH1*)((TH1*)f_mc->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
-			h_reco_jet_spect_mc->SetName(Form("norm_reco_mc_jet_y4_cent%i", i_cent));
-
-			TH1* h_reco_jet_spect_data = (TH1*)((TH1*)f_data->Get(Form("h_reco_jet_spectrum_y4_cent%i", i_cent)))->Clone(Form("norm_reco_data_jet_y4_cent%i", i_cent));
-			h_reco_jet_spect_data->SetName(Form("norm_reco_data_jet_y4_cent%i", i_cent));
-
-			TH1* h_cone_jet_spectra;
-
-			if (dataset_type == "PbPb")
-			{
-				name = Form("cone_norm_jet_cent%i", i_cent);
-				h_cone_jet_spectra= (TH1*)((TH1*)f_data->Get(name.c_str()))->Clone(Form("cone_UE_norm_y4_c%i", i_cent));
-				h_cone_jet_spectra->SetName(Form("%s_data",name.c_str()));
-				h_cone_jet_spectra->Sumw2();
-			}
-
 			TH2* h_raw_subtr = (TH2*)h_raw->Clone(Form("h_raw_subtr_dR%i_c%i", i_dR, i_cent));
 			h_raw_subtr->Reset();
 			h_raw_subtr->Sumw2();
@@ -242,12 +248,13 @@ int main(int argc, char ** argv)
 			for (int i_jet_bin = 1; i_jet_bin <= N_jetpt; i_jet_bin++)
 			{
 				if (i_jet_bin < h_reco_jet_spect_mc->FindBin(100) || i_jet_bin > h_reco_jet_spect_mc->FindBin(390)) continue;
-				n_jets_mc = h_reco_jet_spect_mc->GetBinContent(i_jet_bin);
-				n_jets_data = h_reco_jet_spect_data->GetBinContent(i_jet_bin);
+				double n_jets_mc = h_reco_jet_spect_mc->GetBinContent(i_jet_bin);
+				double n_jets_data = h_reco_jet_spect_data->GetBinContent(i_jet_bin);
+				double n_jets_pp_mc = 1;
+				if (apply_fake_uncert) n_jets_pp_mc = h_pp_MC_jets->GetBinContent(i_jet_bin);
 				//cone method uses same number of jets as n_jets_data
 
 				if (n_jets_mc == 0) continue;
-
 
 				//if pp. Subtract only fakes (UE_TM|MC) for all pT. Need to normalize n_jets_data / n_jets_mc. This correction is 1 if running on MC since UE_TM|MC has same # of jets as in MC
 				//if PbPb
@@ -258,120 +265,194 @@ int main(int argc, char ** argv)
 				for (int i_trk_bin = 1; i_trk_bin <= N_trkpt; i_trk_bin++)
 				{
 
-					double UE = 0, UE_err = 0, final_UE = 0, final_UE_err = 0;
-					double fake = 0, fake_err = 0, final_fake = 0, final_fake_err = 0;
+					double UE = 0, UE_err = 0;
+					double fake = 0, fake_err = 0;
 					double raw = 0, raw_err = 0;
 					double subtr = 0, subtr_err = 0;
-					double correction = 1, correction_err = 0;
-
-					double fake_uncert = 1;
-					if (apply_fake_uncert) fake_uncert = 1.3;
 
 					raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
+					raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 					if (raw == 0)
 					{
 						h_raw_subtr->SetBinContent(i_trk_bin, i_jet_bin, 0);
 						h_raw_subtr->SetBinError(i_trk_bin, i_jet_bin, 0);
 						continue;
 					}
+
+					//UE and subtr done for each individual case below
+					double fake_uncert_addition = 0, fake_uncert_addition_err = 0;
+					if (apply_fake_uncert)
+					{
+						fake_uncert_addition = h_fake_rate->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_pp_mc * 0.3;
+						fake_uncert_addition_err = h_fake_rate->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_pp_mc * 0.3;
+					}
+
 					if (dataset_type == "pp")
 					{
 						UE = 0;
 						UE_err = 0;
 
-						fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
-						fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+						//scale if necessary (in MC, n_jets factor = 1)
+						fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc;
+						fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc;
 
-						correction = n_jets_data / n_jets_mc; //correct number of jets
-						correction_err = 0; //no error on number of jets
+						if (apply_fake_uncert)
+						{
+							fake = 1.3 * fake;
+							fake_err = 1.3 * fake_err;
+						}
 
-						raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
-						raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
-
-						final_fake = fake * correction * fake_uncert;
-						final_fake_err = fake_err * correction * fake_uncert; //error propg: multiplying by constant
-
-						subtr = raw - final_fake;
-						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2) - pow(final_fake_err,2) )); //errors fully correlated
-						else subtr_err = sqrt(pow(raw_err,2) + pow(final_fake_err,2)); //errors uncorrelated
+						subtr = raw - fake;
+						if (isMC) subtr_err = sqrt(fabs( pow(raw_err,2) - pow(fake_err,2) )); //errors fully correlated
+						else subtr_err = sqrt(pow(raw_err,2) + pow(fake_err,2)); //errors uncorrelated
 					}
 
-					if (dataset_type == "PbPb")
+					else if (dataset_type == "PbPb")
 					{
 						if (i_trk_bin >= trkpT_binning->FindBin(0.9) && i_trk_bin < trkpT_binning->FindBin(10.))
 						{
-							fake = 0;
-							fake_err = 0;
 
-							//using mc maps, no correction required
-							UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
-							UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
-							correction = 1;
-
-							//run systematic:
 							if (apply_UE_ConeMethod)
 							{
+								//cone method is scaled correctly in both data and mc
+								//UE is uncorrelated to raw in both data and mc so add in quadrature
+
 								UE = h_UE_corrected_cone->GetBinContent(i_trk_bin, i_jet_bin);
 								UE_err = h_UE_corrected_cone->GetBinError(i_trk_bin, i_jet_bin); //corrected for UE-JER above
+
+								subtr = raw - UE;
+								subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
 							}
-							if (apply_UE_mapStatSys || apply_UE_RunDep)
+							else if (apply_UE_mapStatSys)
 							{
-								if (apply_UE_RunDep)
+								if (!isMC)
 								{
-									TH1* h_corr = (TH1*)UE_uncert->Get(Form("UE_MB_data_indR_jet%i_trk%i_cent%i_SYS", i_jet_bin-1, i_trk_bin-1, i_cent));
-									correction = h_corr->GetBinContent(i_dR+1);
-									delete h_corr;
-								}
-								if (apply_UE_mapStatSys)
-								{
-									TH2* h_corr = (TH2*)UE_uncert->Get(Form("ChPS_MB_UE_dR%i_cent%i_statSys", i_dR, i_cent));
-									correction = h_corr->GetBinContent(i_trk_bin, i_jet_bin);
-									delete h_corr;
-								}
+									//for mapStats systematic in data, use MB method, no jet scaling required, scale by rel. err from map_stat
+									//UE is uncorrelated so errors are scaled by map stat factor and added in quadrature
+									UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin) * h_map_stat->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin) * h_map_stat->GetBinContent(i_trk_bin, i_jet_bin);
 
-								UE = UE*correction;
-								UE_err = UE_err*correction;
+									subtr = raw - UE;
+									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
+								}
+								else if (isMC)
+								{
+									//for mapStats systematic in MC, use TM method, no jet scaling required, no map_stat required
+									//UE is fully correlated so errors are subtracted in quadrature
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+									subtr = raw - UE;
+									subtr_err = sqrt(fabs(pow(raw_err,2) - pow(UE_err,2))); //errors uncorrelated for both data and MC
+								}
 							}
+							else if (apply_fake_uncert)
+							{
+								if (!isMC)
+								{
+									//for fake systematic in data, use MB method and add fakes from pp scaled by n_jet * 0.3
+									//UE is uncorrelated so UE+fake err is just errUE and errFake added in quadrature. errFake also needs to be scaled by n_jets and 0.3
+									UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin) + fake_uncert_addition;
+									UE_err = sqrt( pow(h_UE_MB->GetBinError(i_trk_bin, i_jet_bin),2) + pow(fake_uncert_addition_err,2) );
 
+									subtr = raw - UE;
+									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
+								}
+								else if (isMC)
+								{
+									//for fake systematic in MC, use TM method and add fakes from pp scaled by n_jet * 0.3
+									//Do error in two steps: subtr = raw - UE_err is corr, subtr - fake is uncorr
 
-							raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
-							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin) + fake_uncert_addition;
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin); //doing fake err separately
 
-							final_UE = UE; //reduces to TM method for MC
+									subtr = raw - UE;
+									subtr_err = sqrt(fabs(pow(raw_err,2) - pow(UE_err,2)) + pow(fake_uncert_addition_err,2)); //raw_err and UE_err correlated, fake_uncert_err uncorrelated
+								}
 
-							if (isMC) final_UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin); //use errors from TM method
-							else final_UE_err = UE_err; //handled internally or by scaling factor for sys mode 23
+							}
+							else //no systematic applied, this is nominal behavior
+							{
+								if (!isMC)
+								{
+									//for nominal data, use MB method, no jet scaling required,
+									//UE is uncorrelated so errors added in quadrature
+									UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
 
-							subtr = raw - final_UE;
-							if (isMC) subtr_err = sqrt( fabs( pow(raw_err,2) - pow(final_UE_err,2) ) ); //errors fully correlated
-							else subtr_err = sqrt(pow(raw_err,2) + pow(final_UE_err,2)); //errors uncorrelated
+									subtr = raw - UE;
+									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
+								}
+								else if (isMC)
+								{
+									//in MC, use TM method, no jet scaling required
+									//UE is fully correlated so errors are subtracted in quadrature
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+									subtr = raw - UE;
+									subtr_err = sqrt(fabs(pow(raw_err,2) - pow(UE_err,2))); //errors uncorrelated for both data and MC
+								}
+							}
 						}
-
-						else
+						else //above 10 GeV
 						{
-							UE = 0;
-							UE_err = 0;
-
-							fake = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
-							fake_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
-
-							correction = n_jets_data / n_jets_mc; //correct number of jets
-							correction_err = 0; //no error on number of jets
-
 							raw = h_raw->GetBinContent(i_trk_bin, i_jet_bin);
 							raw_err = h_raw->GetBinError(i_trk_bin, i_jet_bin);
 
-							final_fake = fake * correction * fake_uncert;
-							final_fake_err = fake_err * correction * fake_uncert;
+							if (apply_fake_uncert)
+							{
+								if (!isMC)
+								{
+									//for fake systematic in data above 10 GeV, use TM method and add fakes from pp scaled by n_jet * 0.3
+									//UE is uncorrelated so UE+fake err is just errUE and errFake added in quadrature. errFake also needs to be scaled by n_jets and 0.3
+									UE = (h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin)*n_jets_data/n_jets_mc) + fake_uncert_addition;
+									UE_err = sqrt( pow(h_UE_TM->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc,2) + pow(fake_uncert_addition_err,2) );
 
-							subtr = raw - final_fake;
-							if (isMC) subtr_err = sqrt(pow(raw_err,2) - pow(final_fake_err,2)); //errors fully correlated
-							else subtr_err = sqrt(pow(raw_err,2) + pow(final_fake_err,2)); //errors uncorrelated
+									subtr = raw - UE;
+									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
+								}
+								else if (isMC)
+								{
+									//for fake systematic in MC, use TM method and add fakes from pp scaled by n_jet * 0.3
+									//Do error in two steps: subtr = raw - UE_err is corr, subtr - fake is uncorr
+
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin) + fake_uncert_addition;
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin); //doing fake err separately
+
+									subtr = raw - UE;
+									subtr_err = sqrt(fabs(pow(raw_err,2) - pow(UE_err,2)) + pow(fake_uncert_addition_err,2)); //raw_err and UE_err correlated, fake_uncert_err uncorrelated
+								}
+
+							}
+							else //no systematic applied, this is nominal behavior
+							{
+								if (!isMC)
+								{
+									//for nominal data above 10 GeV, use TM method, jet scaling required
+									//UE is uncorrelated so errors are scaled and added in quadrature
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc;
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc;
+
+									subtr = raw - UE;
+									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC
+								}
+								else if (isMC)
+								{
+									//in MC, use TM method, no jet scaling required
+									//UE is fully correlated so errors are subtracted in quadrature
+									UE = h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_TM->GetBinError(i_trk_bin, i_jet_bin);
+
+									subtr = raw - UE;
+									subtr_err = sqrt(fabs(pow(raw_err,2) - pow(UE_err,2))); //errors uncorrelated for both data and MC
+								}
+							}
 						}
 					}
 
 
-					if (verbose && subtr < 0 && (i_jet_bin >= 7 && i_jet_bin <= 12) && (i_trk_bin >=2 && i_trk_bin <= 10))
+					if (verbose && subtr < 0 && (i_jet_bin > 7 && i_jet_bin < 12) && (i_trk_bin > 2 && i_trk_bin < 10))
 					{
 						std::string trk_label = Form("%1.1f < trk < %1.1f", trkpT_binning->GetBinLowEdge(i_trk_bin), trkpT_binning->GetBinUpEdge(i_trk_bin));
 						std::string jet_label = Form("%1.0f < jet < %1.0f", jetpT_binning->GetBinLowEdge(i_jet_bin), jetpT_binning->GetBinUpEdge(i_jet_bin));
@@ -381,11 +462,11 @@ int main(int argc, char ** argv)
 
 					}
 
-					h_final_UE->SetBinContent(i_trk_bin, i_jet_bin, final_UE);
-					h_final_UE->SetBinError(i_trk_bin, i_jet_bin, final_UE_err);
+					h_final_UE->SetBinContent(i_trk_bin, i_jet_bin, UE);
+					h_final_UE->SetBinError(i_trk_bin, i_jet_bin, UE_err);
 
-					h_final_fake->SetBinContent(i_trk_bin, i_jet_bin, final_fake);
-					h_final_fake->SetBinError(i_trk_bin, i_jet_bin, final_fake_err);
+					h_final_fake->SetBinContent(i_trk_bin, i_jet_bin, fake);
+					h_final_fake->SetBinError(i_trk_bin, i_jet_bin, fake_err);
 
 					h_raw_subtr->SetBinContent(i_trk_bin, i_jet_bin, subtr);
 					h_raw_subtr->SetBinError(i_trk_bin, i_jet_bin, subtr_err);
@@ -526,7 +607,7 @@ int main(int argc, char ** argv)
 
 			if (apply_MC_nonClos && !isMC)
 			{
-				TFile * f_MC_nonClosure = new TFile(Form("output_pdf_nominal/root/final_ChPS_MC_%s.root", dataset_type.c_str()));
+				TFile * f_MC_nonClosure = new TFile(Form("output_pdf_sys3/root/final_ChPS_MC_%s.root", dataset_type.c_str())); //mc nonclosure factors will come from non-reweighed response matrices
 
 
 				for (int i_jet_bin = 0; i_jet_bin < N_jetpt; i_jet_bin++)

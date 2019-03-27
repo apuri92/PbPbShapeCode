@@ -1,12 +1,12 @@
 	
-systematics=(1016 1017) #1001 1003 1006 1007 1008 1009 1010 1011 1014 1015 1018 1019 1020 1021 1022 1023) 
+systematics=(945) #1 2 3 4 5 6 7 8 9 10 11 14 15 16 17 18 19 20 21 22 23 42 43 44 45) 
 
 
 function unfold_draw_DpT {
 	echo "dataset_type: $1" > unfold_draw_DpT_auto.cfg
 	echo "isMC: $2" >> unfold_draw_DpT_auto.cfg
 	echo "sys_mode: $3" >> unfold_draw_DpT_auto.cfg
-	echo "verbose: 0" >> unfold_draw_DpT_auto.cfg
+	echo "verbose: 1" >> unfold_draw_DpT_auto.cfg
 	echo "draw_mode: 1" >> unfold_draw_DpT_auto.cfg
 
 	if [[ $mode == "unfold" ]]; then
@@ -41,7 +41,7 @@ for i in ${systematics[@]}; do
 	echo "************************************"
 
 	sys_path="c"
-	if [[ $i -lt 24 ]]; then
+	if [[ $i -lt 51 ]]; then
 		sys_path="sys"
 	fi
 
@@ -50,13 +50,13 @@ for i in ${systematics[@]}; do
 	mkdir -p output_pdf_$sys_path$i/pp
 
 
-	unfold_draw_DpT PbPb 0 $i ; sleep 30
-	unfold_draw_DpT pp 0 $i ; sleep 30
-	get_RDpT 0 $i ; sleep 30
+	unfold_draw_DpT PbPb 0 $i
+	unfold_draw_DpT pp 0 $i
+	get_RDpT 0 $i
 
-	unfold_draw_DpT PbPb 1 $i ; sleep 30
-	unfold_draw_DpT pp 1 $i ; sleep 30 
-	get_RDpT 1 $i; sleep 30
+	unfold_draw_DpT PbPb 1 $i
+	unfold_draw_DpT pp 1 $i
+	get_RDpT 1 $i
 
 
 done

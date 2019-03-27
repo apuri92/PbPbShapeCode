@@ -3,8 +3,8 @@
 void compare_final_UE()
 {
 	SetAtlasStyle();
-	TFile *file_MC_method = new TFile("final_ChPS_data_PbPb_c25_UEMCmethod.root");
-	TFile *file_cone_method = new TFile("final_ChPS_data_PbPb_c25_UEconemethod.root");
+	TFile *file_MC_method = new TFile("output_dev/unfold/output_pdf_nominal/root/final_ChPS_data_PbPb.root");
+	TFile *file_cone_method = new TFile("output_dev/unfold/output_pdf_sys44/root/final_ChPS_data_PbPb.root"); //44 is cone method
 
 	TAxis* dR_binning = (TAxis*)file_MC_method->Get("dR_binning");
 	TAxis* jetpT_binning = (TAxis*)file_MC_method->Get("jetpT_binning");
@@ -54,9 +54,9 @@ void compare_final_UE()
 				{
 					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
-//					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_raw_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-					name = Form("h_ChPS_raw_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+//					name = Form("h_ChPS_raw_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_raw_subtr_unf_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 					TH1* h_MC_meth = (TH1*)file_MC_method->Get(name.c_str());
@@ -72,7 +72,7 @@ void compare_final_UE()
 
 					for (int i = 0; i < h_ratio->GetXaxis()->GetNbins(); i++)
 					{
-						h_ratio->SetBinError(i+1,0.);
+						h_ratio->SetBinError(i+1,0.0001);
 					}
 					if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR->AddEntry(h_ratio,trk_label.c_str(),"lp");
 

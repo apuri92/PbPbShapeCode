@@ -36,7 +36,7 @@ class UEEstimator
 
 	vector<vector<vector<vector<TH2*>>>> h_UE = vector<vector<vector<vector<TH2*>>>> (13, vector<vector<vector<TH2*>>> (16, vector<vector<TH2*>> (10, vector<TH2*> (6, NULL))));
 
-	vector<vector<vector<vector<vector<TH2*>>>>> h_UE_eta_phi_maps = vector<vector<vector<vector<vector<TH2*>>>>> (12, vector<vector<vector<vector<TH2*>>>> (7, vector<vector<vector<TH2*>>> (10, vector<vector<TH2*>> (6, vector<TH2*> (13)))));
+	vector<vector<vector<vector<vector<TH2*>>>>> h_UE_eta_phi_maps = vector<vector<vector<vector<vector<TH2*>>>>> (12, vector<vector<vector<vector<TH2*>>>> (10, vector<vector<vector<TH2*>>> (10, vector<vector<TH2*>> (6, vector<TH2*> (13)))));
 
 
     TH3D * _h_v2_EP;

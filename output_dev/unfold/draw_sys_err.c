@@ -29,7 +29,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	bool doSmall = true;
 	doSmall = false;
 
-	double r_max_range = 1.2;
+	double r_max_range = 0.8;
 	if (mode == "RDpT") dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
@@ -67,7 +67,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
-	int trk_pt_start = 3;
+	int trk_pt_start = 2;
 	int trk_pt_end = 9;
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
@@ -133,8 +133,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 //				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
 //				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.34,0.34);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.34,0.34);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
 				if (dataset_type == "_pp")
 				{
 					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
@@ -264,6 +264,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					if (dataset_type == "_pp") ltx->DrawLatexNDC(0.19, 0.84, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				}
 
+				//Make sure histograms do not have any infinities, this leads to crashing when printing canvas
 				c_sys->Print(Form("output_pdf_nominal/systematics/%s_dR_sys%s_error_trk%i_jet%i_cent%i.pdf",mode.c_str(), dataset_type.c_str(), i_trk, i_jet, i_cent));
 
 			}

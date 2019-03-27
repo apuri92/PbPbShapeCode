@@ -1,10 +1,10 @@
-void cone_stats(int config)
+void cone_stats()
 {
 	SetAtlasStyle();
 //	TFile *f_mc = new TFile("hist-local_mc_1.root");
 //	TFile *f_data = new TFile("hist-local_mc_2.root");
-	TFile *f_mc = new TFile(Form("output_dev/raw_results/c%i/FF_MC_out_histo_PbPb_5p02_r001.root",config));
-	TFile *f_data = new TFile(Form("output_dev/raw_results/c%i/FF_data_out_histo_PbPb_5p02_r001.root",config));
+	TFile *f_mc = new TFile(Form("output_dev/raw_results/nominal/FF_MC_out_histo_PbPb_5p02_r001.root"));
+	TFile *f_data = new TFile(Form("output_dev/raw_results/nominal/FF_data_out_histo_PbPb_5p02_r001.root"));
 
 
 	TH1* h_mc = (TH1*)f_mc->Get("h_tmp_cone_stats");
@@ -34,9 +34,7 @@ void cone_stats(int config)
 	h_data->Scale(1./h_data->Integral());
 
 	c->cd();
-//	h_mc->GetXaxis()->SetRangeUser(0.2,10);
-	if (config == 24) h_mc->GetXaxis()->SetRangeUser(25,45);
-	if (config == 47) h_mc->GetXaxis()->SetRangeUser(0,10);
+	h_mc->GetXaxis()->SetRangeUser(0,10);
 
 	h_mc->GetYaxis()->SetRangeUser(0,0.3);
 
@@ -53,7 +51,7 @@ void cone_stats(int config)
 
 	string name;
 
-	c->Print(Form("cone_stats_c%i.pdf",config));
+	c->Print(Form("misc_conf_plots/cone_stats.pdf"));
 
 }
 

@@ -38,7 +38,7 @@ void combine_eff_trketa(vector<TFile*>& theFiles, vector<double> w)
     int n_eta_new = eta_range.size()-1;
 
 	//getting binning for trk pt, new fine eta
-	TAxis* trk_pt_binning = (TAxis*)((TH3*)theFiles[0]->Get("h_eff_Injet_cent0"))->GetYaxis();
+	TAxis* trk_pt_binning = (TAxis*)((TH3*)theFiles[0]->Get("h_trk_foreff_full_cent0"))->GetYaxis();
 	int n_trk_pt_bins = trk_pt_binning->GetNbins();
 
 	TAxis* trk_eta_binning_new = new TAxis(n_eta_new, eta_binning_new);

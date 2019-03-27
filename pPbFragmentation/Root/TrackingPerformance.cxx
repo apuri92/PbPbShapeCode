@@ -72,7 +72,7 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	SetupBinning(0, "pt-jet-PbPb", ptJetBins, ptJetBinsN);
 	SetupBinning(0, "eta-jet", etaJetBins, etaJetBinsN);
 	SetupBinning(0, "phi-trk", phiJetBins, phiJetBinsN);
-	SetupBinning(0, "pt-trk-shape", ptTrkBins, ptTrkBinsN);
+	SetupBinning(0, "pt-trk", ptTrkBins, ptTrkBinsN);
 	SetupBinning(0, "eta-trk", etaTrkBins, etaTrkBinsN);
 	SetupBinning(0, "phi-trk", phiTrkBins, phiTrkBinsN);
 	SetupBinning(0, "d0z0", d0z0Bins, d0z0BinsN);
@@ -268,13 +268,13 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 			h_eff_dphi_matched.at(j).at(i)->Sumw2();
 			h_eff_dphi.at(j).at(i)->Sumw2();
 
-			wk()->addOutput (h_eff_dR_matched.at(j).at(i));
-			wk()->addOutput (h_eff_dR.at(j).at(i));
-			wk()->addOutput (h_eff_dR_entries.at(j).at(i));
-			wk()->addOutput (h_eff_deta_matched.at(j).at(i));
-			wk()->addOutput (h_eff_deta.at(j).at(i));
-			wk()->addOutput (h_eff_dphi_matched.at(j).at(i));
-			wk()->addOutput (h_eff_dphi.at(j).at(i));
+//			wk()->addOutput (h_eff_dR_matched.at(j).at(i));
+//			wk()->addOutput (h_eff_dR.at(j).at(i));
+//			wk()->addOutput (h_eff_dR_entries.at(j).at(i));
+//			wk()->addOutput (h_eff_deta_matched.at(j).at(i));
+//			wk()->addOutput (h_eff_deta.at(j).at(i));
+//			wk()->addOutput (h_eff_dphi_matched.at(j).at(i));
+//			wk()->addOutput (h_eff_dphi.at(j).at(i));
 		}
 
 
@@ -289,36 +289,36 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 		h_tmp.clear();
 
 
-		wk()->addOutput (h_reco_Injet_matched.at(i));
-		wk()->addOutput (h_reco_jet_map.at(i));
-		wk()->addOutput (h_eff_matched.at(i));
-		wk()->addOutput (h_eff_total.at(i));
-
-		wk()->addOutput (h_eff_Injet_matched.at(i));
-		wk()->addOutput (h_eff_Injet.at(i));
-		wk()->addOutput (h_trk_eff_matched_map.at(i));
-		wk()->addOutput (h_trk_eff_map.at(i));
-		wk()->addOutput (h_eff_Injet_entries.at(i));
-		wk()->addOutput (h_eff_entries.at(i));
+//		wk()->addOutput (h_reco_Injet_matched.at(i));
+//		wk()->addOutput (h_reco_jet_map.at(i));
+//		wk()->addOutput (h_eff_matched.at(i));
+//		wk()->addOutput (h_eff_total.at(i));
+//
+//		wk()->addOutput (h_eff_Injet_matched.at(i));
+//		wk()->addOutput (h_eff_Injet.at(i));
+//		wk()->addOutput (h_trk_eff_matched_map.at(i));
+//		wk()->addOutput (h_trk_eff_map.at(i));
+//		wk()->addOutput (h_eff_Injet_entries.at(i));
+//		wk()->addOutput (h_eff_entries.at(i));
 		wk()->addOutput (h_trk_foreff_entries.at(i));
 		wk()->addOutput (h_trk_foreff_matched.at(i));
 		wk()->addOutput (h_trk_foreff_full.at(i));
-		wk()->addOutput (h_trk_foreff_r_entries.at(i));
-		wk()->addOutput (h_trk_foreff_r_matched.at(i));
-		wk()->addOutput (h_trk_foreff_r_full.at(i));
-		wk()->addOutput (h_fake_v_jet.at(i));
-		wk()->addOutput (h_fake_v_jet_PV.at(i));
-		wk()->addOutput (h_trk_scale.at(i));
-		wk()->addOutput (h_trk_eta_scale.at(i));
-		wk()->addOutput (h_trk_phi_scale.at(i));
-		wk()->addOutput (h_trk_R_scale.at(i));
-		wk()->addOutput (h_truth_outside.at(i));
-		wk()->addOutput (h_reco_outside.at(i));
-
-		for (int j = 0 ; j < NCuts ; j++)
-		{
-			wk()->addOutput (h_cut_flow_cent.at(i).at(j));
-		}
+//		wk()->addOutput (h_trk_foreff_r_entries.at(i));
+//		wk()->addOutput (h_trk_foreff_r_matched.at(i));
+//		wk()->addOutput (h_trk_foreff_r_full.at(i));
+//		wk()->addOutput (h_fake_v_jet.at(i));
+//		wk()->addOutput (h_fake_v_jet_PV.at(i));
+//		wk()->addOutput (h_trk_scale.at(i));
+//		wk()->addOutput (h_trk_eta_scale.at(i));
+//		wk()->addOutput (h_trk_phi_scale.at(i));
+//		wk()->addOutput (h_trk_R_scale.at(i));
+//		wk()->addOutput (h_truth_outside.at(i));
+//		wk()->addOutput (h_reco_outside.at(i));
+//
+//		for (int j = 0 ; j < NCuts ; j++)
+//		{
+//			wk()->addOutput (h_cut_flow_cent.at(i).at(j));
+//		}
 
 
 	}
@@ -333,13 +333,13 @@ EL::StatusCode TrackingPerformance :: histInitialize ()
 	h_d0sign_subset = new TH3D("h_d0sign_subset","h_d0sign_subset", ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins, phiTrkBinsN, phiJetBins);
 	h_z0sign_subset = new TH3D("h_z0sign_subset","h_z0sign_subset", ptTrkBinsN, ptTrkBins, etaTrkBinsN, etaTrkBins, phiTrkBinsN, phiJetBins);
 
-	wk()->addOutput (h_d0sign_wrt_truth);
-	wk()->addOutput (h_z0sign_wrt_truth);
-	wk()->addOutput (h_d0sign_subset);
-	wk()->addOutput (h_z0sign_subset);
-
-	wk()->addOutput (h_d0_cut);
-	wk()->addOutput (h_d0_nocut);
+//	wk()->addOutput (h_d0sign_wrt_truth);
+//	wk()->addOutput (h_z0sign_wrt_truth);
+//	wk()->addOutput (h_d0sign_subset);
+//	wk()->addOutput (h_z0sign_subset);
+//
+//	wk()->addOutput (h_d0_cut);
+//	wk()->addOutput (h_d0_nocut);
 
 
 	cout << " Histograms  ready" << endl;

@@ -940,8 +940,6 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			legend_ChPS_final->SetTextSize(10);
 			
 			
-			
-			
 			for (int i_dR = 0; i_dR < N_dR; i_dR++)
 			{
 				string dr_label = Form("%1.2f < #it{r} < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
@@ -985,7 +983,7 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
-						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.4, 2.1);
+						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
 						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
 						
@@ -1047,6 +1045,31 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				//			c_ChPS_raw_subtr_unf->Print(Form("output_pdf_%s/ChPS_raw_subtr_unf_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 				c_ChPS_final->Print(Form("output_pdf_%s/ChPS_final_ratio_%s.pdf%s", sys_path.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 			} //end dr loop
+
+
+
+			c_ChPS_final->Clear();
+			c_ChPS_final->Divide(3,2);
+
+			bool first_pass_cent = true;
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+				c_ChPS_final->cd(i_cent+1);
+
+				SetHStyle_smallify(h_ChPS_final_ratio.at(0).at(i_cent).at(7), 0, 1);
+				SetHStyle_smallify(h_ChPS_final_ratio.at(3).at(i_cent).at(7), 1, 1);
+
+				h_ChPS_final_ratio.at(0).at(i_cent).at(7)->GetYaxis()->SetRangeUser(0,2);
+				h_ChPS_final_ratio.at(0).at(i_cent).at(7)->Draw();
+				h_ChPS_final_ratio.at(3).at(i_cent).at(7)->Draw("same");
+				line->SetLineColor(kRed);
+				line->DrawLine(0,1.,0.8,1);
+				gPad->SetLogx();
+
+
+			}
+			c_ChPS_final->Print("tmp.pdf");
+
 		}
 
 		{
