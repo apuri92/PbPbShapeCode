@@ -923,7 +923,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					c_B2S_dR->cd(i_cent+1);
 					ltx->SetTextAlign(32);
 					ltx->SetTextSize(12);
-					ATLASLabel(0.19, 0.88, "     Preliminary", "", kBlack);
+					ATLASLabel(0.19, 0.88, "     Internal", "", kBlack);
 					ltx->SetTextAlign(12);
 					ltx->SetTextSize(15);
 					ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -1160,7 +1160,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				legend_ChPS_dR_UE->Draw();
 
 				c_ChPS_dR_UE->cd(5);
-				ATLASLabel(0.19, 0.88, "     Preliminary", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
+				ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
 
 				pdf_label = "";
 				if (i_jet == jet_pt_start) pdf_label = "(";

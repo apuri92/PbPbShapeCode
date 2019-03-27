@@ -321,7 +321,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				line->DrawLine(0, 1, r_max_range, 1);
 				legend->Draw();
-				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);
 				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -435,7 +435,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 			legend->Draw();
 			legend_open->Draw();
 
-			ATLASLabel(0.17, 0.88, "Preliminary", "", kBlack);
+			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(23);
 			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -553,7 +553,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 
-				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);
 				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
@@ -675,7 +675,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 			line->DrawLine(0, 1, r_max_range, 1);
 
 
-			ATLASLabel(0.17, 0.88, "Preliminary", "", kBlack);
+			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(23);
 			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");

@@ -248,7 +248,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				ltx->SetTextAlign(12);
 				c_sys->cd();
-				ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
+				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
 
 				ltx->SetTextAlign(12);
 				ltx->SetTextSize(23);

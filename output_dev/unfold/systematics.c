@@ -548,7 +548,7 @@ void systematics(string config_file = "sys_config.cfg")
 
 
 			c_sys->cd(1);
-			ATLASLabel(0.19, 0.88, "Preliminary", "", kBlack);
+			ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
 			ltx->SetTextAlign(12);
 			ltx->SetTextSize(10);
 			if (dataset_type == "_pp") ltx->SetTextSize(24);
