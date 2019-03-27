@@ -410,6 +410,53 @@ void systematics(string config_file = "sys_config.cfg")
 	}
 
 
+	//Cast in terms of track pT
+	vector<vector<vector<TH1*>>> h_total_sys_p_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_total_sys_n_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+
+	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+	{
+		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
+		{
+			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+			if (dataset_type == "_pp" && i_cent < 6) continue;
+
+			for (int i_dR = 0; i_dR < N_dR; i_dR++)
+			{
+				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
+				h_total_sys_p_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
+				h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Reset();
+
+				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
+				h_total_sys_n_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
+				h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Reset();
+
+				double val = 0, val_err = 0;
+				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+				{
+					val = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					val_err = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
+					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+
+					val = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					val_err = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
+					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+				}
+
+				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
+				h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
+
+				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
+				h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
+
+			}
+		}
+	}
+
+
+
 	//drawing
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";

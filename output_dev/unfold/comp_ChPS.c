@@ -148,13 +148,14 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
+	line->SetLineStyle(3);
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
 	ltx->SetTextSize(12);
 
 	double trk_pt_lo = 1.;
-	double trk_pt_hi = 150.;
+	double trk_pt_hi = 63;
 	double ratio_lo = 0.;
 	double ratio_hi = 5;
 
@@ -313,21 +314,30 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
+				h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 
 				name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_raw_subtr_unf_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_raw_subtr_unf_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle("Raw+Subtr+Unf #frac{PbPb}{pp} _{(#frac{1}{Area N_{Jets}} #frac{dN}{dp_{T}})}");
+				h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 
 				name = Form("h_ChPS_final_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(rdptr_label.c_str());
+				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 
 				name = Form("h_ChPS_truth_ratio_PbPb_pp_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet) = (TH1*)h_ChPS_final_PbPb.at(i_dR).at(i_cent).at(i_jet)->Clone(name.c_str());
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->Divide(h_ChPS_final_pp.at(i_dR).at(6).at(i_jet));
 				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetTitle(Form("Truth %s", rdptr_label.c_str()));
+				h_ChPS_truth_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
+
+				f_RDpT->cd();
+				name = Form("h_RDpT_final_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->Write(name.c_str());
+
 
 			}
 		}
@@ -978,12 +988,15 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 						
 						
 						h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
+						h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 						h_ChPS_raw_subtr_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
 						h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
+						h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 						h_ChPS_raw_subtr_unf_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
 						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
+						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
 						h_ChPS_final_ratio.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetNdivisions(504);
 						
 						
@@ -1052,22 +1065,46 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 			c_ChPS_final->Divide(3,2);
 
 			bool first_pass_cent = true;
+
+			legend_ChPS_final->Clear();
+			legend_ChPS_final->SetX1NDC(0.2);
+			legend_ChPS_final->SetY1NDC(0.20);
+			legend_ChPS_final->SetX2NDC(0.4);
+			legend_ChPS_final->SetY2NDC(0.40);
+
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
 				c_ChPS_final->cd(i_cent+1);
 
-				SetHStyle_smallify(h_ChPS_final_ratio.at(0).at(i_cent).at(7), 0, 1);
-				SetHStyle_smallify(h_ChPS_final_ratio.at(3).at(i_cent).at(7), 1, 1);
+				int dr_itr = 0;
+				for (int i_dR = 0; i_dR < N_dR; i_dR++)
+				{
+					if (i_dR != 0 && i_dR != 3 && i_dR != 7 && i_dR != 1) continue;
+					string dr_label = Form("%1.2f < #it{r} < %1.2f", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
 
-				h_ChPS_final_ratio.at(0).at(i_cent).at(7)->GetYaxis()->SetRangeUser(0,2);
-				h_ChPS_final_ratio.at(0).at(i_cent).at(7)->Draw();
-				h_ChPS_final_ratio.at(3).at(i_cent).at(7)->Draw("same");
-				line->SetLineColor(kRed);
-				line->DrawLine(0,1.,0.8,1);
-				gPad->SetLogx();
+					if (i_cent == 0) legend_ChPS_final->AddEntry(h_ChPS_final_ratio.at(i_dR).at(i_cent).at(7), dr_label.c_str(), "lp");
+					SetHStyle_smallify(h_ChPS_final_ratio.at(i_dR).at(i_cent).at(7), dr_itr, 1);
 
+					h_ChPS_final_ratio.at(i_dR).at(i_cent).at(7)->GetYaxis()->SetRangeUser(0,2.3);
+					h_ChPS_final_ratio.at(i_dR).at(i_cent).at(7)->Draw("same");
+					line->DrawLine(trk_pt_lo,1.,trk_pt_hi,1.);
+					gPad->SetLogx();
+					dr_itr++;
+				}
 
+				legend_ChPS_final->Draw();
+				ltx->SetTextAlign(32);
+				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", num_to_cent(31, i_cent).c_str()));
 			}
+
+			c_ChPS_final->cd(1);
+			ltx->DrawLatexNDC(0.93, 0.84, "#font[72]{ATLAS} Internal");
+			ltx->DrawLatexNDC(0.93, 0.79, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+			ltx->DrawLatexNDC(0.93, 0.74, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+			ltx->DrawLatexNDC(0.93, 0.68, Form("%1.2f < p_{T}^{Jet} < %1.2f [GeV]", jetpT_binning->GetBinLowEdge(8), jetpT_binning->GetBinUpEdge(8)));
+			ltx->DrawLatexNDC(0.93, 0.63, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+
+
 			c_ChPS_final->Print("tmp.pdf");
 
 		}
