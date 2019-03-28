@@ -11,6 +11,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 	string name;
 	string rdptr_label = "#it{R}_{#it{D} (#it{p}_{T}, #it{r})}";
+	string deltadptr_label = "#it{#Delta} #it{D} (#it{p}_{T}, #it{r}) [GeV]";
 	string dptr_label = "#it{D} (#it{p}_{T}, #it{r}) [GeV^{-1}]";
 	string r_label = "#it{r}";
 	string trk_label = "#it{p}_{T}^{trk} [GeV]";
@@ -63,6 +64,12 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	vector<vector<vector<TGraphAsymmErrors*>>> g_RDpT_final_sys_indR (N_trkpt, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt)));
 	vector<vector<vector<TGraphAsymmErrors*>>> g_RDpT_final_stat_indR (N_trkpt, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt)));
 
+	vector<vector<vector<TH1*>>> h_DeltaDpT_final_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_DeltaDpT_final_sys_Totalpos_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_DeltaDpT_final_sys_Totalneg_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TGraphAsymmErrors*>>> g_DeltaDpT_final_sys_indR (N_trkpt, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt)));
+	vector<vector<vector<TGraphAsymmErrors*>>> g_DeltaDpT_final_stat_indR (N_trkpt, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt)));
+
 	vector<vector<vector<TH1*>>> h_ChPS_PbPb_final_ratio_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_PbPb_final_sys_Totalpos_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_PbPb_final_sys_Totalneg_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -107,6 +114,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	int trk_select1 = 2;
 	int trk_select2 = 6;
 
+	//get all rdpt, dpt (pbpb and pp) distributions and uncertainty (done as a function of r)
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -250,6 +258,80 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		}
 	}
 
+	// get deltaDpT and get uncertainties on this - needs to be added in quadrature
+	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+	{
+		for (int i_cent = 0; i_cent < 6; i_cent++)
+		{
+			int trk_itr = 0;
+			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+			{
+				if (i_trk < 2 || i_trk > 9) continue;
+				//RDpT
+				name = Form("h_DeltaDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_indR[i_trk][i_cent][i_jet] = (TH1*)f_RDpT->Get(name.c_str());
+
+				name = Form("h_RDpT_sys_trk%i_cent%i_jetpt%i_total_p", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet] = (TH1*)(f_RDpT_sys->Get(name.c_str())->Clone(Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_p", i_trk, i_cent, i_jet)));
+				h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->Reset();
+
+				name = Form("h_RDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)(f_RDpT_sys->Get(name.c_str())->Clone(Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet)));
+				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->Reset();
+
+				//get uncert from pbpb and pp and add in quadrature
+				double rel_pbpb_err = 0, abs_pbpb_err = 0, rel_pp_err = 0, abs_pp_err = 0, deltaR_err = 0;
+				for (int i_dR = 0 ; i_dR < 11; i_dR++)
+				{
+					rel_pbpb_err = h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					abs_pbpb_err = rel_pbpb_err * h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					rel_pp_err = h_ChPS_pp_final_sys_Totalpos_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
+					abs_pp_err = rel_pp_err * h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
+					deltaR_err = sqrt(pow(abs_pbpb_err,2) + pow(abs_pp_err,2));
+					h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetBinContent(i_dR+1, deltaR_err);
+					rel_pbpb_err = h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					abs_pbpb_err = fabs(rel_pbpb_err * h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1));
+					rel_pp_err = h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
+					abs_pp_err = fabs(rel_pp_err * h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1));
+					deltaR_err = sqrt(pow(abs_pbpb_err,2) + pow(abs_pp_err,2));
+					h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetBinContent(i_dR+1, deltaR_err);
+				}
+
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+
+				double nom, sys_hi, sys_lo, r_position, r_width, stat_hi, stat_lo;
+				for (int i_dR = 0 ; i_dR < N_dR; i_dR++)
+				{
+					//DeltaDpT
+					r_position = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.001 + i_cent*0.001 + i_jet*0.001);
+					r_width = 0.020;
+
+					nom = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					sys_hi = h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					sys_lo = h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					stat_hi = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+					stat_lo = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, 0, 0, stat_lo, stat_hi);
+
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
+
+				}
+				trk_itr++;
+			}
+		}
+	}
+
+
+	//getting rdpt with uncertainties as a function of track pt
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -312,6 +394,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	double y_range_hi = 4;
 
 
+
+	// DRAWING BEGINS HERRE
 
 	{
 		cout << "Doing Final RDpT as a function of track pT for different dR" << endl;
@@ -397,9 +481,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		} //end cent loop
 	}
 
-
-
-	// drawing
 
 	{
 		cout << "Doing Final RDpT ratio (PbPb/pp) plots in dR" << endl;
@@ -490,6 +571,88 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	}
 
 
+	{
+		cout << "Doing Final DeltaDpT (PbPb - pp) plots in dR" << endl;
+
+		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
+		TLegend *legend = new TLegend(0.7, 0.53, 0.80, 0.80, "","brNDC");
+		legend->SetTextFont(43);
+		legend->SetBorderSize(0);
+		legend->SetTextSize(18);
+		legend->SetNColumns(1);
+
+		int jet_itr = 0;
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		{
+			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+			if (!(i_jet == 8 || i_jet == 10)) continue;
+
+			bool first_pass_cent = true;
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+
+				string centrality = num_to_cent(31,i_cent);
+
+				int trk_itr = 0;
+				canvas->cd();
+				canvas->Clear();
+
+				for (int i_trk = trk_select1; i_trk < 9; i_trk++)
+				{
+					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+					SetHStyle_smallify(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet], trk_itr, 0);
+					SetHStyle_graph(g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet], trk_itr);
+					SetHStyle_graph(g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet], trk_itr);
+
+					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
+
+					y_range_lo = -1.;
+					y_range_hi = 6.;
+
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
+					else g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+
+					trk_itr++;
+
+				} // end trk loop
+
+				canvas->cd();
+				line->DrawLine(0, 0, r_max_range, 0);
+				legend->Draw();
+				ltx->SetTextAlign(11);
+//				ltx->SetTextSize(29);
+				ltx->DrawLatexNDC(0.19, 0.88, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->SetTextSize(23);
+				ltx->DrawLatexNDC(0.19, 0.83, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(0.19, 0.78, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(0.19, 0.73, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(0.93, 0.88, jet_label.c_str());
+				ltx->DrawLatexNDC(0.93, 0.83, Form("%s", centrality.c_str()));
+
+				first_pass_cent = false;
+
+				canvas->Print(Form("output_pdf_nominal/conf/DeltaDpT_final_ratio_dR_CONF_%s_jet%i_cent%i.pdf", did.c_str(), i_jet, i_cent));
+
+			} //end cent loop
+
+			jet_itr++;
+		} //end jet loop
+	}
 
 	{
 		cout << "Doing Final RDpT for different jets for one track pT" << endl;

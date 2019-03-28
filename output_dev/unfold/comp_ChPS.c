@@ -231,6 +231,9 @@ void comp_ChPS(string config_file = "ff_config.cfg")
 				name = Form("h_RDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_final_ratio_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
 
+				name = Form("h_DeltaDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_ChPS_final_diff_indR.at(i_trk).at(i_cent).at(i_jet)->Write(name.c_str());
+
 			}
 
 			//injet
