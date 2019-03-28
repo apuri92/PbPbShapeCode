@@ -61,7 +61,7 @@ std::string num_to_cent(int scheme, int i)
 
 	if (scheme == 31)
 	{
-		if (i==0) cent_label = " 0 - 10%";
+		if (i==0) cent_label = "0 - 10%";
 		if (i==1) cent_label = "10 - 20%";
 		if (i==2) cent_label = "20 - 30%";
 		if (i==3) cent_label = "30 - 40%";

@@ -95,7 +95,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	line->SetLineStyle(3);
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
-	ltx->SetTextSize(12);
+	ltx->SetTextSize(22);
 
 	double trk_pt_lo = 1.;
 	double trk_pt_hi = 63.;
@@ -203,7 +203,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					stat_hi = h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
 					stat_lo = h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
 
-					if (i_trk == 8 && i_jet == 9 && i_dR >= 4 && i_cent == 5)
+					//almost 0 statistic of 25 GeV tracks in 200-251 gev jets in 60-80% collisions above 0.3
+					if (i_trk == 8 && i_jet == 9 && i_dR >= 6 && i_cent == 5)
 					{
 						cout << "VERY SPECIFIC CUT: " << nom << endl;
 						nom = -1;
@@ -403,8 +404,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
 		TLegend *legend = new TLegend(0.19,0.18,0.35,0.4,NULL,"brNDC");
 		legend->SetTextFont(43);
+		legend->SetTextSize(23);
 		legend->SetBorderSize(0);
-		legend->SetTextSize(22);
 
 		bool first_pass_cent = true;
 		for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -462,15 +463,15 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
 				legend->Draw();
 
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, jet_label.c_str());
+				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(31);
-				ltx->SetTextSize(29);
-				ltx->DrawLatexNDC(0.93, 0.88, "#font[72]{ATLAS} Internal");
-				ltx->SetTextSize(23);
-				ltx->DrawLatexNDC(0.93, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				ltx->DrawLatexNDC(0.93, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-				ltx->DrawLatexNDC(0.93, 0.74, jet_label.c_str());
-				ltx->DrawLatexNDC(0.93, 0.69, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-				ltx->DrawLatexNDC(0.93, 0.64, Form("%s", centrality.c_str()));
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
 				if (!((i_jet == 7 || i_jet == 9) && (i_cent == 0 || i_cent == 5))) continue;
 				canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_ratio_dR_CONF_%s_trkpT_jet%i_cent%i.pdf", did.c_str(), i_jet, i_cent));
@@ -486,12 +487,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		cout << "Doing Final RDpT ratio (PbPb/pp) plots in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-//		TLegend *legend = new TLegend(0.50, 0.68, 0.70, 0.92, "","brNDC");
-//		legend->SetTextFont(43);
-//		legend->SetBorderSize(0);
-//		legend->SetTextSize(13);
-//		legend->SetNColumns(1);
-
 		TLegend *legend = new TLegend(0.19, 0.62, 0.80, 0.75, "","brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
@@ -548,18 +543,18 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				} // end trk loop
 
 				canvas->cd();
-				ltx->SetTextAlign(32);
-				ltx->SetTextSize(25);
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
 				line->DrawLine(0, 1, r_max_range, 1);
 				legend->Draw();
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
-				ltx->SetTextAlign(12);
-				ltx->SetTextSize(23);
-				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				ltx->DrawLatexNDC(0.19, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-				ltx->DrawLatexNDC(0.50, 0.79, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(x_right, y, Form("%s", jet_label.c_str()));
+				ltx->DrawLatexNDC(x_right, y-y_diff, Form("%s", centrality.c_str()));
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_left+0.3, y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 				first_pass_cent = false;
 
 				canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_ratio_dR_CONF_%s_jet%i_cent%i.pdf", did.c_str(), i_jet, i_cent));
@@ -585,7 +580,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
 			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-			if (!(i_jet == 8 || i_jet == 10)) continue;
+			if (!(i_jet == 7 || i_jet == 8 || i_jet == 9 || i_jet == 10)) continue;
 
 			bool first_pass_cent = true;
 			for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -633,16 +628,16 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				canvas->cd();
 				line->DrawLine(0, 0, r_max_range, 0);
 				legend->Draw();
-				ltx->SetTextAlign(11);
-//				ltx->SetTextSize(29);
-				ltx->DrawLatexNDC(0.19, 0.88, "#scale[1.5]{#font[72]{ATLAS} Internal}");
-				ltx->SetTextSize(23);
-				ltx->DrawLatexNDC(0.19, 0.83, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				ltx->DrawLatexNDC(0.19, 0.78, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-				ltx->DrawLatexNDC(0.19, 0.73, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
 				ltx->SetTextAlign(31);
-				ltx->DrawLatexNDC(0.93, 0.88, jet_label.c_str());
-				ltx->DrawLatexNDC(0.93, 0.83, Form("%s", centrality.c_str()));
+				ltx->DrawLatexNDC(x_right, y, jet_label.c_str());
+				ltx->DrawLatexNDC(x_right, y-y_diff, Form("%s", centrality.c_str()));
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
 				first_pass_cent = false;
 
@@ -732,31 +727,27 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 				} // end jet loop
 
-				ltx->SetTextSize(16);
 				ltx->SetTextAlign(21);
 				double tmp_height = 0.60;
-				if (trk_itr == 0) ltx->DrawLatexNDC(0.63,tmp_height+0.035, Form("#it{p}_{T} [GeV]:"));
-				if (i_trk == trk_select1) ltx->DrawLatexNDC(0.59,tmp_height, Form("%1.1f-%1.1f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
-				if (i_trk == trk_select2) ltx->DrawLatexNDC(0.67,tmp_height, Form("%1.1f-%1.1f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+				if (trk_itr == 0) ltx->DrawLatexNDC(0.63,tmp_height+0.035, Form("#scale[0.8]{#it{p}_{T} [GeV]:}"));
+				if (i_trk == trk_select1) ltx->DrawLatexNDC(0.59,tmp_height, Form("#scale[0.8]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+				if (i_trk == trk_select2) ltx->DrawLatexNDC(0.67,tmp_height, Form("#scale[0.8]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
 
 				trk_itr++;
 
 			} //end cent loop
 
 			canvas->cd();
-			ltx->SetTextAlign(32);
-			ltx->SetTextSize(25);
 			line->DrawLine(0, 1, r_max_range, 1);
 			legend->Draw();
 			legend_open->Draw();
-
-			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
-			ltx->SetTextAlign(12);
-			ltx->SetTextSize(23);
-			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-			ltx->DrawLatexNDC(0.17, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-			ltx->DrawLatexNDC(0.17, 0.74, Form("%s", centrality.c_str()));
-			ltx->DrawLatexNDC(0.17, 0.69, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+			double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+			ltx->SetTextAlign(11);
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
 
 //			if (i_cent != 0 && i_cent != 5) continue;
 
@@ -766,12 +757,10 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		} //end jet loop
 	}
 
-
 	{
 		cout << "Doing Final DpT spectra for PbPb and pp in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-//		TLegend *legend = new TLegend(0.57,0.70,0.78,0.88,NULL,"brNDC");
 		TLegend *legend = new TLegend(0.255,0.20,0.495,0.40,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
@@ -815,7 +804,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
  					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
 					if (jet_itr == 0 && first_pass_cent) legend_open->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
 
-					y_range_lo = 1E-3;
+					y_range_lo = 1E-4;
 					y_range_hi = 5E2;
 
 
@@ -844,44 +833,30 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2");
 					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
 
-
-//					if (trk_itr == 0) g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("a 2");
-//					else g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("same 2");
-//					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Draw("2");
-//
-//					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->Draw(" same");
-//					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->Draw(" same");
-
 					gPad->SetLogy();
 
 					trk_itr++;
-
 				} // end trk loop
 
 				canvas->cd();
-				ltx->SetTextAlign(32);
-				ltx->SetTextSize(25);
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", jet_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", centrality.c_str()));
+				ltx->SetTextAlign(21);
+				ltx->DrawLatexNDC(0.28,0.41, Form("#scale[0.8]{Pb+Pb}"));
+				ltx->DrawLatexNDC(0.22,0.41, Form("#scale[0.8]{#it{pp}}"));
 				legend_open->Draw();
 				legend->Draw();
 
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, Form("%s", jet_label.c_str()));
+				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
 
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
-				ltx->SetTextAlign(12);
-				ltx->SetTextSize(23);
-				ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				ltx->DrawLatexNDC(0.19, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-				ltx->DrawLatexNDC(0.550, 0.79, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-
-				ltx->SetTextFont(43);
 				first_pass_cent = false;
-
-				ltx->SetTextSize(20);
-				ltx->SetTextAlign(21);
-				ltx->DrawLatexNDC(0.28,0.41, Form("Pb+Pb"));
-				ltx->DrawLatexNDC(0.22,0.41, Form("#it{pp}"));
 
 				canvas->Print(Form("output_pdf_nominal/conf/ChPS_final_dR_CONF_DpT_%s_jet%i_cent%i.pdf",did.c_str(), i_jet, i_cent));
 
@@ -896,8 +871,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		cout << "Doing Final RDpT spectra as function of centrality" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-//		TLegend *legend_open = new TLegend(0.24,0.60,0.48,0.75,NULL,"brNDC");
-//		TLegend *legend =	   new TLegend(0.19,0.60,0.43,0.75,NULL,"brNDC");
 		TLegend *legend_open = new TLegend(0.70,0.70,0.90,0.90,NULL,"brNDC");
 		TLegend *legend = 	   new TLegend(0.62,0.70,0.84,0.90,NULL,"brNDC");
 		legend->SetTextFont(43);
@@ -975,10 +948,9 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 				ltx->SetTextFont(43);
 
-				ltx->SetTextSize(16);
 				ltx->SetTextAlign(21);
-				name = Form("%1.1f-%1.1f", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
-				if (trk_itr == 0) ltx->DrawLatexNDC(0.57,0.91, Form("#it{p}_{T} [GeV]:"));
+				name = Form("#scale[0.8]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+				if (trk_itr == 0) ltx->DrawLatexNDC(0.57,0.91, Form("#scale[0.8]{#it{p}_{T} [GeV]:}"));
 				if (i_trk == trk_select1) ltx->DrawLatexNDC(0.65,0.91, name.c_str() );
 				if (i_trk == trk_select2) ltx->DrawLatexNDC(0.73,0.91, name.c_str() );
 
@@ -990,13 +962,13 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 			line->DrawLine(0, 1, r_max_range, 1);
 
 
-			ATLASLabel(0.17, 0.88, "Internal", "", kBlack);
-			ltx->SetTextAlign(12);
-			ltx->SetTextSize(23);
-			ltx->DrawLatexNDC(0.17, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-			ltx->DrawLatexNDC(0.17, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-			ltx->DrawLatexNDC(0.17, 0.74, Form("%s", jet_label.c_str()));
-			ltx->DrawLatexNDC(0.17, 0.69, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+			double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+			ltx->SetTextAlign(11);
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
 			canvas->Print(Form("output_pdf_nominal/conf/RDpT_final_dR_CONF_%s_cent_trk%i_%i_jet%i.pdf",did.c_str(), trk_select1, trk_select2, i_jet));
 

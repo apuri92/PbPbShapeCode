@@ -82,12 +82,12 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
-	ltx->SetTextSize(12);
+	ltx->SetTextSize(22);
 
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
 
-	int trk_select1 = 3;
+	int trk_select1 = 2;
 	int trk_select2 = 6;
 
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
@@ -126,36 +126,25 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					h_total_sys_n[i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
 				}
 
-				SetHStyle_smallify(h_total_sys_p[i_trk][i_cent][i_jet],0, doSmall);
-				SetHStyle_smallify(h_total_sys_n[i_trk][i_cent][i_jet],0, doSmall);
-//				h_total_sys_p[i_trk][i_cent][i_jet]->SetMarkerStyle(20);
-//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerStyle(20);
-//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
-//				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerSize(1);
-
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
-				if (dataset_type == "_pp")
-				{
-					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
-					h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2,0.2);
-				}
+				h_total_sys_p[i_trk][i_cent][i_jet]->Scale(100);
+				h_total_sys_n[i_trk][i_cent][i_jet]->Scale(100);
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-60,60);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-55,55);
+//				if (dataset_type == "_pp")
+//				{
+//					h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
+//					h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
+//				}
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-
-				h_total_sys_p[i_trk][i_cent][i_jet]->SetLineWidth(2);
-				h_total_sys_n[i_trk][i_cent][i_jet]->SetLineWidth(2);
-
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitleFont(43);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitleSize(30);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitleFont(43);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitleSize(30);
+				SetHStyle(h_total_sys_p[i_trk][i_cent][i_jet],0);
+				SetHStyle(h_total_sys_n[i_trk][i_cent][i_jet],0);
 
 				c_sys->cd();
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("lp ");
@@ -177,12 +166,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
 					}
 
-					SetHStyle_smallify(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
-					SetHStyle_smallify(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1, doSmall);
-//					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerStyle(20);
-//					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerStyle(20);
-//					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerSize(1);
-//					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetMarkerSize(1);
+					SetHStyle(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
+					SetHStyle(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
@@ -215,8 +200,11 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					{
 						legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
 					}
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Scale(100);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Scale(100);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
@@ -230,38 +218,31 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				}
 
 				c_sys->cd();
-				if (dataset_type == "_pp") c_sys->cd();
 				legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","lp");
-
 				legend_sys->Draw();
-				ltx->SetTextAlign(32);
-				ltx->SetTextSize(18);
-
-				ltx->SetTextSize(25);
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", trk_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.84, Form("%s", jet_label.c_str()));
-				if (dataset_type != "_pp") ltx->DrawLatexNDC(0.93, 0.79, Form("%s", centrality.c_str()));
-
 				line->SetLineStyle(1);
-//				line->SetLineWidth(1);
 				line->DrawLine(0, 0, r_max_range, 0);
 
-				ltx->SetTextAlign(12);
-				c_sys->cd();
-				ATLASLabel(0.19, 0.88, "Internal", "", kBlack);
-
-				ltx->SetTextAlign(12);
-				ltx->SetTextSize(23);
-
+				ltx->SetTextAlign(11);
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
 				if (mode == "RDpT")
 				{
-					ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-					ltx->DrawLatexNDC(0.19, 0.79, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					ltx->DrawLatexNDC(x_left+0.3, y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", trk_label.c_str()));
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
 				}
 				else
 				{
-					if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-					if (dataset_type == "_pp") ltx->DrawLatexNDC(0.19, 0.84, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					if (dataset_type == "_PbPb") ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					if (dataset_type == "_pp") ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));
+					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", trk_label.c_str()));
+					if (dataset_type != "_pp") ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
 				}
 
 				//Make sure histograms do not have any infinities, this leads to crashing when printing canvas
