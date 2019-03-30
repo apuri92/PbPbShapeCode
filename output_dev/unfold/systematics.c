@@ -27,15 +27,16 @@ void systematics(string config_file = "sys_config.cfg")
 	//	##############	Config done	##############"
 
 	double r_max_range = 0.8;
-	if (mode == "RDpT") dataset_type = "";
+	if (mode == "RDpT" || mode == "DeltaDpT") dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
 	TFile* nom_file = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
+	if (mode == "RDpT" || mode == "DeltaDpT") nom_file = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", "RDpT", did.c_str(), dataset_type.c_str())); //get R file because difference is saved there
 	TFile* output_file = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()), "recreate");
 
 	TFile *f_pbpb, *f_pp;
 
-	if (mode == "RDpT")
+	if (mode == "RDpT" || mode == "DeltaDpT")
 	{
 		f_pbpb = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_PbPb.root"));
 		f_pp = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_pp.root"));
@@ -125,6 +126,7 @@ void systematics(string config_file = "sys_config.cfg")
 	for (int i_sys = 0; i_sys < sys_names.size(); i_sys++)
 	{
 		name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), mode.c_str(), did.c_str(), dataset_type.c_str());
+		if (mode == "RDpT" || mode == "DeltaDpT") name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), "RDpT", did.c_str(), dataset_type.c_str()); //get R file because difference is saved there
 		sys_files.push_back( new TFile( name.c_str() ) );
 		cout << sys_files[i_sys]->GetName() << endl;
 
@@ -132,15 +134,21 @@ void systematics(string config_file = "sys_config.cfg")
 		{
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
 				if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
-					
+
+					//get relative errors for all modes (pbpb, pp, RDpT, DeltaDpT)
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
-					if (i_sys == 0) h_nom[i_trk][i_cent][i_jet] = (TH1*)((TH1*)nom_file->Get(name.c_str()))->Clone(Form("%s_nom", name.c_str()));
-					h_sys[i_sys][i_trk][i_cent][i_jet] = (TH1*)((TH1*)sys_files[i_sys]->Get(name.c_str()))->Clone(Form("%s_%s", name.c_str(), sys_names[i_sys].c_str()));
+					if (i_sys == 0)
+					{
+						h_nom[i_trk][i_cent][i_jet] = (TH1*)nom_file->Get(name.c_str())
+						h_nom[i_trk][i_cent][i_jet]->SetName(Form("%s_nom", name.c_str()));
+					}
+					h_sys[i_sys][i_trk][i_cent][i_jet] = (TH1*)sys_files[i_sys]->Get(name.c_str());
+					h_sys[i_sys][i_trk][i_cent][i_jet]->SetName(Form("%s_%s", name.c_str(), sys_names[i_sys].c_str()));
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Add(h_nom[i_trk][i_cent][i_jet], -1);
 					h_sys[i_sys][i_trk][i_cent][i_jet]->Divide(h_nom[i_trk][i_cent][i_jet]);
 
@@ -183,10 +191,9 @@ void systematics(string config_file = "sys_config.cfg")
 						double tmp = h_sys[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
 						//special rules
-						//symmetrize for JER, fakes, UE_ConeMethod and UE_RunDep, UE map stat
+						//symmetrize for JER, fakes, UE_ConeMethod, UE map stat
 						if (sys_names[i_sys] == "sys1" ||
 							sys_names[i_sys] == "sys42" ||
-							sys_names[i_sys] == "sys43" ||
 							sys_names[i_sys] == "sys44" ||
 							sys_names[i_sys] == "sys45" )
 						{
@@ -214,17 +221,23 @@ void systematics(string config_file = "sys_config.cfg")
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet, sys_names[i_sys].c_str());
 					h_sys_n[i_sys][i_trk][i_cent][i_jet]->Write(name.c_str());
+
+					if (i_sys == 0)
+					{
+						name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
+						h_nom[i_trk][i_cent][i_jet]->Write(name.c_str());
+					}
 				}
 			}
 		}
 	}
 
-
+	cout << "Grouping Systematics..." << endl;
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+			if (dataset_type != "_pp" && i_cent == 6) continue; //do all cent for pbpb, R, and Delta
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -250,6 +263,8 @@ void systematics(string config_file = "sys_config.cfg")
 								(sys_names[i_sys] == "sys4" && combined_sys_names[i_comb_sys] == "MCNonClosure")
 								)
 							{
+								//if running in combined mode, need to redo all uncorrelated systematics present in both pbpb and pp: unfolding, mc-nonclosure, done below
+
 //								cout << Form("%i_%i_%i_%i %i_%i ", i_trk, i_cent, i_jet, i_dR, i_sys, i_comb_sys);
 //								cout << Form("%s --> %s", sys_names[i_sys].c_str(), combined_sys_names[i_comb_sys].c_str()) << endl;
 
@@ -262,7 +277,7 @@ void systematics(string config_file = "sys_config.cfg")
 								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.0000001);
 							}
 
-							//each systematic needs to be combined
+							//each systematic needs to be combined. Most of the ones listed below are correlated. The ones that are uncorrelated (UE, CENTJES {mcnonclosure and unfolding are individual anyway}) are only different in the pbpb, so err_pp_sysi = 0, and it can be treated as uncorrelated
 							if (
 
 								(
@@ -298,7 +313,6 @@ void systematics(string config_file = "sys_config.cfg")
 
 								(
 								 (sys_names[i_sys] == "sys42" ||
-								  sys_names[i_sys] == "sys43" ||
 								  sys_names[i_sys] == "sys44" ) &&
 								 combined_sys_names[i_comb_sys] == "UE"
 								 )
@@ -320,37 +334,94 @@ void systematics(string config_file = "sys_config.cfg")
 						}
 					}
 
+					//uncorrelated uncertainties do separately so has to be done separately; MC nonclosure and unfolding are by themselves anyway
+
 					//uncorrelated so has to be done separately
-					if (combined_sys_names[i_comb_sys] == "MCNonClosure" && mode == "RDpT")
+					if ( (combined_sys_names[i_comb_sys] == "MCNonClosure" ||
+						  combined_sys_names[i_comb_sys] == "Unfolding" )
+						&&
+						(mode == "RDpT" ||
+						 mode == "DeltaDpT") )
+
+
 					{
+						//get nominal values and relative uncertainties from pbpb and pp sys files
+						name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+						TH1* h_pbpb_nom = (TH1*)f_pbpb->Get(name.c_str());
+						h_pbpb_nom->SetName(Form("%s_pbpb", name.c_str()));
+
+						name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
+						TH1* h_pp_nom = (TH1*)f_pp->Get(name.c_str());
+						h_pp_nom->SetName(Form("%s_pp", name.c_str()));
+
 						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_p", i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
-						TH1* h_pbpb_p = (TH1*)(TH1*)f_pbpb->Get(name.c_str())->Clone(Form("%s_pbpb", name.c_str()));
+						TH1* h_pbpb_p = (TH1*)f_pbpb->Get(name.c_str());
+						h_pbpb_p->SetName(Form("%s_pbpb", name.c_str()));
 
 						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_p", i_trk, 6, i_jet,combined_sys_names[i_comb_sys].c_str());
-						TH1* h_pp_p = (TH1*)(TH1*)f_pp->Get(name.c_str())->Clone(Form("%s_pp", name.c_str()));
+						TH1* h_pp_p = (TH1*)f_pp->Get(name.c_str());
+						h_pp_p->SetName(Form("%s_pp", name.c_str()));
 
 						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_n", i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
-						TH1* h_pbpb_n = (TH1*)(TH1*)f_pbpb->Get(name.c_str())->Clone(Form("%s_pbpb", name.c_str()));
+						TH1* h_pbpb_n = (TH1*)f_pbpb->Get(name.c_str());
+						h_pbpb_n->SetName(Form("%s_pbpb", name.c_str()));
 
 						name = Form("h_ChPS_sys_trk%i_cent%i_jetpt%i_%s_n", i_trk, 6, i_jet,combined_sys_names[i_comb_sys].c_str());
-						TH1* h_pp_n = (TH1*)(TH1*)f_pp->Get(name.c_str())->Clone(Form("%s_pp", name.c_str()));
+						TH1* h_pp_n = (TH1*)f_pp->Get(name.c_str());
+						h_pp_n->SetName(Form("%s_pp", name.c_str()));
 
-
-						double dA_overA, dB_overB, dR_overR;
-						for (int i_dR = 1; i_dR <= N_dR; i_dR++)
+						if (mode == "RDpT")
 						{
-							dA_overA = h_pbpb_p->GetBinContent(i_dR);
-							dB_overB = h_pp_p->GetBinContent(i_dR);
-							dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
-							h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, dR_overR);
-							h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
+							//add relative uncertainties in quadrature to get rel uncert on (grouped systematic) i
+							//deltaR/R = sqrt( (deltaA/A)^2 + (deltaB/B)^2 )
+							double dA_overA, dB_overB, dR_overR;
+							for (int i_dR = 1; i_dR <= N_dR; i_dR++)
+							{
+								dA_overA = h_pbpb_p->GetBinContent(i_dR);
+								dB_overB = h_pp_p->GetBinContent(i_dR);
+								dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, dR_overR);
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
 
-							dA_overA = h_pbpb_n->GetBinContent(i_dR);
-							dB_overB = h_pp_n->GetBinContent(i_dR);
-							dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
-							h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -dR_overR);
-							h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
+								dA_overA = h_pbpb_n->GetBinContent(i_dR);
+								dB_overB = h_pp_n->GetBinContent(i_dR);
+								dR_overR = sqrt( pow(dA_overA,2) + pow(dB_overB,2) );
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -dR_overR);
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
+							}
 						}
+						else if (mode == "DeltaDpT")
+						{
+							//add absolute uncertainties in quadrature to get absolute uncert on systematic i
+							//deltaR = sqrt(deltaA^2 + deltaB^2). make sure to save relative uncert
+							double dA, dB, dR, dR_overR;
+							for (int i_dR = 1; i_dR <= N_dR; i_dR++)
+							{
+								dA = h_pbpb_p->GetBinContent(i_dR) * h_pbpb_nom->GetBinContent(i_dR);
+								dB = h_pp_p->GetBinContent(i_dR) * h_pp_nom->GetBinContent(i_dR);
+								dR = sqrt( pow(dA,2) + pow(dB,2) );
+								dR_overR = dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR));
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, dR_overR);
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
+
+								dA = h_pbpb_n->GetBinContent(i_dR) * h_pbpb_nom->GetBinContent(i_dR);
+								dB = h_pp_n->GetBinContent(i_dR) * h_pp_nom->GetBinContent(i_dR);
+								dR = sqrt( pow(dA,2) + pow(dB,2) );
+								dR_overR = dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR));
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -dR_overR);
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
+							}
+
+
+						}
+
+						delete h_pbpb_nom
+						delete h_pp_nom
+						delete h_pbpb_p;
+						delete h_pp_p;
+						delete h_pbpb_n;
+						delete h_pp_n;
+
 					}
 
 					//remove fluctuations in JES uncert
@@ -373,12 +444,12 @@ void systematics(string config_file = "sys_config.cfg")
 		}
 	}
 
-
+	cout << "Done grouping... getting total..." << endl;
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+			if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -410,53 +481,58 @@ void systematics(string config_file = "sys_config.cfg")
 	}
 
 
-	//Cast in terms of track pT
-	vector<vector<vector<TH1*>>> h_total_sys_p_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-	vector<vector<vector<TH1*>>> h_total_sys_n_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
-
-	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+	//Cast in terms of track pT if in RDpT mode
+	if (mode == "RDpT")
 	{
-		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
+		vector<vector<vector<TH1*>>> h_total_sys_p_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+		vector<vector<vector<TH1*>>> h_total_sys_n_inTrk (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
-			if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
-			if (dataset_type == "_pp" && i_cent < 6) continue;
-
-			for (int i_dR = 0; i_dR < N_dR; i_dR++)
+			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
-				h_total_sys_p_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
-				h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Reset();
+				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
+				if (dataset_type == "_pp" && i_cent < 6) continue;
 
-				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
-				h_total_sys_n_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
-				h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Reset();
-
-				double val = 0, val_err = 0;
-				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+				for (int i_dR = 0; i_dR < N_dR; i_dR++)
 				{
-					val = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					val_err = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
-					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
-					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+					name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
+					cout << nom_file->GetName() << " " << (Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent)) << endl;
+					h_total_sys_p_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
+					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Reset();
 
-					val = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					val_err = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
-					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
-					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+					name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
+					h_total_sys_n_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
+					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Reset();
+
+					double val = 0, val_err = 0;
+					for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+					{
+						val = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+						val_err = h_total_sys_p[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+						h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
+						h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+
+						val = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+						val_err = h_total_sys_n[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+						h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinContent(i_trk+1, val);
+						h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->SetBinError(i_trk+1, val_err);
+					}
+
+					name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
+					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
+
+					name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
+					h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
+
 				}
-
-				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
-				h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
-
-				name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_n",mode.c_str(), i_dR, i_cent, i_jet);
-				h_total_sys_n_inTrk[i_dR][i_cent][i_jet]->Write(name.c_str());
-
 			}
 		}
 	}
 
 
 
+	cout << "Drawing... " << endl;
 	//drawing
 
 	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
@@ -491,7 +567,7 @@ void systematics(string config_file = "sys_config.cfg")
 			bool cent_first_pass = true;
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
 				if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				string centrality = num_to_cent(31,i_cent);

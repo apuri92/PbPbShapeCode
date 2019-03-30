@@ -34,6 +34,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 	TFile *f_RDpT = new TFile(Form("output_pdf_nominal/root/final_RDpT_%s.root", did.c_str()));
 	TFile *f_RDpT_sys = new TFile(Form("output_pdf_nominal/root/final_RDpT_sys_%s.root", did.c_str()));
+	TFile *f_DeltaDpT_sys = new TFile(Form("output_pdf_nominal/root/final_DeltaDpT_sys_%s.root", did.c_str()));
 	TFile *f_ChPS_PbPb = new TFile(Form("output_pdf_nominal/root/final_ChPS_%s_PbPb.root", did.c_str()));
 	TFile *f_ChPS_PbPb_sys = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_%s_PbPb.root", did.c_str()));
 	TFile *f_ChPS_pp = new TFile(Form("output_pdf_nominal/root/final_ChPS_%s_pp.root", did.c_str()));
@@ -43,6 +44,7 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	cout << "Using files:" << endl;
 	cout << f_RDpT->GetName() << endl;
 	cout << f_RDpT_sys->GetName() << endl;
+	cout << f_DeltaDpT_sys->GetName() << endl;
 	cout << f_ChPS_PbPb->GetName() << endl;
 	cout << f_ChPS_PbPb_sys->GetName() << endl;
 	cout << f_ChPS_pp->GetName() << endl;
@@ -141,6 +143,28 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(rdptr_label.c_str());
 				g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 	
+				//DeltaDpT
+				name = Form("h_DeltaDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_indR[i_trk][i_cent][i_jet] = (TH1*)f_RDpT->Get(name.c_str());
+
+				name = Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_p", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet] = (TH1*)f_DeltaDpT_sys->Get(name.c_str());
+
+				name = Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet);
+				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)f_DeltaDpT_sys->Get(name.c_str());
+
+				if (i_trk == 2 && i_jet == 7 && i_cent == 0)
+				{
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->Print("all");
+				}
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
+				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
+				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
+
 
 				//DpT PbPb
 				name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
@@ -216,6 +240,24 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
 
 
+					//DeltaDpT
+					r_position = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.001 + i_cent*0.001 + i_jet*0.001);
+					r_width = 0.020; //h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinWidth(i_dR+1)/4;
+
+					nom = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+					sys_hi = nom * (h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1));
+					sys_lo = fabs(nom * (h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1)));
+					stat_hi = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+					stat_lo = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
+
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, 0, 0, stat_lo, stat_hi);
+
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
+					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
+
+
+
 					//DpT_PbPb
 					r_position = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.002);
 					r_width = 0.020; //h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinWidth(i_dR+1);
@@ -251,79 +293,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 						g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetPoint(i_dR, r_position, nom );
 						g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetPointError(i_dR, 0, 0, stat_lo, stat_hi);
 					}
-
-				}
-
-				trk_itr++;
-			}
-		}
-	}
-
-	// get deltaDpT and get uncertainties on this - needs to be added in quadrature
-	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-	{
-		for (int i_cent = 0; i_cent < 6; i_cent++)
-		{
-			int trk_itr = 0;
-			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
-			{
-				if (i_trk < 2 || i_trk > 9) continue;
-				//RDpT
-				name = Form("h_DeltaDpT_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-				h_DeltaDpT_final_indR[i_trk][i_cent][i_jet] = (TH1*)f_RDpT->Get(name.c_str());
-
-				name = Form("h_RDpT_sys_trk%i_cent%i_jetpt%i_total_p", i_trk, i_cent, i_jet);
-				h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet] = (TH1*)(f_RDpT_sys->Get(name.c_str())->Clone(Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_p", i_trk, i_cent, i_jet)));
-				h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->Reset();
-
-				name = Form("h_RDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet);
-				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)(f_RDpT_sys->Get(name.c_str())->Clone(Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet)));
-				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->Reset();
-
-				//get uncert from pbpb and pp and add in quadrature
-				double rel_pbpb_err = 0, abs_pbpb_err = 0, rel_pp_err = 0, abs_pp_err = 0, deltaR_err = 0;
-				for (int i_dR = 0 ; i_dR < 11; i_dR++)
-				{
-					rel_pbpb_err = h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					abs_pbpb_err = rel_pbpb_err * h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					rel_pp_err = h_ChPS_pp_final_sys_Totalpos_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
-					abs_pp_err = rel_pp_err * h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
-					deltaR_err = sqrt(pow(abs_pbpb_err,2) + pow(abs_pp_err,2));
-					h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetBinContent(i_dR+1, deltaR_err);
-					rel_pbpb_err = h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					abs_pbpb_err = fabs(rel_pbpb_err * h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1));
-					rel_pp_err = h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
-					abs_pp_err = fabs(rel_pp_err * h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1));
-					deltaR_err = sqrt(pow(abs_pbpb_err,2) + pow(abs_pp_err,2));
-					h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetBinContent(i_dR+1, deltaR_err);
-				}
-
-				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
-				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
-				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
-				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
-				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
-				g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
-				double nom, sys_hi, sys_lo, r_position, r_width, stat_hi, stat_lo;
-				for (int i_dR = 0 ; i_dR < N_dR; i_dR++)
-				{
-					//DeltaDpT
-					r_position = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.001 + i_cent*0.001 + i_jet*0.001);
-					r_width = 0.020;
-
-					nom = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					sys_hi = h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					sys_lo = h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
-					stat_hi = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
-					stat_lo = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
-
-					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
-					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, 0, 0, stat_lo, stat_hi);
-
-					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPoint(i_dR, r_position, nom );
-					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
 
 				}
 				trk_itr++;
