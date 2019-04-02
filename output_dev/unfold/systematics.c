@@ -191,8 +191,10 @@ void systematics(string config_file = "sys_config.cfg")
 						double tmp = h_sys[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
 						//special rules
-						//symmetrize for JER, fakes, UE_ConeMethod, UE map stat
+						//symmetrize for JER (1), fakes (45), UE_ConeMethod (44), UE map stat (42), unfolding (3), nonclosure (4)
 						if (sys_names[i_sys] == "sys1" ||
+							sys_names[i_sys] == "sys3" ||
+							sys_names[i_sys] == "sys4" ||
 							sys_names[i_sys] == "sys42" ||
 							sys_names[i_sys] == "sys44" ||
 							sys_names[i_sys] == "sys45" )
@@ -400,14 +402,14 @@ void systematics(string config_file = "sys_config.cfg")
 								dA = h_pbpb_p->GetBinContent(i_dR) * h_pbpb_nom->GetBinContent(i_dR);
 								dB = h_pp_p->GetBinContent(i_dR) * h_pp_nom->GetBinContent(i_dR);
 								dR = sqrt( pow(dA,2) + pow(dB,2) );
-								dR_overR = dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR));
+								dR_overR = fabs(dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR)));
 								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, dR_overR);
 								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
 
 								dA = h_pbpb_n->GetBinContent(i_dR) * h_pbpb_nom->GetBinContent(i_dR);
 								dB = h_pp_n->GetBinContent(i_dR) * h_pp_nom->GetBinContent(i_dR);
 								dR = sqrt( pow(dA,2) + pow(dB,2) );
-								dR_overR = dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR));
+								dR_overR = fabs(dR/(h_pbpb_nom->GetBinContent(i_dR) - h_pp_nom->GetBinContent(i_dR)));
 								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -dR_overR);
 								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.000001);
 							}
@@ -542,7 +544,7 @@ void systematics(string config_file = "sys_config.cfg")
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
 	if (dataset_type == "_pp") c_sys->SetCanvasSize(800,600);
-	TLegend *legend_sys = new TLegend(0.40, 0.18, 0.90, 0.45, "","brNDC");
+	TLegend *legend_sys = new TLegend(0.19, 0.18, 0.70, 0.45, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
 	legend_sys->SetTextSize(14);
@@ -582,7 +584,7 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->SetMarkerStyle(20);
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.8,0.8);
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.8,0.8);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
@@ -628,20 +630,13 @@ void systematics(string config_file = "sys_config.cfg")
 
 					if (cent_first_pass) legend_sys->AddEntry(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],combined_sys_names[i_comb_sys].c_str(),"lp");
 
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
+					//DO NOT SET RANGES ON COMB PLOTS. THIS MESSES UP THE DRAW SAME OPTION
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
-					for (int i = 0 ; i < N_dR; i++)
-					{
-						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-					}
 
 					c_sys->cd(i_cent+1);
 					if (!empty_hist_p) h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Draw("p same");

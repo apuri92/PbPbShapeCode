@@ -93,7 +93,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
 
-	int trk_select1 = 3;
+	int trk_select1 = 2;
 	int trk_select2 = 6;
 
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
@@ -124,13 +124,6 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_total_n",mode.c_str(), i_trk, i_cent, i_jet);
 				h_total_sys_n[i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
-
-				//set bin error so bar through point is non-zero
-				for (int i = 0 ; i < N_dR; i++)
-				{
-					h_total_sys_p[i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-					h_total_sys_n[i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-				}
 
 				h_total_sys_p[i_trk][i_cent][i_jet]->Scale(100);
 				h_total_sys_n[i_trk][i_cent][i_jet]->Scale(100);
@@ -164,13 +157,6 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 					name = Form("h_%s_sys_trk%i_cent%i_jetpt%i_%s_n",mode.c_str(), i_trk, i_cent, i_jet,combined_sys_names[i_comb_sys].c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet] = (TH1*)sys_file->Get(name.c_str());
-
-					//set bin error so bar through point is non-zero
-					for (int i = 0 ; i < N_dR; i++)
-					{
-						h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-						h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i+1,0.00000001);
-					}
 
 					SetHStyle(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
 					SetHStyle(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
