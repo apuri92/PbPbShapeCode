@@ -135,7 +135,7 @@ void systematics(string config_file = "sys_config.cfg")
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
 				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
-				if (dataset_type == "_pp" && i_cent < 6) continue;
+				else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 				{
@@ -144,7 +144,7 @@ void systematics(string config_file = "sys_config.cfg")
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
 					if (i_sys == 0)
 					{
-						h_nom[i_trk][i_cent][i_jet] = (TH1*)nom_file->Get(name.c_str())
+						h_nom[i_trk][i_cent][i_jet] = (TH1*)nom_file->Get(name.c_str());
 						h_nom[i_trk][i_cent][i_jet]->SetName(Form("%s_nom", name.c_str()));
 					}
 					h_sys[i_sys][i_trk][i_cent][i_jet] = (TH1*)sys_files[i_sys]->Get(name.c_str());
@@ -237,7 +237,7 @@ void systematics(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if (dataset_type != "_pp" && i_cent == 6) continue; //do all cent for pbpb, R, and Delta
+			if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -415,8 +415,8 @@ void systematics(string config_file = "sys_config.cfg")
 
 						}
 
-						delete h_pbpb_nom
-						delete h_pp_nom
+						delete h_pbpb_nom;
+						delete h_pp_nom;
 						delete h_pbpb_p;
 						delete h_pp_p;
 						delete h_pbpb_n;
@@ -450,7 +450,7 @@ void systematics(string config_file = "sys_config.cfg")
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
 			if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
-			if (dataset_type == "_pp" && i_cent < 6) continue;
+			else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
@@ -492,12 +492,11 @@ void systematics(string config_file = "sys_config.cfg")
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
 				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
-				if (dataset_type == "_pp" && i_cent < 6) continue;
+				else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				for (int i_dR = 0; i_dR < N_dR; i_dR++)
 				{
 					name = Form("h_%s_sys_dR%i_cent%i_jetpt%i_total_p",mode.c_str(), i_dR, i_cent, i_jet);
-					cout << nom_file->GetName() << " " << (Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent)) << endl;
 					h_total_sys_p_inTrk[i_dR][i_cent][i_jet] = (TH1*)nom_file->Get(Form("h_%s_final_dR0_cent%i_jetpt8",mode.c_str(), i_cent))->Clone(name.c_str());
 					h_total_sys_p_inTrk[i_dR][i_cent][i_jet]->Reset();
 
@@ -535,11 +534,14 @@ void systematics(string config_file = "sys_config.cfg")
 	cout << "Drawing... " << endl;
 	//drawing
 
-	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
-	if (mode == "ChPS") rdptr_label = "#it{D} (#it{p}_{T}, #it{r})";
+	string y_label = "";
+	if (mode == "RDpT") y_label = "Rel. Unc. #it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
+	if (mode == "DeltaDpT") y_label = "Rel. Unc. #delta #it{#Delta}_{ #it{D} (#it{p}_{T}, #it{r})}";
+	if (mode == "ChPS") y_label = "Rel. Unc. #it{D} (#it{p}_{T}, #it{r}) [GeV^{-1}]";
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 1200, 600);
+	if (dataset_type == "_pp") c_sys->SetCanvasSize(800,600);
 	TLegend *legend_sys = new TLegend(0.40, 0.18, 0.90, 0.45, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
@@ -568,7 +570,7 @@ void systematics(string config_file = "sys_config.cfg")
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
 				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
-				if (dataset_type == "_pp" && i_cent < 6) continue;
+				else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				string centrality = num_to_cent(31,i_cent);
 
@@ -583,8 +585,8 @@ void systematics(string config_file = "sys_config.cfg")
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.5,0.5);
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
@@ -630,8 +632,8 @@ void systematics(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.3,0.3);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%.]",rdptr_label.c_str()));
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [Rel. %%]",rdptr_label.c_str()));
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
@@ -653,43 +655,44 @@ void systematics(string config_file = "sys_config.cfg")
 				if (cent_first_pass) legend_sys->AddEntry(h_total_sys_p[i_trk][i_cent][i_jet],"Total","pl");
 
 				legend_sys->Draw();
-				ltx->SetTextAlign(32);
+				ltx->SetTextAlign(31);
 				ltx->SetTextSize(12);
 				if (dataset_type == "_pp") ltx->SetTextSize(24);
+				if (dataset_type == "_pp") legend_sys->SetTextSize(24);
 
-				ltx->DrawLatexNDC(0.93, 0.90, Form("%s", trk_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.85, Form("%s", jet_label.c_str()));
-				ltx->DrawLatexNDC(0.93, 0.80, Form("%s", centrality.c_str()));
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+				ltx->DrawLatexNDC(x_right, y, Form("%s", trk_label.c_str()));
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("%s", jet_label.c_str()));
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("%s", centrality.c_str()));
 
 				cent_first_pass = false;
 
 
 			}
 
+			if (dataset_type == "_pp") c_sys->cd();
+			else c_sys->cd(1);
 
-			ltx->SetTextAlign(12);
-
-
-			c_sys->cd(1);
-			ltx->DrawLatexNDC(0.19,0.88,"#scale[1.2]{#font[72]{ATLAS} Internal}");
-			ltx->SetTextAlign(12);
-			ltx->SetTextSize(10);
-			if (dataset_type == "_pp") ltx->SetTextSize(24);
-
-			if (mode == "RDpT")
+			ltx->SetTextAlign(11);
+			double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			if (mode == "RDpT" || mode == "DeltaDpT")
 			{
-				ltx->DrawLatexNDC(0.2, 0.8, "#splitline{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 			}
 			else
 			{
-				if (dataset_type == "_PbPb") ltx->DrawLatexNDC(0.2, 0.75, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-				if (dataset_type == "_pp") ltx->DrawLatexNDC(0.2, 0.8, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				if (dataset_type == "_PbPb") ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				if (dataset_type == "_pp") ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 			}
 
 			string pdf_label = "";
 			if (i_trk == trk_pt_start && i_jet == jet_pt_start) pdf_label = "(";
 			if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) pdf_label = ")";
-			c_sys->Print(Form("output_pdf_nominal/systematics/%s_dR_sys%s_error.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
+			c_sys->Print(Form("output_pdf_nominal/systematics/Summary_%s_dR_sys%s_error.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
 
 
 		}

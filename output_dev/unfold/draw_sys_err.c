@@ -30,7 +30,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	doSmall = false;
 
 	double r_max_range = 0.8;
-	if (mode == "RDpT") dataset_type = "";
+	if (mode == "RDpT" || mode == "DeltaDpT") dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
 	TFile* sys_file = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
@@ -70,8 +70,14 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	int trk_pt_start = 2;
 	int trk_pt_end = 9;
 
-	string rdptr_label = "#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}";
-	if (mode == "ChPS") rdptr_label = "#it{D} (#it{p}_{T}, #it{r})";
+	string y_label = "Unkown";
+	if (mode == "RDpT") y_label = "#delta[#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}] [%%]";
+	if (mode == "DeltaDpT") y_label = "#delta[#it{#Delta}_{ #it{D} (#it{p}_{T}, #it{r})}] [%%]";
+	if (mode == "ChPS")
+	{
+		if (dataset_type == "_PbPb") y_label = "#it{D} (#it{p}_{T}, #it{r})_{PbPb}";
+		if (dataset_type == "_pp") y_label = "#it{D} (#it{p}_{T}, #it{r})_{pp}";
+	}
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 800, 600);
@@ -87,12 +93,12 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
 
-	int trk_select1 = 2;
+	int trk_select1 = 3;
 	int trk_select2 = 6;
 
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 	{
-		if ((dataset_type == "_PbPb" || mode == "RDpT") && i_cent == 6) continue;
+		if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
 		if (dataset_type == "_pp" && i_cent < 6) continue;
 		string centrality = num_to_cent(31,i_cent);
 
@@ -103,7 +109,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				if ((i_jet != 7 && i_jet != 8 && i_jet != 9 & i_jet != 10) || (i_trk != trk_select1 && i_trk != trk_select2)) continue;
 
-				if ((dataset_type == "_PbPb" || mode == "RDpT") && (i_cent != 0 && i_cent != 5)) continue;
+				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && (i_cent != 0 && i_cent != 5)) continue;
 
 				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
@@ -138,8 +144,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 
-				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
-				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s [%%]",rdptr_label.c_str()));
+				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
+				h_total_sys_n[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 				h_total_sys_p[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 				h_total_sys_n[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 
@@ -207,8 +213,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(Form("#delta%s",rdptr_label.c_str()));
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
 

@@ -153,10 +153,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				name = Form("h_DeltaDpT_sys_trk%i_cent%i_jetpt%i_total_n", i_trk, i_cent, i_jet);
 				h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet] = (TH1*)f_DeltaDpT_sys->Get(name.c_str());
 
-				if (i_trk == 2 && i_jet == 7 && i_cent == 0)
-				{
-					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->Print("all");
-				}
 				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet] = new TGraphAsymmErrors(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]);
 				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(deltadptr_label.c_str());
 				g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
