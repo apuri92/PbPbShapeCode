@@ -537,9 +537,6 @@ EL::StatusCode PbPbFFShape :: execute (){
 	float n_cones = (uee->GetNConesWeight()>0)? 1./uee->GetNConesWeight() : 0;
 	float total = uee->_nPhi * uee->_nEta;
 
-	h_tmp_cone_stats->Fill(n_cones);
-
-
 	for (int i = 0; i <trk_good_pt.size() ; i++)
 	{
 		if (cent_bin != 0) continue;
@@ -585,7 +582,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 //	trk_good_pt.clear();
 
 
-
+	bool fill_conestat = true;
 
 
 	for(unsigned int i=0; i<jet_pt_xcalib_vector.size(); i++)
@@ -601,7 +598,9 @@ EL::StatusCode PbPbFFShape :: execute (){
 		jet_eta = jet_eta_vector.at(i);
 		jet_y = jet_y_vector.at(i);
 		jet_phi = jet_phi_vector.at(i);
+		h_jets_preIso[cent_bin]->Fill(jet_pt, jet_weight);
 		if(!jet_isolated_vector.at(i)) continue;
+		h_jets_postIso[cent_bin]->Fill(jet_pt, jet_weight);
 
 		bool pass_reco_pt_cut = true;
 		if (jet_pt <= _pTjetCut) pass_reco_pt_cut = false;
@@ -683,6 +682,11 @@ EL::StatusCode PbPbFFShape :: execute (){
 			h_reco_jet_spectrum.at(jetcorr->nJetYBins - 1).at(n_cent_bins-1)->Fill(jet_pt, jet_weight);
 		}
 
+		if (fill_conestat && jet_pt > 126 && jet_pt < 316)
+		{
+			h_tmp_cone_stats[cent_bin]->Fill(n_cones, jet_weight);
+			fill_conestat = false;
+		}
 
 		//Reponses
 		if (_data_switch==1)
@@ -878,6 +882,8 @@ EL::StatusCode PbPbFFShape :: execute (){
 						h_dR_change.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
 						h_dR_change.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
 
+						h_dR_change_cnts.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt);
+						h_dR_change_cnts.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt);
 
 						if (pass_reco_pt_cut)
 						{
@@ -1019,7 +1025,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 				int dr_bin = trkcorr->GetdRBin(R);
 
 				ChPS_truth.at(dr_bin).at(cent_bin)->Fill(pt,truth_jet_pt, jet_weight);
-
+				ChPS_truth_dR.at(cent_bin)->Fill(R, pt, truth_jet_pt, jet_weight);
 				//Centrality inclusive
 				ChPS_truth.at(dr_bin).at(n_cent_bins-1)->Fill(pt,truth_jet_pt, jet_weight);
 			}

@@ -852,9 +852,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		{
 			cout << "Doing B2S plots (as function of r, for trk pT)" << endl;
 
+			gStyle->SetErrorX(0);
 			TCanvas *c_B2S_dR = new TCanvas("c_B2S_dR","c_B2S_dR",900,600);
 			if (dataset_type == "pp") c_B2S_dR->SetCanvasSize(600,600);
-			TLegend *legend_B2S_dR = new TLegend(0.18, 0.27, 0.48, 0.62, "","brNDC");
+			TLegend *legend_B2S_dR = new TLegend(0.18, 0.55, 0.48, 0.92, "","brNDC");
 			legend_B2S_dR->SetTextFont(43);
 			legend_B2S_dR->SetBorderSize(0);
 			legend_B2S_dR->SetTextSize(14);
@@ -877,11 +878,12 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 					double max = 0., min = 999., tmp;
 					for (int i_trk = trk_pt_start; i_trk < trk_pt_end; i_trk++)
 					{
-						if (i_trk < 2 || i_trk > 6) continue;
+						if (i_trk < 2 || i_trk > 8) continue;
 
 						string trk_label = Form("%1.1f < #it{p}_{T}^{ch} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
 						SetHStyle_smallify(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet), trk_itr, doSmall);
+						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetNdivisions(504);
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetLabelFont(43);
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetLabelSize(14);
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetLabelFont(43);
@@ -894,26 +896,23 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 						
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
-//						double max = h_ChPS_ratio_B2S_indR.at(2).at(i_cent).at(i_jet)->GetMaximum();
-//						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 1.4*max);
 
-						if (i_cent <= 2) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 80);
-						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0, 15);
+						if (i_cent == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E2);
+						if (i_cent == 1) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,2E2);
+						if (i_cent == 2) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,1E2);
+						if (i_cent == 3) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E1);
+						if (i_cent == 4) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,2E1);
+						if (i_cent == 5) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,3E1);
 
 						if (jet_itr == 0 && first_pass_cent) legend_B2S_dR->AddEntry(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
 						c_B2S_dR->cd(i_cent+1);
 
-						if (trk_itr == 0)
-						{
-							h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
-							line->SetLineStyle(3);
-							line->DrawLine(0, 1, r_max_range, 1);
-						}
-						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
+						if (trk_itr == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("X0");
+						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same X0");
 
 						gPad->SetLogx(0);
-						gPad->SetLogy(0);
+						gPad->SetLogy();
 
 
 						trk_itr++;
@@ -922,25 +921,21 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					c_B2S_dR->cd(i_cent+1);
 					ltx->SetTextAlign(32);
-					ltx->SetTextSize(12);
-					ATLASLabel(0.19, 0.88, "     Internal", "", kBlack);
-					ltx->SetTextAlign(12);
 					ltx->SetTextSize(15);
-					ltx->DrawLatexNDC(0.19, 0.84, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-					ltx->DrawLatexNDC(0.19, 0.77, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-					ltx->DrawLatexNDC(0.19, 0.72, Form("%s", jet_label.c_str()));
-					ltx->DrawLatexNDC(0.19, 0.66, Form("%s", centrality.c_str()));
-
-//
-//					ATLASLabel(0.19, 0.88, "     Internal", "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}", kBlack);
-//					ltx->SetTextAlign(12);
-//					ltx->DrawLatexNDC(0.19, 0.78, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-
+					ltx->DrawLatexNDC(0.93, 0.90, Form("%s", centrality.c_str()));
 
 					first_pass_cent = false;
 				} //end cent loop
 
 				c_B2S_dR->cd(1);
+				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.06;
+				ltx->SetTextAlign(11);
+				ltx->SetTextSize(13);
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));
+
 				c_B2S_dR->cd(6);
 				legend_B2S_dR->Draw();
 
@@ -959,10 +954,11 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		//draw as function of dR
 		{
 			cout << "Doing Final ChPS plots (as function of r, for trk pT)" << endl;
+			gStyle->SetErrorX(0);
 
 			TCanvas *c_ChPS_dR = new TCanvas("c_ChPS_dR","c_ChPS_dR",900,600);
 			if (dataset_type == "pp") c_ChPS_dR->SetCanvasSize(800,600);
-			TLegend *legend_ChPS_dR = new TLegend(0.4, 0.700, 0.93, 0.89, "","brNDC");
+			TLegend *legend_ChPS_dR = new TLegend(0.4, 0.650, 0.93, 0.89, "","brNDC");
 			legend_ChPS_dR->SetTextFont(43);
 			legend_ChPS_dR->SetBorderSize(0);
 			if (dataset_type == "pp") legend_ChPS_dR->SetTextSize(18);
@@ -1013,7 +1009,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1);
 						}
 
-						h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-5,1E5);
+						h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-7,1E6);
 						h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0,r_max_range);
 
 						if (trk_itr == 0) h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
@@ -1030,20 +1026,18 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
 
 							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
-							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.45, 1.55);
+							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.85, 1.15);
 
+							shiftHist(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),trk_itr*0.002);
 							if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 							else h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same");
 							gPad->SetLogx(0);
 							gPad->SetLogy(0);
 
+							line->SetLineStyle(0);
 							line->DrawLine(0, 1, r_max_range, 1);
 
 						}
-
-//						setup_canvas(c_ChPS_dR, dataset_type, i_cent);
-//						if (dataset_type == "pp") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
-//						if (dataset_type == "PbPb") h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
 
 						trk_itr++;
 
@@ -1075,7 +1069,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				ltx->DrawLatexNDC(0.92, 0.75, Form("%s %s", dataset_type.c_str(), did.c_str()));
 //				ltx->DrawLatexNDC(0.19, 0.77, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
-				c_ChPS_dR->cd(2);
+				if (dataset_type == "PbPb") c_ChPS_dR->cd(2);
 				legend_ChPS_dR->Draw();
 
 				pdf_label = "";

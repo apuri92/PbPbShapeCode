@@ -71,12 +71,12 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	int trk_pt_end = 9;
 
 	string y_label = "Unkown";
-	if (mode == "RDpT") y_label = "#delta[#it{R}_{ #it{D} (#it{p}_{T}, #it{r})}] [%%]";
-	if (mode == "DeltaDpT") y_label = "#delta[#it{#Delta}_{ #it{D} (#it{p}_{T}, #it{r})}] [%%]";
+	if (mode == "RDpT") y_label = "#delta#it{R}_{#it{D}(#it{p}_{T},#it{r})} [%]";
+	if (mode == "DeltaDpT") y_label = "#delta#Delta#it{D}(#it{p}_{T}, #it{r}) [%]";
 	if (mode == "ChPS")
 	{
-		if (dataset_type == "_PbPb") y_label = "#it{D} (#it{p}_{T}, #it{r})_{PbPb}";
-		if (dataset_type == "_pp") y_label = "#it{D} (#it{p}_{T}, #it{r})_{pp}";
+		if (dataset_type == "_PbPb") y_label = "#delta#it{D}(#it{p}_{T}, #it{r})_{PbPb} [%]";
+		if (dataset_type == "_pp") y_label = "#delta#it{D}(#it{p}_{T}, #it{r})_{pp} [%]";
 	}
 	string r_label = "#it{r}";
 
@@ -107,7 +107,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 			for (int i_trk = trk_pt_start; i_trk < 11; i_trk++)
 			{
 
-				if ((i_jet != 7 && i_jet != 8 && i_jet != 9 & i_jet != 10) || (i_trk != trk_select1 && i_trk != trk_select2)) continue;
+				if ((i_jet != 7 && i_jet != 9) || (i_trk != trk_select1 && i_trk != trk_select2)) continue;
 
 				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && (i_cent != 0 && i_cent != 5)) continue;
 

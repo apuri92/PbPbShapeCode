@@ -92,7 +92,7 @@ class PbPbFFShape : public BaseClass{
 	TH1D* h_tmp_dRBin; //!
 	TH3D* h_tmp_rdEtadPhi; //!
 	TH2D* h_cone_map; //!
-	TH1D* h_tmp_cone_stats; //!
+	vector<TH1D*> h_tmp_cone_stats; //!
 
 
 	TH1 *h_event_rN; //!
@@ -109,6 +109,7 @@ class PbPbFFShape : public BaseClass{
 	ZDC::ZdcAnalysisTool *m_zdcTools; //!
 
 	vector<vector<TH3D*>> h_dR_change; //!
+	vector<vector<TH3D*>> h_dR_change_cnts; //!
 
 	bool derive_UE_mode = 0;
 	int lo_jetpt_bin = 6;
@@ -122,8 +123,9 @@ class PbPbFFShape : public BaseClass{
 	vector<TH3D*> h_jet_for_eff_full; //!
 	vector<TH3D*> h_jet_psi3; //!
 	vector<TH3D*> h_reco_jets; //!
-
-
+	vector<TH1D*> h_jets_preIso; //!
+	vector<TH1D*> h_jets_postIso; //!
+	vector<TH3D*> ChPS_truth_dR; //!
 	//Raw disitrbutions
 	vector<vector<TH2D*>> ChPS_raw; //!
 

@@ -120,6 +120,27 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				output->cd();
 				h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Write(Form("h_truth_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin));
 
+				//scale by annulus area
+				double orig, orig_err;
+
+				for (int i_dR = 1; i_dR <= h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetNbinsX(); i_dR++)
+				{
+					double lo = h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->GetBinLowEdge(i_dR);
+					double hi = h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->GetBinUpEdge(i_dR);
+					double area = TMath::Pi() * (pow(hi,2) - pow(lo,2));
+
+					orig = h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetBinContent(i_dR);
+					orig_err = h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetBinError(i_dR);
+					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetBinContent(i_dR, orig/area);
+					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetBinError(i_dR, orig_err/area);
+
+					orig = h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetBinContent(i_dR);
+					orig_err = h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetBinError(i_dR);
+					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetBinContent(i_dR, orig/area);
+					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->SetBinError(i_dR, orig_err/area);
+				}
+
+
 				//Ratios
 				h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin) = (TH1*)h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Clone(Form("ratio_c%i_j%i_trk%i", i_cent, i_jetpt, i_pt_bin)); //doing truth/reco. Need to multiply this with the ChPS
 				h_ratio_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Divide(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
@@ -231,12 +252,12 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	legend3->SetTextFont(43);
 	legend3->SetTextSize(12);
 
-	TLegend *legend4 = new TLegend();
+	TLegend *legend4 = new TLegend(0.19, 0.20, 0.70, 0.45);
 	legend4->SetBorderSize(0);
 	legend4->SetTextFont(43);
 	legend4->SetTextSize(12);
 
-	TLegend *legend5 = new TLegend();
+	TLegend *legend5 = new TLegend(0.19, 0.20, 0.70, 0.45);
 	legend5->SetBorderSize(0);
 	legend5->SetTextFont(43);
 	legend5->SetTextSize(12);
@@ -249,12 +270,12 @@ void get_posCorr(string config_file = "ff_config.cfg")
 	TLine *line = new TLine();
 	line->SetLineStyle(2);
 
-	TCanvas *c0 = new TCanvas("c0","c0",900,600);
-	TCanvas *c1 = new TCanvas("c1","c1",900,600);
-	TCanvas *c2 = new TCanvas("c2","c2",900,600);
-	TCanvas *c3 = new TCanvas("c3","c3",900,600);
-	TCanvas *c4 = new TCanvas("c4","c4",900,600);
-	TCanvas *c5 = new TCanvas("c5","c5",900,600);
+	TCanvas *c0 = new TCanvas("c0","c0",1200,600);
+	TCanvas *c1 = new TCanvas("c1","c1",1200,600);
+	TCanvas *c2 = new TCanvas("c2","c2",1200,600);
+	TCanvas *c3 = new TCanvas("c3","c3",1200,600);
+	TCanvas *c4 = new TCanvas("c4","c4",1200,600);
+	TCanvas *c5 = new TCanvas("c5","c5",1200,600);
 
 	bool first_cent_pass = true;
 	for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
@@ -264,23 +285,23 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 		c1->cd();
 		c1->Clear();
-		c1->Divide(3,2);
+		c1->Divide(4,2);
 
 		c2->cd();
 		c2->Clear();
-		c2->Divide(3,2);
+		c2->Divide(4,2);
 
 		c3->cd();
 		c3->Clear();
-		c3->Divide(3,2);
+		c3->Divide(4,2);
 
 		c4->cd();
 		c4->Clear();
-		c4->Divide(3,2);
+		c4->Divide(4,2);
 
 		c5->cd();
 		c5->Clear();
-		c5->Divide(3,2);
+		c5->Divide(4,2);
 
 		int jet_iter = 0;
 
@@ -294,7 +315,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 			c0->cd();
 			c0->Clear();
-			c0->Divide(3,2);
+			c0->Divide(4,2);
 
 			int trk_iter = 0;
 
@@ -304,7 +325,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 				double pt_hi = trk_pt_binning->GetBinUpEdge(i_pt_bin+1);
 
 				if (pt_lo < 1.||
-					pt_hi> 60.) continue;
+					pt_hi> 80.) continue;
 
 				//Drawing 2D response plots, each page is a centrality and jet pt bin, with each pad being a trk bin
 				{
@@ -313,6 +334,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetTitle("Reco r");
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(0,r_max_range);
+					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1E-8,1E0);
 
 //					h_reco_truth.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetZaxis()->SetRangeUser(1e-9,1);
 					gPad->SetRightMargin(0.15);
@@ -331,7 +353,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Reco dR");
 					SetHStyle(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-5, 1);
+					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
 					h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend1->AddEntry(h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_reco_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
@@ -346,7 +368,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetTitle("Truth dR");
 					SetHStyle(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin),jet_iter);
 					smallify(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin));
-					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-5, 1);
+					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetYaxis()->SetRangeUser(1e-7, 1);
 					h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->GetXaxis()->SetRangeUser(0,r_max_range);
 					if (trk_iter == 0) legend2->AddEntry(h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_truth_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
@@ -400,9 +422,15 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					if (trk_iter == 0) legend4->AddEntry(h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_purity_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,0.5,1.2,0.5);
 					if (jet_iter == 0) line->DrawLine(0,1,r_max_range,1);
+					if (jet_iter == 0)
+					{
+						ltx->SetTextAlign(32);
+						ltx->DrawLatexNDC(0.95,0.90,num_to_cent(31,i_cent).c_str());
+						ltx->SetTextAlign(12);
+						ltx->DrawLatexNDC(0.17,0.90,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
+					}
 				}
 
 				//Drawing efficienct of response projections, each page is a centrality, each pad is a trk pt bin, each pad has different curves for jet pt
@@ -417,9 +445,16 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					if (trk_iter == 0) legend5->AddEntry(h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin), Form("%4.0f < #it{p}_{T}^{jet} < %4.0f GeV", pt_jet_lo, pt_jet_hi));
 					if (jet_iter == 0) h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("p");
 					else h_efficiency_dR.at(i_jetpt).at(i_cent).at(i_pt_bin)->Draw("same p");
-					if (jet_iter == 0) ltx->DrawLatexNDC(0.20,0.88,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
 					if (jet_iter == 0) line->DrawLine(0,0.5,r_max_range,0.5);
 					if (jet_iter == 0) line->DrawLine(0,1,r_max_range,1);
+					if (jet_iter == 0)
+					{
+						ltx->SetTextAlign(32);
+						ltx->DrawLatexNDC(0.95,0.90,num_to_cent(31,i_cent).c_str());
+						ltx->SetTextAlign(12);
+						ltx->DrawLatexNDC(0.17,0.90,Form("%4.1f < #it{p}_{T}^{trk} < %4.1f",pt_lo, pt_hi));
+					}
+
 				}
 
 
@@ -494,13 +529,9 @@ void get_posCorr(string config_file = "ff_config.cfg")
 
 		{
 			c4->cd();
-			ltx->DrawLatexNDC(0.055,0.975,num_to_cent(31,i_cent).c_str());
+			ltx->SetTextAlign(32);
 
 			c4->cd(1);
-			legend4->SetX1NDC(0.19);
-			legend4->SetX2NDC(0.70);
-			legend4->SetY1NDC(0.20);
-			legend4->SetY2NDC(0.55);
 			legend4->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";
@@ -509,14 +540,7 @@ void get_posCorr(string config_file = "ff_config.cfg")
 		}
 
 		{
-			c5->cd();
-			ltx->DrawLatexNDC(0.055,0.975,num_to_cent(31,i_cent).c_str());
-
 			c5->cd(1);
-			legend5->SetX1NDC(0.19);
-			legend5->SetX2NDC(0.70);
-			legend5->SetY1NDC(0.20);
-			legend5->SetY2NDC(0.55);
 			legend5->Draw();
 			if (first_cent_pass) name = "(";
 			else name = "";

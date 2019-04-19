@@ -1,6 +1,6 @@
 #include "output_dev/functions/global_variables.h"
 
-void runStats(int config = 47)
+void runStats(int config = 0)
 {
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
@@ -30,7 +30,7 @@ void runStats(int config = 47)
 	int run_start = 1;
 	int run_end = N_runs;
 
-//	map<int, double> luminosity = {{ 286665 , 0.02071 }, { 286711 , 0.419829 }, { 286717 , 0.590276 }, { 286748 , 4.24438 }, { 286767 , 5.799 }, { 286834 , 13.1028 }, { 286854 , 13.595759 }, { 286908 , 11.00192 }, { 286990 , 10.27951 }, { 287038 , 15.9825 }, { 287044 , 23.3479 }, { 287068 , 6.83118 }, { 287222 , 1.33018 }, { 287224 , 1.932658 }, { 287259 , 17.4035 }, { 287270 , 22.0425 }, { 287281 , 24.1107 }, { 287321 , 5.49172 }, { 287330 , 21.620117 }, { 287334 , 16.3135 }, { 287378 , 16.81257 }, { 287380 , 0.319641 }, { 287382 , 17.651474 }, { 287560 , 0.572368 }, { 287594 , 12.6278 }, { 287632 , 18.9915 }, { 287706 , 26.6057 }, { 287728 , 25.93 }, { 287827 , 24.1147 }, { 287843 , 25.0225 }, { 287866 , 42.1866 }, { 287924 , 22.5426 }, { 287931 , 37.2019 }};
+	map<int, double> luminosity = {{ 286665 , 0.02071 }, { 286711 , 0.419829 }, { 286717 , 0.590276 }, { 286748 , 4.24438 }, { 286767 , 5.799 }, { 286834 , 13.1028 }, { 286854 , 13.595759 }, { 286908 , 11.00192 }, { 286990 , 10.27951 }, { 287038 , 15.9825 }, { 287044 , 23.3479 }, { 287068 , 6.83118 }, { 287222 , 1.33018 }, { 287224 , 1.932658 }, { 287259 , 17.4035 }, { 287270 , 22.0425 }, { 287281 , 24.1107 }, { 287321 , 5.49172 }, { 287330 , 21.620117 }, { 287334 , 16.3135 }, { 287378 , 16.81257 }, { 287380 , 0.319641 }, { 287382 , 17.651474 }, { 287560 , 0.572368 }, { 287594 , 12.6278 }, { 287632 , 18.9915 }, { 287706 , 26.6057 }, { 287728 , 25.93 }, { 287827 , 24.1147 }, { 287843 , 25.0225 }, { 287866 , 42.1866 }, { 287924 , 22.5426 }, { 287931 , 37.2019 }};
 
 	TH1* h_tmp_mc = (TH1*)input_file->Get("h_event_rN");
 	h_tmp_mc->SetName("h_event_rN_mc");
@@ -56,18 +56,20 @@ void runStats(int config = 47)
 
 	for (int i = 1; i <= h_eventPercentage_mc->GetNbinsX(); i++)
 	{
-		h_eventPercentage_mc->SetBinContent(i,h_tmp_mc->GetBinContent(i));
-		h_eventPercentage_data->SetBinContent(i,h_tmp_data->GetBinContent(i));
+		h_eventPercentage_mc->SetBinContent(i,h_tmp_mc->GetBinContent(i));///luminosity[h_tmp_mc->GetBinLowEdge(i)]);
+		cout << luminosity[h_tmp_mc->GetBinLowEdge(i)] << " " << h_tmp_mc->GetBinLowEdge(i) << endl;
+		h_eventPercentage_data->SetBinContent(i,h_tmp_data->GetBinContent(i));///luminosity[h_tmp_mc->GetBinLowEdge(i)]);
+
 	}
 
 	h_eventPercentage_mc->Scale(1./h_eventPercentage_mc->Integral());
 	h_eventPercentage_data->Scale(1./h_eventPercentage_data->Integral());
 
-	TCanvas *c_x = new TCanvas("c_x","c_x",1500,900);
+	TCanvas *c_x = new TCanvas("c_x","c_x",800,600);
 	TLegend *legend_x = new TLegend(0.20, 0.6, 0.30, 0.7, "","brNDC");
 	legend_x->SetTextFont(43);
 	legend_x->SetBorderSize(0);
-	legend_x->SetTextSize(20);
+	legend_x->SetTextSize(24);
 	legend_x->SetNColumns(1);
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
@@ -79,10 +81,12 @@ void runStats(int config = 47)
 	c_x->cd();
 	SetHStyle_smallify(h_eventPercentage_data, 0, 0);
 	SetHStyle_smallify(h_eventPercentage_mc, 1, 0);
+	h_eventPercentage_mc->GetXaxis()->SetLabelSize(14);
 	h_eventPercentage_mc->LabelsOption("v");
 	h_eventPercentage_data->LabelsOption("v");
 //	h_eventPercentage_mc->GetYaxis()->SetTitleOffset(0.8);
-	h_eventPercentage_mc->GetXaxis()->SetTitleOffset(2.2);
+	h_eventPercentage_mc->GetXaxis()->SetTitleOffset(1.4);
+	h_eventPercentage_mc->GetYaxis()->SetRangeUser(0,0.15);
 	h_eventPercentage_mc->Draw("hist");
 	h_eventPercentage_data->Draw("hist same");
 	legend_x->AddEntry(h_eventPercentage_data,"Data","lp");

@@ -177,15 +177,10 @@ void draw_spectra(string config_file = "ff_config.cfg")
 				h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitle("Normalized counts [GeV^{-1}]");
 				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitle("MC Closure");
 
-				if (doSmall)
-				{
-					h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(12);
-					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(12);
-				}
 
 				h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitle("#it{p}_{T}^{jet} [GeV]");
 
-				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.84, 1.16);
+				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetRangeUser(0.93, 1.07);
 //				h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);
 
 
@@ -220,12 +215,36 @@ void draw_spectra(string config_file = "ff_config.cfg")
 					if (dataset_type == "PbPb") c_spect_closure->cd(i_cent+1)->cd(2);
 					h_closure.at(i_cent).at(i_y)->GetYaxis()->SetNdivisions(504);
 					h_closure.at(i_cent).at(i_y)->Draw("");
-					if (dataset_type == "pp") h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
+					if (dataset_type == "pp")
+					{
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(2.2);
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleSize(18);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(18);
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetLabelSize(18);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetLabelSize(18);
+
+
+						h_true.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(3.2);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(2.2);
+						h_true.at(i_cent).at(i_y)->GetXaxis()->SetTitleSize(18);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(18);
+						h_true.at(i_cent).at(i_y)->GetXaxis()->SetLabelSize(18);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetLabelSize(18);
+					}
+
 					if (dataset_type == "PbPb")
 					{
 						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleOffset(5);
-						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
-						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(4.);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(3.5);
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetTitleSize(13);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(13);
+						h_closure.at(i_cent).at(i_y)->GetXaxis()->SetLabelSize(13);
+						h_closure.at(i_cent).at(i_y)->GetYaxis()->SetLabelSize(13);
+
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleOffset(3.5);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetTitleSize(13);
+						h_true.at(i_cent).at(i_y)->GetYaxis()->SetLabelSize(13);
 
 					}
 					line->DrawLine(jet_pt_lo, 1, jet_pt_hi, 1);

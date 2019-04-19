@@ -326,10 +326,12 @@ void systematics(string config_file = "sys_config.cfg")
 								tmp = pow(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
 								tmp = tmp + pow(h_sys_p[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
 								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, sqrt(tmp) );
+								h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.0000001);
 
 								tmp = pow(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
 								tmp = tmp + pow(h_sys_n[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR),2);
 								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinContent(i_dR, -sqrt(tmp) );
+								h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetBinError(i_dR, 0.0000001);
 
 							}
 
@@ -606,8 +608,6 @@ void systematics(string config_file = "sys_config.cfg")
 //					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineStyle(1);
 //					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
 //					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetLineWidth(1);
-//					h_sys_p[i_sys][i_trk][i_cent][i_jet]->SetMarkerSize(0.3);
-//					h_sys_n[i_sys][i_trk][i_cent][i_jet]->SetMarkerSize(0.3);
 //
 //					if (cent_first_pass) legend_sys->AddEntry(h_sys_p[i_sys][i_trk][i_cent][i_jet],sys_i_name[sys_names[i_sys]].c_str(),"lp");
 //					h_sys_p[i_sys][i_trk][i_cent][i_jet]->Draw("p same");

@@ -3,6 +3,7 @@
 void compare_final_UE()
 {
 	SetAtlasStyle();
+	gStyle->SetErrorX(0);
 	TFile *file_MC_method = new TFile("output_dev/unfold/output_pdf_nominal/root/final_ChPS_data_PbPb.root");
 	TFile *file_cone_method = new TFile("output_dev/unfold/output_pdf_sys44/root/final_ChPS_data_PbPb.root"); //44 is cone method
 
@@ -16,7 +17,7 @@ void compare_final_UE()
 		cout << "Comparing Final ChPS plots (as function of r, for trk pT)" << endl;
 
 		TCanvas *c_ChPS_dR = new TCanvas("c_ChPS_dR","c_ChPS_dR",900,600);
-		TLegend *legend_ChPS_dR = new TLegend(0.19, 0.700, 0.40, 0.93, "","brNDC");
+		TLegend *legend_ChPS_dR = new TLegend(0.19, 0.35, 0.40, 0.58, "","brNDC");
 		legend_ChPS_dR->SetTextFont(43);
 		legend_ChPS_dR->SetBorderSize(0);
 		legend_ChPS_dR->SetTextSize(13);
@@ -54,11 +55,12 @@ void compare_final_UE()
 				{
 					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
-					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+//					name = Form("h_ChPS_UE_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_raw_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_raw_subtr_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 //					name = Form("h_ChPS_raw_subtr_unf_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
-//					name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+					name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
+					cout << "USING " << name << " FOR RATIO!!! " << endl;
 					TH1* h_MC_meth = (TH1*)file_MC_method->Get(name.c_str());
 					h_MC_meth->SetName(Form("%s_MCMeth", name.c_str()));
 
@@ -67,22 +69,22 @@ void compare_final_UE()
 
 					TH1* h_ratio = (TH1*)h_cone_meth->Clone(Form("%s_ratio", name.c_str()));
 					h_ratio->Divide(h_MC_meth);
-					h_ratio->GetYaxis()->SetTitle("ChPS_{Cone Method} / ChPS_{MC Method}");
+					h_ratio->GetYaxis()->SetTitle("ChPS_{Cone Method}^{Subtracted} / ChPS_{MC Method}^{Subtracted}");
 					SetHStyle_smallify(h_ratio, trk_itr, 1);
 
-					for (int i = 0; i < h_ratio->GetXaxis()->GetNbins(); i++)
-					{
-						h_ratio->SetBinError(i+1,0.0001);
-					}
+					for (int i = 0; i < h_ratio->GetXaxis()->GetNbins(); i++) h_ratio->SetBinError(i+1,0.0001);
 					if (jet_itr == 0 && first_pass_cent) legend_ChPS_dR->AddEntry(h_ratio,trk_label.c_str(),"lp");
 
 					c_ChPS_dR->cd(i_cent+1);
 
-					h_ratio->GetYaxis()->SetRangeUser(0,2);
+					h_ratio->GetYaxis()->SetNdivisions(505);
+					h_ratio->GetYaxis()->SetRangeUser(0.6,1.1);
 					h_ratio->GetXaxis()->SetRangeUser(0,r_max_range);
 
-					if (trk_itr == 0) h_ratio->DrawCopy("p");
-					else h_ratio->DrawCopy("p same");
+					shiftHist(h_ratio,trk_itr*0.003);
+
+					if (trk_itr == 0) h_ratio->DrawCopy("X0");
+					else h_ratio->DrawCopy("X0 same");
 					gPad->SetLogx(0);
 					gPad->SetLogy(0);
 

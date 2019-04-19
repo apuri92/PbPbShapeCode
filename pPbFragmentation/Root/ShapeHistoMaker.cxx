@@ -98,10 +98,6 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	wk()->addOutput(h_tmp_dRBin);
 	h_tmp_rdEtadPhi = new TH3D("h_tmp_rdEtadPhi","h_tmp_rdEtadPhi;r;#delta#eta;#delta#phi",tmp_rBinsN, tmp_rBins, tmp_finerBinsN, tmp_finerBins, tmp_finerBinsN, tmp_finerBins);
 	wk()->addOutput(h_tmp_rdEtadPhi);
-	h_tmp_cone_stats = new TH1D("h_tmp_cone_stats","h_tmp_cone_stats;# Valid Cone ; Events;",51,-0.5,50.5);
-	wk()->addOutput(h_tmp_cone_stats);
-//	h_tmp_cone_stats = new TH3D("h_tmp_cone_stats","h_tmp_cone_stats# Valid Cone;p_T^{Trk};p_T^{jet}",tmp_coneBinsN, tmp_coneBins, ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
-//	wk()->addOutput(h_tmp_cone_stats);
 
 
 	h_cone_map = new TH2D("h_cone_map","h_cone_map;#eta_{cone};#phi_{cone}",100, -2.5, 2.5, 140, -3.5, 3.5);
@@ -110,6 +106,10 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	//Debugging histograms
 	for (int i=0;i<GetCentralityNBins(_centrality_scheme);i++)
 	{
+		temphist_1D = new TH1D(Form("h_tmp_cone_stats_cent%i",i),Form("h_tmp_cone_stats_cent%i ; #Valid Cone ; Events", i),51,-0.5,50.5);
+		temphist_1D->Sumw2();
+		h_tmp_cone_stats.push_back(temphist_1D);
+
 		temphist_3D = new TH3D(Form("h_reco_truth_matched_cent%i",i),Form("h_reco_truth_matched_cent%i",i),ptJetBinsN, ptJetBins, ptJetBinsN, ptJetBins, dR_resBinsN, dR_resBins);
 		temphist_3D->Sumw2();
 		h_reco_truth_matched.push_back(temphist_3D);
@@ -135,6 +135,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		wk()->addOutput (h_jet_for_eff_full.at(i));
 		wk()->addOutput (h_jet_psi3.at(i));
 		wk()->addOutput (h_reco_jets.at(i));
+		wk()->addOutput (h_tmp_cone_stats.at(i));
 	}
 
 	//Basic histograms
@@ -240,6 +241,14 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		temphist_2D->Sumw2();
 		h_z0sintheta.push_back(temphist_2D);
 
+		temphist_1D = new TH1D(Form("h_jets_preIso_cent%i", i), Form("h_jets_preIso_cent%i", i), ptJetBinsN, ptJetBins);
+		temphist_1D->Sumw2();
+		h_jets_preIso.push_back(temphist_1D);
+
+		temphist_1D = new TH1D(Form("h_jets_postIso_cent%i", i), Form("h_jets_postIso_cent%i", i), ptJetBinsN, ptJetBins);
+		temphist_1D->Sumw2();
+		h_jets_postIso.push_back(temphist_1D);
+
 //		temphist_3D = new TH3D(Form("h_jetpT_v_multiplicity_cent%i",i),"h_jetpT_v_multiplicity;jet p_{T} GeV;p_{T}^{trk,min} [GeV];multiplicity",20,0,1000,6,0,6,50,0,50);
 //		h_jetpT_v_multiplicity.push_back(temphist_3D);
 //		h_jetpT_v_multiplicity.at(i)->Sumw2();
@@ -249,6 +258,8 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		wk()->addOutput (h_SCTHits.at(i));
 		wk()->addOutput (h_d0.at(i));
 		wk()->addOutput (h_z0sintheta.at(i));
+		wk()->addOutput (h_jets_preIso.at(i));
+		wk()->addOutput (h_jets_postIso.at(i));
 //		wk()->addOutput (h_jetpT_v_multiplicity.at(i));
 
 	}
@@ -264,6 +275,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	ChPS_FNS_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	ChPS_circ_UE =  vector<vector<TH2D*> > (_ndRBins, vector<TH2D*>(_nCentbins));
 	h_dR_change =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
+	h_dR_change_cnts =  vector<vector<TH3D*> > (ptJetBinsN, vector<TH3D*>(_nCentbins));
 
 	h_reco_jet_spectrum =  vector<vector<TH1D*> > (_nJetYBins, vector<TH1D*>(_nCentbins));
 
@@ -289,6 +301,7 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 	TM_norm_jet = vector<TH1D*> (_nCentbins);
 	TM_norm_jet_rN = vector<TH2D*> (_nCentbins);
 	FS_norm_jet = vector<TH1D*> (_nCentbins);
+	ChPS_truth_dR = vector<TH3D*> (_nCentbins);
 
 //	h_UE_dNdEtadPhidpT =  vector<vector<vector<vector<TH3D*>>>> (ptJetBinsN, vector<vector<vector<TH3D*>>> (1, vector<vector<TH3D*>> (_nCentbins, vector<TH3D*>(_ndRBins))));
 	h_UE_dNdEtadPhidpT =  vector<vector<vector<vector<TH3D*>>>> (ptJetBinsN, vector<vector<vector<TH3D*>>> (PsiBinsN, vector<vector<TH3D*>> (_nCentbins, vector<TH3D*>(_ndRBins))));
@@ -320,6 +333,9 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 		FS_norm_jet.at(j) = temphist_1D;
 		wk()->addOutput (FS_norm_jet.at(j));
 
+		temphist_3D = new TH3D(Form("ChPS_truth_indR_cent%i",j),Form("ChPS_truth_indR_cent%i",j),dR_resBinsN, dR_resBins, ptTrkBinsN, ptTrkBins, ptJetBinsN, ptJetBins);
+		ChPS_truth_dR.at(j) = temphist_3D;
+		wk()->addOutput (ChPS_truth_dR.at(j));
 
 		if (derive_UE_mode)
 		{
@@ -378,6 +394,11 @@ EL::StatusCode PbPbFFShape :: histInitialize ()
 			h_dR_change.at(i).at(j) = temphist_3D;
 			h_dR_change.at(i).at(j)->Sumw2();
 			wk()->addOutput (h_dR_change.at(i).at(j));
+
+			temphist_3D = new TH3D(Form("h_dR_change_cnts_jetpt%i_cent%i",i,j),Form("h_dR_change_cnts_jetpt%i_cent%i",i,j),_ndRBins-1,trkcorr->dRrange,_ndRBins-1,trkcorr->dRrange,ptTrkBinsN, ptTrkBins);
+			h_dR_change_cnts.at(i).at(j) = temphist_3D;
+			h_dR_change_cnts.at(i).at(j)->Sumw2();
+			wk()->addOutput (h_dR_change_cnts.at(i).at(j));
 		}
 
 
