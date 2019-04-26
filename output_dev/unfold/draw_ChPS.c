@@ -855,10 +855,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			gStyle->SetErrorX(0);
 			TCanvas *c_B2S_dR = new TCanvas("c_B2S_dR","c_B2S_dR",900,600);
 			if (dataset_type == "pp") c_B2S_dR->SetCanvasSize(600,600);
-			TLegend *legend_B2S_dR = new TLegend(0.18, 0.55, 0.48, 0.92, "","brNDC");
+			TLegend *legend_B2S_dR = new TLegend(0.18, 0.47, 0.48, 0.92, "","brNDC");
 			legend_B2S_dR->SetTextFont(43);
 			legend_B2S_dR->SetBorderSize(0);
-			legend_B2S_dR->SetTextSize(14);
+			legend_B2S_dR->SetTextSize(13);
 
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -1026,7 +1026,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
 
 							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
-							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.85, 1.15);
+							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.95, 1.05);
 
 							shiftHist(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),trk_itr*0.002);
 							if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
