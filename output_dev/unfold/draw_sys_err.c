@@ -34,6 +34,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
 	TFile* sys_file = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
+	//For compiledCode
+	//	TFile* sys_file = new TFile(Form("compiledCode/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
 
 	cout << "Using files:" << endl;
 	cout << sys_file->GetName() << endl;

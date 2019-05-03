@@ -27,19 +27,26 @@ void systematics(string config_file = "sys_config.cfg")
 	//	##############	Config done	##############"
 
 	double r_max_range = 0.8;
-	if (mode == "RDpT" || mode == "DeltaDpT") dataset_type = "";
+	if (mode.compare("ChPS") !=0 ) dataset_type = "";
 	else dataset_type = Form("_%s", dataset_type.c_str());
 
 	TFile* nom_file = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()));
 	if (mode == "RDpT" || mode == "DeltaDpT") nom_file = new TFile(Form("output_pdf_nominal/root/final_%s_%s%s.root", "RDpT", did.c_str(), dataset_type.c_str())); //get R file because difference is saved there
 	TFile* output_file = new TFile(Form("output_pdf_nominal/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()), "recreate");
 
+	//For compiledCode
+	//	TFile* nom_file = new TFile(Form("compiledCode/root/output_nominal_data.root"));
+	//	TFile* output_file = new TFile(Form("compiledCode/root/final_%s_sys_%s%s.root", mode.c_str(), did.c_str(), dataset_type.c_str()), "recreate");
+
 	TFile *f_pbpb, *f_pp;
 
-	if (mode == "RDpT" || mode == "DeltaDpT")
+	if (dataset_type.compare("") == 0)
 	{
 		f_pbpb = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_PbPb.root"));
 		f_pp = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_data_pp.root"));
+		//For compiledCode
+//		f_pbpb = new TFile(Form("compiledCode/root/final_ChPS_sys_data_PbPb.root"));
+//		f_pp = new TFile(Form("compiledCode/root/final_ChPS_sys_data_pp.root"));
 	}
 
 
@@ -127,6 +134,9 @@ void systematics(string config_file = "sys_config.cfg")
 	{
 		name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), mode.c_str(), did.c_str(), dataset_type.c_str());
 		if (mode == "RDpT" || mode == "DeltaDpT") name = Form("output_pdf_%s/root/final_%s_%s%s.root", sys_names[i_sys].c_str(), "RDpT", did.c_str(), dataset_type.c_str()); //get R file because difference is saved there
+
+		//For compiledCode
+//		name = Form("compiledCode/root/output_%s_data.root", sys_names[i_sys].c_str());
 		sys_files.push_back( new TFile( name.c_str() ) );
 		cout << sys_files[i_sys]->GetName() << endl;
 
@@ -134,7 +144,7 @@ void systematics(string config_file = "sys_config.cfg")
 		{
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
+				if ((dataset_type.compare("_pp") !=0 ) && i_cent == 6) continue;
 				else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -142,6 +152,8 @@ void systematics(string config_file = "sys_config.cfg")
 
 					//get relative errors for all modes (pbpb, pp, RDpT, DeltaDpT)
 					name = Form("h_%s_final_indR_trk%i_cent%i_jetpt%i",mode.c_str(), i_trk, i_cent, i_jet);
+					//For compiledCode
+//					name = Form("h%s_%s_final_indR_trk%i_cent%i_jetpt%i",dataset_type.c_str(), mode.c_str(), i_trk, i_cent, i_jet);
 					if (i_sys == 0)
 					{
 						h_nom[i_trk][i_cent][i_jet] = (TH1*)nom_file->Get(name.c_str());
@@ -191,8 +203,9 @@ void systematics(string config_file = "sys_config.cfg")
 						double tmp = h_sys[i_sys][i_trk][i_cent][i_jet]->GetBinContent(i_dR);
 
 						//special rules
-						//symmetrize for JER (1), fakes (45), UE_ConeMethod (44), UE map stat (42), unfolding (3), nonclosure (4)
+						//symmetrize for JER (1), fakes (45), UE_ConeMethod (44), UE map stat (42), unfolding (3), nonclosure (4), significance (2)
 						if (sys_names[i_sys] == "sys1" ||
+							sys_names[i_sys] == "sys2" ||
 							sys_names[i_sys] == "sys3" ||
 							sys_names[i_sys] == "sys4" ||
 							sys_names[i_sys] == "sys42" ||
@@ -239,7 +252,7 @@ void systematics(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
+			if ((dataset_type.compare("_pp") !=0 ) && i_cent == 6) continue;
 			if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -344,8 +357,7 @@ void systematics(string config_file = "sys_config.cfg")
 					if ( (combined_sys_names[i_comb_sys] == "MCNonClosure" ||
 						  combined_sys_names[i_comb_sys] == "Unfolding" )
 						&&
-						(mode == "RDpT" ||
-						 mode == "DeltaDpT") )
+						(dataset_type.compare("") == 0) )
 
 
 					{
@@ -453,7 +465,7 @@ void systematics(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 		{
-			if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
+			if ((dataset_type.compare("_pp") !=0 ) && i_cent == 6) continue;
 			else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
@@ -573,7 +585,7 @@ void systematics(string config_file = "sys_config.cfg")
 			bool cent_first_pass = true;
 			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
 			{
-				if ((dataset_type == "_PbPb" || mode == "RDpT" || mode == "DeltaDpT") && i_cent == 6) continue;
+				if ((dataset_type.compare("_pp") !=0 ) && i_cent == 6) continue;
 				else if (dataset_type == "_pp" && i_cent < 6) continue;
 
 				string centrality = num_to_cent(31,i_cent);
@@ -596,7 +608,7 @@ void systematics(string config_file = "sys_config.cfg")
 
 
 				c_sys->cd(i_cent+1);
-//				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.1, 0.1);
+//				h_total_sys_p[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-0.2, 0.2);
 				h_total_sys_p[i_trk][i_cent][i_jet]->Draw("p");
 				h_total_sys_n[i_trk][i_cent][i_jet]->Draw("p same");
 
@@ -689,11 +701,22 @@ void systematics(string config_file = "sys_config.cfg")
 			if (i_trk == trk_pt_end-1 && i_jet == jet_pt_end-1) pdf_label = ")";
 			c_sys->Print(Form("output_pdf_nominal/systematics/Summary_%s_dR_sys%s_error.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
 
+			//For compiledCode
+//			c_sys->Print(Form("compiledCode/systematics/Summary_%s_dR_sys%s_error.pdf%s",mode.c_str(), dataset_type.c_str(), pdf_label.c_str()), Form("Title:trk%i_jetpt%i", i_trk, i_jet));
+
+
 
 		}
 	}
 
 
+	delete c_sys;
+	delete legend_sys;
+	delete ltx;
+	delete line;
+	delete m_config;
+	delete nom_file;
+	delete output_file;
 
 	cout << "######### Done Systematics #########" << endl;
 

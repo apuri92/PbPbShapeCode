@@ -1,5 +1,6 @@
 	
-systematics=(0 1 2 3 4 5 6 7 8 9 10 11 14 15 16 17 18 19 20 21 22 23 42 43 44 45) 
+# systematics=(0 1 2 3 4 5 6 7 8 9 10 11 14 15 16 17 18 19 20 21 22 23 42 43 44 45) 
+systematics=(45) 
 
 
 function unfold_draw_DpT {
@@ -52,11 +53,11 @@ for i in ${systematics[@]}; do
 
 	unfold_draw_DpT PbPb 0 $i
 	unfold_draw_DpT pp 0 $i
-	get_RDpT 0 $i
+	# get_RDpT 0 $i
 
 	unfold_draw_DpT PbPb 1 $i
 	unfold_draw_DpT pp 1 $i
-	get_RDpT 1 $i
+	# get_RDpT 1 $i
 
 
 done

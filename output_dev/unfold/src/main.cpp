@@ -226,7 +226,8 @@ int main(int argc, char ** argv)
 
 			if (apply_fake_uncert)
 			{
-				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_TM_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
+//				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_TM_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
+				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_FNS_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
 				h_fake_rate->SetName(Form("fake_dR%i_cent%i", i_dR, i_cent));
 				h_pp_MC_jets = (TH1*)fake_uncert->Get(Form("h_reco_jet_spectrum_y4_cent6"))->Clone(Form("fake_norm_%i",i_cent));
 				h_pp_MC_jets->SetName(Form("fake_norm_%i",i_cent));
@@ -298,8 +299,8 @@ int main(int argc, char ** argv)
 
 						if (apply_fake_uncert)
 						{
-							fake = 1.3 * fake;
-							fake_err = 1.3 * fake_err;
+							fake = fake + fake_uncert_addition;
+							fake_err = sqrt(pow(fake_err,2) - pow(fake_uncert_addition_err,2));
 						}
 
 						subtr = raw - fake;

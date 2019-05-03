@@ -1,6 +1,6 @@
 #include "../functions/global_variables.h"
 
-void draw_conf_plots(string config_file = "sys_config.cfg")
+void draw_conf_plots()
 {
 	cout << "######### DOING CONF_Plots #########" << endl;
 
@@ -17,16 +17,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	string trk_label = "#it{p}_{T}^{trk} [GeV]";
 	string jet_label = "#it{p}_{T}^{jet} [GeV]";
 
-	//	##############	Reading config	##############"
-	TEnv *m_config = new TEnv();
-	m_config->ReadFile(config_file.c_str(), EEnvLevel(1));
-
-	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
-	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
-
-	if (verbose) m_config->Print();
-	//	##############	Config done	##############"
-
 	int isMC = 0; //will never run on MC for these plots
 	std::string did = "data";
 
@@ -38,6 +28,16 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	TFile *f_ChPS_pp = new TFile(Form("output_pdf_nominal/root/final_ChPS_%s_pp.root", did.c_str()));
 	TFile *f_ChPS_pp_sys = new TFile(Form("output_pdf_nominal/root/final_ChPS_sys_%s_pp.root", did.c_str()));
 
+
+	//Use this for new version of drawChPS (in compiledCode)
+//	TFile *f_RDpT = new TFile(Form("compiledCode/root/output_nominal_data.root"));
+//	TFile *f_RDpT_sys = new TFile(Form("compiledCode/root/final_RDpT_sys_%s.root", did.c_str()));
+//	TFile *f_DeltaDpT_sys = new TFile(Form("compiledCode/root/final_DeltaDpT_sys_%s.root", did.c_str()));
+//
+//	TFile *f_ChPS_PbPb = new TFile(Form("compiledCode/root/output_nominal_data.root"));
+//	TFile *f_ChPS_PbPb_sys = new TFile(Form("compiledCode/root/final_ChPS_sys_%s_PbPb.root", did.c_str()));
+//	TFile *f_ChPS_pp = new TFile(Form("compiledCode/root/output_nominal_data.root"));
+//	TFile *f_ChPS_pp_sys = new TFile(Form("compiledCode/root/final_ChPS_sys_%s_pp.root", did.c_str()));
 
 	cout << "Using files:" << endl;
 	cout << f_RDpT->GetName() << endl;
@@ -94,28 +94,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	vector<vector<vector<TGraphAsymmErrors*>>> g_RDpT_final_sys_inJet (N_dR, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_trkpt)));
 	vector<vector<vector<TGraphAsymmErrors*>>> g_RDpT_final_stat_inJet (N_dR, vector<vector<TGraphAsymmErrors*>> (n_cent_cuts, vector<TGraphAsymmErrors*> (N_trkpt)));
 
-
-	vector<vector<TH1*>> h_DpT_PbPb_integrated (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DpT_PbPb_integrated_Totalpos (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DpT_PbPb_integrated_Totalneg (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_DpT_PbPb_integrated_sys (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_DpT_PbPb_integrated_stat (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-
-	vector<vector<TH1*>> h_DpT_pp_integrated (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DpT_pp_integrated_Totalpos (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DpT_pp_integrated_Totalneg (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_DpT_pp_integrated_sys (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_DpT_pp_integrated_stat (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-
-
-
-	vector<vector<TH1*>> h_DeltaDpT_integrated (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DeltaDpT_integrated_Totalpos (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TH1*>> h_DeltaDpT_integrated_Totalneg (n_cent_cuts, vector<TH1*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_RDpT_integrated_sys (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-	vector<vector<TGraphAsymmErrors*>> g_RDpT_integrated_stat (n_cent_cuts, vector<TGraphAsymmErrors*> (N_jetpt));
-
-
 	string pdf_label;
 
 	TLine *line = new TLine();
@@ -150,11 +128,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 	{
 		for (int i_cent = 0; i_cent < 6; i_cent++)
 		{
-			h_DeltaDpT_integrated[i_cent][i_jet] = new TH1D(Form("integrated_jet%i_cent%i",i_jet, i_cent), Form("integrated_jet%i_cent%i",i_jet, i_cent),dR_binning->GetNbins(),  ((TArrayD*)dR_binning->GetXbins())->GetArray());
-			h_DpT_PbPb_integrated[i_cent][i_jet] = new TH1D(Form("integrated_PbPb_jet%i_cent%i",i_jet, i_cent), Form("integrated_PbPb_jet%i_cent%i",i_jet, i_cent),dR_binning->GetNbins(),  ((TArrayD*)dR_binning->GetXbins())->GetArray());
-
-			if (i_cent == 0) h_DpT_pp_integrated[6][i_jet] = new TH1D(Form("integrated_pp_jet%i_cent%i",i_jet, 6), Form("integrated_pp_jet%i_cent%i",i_jet, 6),dR_binning->GetNbins(),  ((TArrayD*)dR_binning->GetXbins())->GetArray());
-
 			int trk_itr = 0;
 			for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 			{
@@ -197,6 +170,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 				//DpT PbPb
+				//For compiledCode
+//				name = Form("h_PbPb_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, i_cent, i_jet);
 				h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet] = (TH1*)f_ChPS_PbPb->Get(name.c_str());
 				h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->SetName(Form("%s_PbPb", name.c_str()));
@@ -221,6 +196,8 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				//DpT pp
 				if (i_cent == 0)
 				{
+					//For compiledCode
+//					name = Form("h_pp_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
 					name = Form("h_ChPS_final_indR_trk%i_cent%i_jetpt%i", i_trk, 6, i_jet);
 					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet] = (TH1*)f_ChPS_pp->Get(name.c_str());
 					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->SetName(Form("%s_pp", name.c_str()));
@@ -329,20 +306,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
 
 
-					if (i_trk >= 2 && i_trk <= 4)
-					{
-						tmp = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1) + h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR+1);
-						h_DeltaDpT_integrated[i_cent][i_jet]->SetBinContent(i_dR+1, tmp);
-
-						tmp = (trkpT_binning->GetBinCenter(i_trk+1)*h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1)) + h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR+1);
-						h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinContent(i_dR+1, tmp);
-
-						if (i_cent == 0)
-						{
-							tmp = (trkpT_binning->GetBinCenter(i_trk+1)*h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1)) + h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR+1);
-							h_DpT_pp_integrated[6][i_jet]->SetBinContent(i_dR+1, tmp);
-						}
-					}
 
 					//DpT_PbPb
 					r_position = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.002);
@@ -383,101 +346,9 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 				}
 				trk_itr++;
 			}
-
-			//rescale bins by area of annulus to get actual number, not densities:
-			for (int i_dR = 1 ; i_dR <= N_dR; i_dR++)
-			{
-				double dR_lo = dR_binning->GetBinLowEdge(i_dR);
-				double dR_hi = dR_binning->GetBinUpEdge(i_dR);
-				double area = TMath::Pi() * ((dR_hi*dR_hi) - (dR_lo*dR_lo));
-
-				h_DeltaDpT_integrated[i_cent][i_jet]->SetBinContent(i_dR, h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR) * area);
-				h_DeltaDpT_integrated[i_cent][i_jet]->SetBinError(i_dR, h_DeltaDpT_integrated[i_cent][i_jet]->GetBinError(i_dR) * area);
-
-				h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinContent(i_dR, h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR) * area);
-				h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinError(i_dR, h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinError(i_dR) * area);
-
-				if (i_cent == 0)
-				{
-					h_DpT_pp_integrated[6][i_jet]->SetBinContent(i_dR, h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR) * area);
-					h_DpT_pp_integrated[6][i_jet]->SetBinError(i_dR, h_DpT_pp_integrated[6][i_jet]->GetBinError(i_dR) * area);
-				}
-
-			}
-
-			double norm_comb = 0, norm_pp = 0, norm_pbpb = 0;
-			for (int i_dR = 1 ; i_dR <= N_dR; i_dR++)
-			{
-				if (h_DeltaDpT_integrated[i_cent][i_jet]->GetXaxis()->GetBinLowEdge(i_dR) >= 0.4) break;
-				norm_comb += h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR);
-
-				norm_pp += h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR);
-				norm_pbpb += h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR);
-			}
-
-			norm_comb = norm_comb / (TMath::Pi() * (0.4*0.4));
-			norm_pp = norm_pp / (TMath::Pi() * (0.4*0.4));
-			norm_pbpb = norm_pbpb / (TMath::Pi() * (0.4*0.4));
-
-			//integrate from 0 -> r and put in bin i_r
-			double tmp = 0;
-			for (int i_dR = 1 ; i_dR <= N_dR; i_dR++)
-			{
-				tmp = h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR-1)+h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR);
-				h_DeltaDpT_integrated[i_cent][i_jet]->SetBinContent(i_dR, tmp);
-
-				tmp = h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR-1)+h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR);
-				h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinContent(i_dR, tmp);
-
-				if (i_cent == 0)
-				{
-					tmp = h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR-1)+h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR);
-					h_DpT_pp_integrated[6][i_jet]->SetBinContent(i_dR, tmp);
-				}
-			}
-
-			//normalize by area of circle that has been integrated over
-			for (int i_dR = 1 ; i_dR <= N_dR; i_dR++)
-			{
-				double dR_hi = dR_binning->GetBinUpEdge(i_dR);
-				double area = TMath::Pi() * ((dR_hi*dR_hi));
-				h_DeltaDpT_integrated[i_cent][i_jet]->SetBinContent(i_dR, h_DeltaDpT_integrated[i_cent][i_jet]->GetBinContent(i_dR) / area);
-				h_DeltaDpT_integrated[i_cent][i_jet]->SetBinError(i_dR, h_DeltaDpT_integrated[i_cent][i_jet]->GetBinError(i_dR) / area);
-
-				h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinContent(i_dR, h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinContent(i_dR) / area);
-				h_DpT_PbPb_integrated[i_cent][i_jet]->SetBinError(i_dR,1E-5);// h_DpT_PbPb_integrated[i_cent][i_jet]->GetBinError(i_dR) / area);
-
-				if (i_cent == 0)
-				{
-					h_DpT_pp_integrated[6][i_jet]->SetBinContent(i_dR, h_DpT_pp_integrated[6][i_jet]->GetBinContent(i_dR) / area);
-					h_DpT_pp_integrated[6][i_jet]->SetBinError(i_dR, 1E-5);//h_DpT_pp_integrated[6][i_jet]->GetBinError(i_dR) / area);
-				}
-			}
-
-
-			//scale by integral over jet cone
-			h_DeltaDpT_integrated[i_cent][i_jet]->Scale(1./norm_comb);
-
-			//divide by pp
-			h_DpT_PbPb_integrated[i_cent][i_jet]->Divide(h_DpT_pp_integrated[6][i_jet]);
-
-			h_DeltaDpT_integrated[i_cent][i_jet]->GetYaxis()->SetTitleSize(8);
-			h_DeltaDpT_integrated[i_cent][i_jet]->GetYaxis()->SetTitle("#int_{0}^{r'}#int_{1}^{4}#DeltaDd#it{p}_{T} / dr#int_{0}^{0.4}#int_{1}^{4}#DeltaDd#it{p}_{T}dr");
-			h_DeltaDpT_integrated[i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
-			h_DpT_PbPb_integrated[i_cent][i_jet]->GetYaxis()->SetTitleSize(8);
-			h_DpT_PbPb_integrated[i_cent][i_jet]->GetYaxis()->SetTitle("#int_{0}^{r'}#int_{1}^{4} D_{PbPb}#it{p}_{T}d#it{p}_{T}dr/#int_{0}^{r'} #int_{1}^{4}D_{pp}#it{p}_{T}d#it{p}_{T}dr");
-			h_DpT_PbPb_integrated[i_cent][i_jet]->GetXaxis()->SetTitle(r_label.c_str());
-
-
 		}
 	}
 
-//	h_DeltaDpT_integrated[0][7]->Print("all");
-////	h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->Print("all");
-//	h_DeltaDpT_final_indR[2][0][7]->Print("all");
-//	h_DeltaDpT_final_indR[3][0][7]->Print("all");
-//	h_DeltaDpT_final_indR[4][0][7]->Print("all");
 
 	//getting rdpt with uncertainties as a function of track pt
 	for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -857,7 +728,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 				canvas->cd();
 				canvas->Clear();
-				if (i_jet != 7 && i_jet != 9) continue;
 
 
 				for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -1086,82 +956,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 	{
-		cout << "Doing Final integrated deltaDpT (PbPb - pp) plots in dR" << endl;
-
-		TCanvas *canvas = new TCanvas("canvas","canvas",1200,600);
-		TLegend *legend = new TLegend(0.18, 0.17, 0.3, 0.40, "","brNDC");
-		legend->SetTextFont(43);
-		legend->SetBorderSize(0);
-		legend->SetTextSize(9);
-		legend->SetNColumns(1);
-		bool first_pass_cent = true;
-
-		canvas->cd();
-		canvas->Clear();
-		canvas->Divide(3,2);
-
-		for (int i_cent = 0; i_cent < 6; i_cent++)
-		{
-
-			string centrality = num_to_cent(31,i_cent);
-
-			int jet_itr = 0;
-			canvas->cd(i_cent+1);
-			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
-			{
-				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-				if (!(i_jet == 7 || i_jet == 8 || i_jet == 9 || i_jet == 10)) continue;
-
-				SetHStyle_smallify(h_DeltaDpT_integrated[i_cent][i_jet], jet_itr, 1);
-				SetHStyle_smallify(h_DpT_PbPb_integrated[i_cent][i_jet], jet_itr, 1);
-
-				if (first_pass_cent) legend->AddEntry(h_DeltaDpT_integrated[i_cent][i_jet],jet_label.c_str(),"p");
-
-				y_range_lo = 0.;
-				y_range_hi = 3.;
-
-				h_DeltaDpT_integrated[i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-				h_DeltaDpT_integrated[i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-				h_DeltaDpT_integrated[i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
-
-				h_DpT_PbPb_integrated[i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-				h_DpT_PbPb_integrated[i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-				h_DpT_PbPb_integrated[i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
-
-//				if (jet_itr == 0) h_DeltaDpT_integrated[i_cent][i_jet]->Draw("");
-//				else h_DeltaDpT_integrated[i_cent][i_jet]->Draw("same");
-
-				if (jet_itr == 0) h_DpT_PbPb_integrated[i_cent][i_jet]->Draw("");
-				else h_DpT_PbPb_integrated[i_cent][i_jet]->Draw("same");
-
-
-				jet_itr++;
-
-			} //end jet loop
-			line->DrawLine(0, 1, r_max_range, 1);
-
-			double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-			ltx->SetTextAlign(31);
-			ltx->DrawLatexNDC(x_right, y-y_diff, Form("%s", centrality.c_str()));
-			first_pass_cent = false;
-		} //end cent loop
-
-		canvas->cd(1);
-		double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-		ltx->SetTextAlign(11);
-		ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
-		ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
-		ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
-		ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
-		legend->Draw();
-
-		canvas->Print(Form("output_pdf_nominal/conf/RDpT_dR_Integ_drdpt_pTChPS.pdf"));
-		//ratios (as function of r) of integral (dR: 0-r', dpT:1-4) of pT * ChPS
-
-	}
-
-
-	{
 		cout << "Doing Final RDpT for different jets for one track pT" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
@@ -1290,7 +1084,6 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
 		{
 			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
-			if (!(i_jet == 7 || i_jet == 9)) continue;
 
 			bool first_pass_cent = true;
 			canvas->cd();
@@ -1380,6 +1173,92 @@ void draw_conf_plots(string config_file = "sys_config.cfg")
 
 
 			canvas->Print(Form("output_pdf_nominal/conf/DpT_dR_jet%i.pdf", i_jet));
+
+			jet_itr++;
+		} //end jet loop
+	}
+
+
+	{
+		cout << "Doing Final RDpT ratio (PbPb/pp) plots in dR for all jet/cent" << endl;
+
+		TCanvas *canvas = new TCanvas("canvas","canvas",600,800);
+		TLegend *legend = new TLegend(0.18,0.60,0.5,0.92,NULL,"brNDC");
+		legend->SetTextFont(43);
+		legend->SetBorderSize(0);
+		legend->SetTextSize(10);
+
+		int jet_itr = 0;
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		{
+			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+			bool first_pass_cent = true;
+			canvas->cd();
+			canvas->Clear();
+			canvas->Divide(2,3);
+
+			for (int i_cent = 0; i_cent < 6; i_cent++)
+			{
+
+				string centrality = num_to_cent(31,i_cent);
+
+				int trk_itr = 0;
+				canvas->cd(i_cent+1);
+
+
+				for (int i_trk = trk_select1; i_trk < 9; i_trk++)
+				{
+					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+
+					SetHStyle_smallify(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet], trk_itr, 1);
+					SetHStyle_graph_smallify(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet], trk_itr, 1);
+					SetHStyle_graph_smallify(g_RDpT_final_stat_indR[i_trk][i_cent][i_jet], trk_itr, 1);
+
+					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
+
+					y_range_lo = 0.;
+					y_range_hi = 4.2;
+
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
+					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
+					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+
+					trk_itr++;
+
+				} // end trk loop
+				first_pass_cent = false;
+				double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, Form("#scale[0.7]{%s}", centrality.c_str()));
+				line->DrawLine(0, 1, r_max_range, 1);
+
+			}
+			canvas->cd(2);
+			legend->Draw();
+
+			canvas->cd(1);
+			double x_left = 0.19, x_right = 0.92, y = 0.87, y_diff = 0.06;
+			ltx->SetTextAlign(31);
+			ltx->DrawLatexNDC(x_right, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
+
+			canvas->Print(Form("output_pdf_nominal/conf/RDpT_dR_jet%i.pdf", i_jet));
 
 			jet_itr++;
 		} //end jet loop
