@@ -63,7 +63,7 @@ void integConfClass::makeGraph()
 		{
 			for (int i_dR = 0 ; i_dR < N_dR; i_dR++)
 			{
-				r_position = h_nom[i_cent][i_jet]->GetBinCenter(i_dR+1) + (i_cent*0.001 + i_jet*0.001);
+				r_position = h_nom[i_cent][i_jet]->GetBinCenter(i_dR+1);
 				r_width = 0.020; //h_nom[i_cent][i_jet]->GetBinWidth(i_dR+1)/4;
 
 				nom = h_nom[i_cent][i_jet]->GetBinContent(i_dR+1);
@@ -86,15 +86,16 @@ void integConfClass::drawAll()
 {
 	cout << "Drawing..." << endl;
 
-	canvas = new TCanvas("canvas","canvas",700,800);
+	canvas = new TCanvas("canvas","canvas",800,600);
 	legend = new TLegend(legend_x1, legend_y1, legend_x2, legend_y2, "","brNDC");
 	legend->SetTextFont(43);
 	legend->SetBorderSize(0);
-	legend->SetTextSize(10);
+	legend->SetTextSize(20);
 	legend->SetNColumns(legend_cols);
+	legend->SetFillStyle(0);
 	ltx = new TLatex();
 	ltx->SetTextFont(43);
-	ltx->SetTextSize(12);
+	ltx->SetTextSize(20);
 	line = new TLine();
 	line->SetLineStyle(3);
 
@@ -102,14 +103,12 @@ void integConfClass::drawAll()
 
 	bool first_pass_cent = true;
 
-	canvas->Clear();
-	canvas->Divide(2,3);
-
 	for (int i_cent = 0; i_cent < 6; i_cent++)
 	{
+		if (i_cent != 0 && i_cent != 3 && i_cent != 5) continue;
 
+		canvas->Clear();
 		string centrality = num_to_cent(31,i_cent);
-
 		canvas->cd(i_cent+1);
 
 		int jet_itr = 0;
@@ -117,55 +116,53 @@ void integConfClass::drawAll()
 		{
 			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
-			SetHStyle_smallify(h_nom[i_cent][i_jet], jet_itr, 1);
-			SetHStyle_graph_smallify(g_sys[i_cent][i_jet], jet_itr, 1);
-			SetHStyle_graph_smallify(g_stat[i_cent][i_jet], jet_itr, 1);
+			SetHStyle_smallify(h_nom[i_cent][i_jet], jet_itr, 0);
+			SetHStyle_graph_smallify(g_sys[i_cent][i_jet], jet_itr, 0);
+			SetHStyle_graph_smallify(g_stat[i_cent][i_jet], jet_itr, 0);
 
 			if (first_pass_cent) legend->AddEntry(g_sys[i_cent][i_jet],jet_label.c_str(),"p");
 
-			g_sys[i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.8);
-			g_sys[i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-			g_sys[i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
-			g_sys[i_cent][i_jet]->GetYaxis()->SetTitleOffset(4);
-			g_sys[i_cent][i_jet]->GetYaxis()->SetTitleFont(43);
-			g_sys[i_cent][i_jet]->GetYaxis()->SetTitleSize(12);
 			g_sys[i_cent][i_jet]->SetLineColor(h_nom[i_cent][i_jet]->GetMarkerColor());
 			g_sys[i_cent][i_jet]->SetFillColorAlpha(g_sys[i_cent][i_jet]->GetFillColor(),opacity);
 			g_sys[i_cent][i_jet]->SetLineWidth(1.);
-			g_stat[i_cent][i_jet]->SetLineWidth(2.);
+			g_stat[i_cent][i_jet]->SetLineWidth(1.);
 
-			h_nom[i_cent][i_jet]->GetXaxis()->SetRangeUser(0, 0.8);
-			h_nom[i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-			h_nom[i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+			TGraphAsymmErrors* tmp_sys = (TGraphAsymmErrors*)g_sys[i_cent][i_jet]->Clone("tmp_gsys");
+			TGraphAsymmErrors* tmp_stat = (TGraphAsymmErrors*)g_stat[i_cent][i_jet]->Clone("tmp_gsys");
+			double shift_size = 0.008;
+			tmp_sys = shift(tmp_sys, jet_itr, shift_size);
+			tmp_stat = shift(tmp_stat, jet_itr, shift_size);
 
-			if (jet_itr == 0) g_sys[i_cent][i_jet]->Draw("a E2");
-			else g_sys[i_cent][i_jet]->Draw("E2 same");
-			g_stat[i_cent][i_jet]->Draw("P E1");
+			if (jet_itr == 0) tmp_sys->Draw("a E2");
+			else tmp_sys->Draw("E2 same");
+			tmp_stat->Draw("P E1");
 
 			jet_itr++;
 
 		} // end trk loop
 
-		canvas->cd(i_cent+1);
 		line->DrawLine(line_x1, line_y1, line_x2, line_y2);
 		legend->Draw();
 
-		double x_left = 0.19, x_right = 0.93, y = 0.87, y_diff = 0.045;
-		ltx->SetTextAlign(11);
-		ltx->DrawLatexNDC(x_left, y, Form("%s", centrality.c_str()));
-		ltx->SetTextAlign(31);
-		ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
-		ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-		ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-		ltx->DrawLatexNDC(x_right+0.3, y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+		double x_left = 0.19, x_right = 0.92, y = 0.88, y_diff = 0.045;
+
+
+		if (mode.compare("DeltaDpT") == 0)
+		{
+			ltx->SetTextAlign(31);
+			x_left = x_right;
+		}
+		else ltx->SetTextAlign(11);
+		ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+		ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+		ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+		ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+		ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
 		first_pass_cent = false;
 
-
-//		canvas->Print(Form("compiledCode/finalFig/RDpT_dR_jet%i_cent%i.pdf", i_jet, i_cent));
-
+		canvas->Print(Form("output_pdf_nominal/conf/%s_%s_cent%i.pdf", mode.c_str(), integType.c_str(), i_cent));
 	} //end cent loop
 
-	canvas->Print(Form("output_pdf_nominal/conf/%s_%s_dR.pdf", mode.c_str(), integType.c_str()));
 
 
 	delete canvas;
@@ -193,7 +190,7 @@ void integConfClass::setSpecifics()
 {
 	if (mode.compare("DeltaDpT") == 0 && integType.compare("jetshape") == 0)
 	{
-		legend_x1 = 0.55, legend_y1 = 0.50, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.63, legend_y1 = 0.45, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 0.0, line_y2 = 0.0;
 		y_range_lo = -1, y_range_hi = 5;
 		axis_label_y = jetshape_deltadpt_title;
@@ -201,7 +198,7 @@ void integConfClass::setSpecifics()
 	}
 	if (mode.compare("DeltaDpT") == 0 && integType.compare("lowpt_integ") == 0)
 	{
-		legend_x1 = 0.55, legend_y1 = 0.50, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.63, legend_y1 = 0.45, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 0.0, line_y2 = 0.0;
 		y_range_lo = -1, y_range_hi = 5;
 		axis_label_y = lowpt_integ_deltadpt_title;
@@ -211,21 +208,43 @@ void integConfClass::setSpecifics()
 
 	if (mode.compare("RDpT") == 0 && integType.compare("jetshape") == 0)
 	{
-		legend_x1 = 0.18, legend_y1 = 0.55, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.24, legend_y1 = 0.17, legend_x2 = legend_x1+0.600, legend_y2 = legend_y1+0.17;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 1.0, line_y2 = 1.0;
-		y_range_lo = 0.5, y_range_hi = 3;
+		y_range_lo = 0., y_range_hi = 3.1;
+//		y_range_lo = 0.6, y_range_hi = 1.9;
 		axis_label_y = jetshape_rdpt_title;
 		axis_label_x = r_title;
+		legend_cols = 2;
+
 	}
 	if (mode.compare("RDpT") == 0 && integType.compare("lowpt_integ") == 0)
 	{
-		legend_x1 = 0.18, legend_y1 = 0.55, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.24, legend_y1 = 0.17, legend_x2 = legend_x1+0.600, legend_y2 = legend_y1+0.17;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 1.0, line_y2 = 1.0;
-		y_range_lo = 0.0, y_range_hi = 5;
+		y_range_lo = 0., y_range_hi = 3.1;
+//		y_range_lo = 0., y_range_hi = 2.9;
 		axis_label_y = lowpt_integ_rdpt_title;
 		axis_label_x = r_title;
+		legend_cols = 2;
 	}
 
+}
+
+TGraphAsymmErrors* integConfClass::shift(TGraphAsymmErrors* g, int variable, double shift_size = 0.0025)
+{
+	for (int i = 0; i < g->GetN(); i++)
+	{
+		double x, y, err_x;
+		g->GetPoint(i, x, y);
+		err_x = g->GetErrorX(i);
+		double orig_pos = x+variable*shift_size;// * err_x/2;
+		g->SetPoint(i, orig_pos, y);
+	}
+
+	g->GetXaxis()->SetLimits(0, 0.8);
+	g->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+	g->GetYaxis()->SetNdivisions(504);
 
 
+	return g;
 }

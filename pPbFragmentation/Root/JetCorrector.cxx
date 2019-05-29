@@ -157,6 +157,17 @@ float JetCorrector::GetCHPSReweightingFactor(double pt, double jet_pt, int dR_bi
 	return shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetBinContent(trk_pt_bin);
 }
 
+float JetCorrector::GetResReweightingFactor(double pt, double jet_pt, int dR_bin, int cent){
+	if (dR_bin > 12) return 1;
+	if (jet_pt < min_jet_pt) jet_pt = min_jet_pt; //Minimum reco pT
+	if (jet_pt > max_jet_pt) jet_pt = max_jet_pt; //Maximum reco pT
+	int jet_pt_bin = jet_pt_binning->FindBin(jet_pt)-1;
+	int trk_pt_bin = trk_pt_binning->FindBin(pt);;
+	//	cout << " jet pt: " << jet_pt << " trk_pt " << pt << " cent: " << cent << " dr: " << dR_bin;
+	//	cout << " CHPS w: " << shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetName() << " " << shape_ChPSSpectra_weights[dR_bin][cent][jet_pt_bin]->GetBinContent(trk_pt_bin) << endl;
+	return shape_ChPSRes_weights[dR_bin][cent][jet_pt_bin]->GetBinContent(trk_pt_bin);
+}
+
 float JetCorrector::GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent)
 {
 	int pt_bin = (((TAxis*)eta_factors->Get("jetpT_binning"))->FindBin(jet_pt)) - 1;

@@ -52,6 +52,10 @@ void get_ChPS_weights(string dataset_type, TFile *f_weights)
 	vector<vector<vector<TH1*>>> h_ChPS_raw_data (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_ChPS_ratio (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 
+	vector<vector<vector<TH1*>>> h_ChPS_res_RW_MC (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_res_RW_data (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+	vector<vector<vector<TH1*>>> h_ChPS_res_RW_ratio (N_dR, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
+
 
 	vector<vector<TH1*>> h_jet_MC (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
 	vector<vector<TH1*>> h_jet_data (n_cent_cuts, vector<TH1*> (N_JET_Y+1));
@@ -75,11 +79,24 @@ void get_ChPS_weights(string dataset_type, TFile *f_weights)
 				h_ChPS_ratio[i_dR][i_cent][i_jet] = (TH1*)h_ChPS_raw_data[i_dR][i_cent][i_jet]->Clone(Form("%s_ratio", name.c_str()));
 				h_ChPS_ratio[i_dR][i_cent][i_jet]->Divide(h_ChPS_raw_MC[i_dR][i_cent][i_jet]);
 
+				name = Form("h_ChPS_raw_subtr_unf_dR%i_cent%i_jetpt%i", i_dR, i_cent, i_jet);
+				h_ChPS_res_RW_MC[i_dR][i_cent][i_jet] = (TH1*)((TH1*)f_mc->Get(name.c_str()))->Clone(Form("%s_MC", name.c_str()));
+				h_ChPS_res_RW_data[i_dR][i_cent][i_jet] = (TH1*)((TH1*)f_data->Get(name.c_str()))->Clone(Form("%s_data", name.c_str()));
+
+				h_ChPS_res_RW_ratio[i_dR][i_cent][i_jet] = (TH1*)h_ChPS_res_RW_data[i_dR][i_cent][i_jet]->Clone(Form("%s_ratio", name.c_str()));
+				h_ChPS_res_RW_ratio[i_dR][i_cent][i_jet]->Divide(h_ChPS_res_RW_MC[i_dR][i_cent][i_jet]);
+
+
 				f_weights->cd();
 				name = Form("CHPS_weight_%s_dR%i_cent%i_jet%i", dataset_type.c_str(), i_dR, i_cent, i_jet);
 				h_ChPS_ratio[i_dR][i_cent][i_jet]->SetName(name.c_str());
 				h_ChPS_ratio[i_dR][i_cent][i_jet]->SetTitle(name.c_str());
 				h_ChPS_ratio[i_dR][i_cent][i_jet]->Write(name.c_str());
+
+				name = Form("CHPS_resRW_weight_%s_dR%i_cent%i_jet%i", dataset_type.c_str(), i_dR, i_cent, i_jet);
+				h_ChPS_res_RW_ratio[i_dR][i_cent][i_jet]->SetName(name.c_str());
+				h_ChPS_res_RW_ratio[i_dR][i_cent][i_jet]->SetTitle(name.c_str());
+				h_ChPS_res_RW_ratio[i_dR][i_cent][i_jet]->Write(name.c_str());
 			}
 		}
 

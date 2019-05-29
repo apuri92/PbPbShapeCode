@@ -57,7 +57,7 @@ void draw_UEcorr_factor()
 		if (i_dR == 0) name = "(";
 		else if (i_dR == N_dR - 1) name = ")";
 
-		c->Print(Form("misc_conf_plots/CorrFactorComparison.pdf%s",name.c_str()),Form("Title: r%i, %s",i_dR, dr_label.c_str()));
+		c->Print(Form("misc_plots/CorrFactorComparison.pdf%s",name.c_str()),Form("Title: r%i, %s",i_dR, dr_label.c_str()));
 
 	}
 

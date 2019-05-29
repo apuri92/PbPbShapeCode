@@ -45,7 +45,7 @@ void cone_stats()
 		ltx->DrawLatexNDC(0.22,0.87,Form("%s",num_to_cent(31,i).c_str()));
 
 	}
-	c->Print(Form("misc_conf_plots/cone_stats.pdf"));
+	c->Print(Form("misc_plots/cone_stats.pdf"));
 
 }
 

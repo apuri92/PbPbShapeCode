@@ -93,6 +93,6 @@ void runStats(int config = 0)
 	legend_x->AddEntry(h_eventPercentage_mc,"MC","lp");
 	legend_x->Draw();
 
-	c_x->Print(Form("misc_conf_plots/EventPercentages_c%i.pdf",config));
+	c_x->Print(Form("misc_plots/EventPercentages_c%i.pdf",config));
 
 }

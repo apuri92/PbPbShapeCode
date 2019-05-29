@@ -41,6 +41,7 @@ class JetCorrector
     TF1 *jet_spectra_weight[8][8];
 	TF1 *shape_JetSpectra_weights[7];
 	TH1 *shape_ChPSSpectra_weights[13][7][16];
+	TH1 *shape_ChPSRes_weights[13][7][16];
 
 	TH1D *FF_weight[8][8][20];
 	TH1D *CHPS_weight[8][8][20];
@@ -109,6 +110,7 @@ class JetCorrector
 					 for (int i_jet = 0; i_jet < jet_pt_binning->GetNbins(); i_jet++)
 					 {
 						 shape_ChPSSpectra_weights[i_dR][i_cent][i_jet] = (TH1*)_f_reweighting->Get(Form("CHPS_weight_%s_dR%i_cent%i_jet%i", data_type.c_str(), i_dR, i_cent, i_jet));
+						 shape_ChPSRes_weights[i_dR][i_cent][i_jet] = (TH1*)_f_reweighting->Get(Form("CHPS_resRW_weight_%s_dR%i_cent%i_jet%i", data_type.c_str(), i_dR, i_cent, i_jet));
 					 }
 				 }
 
@@ -199,6 +201,7 @@ class JetCorrector
 	float GetFFReweightingFactor(double z, double jet_pt, double jet_eta, int cent, bool isFine);
 	float GetCHPSReweightingFactor(double pt, double jet_pt, double jet_eta, int cent, bool isFine);
 	float GetCHPSReweightingFactor(double pt, double jet_pt, int dR_bin, int cent);
+	float GetResReweightingFactor(double pt, double jet_pt, int dR_bin, int cent);
 	float GetEtaReweightingFactor(double jet_pt, double jet_eta, int cent);
     ~JetCorrector() {}
 };

@@ -64,7 +64,7 @@ int main(int argc, char ** argv)
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50 || sys_mode < 0) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_mc = new TFile(Form("../raw_results/%s/FF_MC_out_histo_%s_5p02_r001.root", sys_path.c_str(), dataset_type.c_str()));
@@ -74,13 +74,13 @@ int main(int argc, char ** argv)
 	cout << f_mc->GetName() << endl;
 	cout << f_data->GetName() << endl;	
 
-	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
-	TFile *dr_factors = new TFile(Form("output_pdf%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
+//	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
+	TFile *dr_factors = new TFile(Form("output_pdf_%s/root/posCorr_factors_%s.root", sys_path.c_str(), dataset_type.c_str()));
 	TFile *UE_uncert, *fake_uncert;
 	if (apply_UE_RunDep) UE_uncert = new TFile(Form("UE_RunDependentSys.root"));
 	if (apply_UE_mapStatSys) UE_uncert = new TFile(Form("UE_MapSystematic.root"));
 	if (apply_fake_uncert) fake_uncert = new TFile(Form("../raw_results/nominal/FF_MC_out_histo_pp_5p02_r001.root"));
-	TFile *f_output = new TFile(Form("output_pdf%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
+	TFile *f_output = new TFile(Form("output_pdf_%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
 	int N_Y = 5;
 
@@ -226,8 +226,7 @@ int main(int argc, char ** argv)
 
 			if (apply_fake_uncert)
 			{
-//				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_TM_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
-				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_FNS_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
+				h_fake_rate = (TH2*)(fake_uncert->Get(Form("ChPS_TM_UE_dR%i_cent6", i_dR))->Clone(Form("fake_dR%i_cent%i", i_dR, i_cent)));
 				h_fake_rate->SetName(Form("fake_dR%i_cent%i", i_dR, i_cent));
 				h_pp_MC_jets = (TH1*)fake_uncert->Get(Form("h_reco_jet_spectrum_y4_cent6"))->Clone(Form("fake_norm_%i",i_cent));
 				h_pp_MC_jets->SetName(Form("fake_norm_%i",i_cent));
@@ -299,8 +298,8 @@ int main(int argc, char ** argv)
 
 						if (apply_fake_uncert)
 						{
-							fake = fake + fake_uncert_addition;
-							fake_err = sqrt(pow(fake_err,2) - pow(fake_uncert_addition_err,2));
+							fake = 1.3 * fake;
+							fake_err = 1.3 * fake_err;
 						}
 
 						subtr = raw - fake;
@@ -407,8 +406,13 @@ int main(int argc, char ** argv)
 								{
 									//for fake systematic in data above 10 GeV, use TM method and add fakes from pp scaled by n_jet * 0.3
 									//UE is uncorrelated so UE+fake err is just errUE and errFake added in quadrature. errFake also needs to be scaled by n_jets and 0.3
-									UE = (h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin)*n_jets_data/n_jets_mc) + fake_uncert_addition;
-									UE_err = sqrt( pow(h_UE_TM->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc,2) + pow(fake_uncert_addition_err,2) );
+
+//									UE = (h_UE_TM->GetBinContent(i_trk_bin, i_jet_bin)*n_jets_data/n_jets_mc) + fake_uncert_addition;
+//									UE_err = sqrt( pow(h_UE_TM->GetBinError(i_trk_bin, i_jet_bin) * n_jets_data/n_jets_mc,2) + pow(fake_uncert_addition_err,2) );
+
+									UE = h_UE_MB->GetBinContent(i_trk_bin, i_jet_bin);
+									UE_err = h_UE_MB->GetBinError(i_trk_bin, i_jet_bin);
+
 
 									subtr = raw - UE;
 									subtr_err = sqrt(pow(raw_err,2) + pow(UE_err,2)); //errors uncorrelated for both data and MC

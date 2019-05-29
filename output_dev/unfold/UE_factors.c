@@ -18,15 +18,15 @@ void UE_factors(string config_file = "ff_config.cfg")
 
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50 || sys_mode < 0) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 	TFile *input_file = new TFile(Form("../raw_results/%s/FF_MC_out_histo_PbPb_5p02_r001.root", sys_path.c_str()));
 
 	cout << "Using file:" << endl;
 	cout << input_file->GetName() << endl;
 
-	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
-	TFile *UE_factors = new TFile(Form("output_pdf%s/root/UE_factors.root", sys_path.c_str()), "recreate");
+//	if (sys_mode >= 0) sys_path = Form("_%s", sys_path.c_str());
+	TFile *UE_factors = new TFile(Form("output_pdf_%s/root/UE_factors.root", sys_path.c_str()), "recreate");
 
 
 	TAxis* dR_binning = (TAxis*)((TH3*)input_file->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();
@@ -168,7 +168,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 		if (i_dR == 0) name = "(";
 		else if (i_dR == 12) name = ")";
 		else name = "";
-		c1->Print(Form("output_pdf%s/PbPb/UE_factors.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
+		c1->Print(Form("output_pdf_%s/PbPb/UE_factors.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: dR%i - %s", i_dR, dr_label.c_str()));
 
 
 	}
@@ -236,7 +236,7 @@ void UE_factors(string config_file = "ff_config.cfg")
 			if (i_jet == jet_pt_start) name = "(";
 			else if (i_jet == jet_pt_end - 1) name = ")";
 			else name = "";
-			c_pos_res->Print(Form("output_pdf%s/PbPb/UE_factors_r.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: jet%i", i_jet));
+			c_pos_res->Print(Form("output_pdf_%s/PbPb/UE_factors_r.pdf%s",sys_path.c_str(), name.c_str()), Form("Title: jet%i", i_jet));
 			jet_itr++;
 
 		}

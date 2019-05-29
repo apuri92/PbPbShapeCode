@@ -640,7 +640,7 @@ EL::StatusCode PbPbFFShape :: execute (){
 
 			for (int i_dR = 0; i_dR < 11; i_dR++)
 			{
-				for (int i_pt = 0; i_pt < 10; i_pt++)
+				for (int i_pt = 0; i_pt < 7; i_pt++)
 				{
 					double UE_err = -1;
 					double UE_val = 0;
@@ -856,8 +856,15 @@ EL::StatusCode PbPbFFShape :: execute (){
 						float R_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
 						double z_truth = cos(R_truth)*track_mc_pt / matched_truth_jet_pt;
 
+						float R_reco_reco = DeltaR(phi,eta,jet_phi,jet_eta); //(reco_reco and truth_reco) and (reco_truth and truth_truth) are same
+						float R_truth_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
+
+						int dr_bin_tt = trkcorr->GetdRBin(R_truth_truth);
+						int dr_bin_rr = trkcorr->GetdRBin(R_reco_reco);
+
 						double dpT_weight = 1.;
 						double spectrum_rw = 1.;
+						double dr_weight = 1.;
 
 						if (_applyReweighting)
 						{
@@ -866,21 +873,23 @@ EL::StatusCode PbPbFFShape :: execute (){
 							{
 								spectrum_rw=jetcorr->GetJetReweightingFactor(matched_truth_jet_pt,cent_bin);
 								dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, cent_bin);
+								dr_weight = jetcorr->GetResReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin_tt, cent_bin);
 							}
 							if (_dataset == 3)
 							{
 								spectrum_rw=jetcorr->GetJetReweightingFactor(matched_truth_jet_pt,6);
 								dpT_weight = jetcorr->GetCHPSReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin, 6);
+								dr_weight = jetcorr->GetResReweightingFactor(track_mc_pt, matched_truth_jet_pt, dr_bin_tt, 6);
 							}
 
 						}
 
 						//R_trk_jet
-						float R_reco_reco = DeltaR(phi,eta,jet_phi,jet_eta); //(reco_reco and truth_reco) and (reco_truth and truth_truth) are same
-						float R_truth_truth = DeltaR(track_mc_phi,track_mc_eta,truth_jet_phi_vector.at(TruthJetIndex.at(i)),truth_jet_eta_vector.at(TruthJetIndex.at(i)) );
+						h_dR_change.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight*dr_weight);
+						h_dR_change.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight*dr_weight);
 
-						h_dR_change.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
-						h_dR_change.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt, jet_weight*eff_weight);
+//						h_dR_change_new.at(dr_bin_tt).at(dr_bin_rr).at(cent_bin)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight);
+//						h_dR_change_new.at(dr_bin_tt).at(dr_bin_rr).at(n_cent_bins-1)->Fill(track_mc_pt, matched_truth_jet_pt, jet_weight*eff_weight);
 
 						h_dR_change_cnts.at(truth_jetpt_bin).at(cent_bin)->Fill(R_truth_truth, R_reco_reco, track_mc_pt);
 						h_dR_change_cnts.at(truth_jetpt_bin).at(n_cent_bins-1)->Fill(R_truth_truth, R_reco_reco, track_mc_pt);

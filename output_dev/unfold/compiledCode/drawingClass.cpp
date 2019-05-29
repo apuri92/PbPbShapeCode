@@ -124,7 +124,7 @@ void drawingClass::drawCentPanels(vector<vector<TH1*>> vvhist, string name)
 
 void drawingClass::loadAxes()
 {
-	TFile *file = new TFile(Form("../output_pdf_nominal/root/final_ChPS_MC_PbPb.root"));
+	TFile *file = new TFile(Form("../output_pdf_nominal/root/final_ChPS_data_PbPb.root"));
 	dR_binning = (TAxis*)file->Get("dR_binning");
 	jetpT_binning = (TAxis*)file->Get("jetpT_binning");
 	trkpT_binning = (TAxis*)file->Get("trkpT_binning");

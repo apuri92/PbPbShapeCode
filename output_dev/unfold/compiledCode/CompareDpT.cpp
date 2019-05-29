@@ -322,7 +322,7 @@ void CompareDpT::writeToFile()
 
 void CompareDpT::loadAxes()
 {
-	TFile *file = new TFile(Form("../output_pdf_nominal/root/final_ChPS_MC_PbPb.root"));
+	TFile *file = new TFile(Form("../output_pdf_nominal/root/final_ChPS_data_PbPb.root"));
 
 	dR_binning = (TAxis*)file->Get("dR_binning");
 	jetpT_binning = (TAxis*)file->Get("jetpT_binning");

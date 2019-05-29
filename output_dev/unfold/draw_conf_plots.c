@@ -1,5 +1,35 @@
 #include "../functions/global_variables.h"
 
+TGraphAsymmErrors* shift(TGraphAsymmErrors* g, int variable, double shift_size = 0.0025)
+{
+	for (int i = 0; i < g->GetN(); i++)
+	{
+		double x, y, err_x;
+		g->GetPoint(i, x, y);
+		err_x = g->GetErrorX(i);
+		double orig_pos = x+variable*shift_size;// * err_x/2;
+		g->SetPoint(i, orig_pos, y);
+	}
+
+	return g;
+}
+
+TGraphAsymmErrors* shift(TGraphAsymmErrors* g, TAxis* axis, int variable, double shift_size = 0.0025)
+{
+	for (int i = 0; i < g->GetN(); i++)
+	{
+		double x, y;
+		g->GetPoint(i, x, y);
+		double binW = axis->GetBinWidth(axis->FindBin(x));
+		double orig_pos = x+variable*shift_size * binW;
+		g->SetPoint(i, orig_pos, y);
+	}
+
+	return g;
+}
+
+
+
 void draw_conf_plots()
 {
 	cout << "######### DOING CONF_Plots #########" << endl;
@@ -7,11 +37,11 @@ void draw_conf_plots()
 	SetAtlasStyle();
 	gErrorIgnoreLevel = 3001;
 //	gStyle->SetErrorX(0);
-//	gStyle->SetEndErrorSize(8);
+	gStyle->SetEndErrorSize(3);
 
 	string name;
 	string rdptr_label = "#it{R}_{#it{D} (#it{p}_{T}, #it{r})}";
-	string deltadptr_label = "#it{#Delta} #it{D} (#it{p}_{T}, #it{r}) [GeV]";
+	string deltadptr_label = "#it{#Delta} #it{D} (#it{p}_{T}, #it{r}) [GeV^{-1}]";
 	string dptr_label = "#it{D} (#it{p}_{T}, #it{r}) [GeV^{-1}]";
 	string r_label = "#it{r}";
 	string trk_label = "#it{p}_{T}^{trk} [GeV]";
@@ -225,7 +255,7 @@ void draw_conf_plots()
 				for (int i_dR = 0 ; i_dR < N_dR; i_dR++)
 				{
 					//RDpT
-					r_position = h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.001 + i_cent*0.001 + i_jet*0.001);
+					r_position = h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1);
 					r_width = 0.020; //h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinWidth(i_dR+1)/4;
 
 					nom = h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
@@ -275,7 +305,7 @@ void draw_conf_plots()
 
 
 					//DeltaDpT
-					r_position = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.001 + i_cent*0.001 + i_jet*0.001);
+					r_position = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1);
 					r_width = 0.020; //h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinWidth(i_dR+1)/4;
 
 					nom = h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
@@ -308,10 +338,27 @@ void draw_conf_plots()
 
 
 					//DpT_PbPb
-					r_position = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.002);
+					r_position = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinCenter(i_dR+1);
 					r_width = 0.020; //h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinWidth(i_dR+1);
 
 					nom = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1);
+
+					if ((i_jet == 7 && i_trk == 6 && i_dR >= 6)
+						||
+						(i_jet == 7 && i_trk == 7 && i_dR >= 6)
+						||
+						(i_jet == 7 && i_trk == 8 && i_dR >= 4)
+						||
+						(i_jet == 8 && i_trk == 7 && i_dR >= 7)
+						||
+						(i_jet == 8 && i_trk == 8 && i_dR >= 6)
+						||
+						(i_jet == 9 && i_trk == 8 && i_dR >= 6)
+						)
+					{
+						nom = 10E-9;
+					}
+
 					sys_hi = nom * (h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1));
 					sys_lo = fabs(nom * (h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->GetBinContent(i_dR+1)));
 					stat_hi = h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetBinError(i_dR+1);
@@ -327,7 +374,7 @@ void draw_conf_plots()
 					//DpT_pp
 					if (i_cent == 0)
 					{
-						r_position = h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinCenter(i_dR+1) + (trk_itr*0.002);
+						r_position = h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinCenter(i_dR+1);
 						r_width = 0.02; //h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinWidth(i_dR+1);
 
 						nom = h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinContent(i_dR+1);
@@ -336,6 +383,22 @@ void draw_conf_plots()
 						stat_hi = h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinError(i_dR+1);
 						stat_lo = h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetBinError(i_dR+1);
 
+						if ((i_jet == 7 && i_trk == 6 && i_dR >= 6)
+							||
+							(i_jet == 7 && i_trk == 7 && i_dR >= 6)
+							||
+							(i_jet == 7 && i_trk == 8 && i_dR >= 4)
+							||
+							(i_jet == 8 && i_trk == 7 && i_dR >= 7)
+							||
+							(i_jet == 8 && i_trk == 8 && i_dR >= 6)
+							||
+							(i_jet == 9 && i_trk == 8 && i_dR >= 6)
+							)
+						{
+							nom = 10E-9;
+						}
+						
 						g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->SetPoint(i_dR, r_position, nom );
 						g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->SetPointError(i_dR, r_width/2, r_width/2, sys_lo, sys_hi);
 
@@ -384,7 +447,7 @@ void draw_conf_plots()
 					if (i_trk < 2 || i_trk > 9) continue;
 
 					//RDpT
-					r_position = h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetBinCenter(i_trk+1) + (dR_itr*0.001 + i_cent*0.001 + i_jet*0.001);
+					r_position = h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetBinCenter(i_trk+1);
 					r_width = h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetBinWidth(i_trk+1)*0.30;
 					if (i_trk > 4 && i_trk < 7) r_width = h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetBinWidth(i_trk+1)*0.40;
 					if (i_trk >=7) r_width = h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetBinWidth(i_trk+1)*0.20;
@@ -424,7 +487,7 @@ void draw_conf_plots()
 	}
 
 
-/*
+
 
 	double *X = ((TArrayD*)jetpT_binning->GetXbins())->GetArray();
 	//getting rdpt with uncertainties as a function of jet pt
@@ -475,10 +538,8 @@ void draw_conf_plots()
 					if (i_jet < 7 || i_jet > 10) continue;
 
 					//RDpT
-					r_position = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinCenter(i_jet+1) + (dR_itr*1 + i_cent*0.001 + i_trk*0.001);
+					r_position = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinCenter(i_jet+1);
 					r_width = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinWidth(i_jet+1)*0.30;
-//					if (i_trk > 4 && i_trk < 7) r_width = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinWidth(i_jet+1)*0.40;
-//					if (i_trk >=7) r_width = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinWidth(i_jet+1)*0.20;
 
 					nom = h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetBinContent(i_jet+1);
 					sys_hi = nom * (h_RDpT_final_sys_Totalpos_inJet[i_dR][i_cent][i_trk]->GetBinContent(i_jet+1));
@@ -515,7 +576,6 @@ void draw_conf_plots()
 		}
 	}
 
-*/
 
 
 	double y_range_lo = 0;
@@ -525,100 +585,101 @@ void draw_conf_plots()
 
 	// DRAWING BEGINS HERRE
 
-	/*
+/*
+	{
+		cout << "Doing Final RDpT as a function of jet pT for different dR" << endl;
 
-	 {
-	 cout << "Doing Final RDpT as a function of jet pT for different dR" << endl;
+		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
+		TLegend *legend = new TLegend(0.19,0.63,0.35,0.80,NULL,"brNDC");
+		legend->SetTextFont(43);
+		legend->SetTextSize(23);
+		legend->SetBorderSize(0);
 
-	 TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-	 TLegend *legend = new TLegend(0.19,0.63,0.35,0.80,NULL,"brNDC");
-	 legend->SetTextFont(43);
-	 legend->SetTextSize(23);
-	 legend->SetBorderSize(0);
+		bool first_pass_cent = true;
+		for (int i_cent = 0; i_cent < 6; i_cent++)
+		{
+			string centrality = num_to_cent(31,i_cent);
 
-	 bool first_pass_cent = true;
-	 for (int i_cent = 0; i_cent < 6; i_cent++)
-	 {
-	 string centrality = num_to_cent(31,i_cent);
+			int trk_itr = 0;
+			for (int i_trk = 2; i_trk < 9; i_trk++)
+			{
+				string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
-	 int trk_itr = 0;
-	 for (int i_trk = 2; i_trk < 9; i_trk++)
-	 {
-	 string trk_label = Form("%1.1f < #it{p}_{T}^{trk} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
+				canvas->cd();
+				canvas->Clear();
 
-	 canvas->cd();
-	 canvas->Clear();
+				int dR_itr = 0;
 
-	 int dR_itr = 0;
+				for (int i_dR = 0; i_dR < N_dR; i_dR++)
+				{
+					string dR_label = Form("%1.2f < #it{r} < %1.2f ", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
+					//					if (i_dR > 9) continue;
+					if (i_dR != 0 && i_dR != 3 && i_dR != 6 && i_dR != 8) continue;
 
-	 for (int i_dR = 0; i_dR < N_dR; i_dR++)
-	 {
-	 string dR_label = Form("%1.2f < #it{r} < %1.2f ", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
-	 //					if (i_dR > 9) continue;
-	 if (i_dR != 0 && i_dR != 3 && i_dR != 6 && i_dR != 8) continue;
+					SetHStyle(h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk], dR_itr);
+					SetHStyle_graph(g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk], dR_itr);
+					SetHStyle_graph(g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk], dR_itr);
+					g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->SetFillColorAlpha(g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetFillColor(),opacity);
 
-	 SetHStyle(h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk], dR_itr);
-	 SetHStyle_graph(g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk], dR_itr);
-	 SetHStyle_graph(g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk], dR_itr);
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->SetFillColorAlpha(g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetFillColor(),opacity);
+					if (first_pass_cent && trk_itr == 0) legend->AddEntry(g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk],dR_label.c_str(),"p");
 
-	 if (first_pass_cent && trk_itr == 0) legend->AddEntry(g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk],dR_label.c_str(),"p");
+					g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->SetLineWidth(1.);
+					g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk]->SetLineWidth(1.);
 
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->SetLineWidth(1.);
-	 g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk]->SetLineWidth(2.);
+					y_range_lo = 0.;
+					y_range_hi = 4.2;
 
-	 y_range_lo = 0.;
-	 y_range_hi = 4.;
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk]->Clone("g_stat");
 
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetXaxis()->SetLimits(126, 310);
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+0.2);
-	 //					if (i_trk == 9) g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi+0.7);
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetYaxis()->SetNdivisions(505);
+					double shift_size = 2;
+					g_sys = shift(g_sys, dR_itr, shift_size);
+					g_stat = shift(g_stat, dR_itr, shift_size);
 
-	 h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetXaxis()->SetRangeUser(126, 310);
-	 h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+0.2);
-	 h_RDpT_final_ratio_inJet[i_dR][i_cent][i_trk]->GetYaxis()->SetNdivisions(504);
-	 g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->GetXaxis()->SetMoreLogLabels(1);
+					g_sys->GetXaxis()->SetLimits(126, 310);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo,y_range_hi);
+					g_sys->GetYaxis()->SetNdivisions(505);
+					g_sys->GetXaxis()->SetMoreLogLabels(1);
 
-	 if (dR_itr == 0) g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->Draw("a E2");
-	 else g_RDpT_final_sys_inJet[i_dR][i_cent][i_trk]->Draw(" E2 ");
-	 g_RDpT_final_stat_inJet[i_dR][i_cent][i_trk]->Draw("P E1");
-	 gPad->SetLogx(0);
+					if (dR_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+					gPad->SetLogx(0);
 
-	 dR_itr++;
-	 } // end dR loop
+					dR_itr++;
+				} // end dR loop
 
-	 trk_itr++;
+				trk_itr++;
 
-	 canvas->cd();
-	 line->DrawLine(jet_pt_lo, 1, jet_pt_hi, 1);
-	 legend->Draw();
+				canvas->cd();
+				line->DrawLine(jet_pt_lo, 1, jet_pt_hi, 1);
+				legend->Draw();
 
-	 double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-	 ltx->SetTextAlign(11);
-	 ltx->DrawLatexNDC(x_left, y, trk_label.c_str());
-	 ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
-	 ltx->SetTextAlign(31);
-	 ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
-	 ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-	 ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-	 ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+				double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
+				ltx->SetTextAlign(11);
+				ltx->DrawLatexNDC(x_left, y, trk_label.c_str());
+				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 
-	 if (!((i_trk == 2 || i_trk == 5) && (i_cent == 0 || i_cent == 5))) continue;
-	 canvas->Print(Form("output_pdf_nominal/conf/RDpT_jetpt_trk%i_cent%i.pdf", i_trk, i_cent));
+				if (!((i_trk == 2 || i_trk == 5) && (i_cent == 0 || i_cent == 5))) continue;
+				canvas->Print(Form("output_pdf_nominal/conf/RDpT_jetpt_trk%i_cent%i.pdf", i_trk, i_cent));
 
-	 } //end jet loop
+			} //end jet loop
 
-	 first_pass_cent = false;
-	 } //end cent loop
-	 }
-	 */
+			first_pass_cent = false;
+		} //end cent loop
+	}
+ 	*/
 
 	{
 		cout << "Doing Final RDpT as a function of track pT for different dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.19,0.18,0.35,0.4,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.7,0.55,0.85,0.72,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetTextSize(23);
 		legend->SetBorderSize(0);
@@ -641,7 +702,6 @@ void draw_conf_plots()
 				for (int i_dR = 0; i_dR < N_dR; i_dR++)
 				{
 					string dR_label = Form("%1.2f < #it{r} < %1.2f ", dR_binning->GetBinLowEdge(i_dR+1), dR_binning->GetBinUpEdge(i_dR+1));
-//					if (i_dR > 9) continue;
 					if (i_dR != 0 && i_dR != 3 && i_dR != 6 && i_dR != 8) continue;
 
 					SetHStyle(h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet], dR_itr);
@@ -652,23 +712,26 @@ void draw_conf_plots()
 					if (first_pass_cent && jet_itr == 0) legend->AddEntry(g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet],dR_label.c_str(),"p");
 
 					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(1.);
 
 					y_range_lo = 0.;
-					y_range_hi = 4.2;
+					y_range_hi = 2.7;
 
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetXaxis()->SetLimits(trk_pt_lo, trk_pt_hi);
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi+0.2);
-					if (i_jet == 9) g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi+0.7);
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->Clone("g_stat");
 
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetRangeUser(ratio_lo, ratio_hi);
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					double shift_size = 0.045;
+					g_sys = shift(g_sys, trkpT_binning, dR_itr, shift_size);
+					g_stat = shift(g_stat, trkpT_binning, dR_itr, shift_size);
 
-					if (dR_itr == 0) g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Draw(" E2 ");
-					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->Draw("P E1");
+					g_sys->GetXaxis()->SetLimits(trk_pt_lo, trk_pt_hi);
+					g_sys->GetYaxis()->SetRangeUser(0,y_range_hi);
+					if (i_jet == 9) g_sys->GetYaxis()->SetRangeUser(0,y_range_hi+0.5);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (dR_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
 					gPad->SetLogx();
 
 					dR_itr++;
@@ -704,11 +767,11 @@ void draw_conf_plots()
 		cout << "Doing Final RDpT as a function of track pT for different centrality" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.6,0.6,0.92,0.72,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.7,0.6,0.85,0.72,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetTextSize(22);
 		legend->SetBorderSize(0);
-		legend->SetNColumns(2);
+		legend->SetNColumns(1);
 
 		int dR_itr = 0;
 		for (int i_dR = 0; i_dR < N_dR; i_dR++)
@@ -718,8 +781,6 @@ void draw_conf_plots()
 			y_range_lo = 0.; y_range_hi = 4;
 			if (i_dR == 0) {y_range_lo = 0.7; y_range_hi = 1.8;}
 			if (i_dR == 3) {y_range_lo = 0.0; y_range_hi = 2.52;}
-//			if (i_dR == 6) {y_range_lo = 0.0; y_range_hi = 3.0;}
-//			if (i_dR == 8) {y_range_lo = 0.0; y_range_hi = 3.5;}
 
 			int jet_itr = 0;
 			for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -730,32 +791,40 @@ void draw_conf_plots()
 				canvas->Clear();
 
 
+				int cent_itr = 0;
 				for (int i_cent = 0; i_cent < 6; i_cent++)
 				{
 					string centrality = num_to_cent(31,i_cent);
+					if (i_cent != 0 && i_cent != 3 && i_cent != 5 ) continue;
 
-					SetHStyle(h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet], i_cent);
-					SetHStyle_graph(g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet], i_cent);
-					SetHStyle_graph(g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet], i_cent);
+					SetHStyle(h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet], cent_itr);
+					SetHStyle_graph(g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet], cent_itr);
+					SetHStyle_graph(g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet], cent_itr);
 					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetFillColor(),opacity);
 
 					if (dR_itr == 0 && jet_itr == 0) legend->AddEntry(g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet],centrality.c_str(),"p");
 
 					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->SetLineWidth(1.);
 
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetXaxis()->SetLimits(trk_pt_lo, trk_pt_hi);
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->Clone("g_stat");
 
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetXaxis()->SetRangeUser(trk_pt_lo, trk_pt_hi);
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_RDpT_final_ratio_inTrk[i_dR][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					double shift_size = 0.1;
+					g_sys = shift(g_sys, trkpT_binning, cent_itr, shift_size);
+					g_stat = shift(g_stat, trkpT_binning, cent_itr, shift_size);
 
-					if (i_cent == 0) g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_inTrk[i_dR][i_cent][i_jet]->Draw(" E2 ");
-					g_RDpT_final_stat_inTrk[i_dR][i_cent][i_jet]->Draw("P E1");
+					g_sys->GetXaxis()->SetLimits(trk_pt_lo, trk_pt_hi);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (i_cent == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+
 					gPad->SetLogx();
+
+					cent_itr++;
 
 				} // end cent loop
 
@@ -824,21 +893,27 @@ void draw_conf_plots()
 					y_range_lo = 0.;
 					y_range_hi = 4.2;
 
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
 
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 
-					if (trk_itr == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat");
+
+					double shift_size = 0.0025;
+					g_sys = shift(g_sys, trk_itr, shift_size);
+					g_stat = shift(g_stat, trk_itr, shift_size);
+
+					g_sys->GetXaxis()->SetLimits(0, 0.8);
+					g_sys->GetYaxis()->SetRangeUser(0,4.2);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+
 
 					trk_itr++;
 
@@ -887,6 +962,7 @@ void draw_conf_plots()
 			bool first_pass_cent = true;
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
+				if (i_cent != 0) continue;
 
 				string centrality = num_to_cent(31,i_cent);
 
@@ -904,27 +980,35 @@ void draw_conf_plots()
 
 					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
 
-					y_range_lo = -1.;
-					y_range_hi = 6.;
+					y_range_lo = -2.;
+					y_range_hi = 16;
 
-					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					if (i_jet == 8) g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+1);
-					if (i_jet == 9) g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+4);
-					if (i_jet == 10) g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+10);
-					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 					g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
 
-					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat");
 
-					if (trk_itr == 0) g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
-					else g_DeltaDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
-					g_DeltaDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					double shift_size = 0.0040;
+					g_sys = shift(g_sys, trk_itr, shift_size);
+					g_stat = shift(g_stat, trk_itr, shift_size);
+
+					g_sys->GetXaxis()->SetLimits(0, r_max_range);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+
+//					if (i_jet < 9) g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+//					else if (i_jet >= 9) g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi+7);
+//					if (i_jet == 8) g_sys->GetYaxis()->SetRangeUser(y_range_lo-1., y_range_hi+2);
+//					if (i_jet == 9) g_sys->GetYaxis()->SetRangeUser(y_range_lo-1, y_range_hi+5);
+//					if (i_jet == 10) g_sys->GetYaxis()->SetRangeUser(y_range_lo-2., y_range_hi+11);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+
 
 					trk_itr++;
 
@@ -956,19 +1040,19 @@ void draw_conf_plots()
 
 
 	{
+		trk_select1 = 3;
 		cout << "Doing Final RDpT for different jets for one track pT" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		double tmp_x = .25, tmp_y = .303;
+		double tmp_x = 0, tmp_y = .303;
 
-		TLegend *legend_open = 	new TLegend(0.45+tmp_x,0.41+tmp_y,0.60+tmp_x,0.565+tmp_y,NULL,"brNDC");
-		TLegend *legend =	 	new TLegend(0.37+tmp_x,0.41+tmp_y,0.60+tmp_x,0.565+tmp_y,NULL,"brNDC");
+		TLegend *legend_open = 	new TLegend(0.26+tmp_x,0.35+tmp_y,0.40+tmp_x,0.565+tmp_y,NULL,"brNDC");
+		TLegend *legend =	 	new TLegend(0.19+tmp_x,0.35+tmp_y,0.40+tmp_x,0.565+tmp_y,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
-//		legend->SetTextSize(13);
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
-		legend_open->SetTextSize(14);
+		legend_open->SetTextSize(18);
 
 		bool first_pass_cent = true;
 		for (int i_cent = 0; i_cent < 6; i_cent++)
@@ -1013,23 +1097,26 @@ void draw_conf_plots()
 					}
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
 
 					y_range_lo = 0.;
-					y_range_hi = 4.2;
+					y_range_hi = 4.6;
 
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0.0, 4.6);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat");
 
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(0.3, 2.8);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(504);
+					double shift_size = 0.008;
+					g_sys = shift(g_sys, jet_itr, shift_size);
+					g_stat = shift(g_stat, jet_itr, shift_size);
 
+					g_sys->GetXaxis()->SetLimits(0, r_max_range);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys->GetYaxis()->SetNdivisions(505);
 
-					if (trk_itr == 0 && jet_itr == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw(" E2 ");
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					if (trk_itr == 0 && jet_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+
 
 					jet_itr++;
 
@@ -1037,10 +1124,10 @@ void draw_conf_plots()
 
 				ltx->SetTextAlign(21);
 				double tmp_height = 0.87;
-				double left_diff = -0.05;
-				if (trk_itr == 0) ltx->DrawLatexNDC(0.63-left_diff,tmp_height+0.035, Form("#scale[0.65]{#it{p}_{T} [GeV]:}"));
-				if (i_trk == trk_select1) ltx->DrawLatexNDC(0.59-left_diff,tmp_height, Form("#scale[0.65]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
-				if (i_trk == trk_select2) ltx->DrawLatexNDC(0.67-left_diff,tmp_height, Form("#scale[0.65]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+				double left_diff = 0;
+				if (trk_itr == 0) ltx->DrawLatexNDC(0.24-left_diff,tmp_height+0.035, Form("#scale[0.65]{#it{p}_{T} [GeV]:}"));
+				if (i_trk == trk_select1) ltx->DrawLatexNDC(0.21-left_diff,tmp_height, Form("#scale[0.65]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+				if (i_trk == trk_select2) ltx->DrawLatexNDC(0.28-left_diff,tmp_height, Form("#scale[0.65]{%1.1f-%1.1f}", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
 
 				trk_itr++;
 
@@ -1051,12 +1138,12 @@ void draw_conf_plots()
 			legend->Draw();
 			legend_open->Draw();
 			double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-			ltx->SetTextAlign(11);
-			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
-			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
-			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
+			ltx->SetTextAlign(31);
+			ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("%s", centrality.c_str()));
 
 //			if (i_cent != 0 && i_cent != 5) continue;
 
@@ -1064,21 +1151,25 @@ void draw_conf_plots()
 
 			first_pass_cent = false;
 		} //end jet loop
+		trk_select1 = 2;
 	}
 
 	{
 		cout << "Doing Final DpT spectra for PbPb and pp in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",600,800);
-		TLegend *legend = new TLegend(0.505,0.68,0.745,0.88,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.20,0.65,0.75,0.88,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
 		legend->SetTextSize(12);
-		TLegend *legend_open = new TLegend(0.42,0.68,0.68,0.88,NULL,"brNDC");
+		legend->SetNColumns(2);
+		legend->SetFillStyle(0);
+		TLegend *legend_open = new TLegend(0.20,0.72,0.78,0.88,NULL,"brNDC");
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
 		legend_open->SetTextSize(12);
-
+		legend_open->SetNColumns(2);
+		legend_open->SetFillStyle(0);
 
 		int jet_itr = 0;
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -1086,9 +1177,10 @@ void draw_conf_plots()
 			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 
 			bool first_pass_cent = true;
-			canvas->cd();
+			canvas->cd(0);
+			gPad->Clear();
 			canvas->Clear();
-			canvas->Divide(2,3);
+			canvas->Divide(2,3);//0.001,0.001,3);
 			for (int i_cent = 0; i_cent < 6; i_cent++)
 			{
 				string centrality = num_to_cent(31,i_cent);
@@ -1096,7 +1188,23 @@ void draw_conf_plots()
 				int trk_itr = 0;
 				canvas->cd(i_cent+1);
 
-				for (int i_trk = trk_select1; i_trk < 7; i_trk++)
+				double xlo, ylo, xhi, yhi;
+				if (i_cent == 0) xlo = 0, xhi = 0.54, ylo = 0.68, yhi = 0.98;
+				if (i_cent == 1) xlo = 0.55, xhi = 1.00, ylo = 0.68, yhi = 0.98;
+				if (i_cent == 2) xlo = 0, xhi = 0.54, ylo-=0.3, yhi-=0.3;
+				if (i_cent == 3) xlo = 0.55, xhi = 1.00, ylo, yhi;
+				if (i_cent == 4) xlo = 0, xhi = 0.54, ylo-=0.37, yhi-=0.3;
+				if (i_cent == 5) xlo = 0.55, xhi = 1.00, ylo, yhi;
+				gPad->SetPad(xlo, ylo, xhi, yhi);
+
+				if (i_cent %2 == 1)gPad->SetLeftMargin(0.012);
+				else gPad->SetRightMargin(0.014);
+
+
+				if (i_cent == 0 || i_cent == 1) {gPad->SetBottomMargin(0.01);}
+				if (i_cent == 2 || i_cent == 3) {gPad->SetBottomMargin(0.01);}
+
+				for (int i_trk = trk_select1; i_trk < 9; i_trk++)
 				{
 					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
@@ -1108,41 +1216,54 @@ void draw_conf_plots()
 					SetHStyle_open_smallify(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet], trk_itr, 1);
 					SetHStyle_graph_open(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet], trk_itr);
 					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetMarkerSize(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetMarkerSize());
-					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2);
-					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(2);
+					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(1.);
 
-					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
-					if (jet_itr == 0 && first_pass_cent) legend_open->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
+					if (jet_itr == 0 && first_pass_cent)
+					{
+						if (trk_itr < 4)
+						{
+							legend->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
+							legend->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
+						}
+						else
+						{
+							legend_open->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
+							legend_open->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
+						}
 
-					y_range_lo = 1E-3;
-					y_range_hi = 1E3;
+					}
 
+					y_range_lo = 5E-5;
+					y_range_hi = 2E5;
 
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
-
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
-
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->SetFillColorAlpha(g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetFillColor(),opacity);
 
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys_pbpb = (TGraphAsymmErrors*)g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys_PbPb");
+					TGraphAsymmErrors* g_stat_pbpb = (TGraphAsymmErrors*)g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat_PbPb");
+					TGraphAsymmErrors* g_sys_pp = (TGraphAsymmErrors*)g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Clone("g_sys_pp");
+					TGraphAsymmErrors* g_stat_pp = (TGraphAsymmErrors*)g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->Clone("g_stat_pp");
 
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetTitleOffset(3.8);
-					if (trk_itr == 0) g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("a E2");
-					else g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("E2 same");
-					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->Draw("P E1");
+					double shift_size = 0.0025;
+					g_sys_pbpb = shift(g_sys_pbpb, trk_itr, shift_size);
+					g_stat_pbpb = shift(g_stat_pbpb, trk_itr, shift_size);
 
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2");
-					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					g_sys_pp = shift(g_sys_pp, trk_itr, shift_size);
+					g_stat_pp = shift(g_stat_pp, trk_itr, shift_size);
+
+
+					g_sys_pbpb->GetXaxis()->SetRangeUser(0, r_max_range);
+					g_sys_pbpb->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys_pbpb->GetYaxis()->SetNdivisions(505);
+					g_sys_pbpb->GetYaxis()->SetTitleOffset(3.8);
+
+					if (trk_itr == 0) g_sys_pbpb->Draw("a E2");
+					else g_sys_pbpb->Draw("E2 same");
+					g_stat_pbpb->Draw("P E1");
+					g_sys_pp->Draw("E2");
+					g_stat_pp->Draw("P E1");
+
 
 					gPad->SetLogy();
 
@@ -1151,25 +1272,29 @@ void draw_conf_plots()
 
 				first_pass_cent = false;
 				double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-				ltx->SetTextAlign(11);
-				ltx->DrawLatexNDC(x_left, y, Form("#scale[0.7]{%s}", centrality.c_str()));
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(x_right, y, Form("#scale[0.7]{%s}", centrality.c_str()));
 
 			} //end cent loop
-			canvas->cd(2);
+			canvas->cd(5);
 			ltx->SetTextAlign(21);
-			ltx->DrawLatexNDC(0.53,0.89, Form("#scale[0.6]{#scale[0.8]{Pb+Pb}}"));
-			ltx->DrawLatexNDC(0.45,0.89, Form("#scale[0.6]{#scale[0.8]{#it{pp}}}"));
-			legend_open->Draw();
+			ltx->DrawLatexNDC(0.25,0.89, Form("#scale[0.6]{#scale[0.8]{#it{pp}}}"));
+			ltx->DrawLatexNDC(0.34,0.89, Form("#scale[0.6]{#scale[0.8]{Pb+Pb}}"));
 			legend->Draw();
+			canvas->cd(6);
+			ltx->SetTextAlign(21);
+			ltx->DrawLatexNDC(0.25,0.89, Form("#scale[0.6]{#scale[0.8]{#it{pp}}}"));
+			ltx->DrawLatexNDC(0.34,0.89, Form("#scale[0.6]{#scale[0.8]{Pb+Pb}}"));
+			legend_open->Draw();
 
 			canvas->cd(1);
 			double x_left = 0.19, x_right = 0.92, y = 0.87, y_diff = 0.06;
-			ltx->SetTextAlign(31);
-			ltx->DrawLatexNDC(x_right, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
+			ltx->SetTextAlign(11);
+			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
 
 
 			canvas->Print(Form("output_pdf_nominal/conf/DpT_dR_jet%i.pdf", i_jet));
@@ -1206,6 +1331,22 @@ void draw_conf_plots()
 				int trk_itr = 0;
 				canvas->cd(i_cent+1);
 
+				double xlo, ylo, xhi, yhi;
+				if (i_cent == 0) xlo = 0, xhi = 0.54, ylo = 0.68, yhi = 0.98;
+				if (i_cent == 1) xlo = 0.55, xhi = 1.00, ylo = 0.68, yhi = 0.98;
+				if (i_cent == 2) xlo = 0, xhi = 0.54, ylo-=0.3, yhi-=0.3;
+				if (i_cent == 3) xlo = 0.55, xhi = 1.00, ylo, yhi;
+				if (i_cent == 4) xlo = 0, xhi = 0.54, ylo-=0.37, yhi-=0.3;
+				if (i_cent == 5) xlo = 0.55, xhi = 1.00, ylo, yhi;
+				gPad->SetPad(xlo, ylo, xhi, yhi);
+
+				if (i_cent %2 == 1)gPad->SetLeftMargin(0.010);
+				else gPad->SetRightMargin(0.014);
+
+
+				if (i_cent == 0 || i_cent == 1) {gPad->SetBottomMargin(0.01);}
+				if (i_cent == 2 || i_cent == 3) {gPad->SetBottomMargin(0.01);}
+
 
 				for (int i_trk = trk_select1; i_trk < 9; i_trk++)
 				{
@@ -1220,29 +1361,34 @@ void draw_conf_plots()
 					y_range_lo = 0.;
 					y_range_hi = 4.2;
 
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
 
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat");
 
-					if (trk_itr == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2 same");
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					double shift_size = 0.0025;
+					g_sys = shift(g_sys, trk_itr, shift_size);
+					g_stat = shift(g_stat, trk_itr, shift_size);
+
+					g_sys->GetXaxis()->SetLimits(0, r_max_range);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
+
 
 					trk_itr++;
 
 				} // end trk loop
 				first_pass_cent = false;
 				double x_left = 0.19, x_right = 0.91, y = 0.88, y_diff = 0.045;
-				ltx->SetTextAlign(11);
-				ltx->DrawLatexNDC(x_left, y, Form("#scale[0.7]{%s}", centrality.c_str()));
+				ltx->SetTextAlign(31);
+				ltx->DrawLatexNDC(x_right, y, Form("#scale[0.7]{%s}", centrality.c_str()));
 				line->DrawLine(0, 1, r_max_range, 1);
 
 			}
@@ -1251,12 +1397,12 @@ void draw_conf_plots()
 
 			canvas->cd(1);
 			double x_left = 0.19, x_right = 0.92, y = 0.87, y_diff = 0.06;
-			ltx->SetTextAlign(31);
-			ltx->DrawLatexNDC(x_right, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
-			ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
+			ltx->SetTextAlign(11);
+			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
+			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{anti-#font[12]{k}_{#font[12]{t}} R=0.4}"));
 
 			canvas->Print(Form("output_pdf_nominal/conf/RDpT_dR_jet%i.pdf", i_jet));
 
@@ -1269,11 +1415,11 @@ void draw_conf_plots()
 		cout << "Doing Final DpT spectra for PbPb and pp in dR" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend = new TLegend(0.255,0.20,0.495,0.40,NULL,"brNDC");
+		TLegend *legend = new TLegend(0.555,0.20,0.795,0.40,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
 		legend->SetTextSize(18);
-		TLegend *legend_open = new TLegend(0.19,0.20,0.43,0.40,NULL,"brNDC");
+		TLegend *legend_open = new TLegend(0.49,0.20,0.73,0.40,NULL,"brNDC");
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
 		legend_open->SetTextSize(18);
@@ -1294,7 +1440,7 @@ void draw_conf_plots()
 				canvas->cd();
 				canvas->Clear();
 
-				for (int i_trk = trk_select1; i_trk < 7; i_trk++)
+				for (int i_trk = trk_select1; i_trk < 9; i_trk++)
 				{
 					string trk_label = Form("%1.1f < #it{p}_{T} < %1.1f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
@@ -1306,40 +1452,43 @@ void draw_conf_plots()
 					SetHStyle_open(h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet], trk_itr);
 					SetHStyle_graph_open(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet], trk_itr);
 
- 					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2);
- 					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(2);
+ 					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
+ 					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->SetLineWidth(1.);
 
  					if (jet_itr == 0 && first_pass_cent) legend->AddEntry(g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet],trk_label.c_str(),"p");
 					if (jet_itr == 0 && first_pass_cent) legend_open->AddEntry(g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]," ","p");
 
-					y_range_lo = 1E-4;
+					y_range_lo = 8E-5;
 					y_range_hi = 5E2;
 
-
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
-
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->SetFillColorAlpha(g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->GetFillColor(),opacity);
 
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->GetYaxis()->SetNdivisions(505);
+					TGraphAsymmErrors* g_sys_pbpb = (TGraphAsymmErrors*)g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys_PbPb");
+					TGraphAsymmErrors* g_stat_pbpb = (TGraphAsymmErrors*)g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat_PbPb");
+					TGraphAsymmErrors* g_sys_pp = (TGraphAsymmErrors*)g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Clone("g_sys_pp");
+					TGraphAsymmErrors* g_stat_pp = (TGraphAsymmErrors*)g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->Clone("g_stat_pp");
 
-					if (trk_itr == 0) g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("a E2");
-					else g_ChPS_pp_final_sys_indR[i_trk][6][i_jet]->Draw("E2 same");
-					g_ChPS_pp_final_stat_indR[i_trk][6][i_jet]->Draw("P E1");
+					double shift_size = 0.0025;
+					g_sys_pbpb = shift(g_sys_pbpb, trk_itr, shift_size);
+					g_stat_pbpb = shift(g_stat_pbpb, trk_itr, shift_size);
 
-					g_ChPS_PbPb_final_sys_indR[i_trk][i_cent][i_jet]->Draw("E2");
-					g_ChPS_PbPb_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1");
+					g_sys_pp = shift(g_sys_pp, trk_itr, shift_size);
+					g_stat_pp = shift(g_stat_pp, trk_itr, shift_size);
+
+
+					g_sys_pp->GetXaxis()->SetRangeUser(0, r_max_range);
+					g_sys_pp->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys_pp->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0) g_sys_pp->Draw("a E2");
+					else g_sys_pp->Draw("E2 same");
+					g_stat_pp->Draw("P E1");
+					g_sys_pbpb->Draw("E2");
+					g_stat_pbpb->Draw("P E1");
 
 					gPad->SetLogy();
 
@@ -1348,8 +1497,8 @@ void draw_conf_plots()
 
 				canvas->cd();
 				ltx->SetTextAlign(21);
-				ltx->DrawLatexNDC(0.28,0.41, Form("#scale[0.8]{Pb+Pb}"));
-				ltx->DrawLatexNDC(0.22,0.41, Form("#scale[0.8]{#it{pp}}"));
+				ltx->DrawLatexNDC(0.58,0.41, Form("#scale[0.8]{Pb+Pb}"));
+				ltx->DrawLatexNDC(0.52,0.41, Form("#scale[0.8]{#it{pp}}"));
 				legend_open->Draw();
 				legend->Draw();
 
@@ -1376,18 +1525,20 @@ void draw_conf_plots()
 
 
 	{
+		trk_select1 = 3;
 		cout << "Doing Final RDpT spectra as function of centrality" << endl;
 
 		TCanvas *canvas = new TCanvas("canvas","canvas",800,600);
-		TLegend *legend_open = new TLegend(0.70,0.70,0.90,0.90,NULL,"brNDC");
-		TLegend *legend = 	   new TLegend(0.62,0.70,0.84,0.90,NULL,"brNDC");
+		TLegend *legend_open = new TLegend(0.70,0.65,0.90,0.90,NULL,"brNDC");
+		TLegend *legend = 	   new TLegend(0.62,0.65,0.84,0.90,NULL,"brNDC");
 		legend->SetTextFont(43);
 		legend->SetBorderSize(0);
-		legend->SetTextSize(18);
+		legend->SetTextSize(22);
+		legend->SetFillStyle(0);
 		legend_open->SetTextFont(43);
 		legend_open->SetBorderSize(0);
-		legend_open->SetTextSize(18);
-
+		legend_open->SetTextSize(22);
+		legend_open->SetFillStyle(0);
 
 		int jet_itr = 0;
 		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
@@ -1427,21 +1578,28 @@ void draw_conf_plots()
 
 
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(2.);
+					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetLineWidth(1.);
 
 					y_range_lo = 0.;
-					y_range_hi = 4.2;
+					y_range_hi = 5;
 
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetYaxis()->SetNdivisions(505);
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetLineColor(h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->GetMarkerColor());
 					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetFillColorAlpha(g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->GetFillColor(),opacity);
 
+					TGraphAsymmErrors* g_sys = (TGraphAsymmErrors*)g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Clone("g_sys");
+					TGraphAsymmErrors* g_stat = (TGraphAsymmErrors*)g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Clone("g_stat");
 
-					if (trk_itr == 0 && i_cent == 0) g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw("a E2");
-					else g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Draw(" E2 same");
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Draw("P E1 same");
+					double shift_size = 0.0045;
+					g_sys = shift(g_sys, i_cent, shift_size);
+					g_stat = shift(g_stat, i_cent, shift_size);
+
+					g_sys->GetXaxis()->SetLimits(0, r_max_range);
+					g_sys->GetYaxis()->SetRangeUser(y_range_lo, y_range_hi);
+					g_sys->GetYaxis()->SetNdivisions(505);
+
+					if (trk_itr == 0 && i_cent == 0) g_sys->Draw("a E2");
+					else g_sys->Draw("E2 same");
+					g_stat->Draw("P E1");
 
 					gPad->SetLogy(0);
 
@@ -1482,6 +1640,7 @@ void draw_conf_plots()
 
 			jet_itr++;
 		} //end jet loop
+		trk_select1 = 2;
 	}
 
 	cout << "######### DONE CONF PLOTS #########" << endl << endl;;

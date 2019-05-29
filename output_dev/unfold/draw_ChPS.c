@@ -30,7 +30,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	//	##############	Config done	##############"
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
-	else if (sys_mode > 50) sys_path = Form("c%i", sys_mode);
+	else if (sys_mode > 50 || sys_mode < 0) sys_path = Form("c%i", sys_mode);
 	else sys_path = Form("sys%i", sys_mode);
 
 	TFile *f_input = new TFile(Form("output_pdf_%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));
@@ -128,7 +128,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	int jet_pt_end = 11;
 
 	int trk_pt_start = 2;
-	int trk_pt_end = 9;
+	int trk_pt_end = trkpT_binning->GetNbins()-2;
 
 	bool doSmall;
 	if (dataset_type == "pp") doSmall = false;
@@ -693,6 +693,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				c_ChPS_final->Print(Form("output_pdf_%s/%s/ChPS_final_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 			} //end dR loop
+
+			delete c_ChPS_final;
+			delete legend_ChPS_final;
+
 		}
 
 
@@ -771,6 +775,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			pdf_label = "";
 			c_ChPS_final_inJet->Print(Form("output_pdf_%s/%s/ChPS_final_inJet_%s_%s.pdf", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str()), Form("Title:InJet"));
 
+			delete c_ChPS_final_inJet;
+			delete legend_ChPS_final_inJet;
 		}
 
 		//Draw Final UE plots
@@ -844,6 +850,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				c_ChPS_UE->Print(Form("output_pdf_%s/%s/ChPS_UE_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 			} //end dR loop
+
+			delete c_ChPS_UE;
+			delete legend_ChPS_UE;
 		}
 
 
@@ -897,12 +906,8 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						
 						h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
 
-						if (i_cent == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E2);
-						if (i_cent == 1) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,2E2);
-						if (i_cent == 2) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,1E2);
-						if (i_cent == 3) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E1);
-						if (i_cent == 4) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,2E1);
-						if (i_cent == 5) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,3E1);
+						if (i_cent < 3) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E2);
+						if (i_cent >=3 ) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(9E-1,5E1);
 
 						if (jet_itr == 0 && first_pass_cent) legend_B2S_dR->AddEntry(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
@@ -949,6 +954,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				jet_itr++;
 
 			} //end jet loop
+
+			delete c_B2S_dR;
+			delete legend_B2S_dR;
+
 		}
 
 		//draw as function of dR
@@ -989,7 +998,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 					int trk_itr = 0;
 					double max = 0., min = 999., tmp;
-					for (int i_trk = 2; i_trk < 9; i_trk++)
+					for (int i_trk = 2; i_trk < trk_pt_end; i_trk++)
 					{
 						string trk_label = Form("%1.0f < #it{p}_{T} < %1.0f GeV", trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1));
 
@@ -1026,7 +1035,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 							if (dataset_type == "PbPb") c_ChPS_dR->cd(i_cent+1)->cd(2);
 
 							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0, r_max_range);
-							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.95, 1.05);
+							h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0.85, 1.15);
 
 							shiftHist(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),trk_itr*0.002);
 							if (trk_itr == 0) h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
@@ -1036,6 +1045,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 							line->SetLineStyle(0);
 							line->DrawLine(0, 1, r_max_range, 1);
+							line->SetLineStyle(2);
+							line->DrawLine(0, 0.95, r_max_range, 0.95);
+							line->DrawLine(0, 1.05, r_max_range, 1.05);
 
 						}
 
@@ -1080,6 +1092,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				jet_itr++;
 
 			} //end jet loop
+
+			delete c_ChPS_dR;
+			delete legend_ChPS_dR;
+
 		}
 
 
@@ -1164,6 +1180,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				jet_itr++;
 
 			} //end jet loop
+
+			delete c_ChPS_dR_UE;
+			delete legend_ChPS_dR_UE;
 		}
 
 		//background to signal ratio
@@ -1227,6 +1246,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				c_ChPS_B2S->Print(Form("output_pdf_%s/%s/ChPS_B2S_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 			} //end dR loop
+
+			delete c_ChPS_B2S;
+			delete legend_ChPS_B2S;
 		}
 
 		{
@@ -1276,6 +1298,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				c_resp_matrix->Print(Form("output_pdf_%s/%s/resp_matrix_ChPS_%s_%s.pdf%s", sys_path.c_str(), dataset_type.c_str(), dataset_type.c_str(), did.c_str(), pdf_label.c_str()), Form("Title:dR%i", i_dR));
 
 			} //end dR loop
+			delete c_resp_matrix;
 		}
 
 
@@ -1366,7 +1389,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						if (dataset_type == "pp") c_evol_dR->cd(2);
 						if (dataset_type == "PbPb") c_evol_dR->cd(i_cent+1)->cd(2);
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(0,2);
-						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0,r_max_range);
+						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0,0.8);
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 //						h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-0.01,0.01);
 //						h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("hist text");
@@ -1403,9 +1426,41 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 				jet_itr++;
 			} //end jet loop
+
+			delete c_evol_dR;
+			delete legend_evol_dR;
 		}
 
+
 	}
+
+	for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
+	{
+		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)
+		{
+			for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
+			{
+				if (dataset_type == "PbPb" && i_cent == 6) continue;
+				if (dataset_type == "pp" && i_cent < 6) continue;
+				delete h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_raw_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_raw_subtr_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_raw_subtr_unf_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_truth_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet);
+				delete h_ChPS_fake_indR.at(i_trk).at(i_cent).at(i_jet);
+
+				if (dataset_type == "PbPb")
+				{
+					delete h_ChPS_UE_indR.at(i_trk).at(i_cent).at(i_jet);
+				}
+			}
+		}
+	}
+
+
 	cout << "######### DONE DRAW_CHPS #########" << endl << endl;;
 
 }

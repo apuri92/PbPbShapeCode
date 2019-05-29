@@ -27,11 +27,12 @@ public:
 	std::string trk_title = "#it{p}_{T}^{trk} [GeV]";
 	std::string jet_title = "#it{p}_{T}^{jet} [GeV]";
 
-	std::string jetshape_rdpt_title = "#int_{0}^{r}#int_{1}^{4} D_{PbPb} d#it{p}_{T}dr' / #int_{0}^{r} #int_{1}^{4}D_{pp} d#it{p}_{T}dr'";
-	std::string jetshape_deltadpt_title = "#int_{0}^{r}#int_{1}^{4}#DeltaD d#it{p}_{T} dr' [GeV]";
+	std::string jetshape_rdpt_title = "#it{R}_{#it{P(#it{r})}}";
+	std::string jetshape_deltadpt_title = "#Delta_{#it{P(#it{r})}} [GeV^{-1}]";
 
-	std::string lowpt_integ_rdpt_title = "#int_{1}^{4} D_{PbPb} d#it{p}_{T} / #int_{1}^{4}D_{pp} d#it{p}_{T}";
-	std::string lowpt_integ_deltadpt_title = "#int_{1}^{4}#DeltaD d#it{p}_{T} [GeV]";
+	std::string lowpt_integ_rdpt_title = "#it{R}_{#it{#Theta(#it{r})}}";
+	std::string lowpt_integ_deltadpt_title = "#Delta_{#it{#Theta(#it{r})}} [GeV^{-1}]";
+
 
 
 	std::string lowpt_integ_dptr_title = Form("#int_{1}^{4} %s d#it{p}_{T}", dptr_title.c_str());
@@ -99,7 +100,7 @@ public:
 	void drawAll();
 	void cleanUp();
 	void setSpecifics();
-
+	TGraphAsymmErrors* shift(TGraphAsymmErrors* g, int variable, double shift_size = 0.0025);
 
 
 };

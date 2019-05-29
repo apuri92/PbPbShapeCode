@@ -70,7 +70,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	int jet_pt_start = 7;
 	int jet_pt_end = 11;
 	int trk_pt_start = 2;
-	int trk_pt_end = 9;
+	int trk_pt_end = 6;
 
 	string y_label = "Unkown";
 	if (mode == "RDpT") y_label = "#delta#it{R}_{#it{D}(#it{p}_{T},#it{r})} [%]";
@@ -163,6 +163,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 					SetHStyle(h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
 					SetHStyle(h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet],i_comb_sys+1);
 
+					if (dataset_type.compare("_pp")==0 && combined_sys_names[i_comb_sys].compare("UE") == 0) continue;
+					
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->SetLineWidth(2);
 
