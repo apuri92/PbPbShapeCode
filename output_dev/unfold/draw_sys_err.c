@@ -53,12 +53,12 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	vector<string> sys_names;
 	vector<string> combined_sys_names;
 
-	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("JES");
-	combined_sys_names.push_back("UE");
+	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("Tracking");
 	combined_sys_names.push_back("Unfolding");
 	combined_sys_names.push_back("MCNonClosure");
+	combined_sys_names.push_back("UE");
 
 	vector<vector<vector<TH1*>>> h_total_sys_p (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
 	vector<vector<vector<TH1*>>> h_total_sys_n (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -83,14 +83,16 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 	string r_label = "#it{r}";
 
 	TCanvas *c_sys = new TCanvas("c_sys","c_sys", 800, 600);
-	TLegend *legend_sys = new TLegend(0.18, 0.18, 0.40, 0.40, "","brNDC");
+	TLegend *legend_sys = new TLegend(0.18, 0.70, 0.8, 0.92, "","brNDC");
 	legend_sys->SetTextFont(43);
 	legend_sys->SetBorderSize(0);
-	legend_sys->SetTextSize(20);
+	legend_sys->SetTextSize(33);
+	legend_sys->SetNColumns(2);
+	legend_sys->SetFillStyle(0);
 
 	TLatex *ltx = new TLatex();
 	ltx->SetTextFont(43);
-	ltx->SetTextSize(22);
+	ltx->SetTextSize(25);
 
 	TLine *line = new TLine();
 	line->SetLineColor(kBlack);
@@ -199,8 +201,8 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->Scale(100);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->Scale(100);
-					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
-					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-30,30);
+					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-60,60);
+					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetRangeUser(-55,55);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_n[i_comb_sys][i_trk][i_cent][i_jet]->GetXaxis()->SetRangeUser(0, r_max_range);
 					h_comb_sys_p[i_comb_sys][i_trk][i_cent][i_jet]->GetYaxis()->SetTitle(y_label.c_str());
@@ -219,14 +221,17 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 				line->SetLineStyle(1);
 				line->DrawLine(0, 0, r_max_range, 0);
 
+
+				ltx->SetTextSize(24);
+
 				ltx->SetTextAlign(11);
-				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
-				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				double x_left = 0.19, x_right = 0.93, y = 0.42, y_diff = 0.046;
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.3]{#font[72]{ATLAS} Internal}");
 				if (mode == "RDpT")
 				{
-					ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
+					ltx->DrawLatexNDC(x_left, y=y-(1.1*y_diff), "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 					ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-					ltx->DrawLatexNDC(x_left+0.3, y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+					ltx->DrawLatexNDC(x_left+0.35, y=y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));
 					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", trk_label.c_str()));
 					ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));

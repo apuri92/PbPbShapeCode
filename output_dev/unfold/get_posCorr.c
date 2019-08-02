@@ -439,6 +439,15 @@ void get_posCorr(string config_file = "ff_config.cfg")
 					ltx->SetTextAlign(32);
 					if (jet_iter == 0) ltx->DrawLatexNDC(0.90,0.90,num_to_cent(31,i_cent).c_str());
 
+					line->SetLineColor(kBlack);
+					line->SetLineStyle(3);
+					line->DrawLine(0.0, 1+0.05, 0.8, 1+0.05);
+					line->DrawLine(0.0, 1-0.05, 0.8, 1-0.05);
+					line->SetLineColor(kRed);
+					line->DrawLine(0.0, 1+0.15, 0.8, 1+0.15);
+					line->DrawLine(0.0, 1-0.15, 0.8, 1-0.15);
+					line->SetLineColor(kBlack);
+					line->SetLineStyle(2);
 				}
 
 				//Drawing purity of response, each page is a centrality, each pad is a trk pt bin, each pad has different curves for jet pt

@@ -18,6 +18,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 	std::string dataset_type = "PbPb"; dataset_type = m_config->GetValue("dataset_type", dataset_type.c_str());
 	int isMC = 1; isMC = m_config->GetValue("isMC", isMC);
 	int sys_mode = -1; sys_mode = m_config->GetValue("sys_mode", sys_mode);
+	int n_unfold = 4; n_unfold = m_config->GetValue("n_unfold", n_unfold);
 
 	int centrality_scheme = 31; centrality_scheme = m_config->GetValue("centrality_scheme", centrality_scheme);
 	int verbose = 0; verbose = m_config->GetValue("verbose", verbose);
@@ -35,6 +36,10 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 	TFile *f_input = new TFile(Form("output_pdf_%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()));
 	TFile *f_output = new TFile(Form("output_pdf_%s/root/final_ChPS_%s_%s.root", sys_path.c_str(),did.c_str(), dataset_type.c_str()), "recreate");
+
+//	TFile *f_input = new TFile(Form("iteration_test/raw_unfolded_iter%i_%s_%s.root",n_unfold, did.c_str(), dataset_type.c_str()));
+//	TFile *f_output = new TFile(Form("iteration_test/final_ChPS_iter%i_%s_%s.root", n_unfold, did.c_str(), dataset_type.c_str()), "recreate");
+
 
 	cout << "Using files:" << endl;
 	cout << f_input->GetName() << endl;
@@ -500,10 +505,11 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			cout << "Doing full analysis evolution plots" << endl;
 			TCanvas *c_evol = new TCanvas("c_evol","c_evol",900,600);
 			if (dataset_type == "pp") c_evol->SetCanvasSize(600,600);
-			TLegend *legend_evol = new TLegend(0.48, 0.55, 0.90, 0.85, "","brNDC");
+			TLegend *legend_evol = new TLegend(0.18, 0.05, 0.75, 0.45, "","brNDC");
 			legend_evol->SetTextFont(43);
 			legend_evol->SetBorderSize(0);
-			legend_evol->SetNColumns(2);
+			legend_evol->SetNColumns(1);
+			if (dataset_type == "PbPb") legend_evol->SetNColumns(2);
 			if (dataset_type == "pp") legend_evol->SetTextSize(14);
 			if (dataset_type == "PbPb") legend_evol->SetTextSize(12);
 
@@ -561,7 +567,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						if (dataset_type == "pp") c_evol->cd(1);
 						else c_evol->cd(i_cent+1)->cd(1);
 
-//						h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-7, 1E3);
+						h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(1E-7, 1E3);
 						h_ChPS_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("");
 						if (dataset_type == "PbPb") h_ChPS_UE.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 						h_ChPS_fake.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
@@ -580,7 +586,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_ratio_subtr_raw.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 						gPad->SetLogx();
 
-						if (dataset_type == "pp") h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+						if (dataset_type == "pp") h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(2.2);
 						if (dataset_type == "PbPb") h_ChPS_ratio_unf_subtr.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
 
 						line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
@@ -668,7 +674,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						else h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->Draw("same");
 						gPad->SetLogx();
 
-						if (dataset_type == "pp") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(3.2);
+						if (dataset_type == "pp") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(2.5);
 						if (dataset_type == "PbPb") h_ChPS_ratio_closure.at(i_dR).at(i_cent).at(i_jet)->GetXaxis()->SetTitleOffset(5);
 						line->DrawLine(trk_pt_lo, 1, trk_pt_hi, 1);
 
@@ -699,7 +705,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 
 		}
 
-
+/*
 		//Draw Final ChPS plots in jet
 		{
 			cout << "Doing Final ChPS plots (as function of trk pT, for jet pT) for R < 0.4" << endl;
@@ -856,6 +862,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 		}
 
 
+		//-------------> first circulation version of this plot used MC!!!! <-------------
 		//Draw B2S for indR plots
 		if (dataset_type == "PbPb")
 		{
@@ -875,7 +882,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
 				c_B2S_dR->cd();
 				c_B2S_dR->Clear();
-				c_B2S_dR->Divide(3,2);
+				c_B2S_dR->Divide(3,2, 0, 0);
 
 				bool first_pass_cent = true;
 				for (int i_cent = 0; i_cent < n_cent_cuts; i_cent++)
@@ -912,9 +919,22 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						if (jet_itr == 0 && first_pass_cent) legend_B2S_dR->AddEntry(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet),trk_label.c_str(),"lp");
 
 						c_B2S_dR->cd(i_cent+1);
+						TGraph *g_tmp = new TGraph(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet));
+						g_tmp->GetYaxis()->SetTitle(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->GetTitle());
+						g_tmp->GetXaxis()->SetTitle(h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->GetTitle());
 
-						if (trk_itr == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("X0");
-						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same X0");
+						g_tmp->GetXaxis()->SetLimits(-0.02, 0.83);
+						g_tmp->GetXaxis()->SetNdivisions(505);
+						g_tmp->GetYaxis()->SetTickSize(0.02);
+						g_tmp->GetXaxis()->SetTickSize(0.02);
+						if (i_cent < 3)  g_tmp->GetYaxis()->SetRangeUser(8E-1,8E2);
+						if (i_cent >=3 ) g_tmp->GetYaxis()->SetRangeUser(8E-1,9E1);
+
+
+//						if (trk_itr == 0) h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("X0");
+//						else h_ChPS_ratio_B2S_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("same X0");
+						if (trk_itr == 0) g_tmp->Draw("AP");
+						else g_tmp->Draw("same P");
 
 						gPad->SetLogx(0);
 						gPad->SetLogy();
@@ -933,7 +953,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 				} //end cent loop
 
 				c_B2S_dR->cd(1);
-				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.06;
+				double x_left = 0.21, x_right = 0.93, y = 0.88, y_diff = 0.06;
 				ltx->SetTextAlign(11);
 				ltx->SetTextSize(13);
 				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
@@ -1431,9 +1451,9 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			delete legend_evol_dR;
 		}
 
-
+*/
 	}
-
+	cout << "Clearing memory" << endl;
 	for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
 	{
 		for (int i_jet = 0; i_jet < N_jetpt; i_jet++)

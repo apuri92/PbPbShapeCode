@@ -100,12 +100,12 @@ void systematics(string config_file = "sys_config.cfg")
 	map<std::string, std::string> sys_i_name = {{ "sys1" , "JER" }, { "sys2" , "Significance" }, { "sys3" , "Unfolding" }, { "sys4" , "MC NonClosure" }, { "sys5" , "MCProbCut" }, { "sys6" , "HIJES_1_P" }, { "sys7" , "HIJES_1_N" }, { "sys8" , "HIJES_2_P" }, { "sys9" , "HIJES_2_N" }, { "sys10" , "Material_P" }, { "sys11" , "Material_N" }, { "sys14" , "DenseEnv" }, { "sys15" , "TrackingRes" }, { "sys16" , "CentHIJES_P" }, { "sys17" , "CentHIJES_N" }, { "sys18" , "ppJES_P_101" }, { "sys19" , "ppJES_N_101" }, { "sys20" , "ppJES_P_102" },{ "sys21" , "ppJES_N_102" }, { "sys22" , "ppJES_P_103" }, { "sys23" , "ppJES_P_103" }, { "sys42" , "UE_{MapStat}" }, { "sys43" , "UE_{RunDep}" }, { "sys44" , "UE_{Cone}" }, { "sys45" , "Fakes" }};
 
 
-	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("JES");
-	combined_sys_names.push_back("UE");
+	combined_sys_names.push_back("JER");
 	combined_sys_names.push_back("Tracking");
 	combined_sys_names.push_back("Unfolding");
 	combined_sys_names.push_back("MCNonClosure");
+	combined_sys_names.push_back("UE");
 
 
 	vector<vector<vector<TH1*>>> h_nom (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));

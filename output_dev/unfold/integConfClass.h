@@ -28,10 +28,10 @@ public:
 	std::string jet_title = "#it{p}_{T}^{jet} [GeV]";
 
 	std::string jetshape_rdpt_title = "#it{R}_{#it{P(#it{r})}}";
-	std::string jetshape_deltadpt_title = "#Delta_{#it{P(#it{r})}} [GeV^{-1}]";
+	std::string jetshape_deltadpt_title = "#Delta_{#it{P(#it{r})}}";
 
 	std::string lowpt_integ_rdpt_title = "#it{R}_{#it{#Theta(#it{r})}}";
-	std::string lowpt_integ_deltadpt_title = "#Delta_{#it{#Theta(#it{r})}} [GeV^{-1}]";
+	std::string lowpt_integ_deltadpt_title = "#Delta_{#it{#Theta(#it{r})}}";
 
 
 

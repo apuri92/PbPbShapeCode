@@ -90,7 +90,7 @@ void integConfClass::drawAll()
 	legend = new TLegend(legend_x1, legend_y1, legend_x2, legend_y2, "","brNDC");
 	legend->SetTextFont(43);
 	legend->SetBorderSize(0);
-	legend->SetTextSize(20);
+	legend->SetTextSize(27);
 	legend->SetNColumns(legend_cols);
 	legend->SetFillStyle(0);
 	ltx = new TLatex();
@@ -144,20 +144,25 @@ void integConfClass::drawAll()
 		line->DrawLine(line_x1, line_y1, line_x2, line_y2);
 		legend->Draw();
 
-		double x_left = 0.19, x_right = 0.92, y = 0.88, y_diff = 0.045;
+		double x_left = 0.19, x_right = 0.92, y = 0.88, y_diff = 0.049;
 
 
-		if (mode.compare("DeltaDpT") == 0)
+		ltx->SetTextSize(25);
+		if (mode.compare("RDpT") == 0)
 		{
-			ltx->SetTextAlign(31);
-			x_left = x_right;
+			y = 0.29;
+			legend->SetMargin(0.15);
+			legend->SetTextSize(25);
 		}
-		else ltx->SetTextAlign(11);
+//		else
+		ltx->SetTextAlign(11);
 		ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
 		ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 		ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
-		ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
-		ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", centrality.c_str()));
+		ltx->DrawLatexNDC(x_left+0.38, y=y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
+
+		ltx->SetTextAlign(31);
+		ltx->DrawLatexNDC(x_right, y=0.88, Form("%s", centrality.c_str()));
 		first_pass_cent = false;
 
 		canvas->Print(Form("output_pdf_nominal/conf/%s_%s_cent%i.pdf", mode.c_str(), integType.c_str(), i_cent));
@@ -190,7 +195,7 @@ void integConfClass::setSpecifics()
 {
 	if (mode.compare("DeltaDpT") == 0 && integType.compare("jetshape") == 0)
 	{
-		legend_x1 = 0.63, legend_y1 = 0.45, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.57, legend_y1 = 0.45, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 0.0, line_y2 = 0.0;
 		y_range_lo = -1, y_range_hi = 5;
 		axis_label_y = jetshape_deltadpt_title;
@@ -198,9 +203,9 @@ void integConfClass::setSpecifics()
 	}
 	if (mode.compare("DeltaDpT") == 0 && integType.compare("lowpt_integ") == 0)
 	{
-		legend_x1 = 0.63, legend_y1 = 0.45, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.25;
+		legend_x1 = 0.570, legend_y1 = 0.40, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.35;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 0.0, line_y2 = 0.0;
-		y_range_lo = -1, y_range_hi = 5;
+		y_range_lo = -1, y_range_hi = 6;
 		axis_label_y = lowpt_integ_deltadpt_title;
 		axis_label_x = r_title;
 	}
@@ -208,24 +213,24 @@ void integConfClass::setSpecifics()
 
 	if (mode.compare("RDpT") == 0 && integType.compare("jetshape") == 0)
 	{
-		legend_x1 = 0.24, legend_y1 = 0.17, legend_x2 = legend_x1+0.600, legend_y2 = legend_y1+0.17;
+		legend_x1 = 0.15, legend_y1 = 0.66, legend_x2 = legend_x1+0.4, legend_y2 = legend_y1+0.28;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 1.0, line_y2 = 1.0;
-		y_range_lo = 0., y_range_hi = 3.1;
+		y_range_lo = 0.5, y_range_hi = 2.2;
 //		y_range_lo = 0.6, y_range_hi = 1.9;
 		axis_label_y = jetshape_rdpt_title;
 		axis_label_x = r_title;
-		legend_cols = 2;
+		legend_cols = 1;
 
 	}
 	if (mode.compare("RDpT") == 0 && integType.compare("lowpt_integ") == 0)
 	{
-		legend_x1 = 0.24, legend_y1 = 0.17, legend_x2 = legend_x1+0.600, legend_y2 = legend_y1+0.17;
+		legend_x1 = 0.15, legend_y1 = 0.66, legend_x2 = legend_x1+0.4, legend_y2 = legend_y1+0.28;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 1.0, line_y2 = 1.0;
-		y_range_lo = 0., y_range_hi = 3.1;
+		y_range_lo = 0., y_range_hi = 3.8;
 //		y_range_lo = 0., y_range_hi = 2.9;
 		axis_label_y = lowpt_integ_rdpt_title;
 		axis_label_x = r_title;
-		legend_cols = 2;
+		legend_cols = 1;
 	}
 
 }

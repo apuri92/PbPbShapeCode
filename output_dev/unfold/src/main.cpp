@@ -62,6 +62,17 @@ int main(int argc, char ** argv)
 	if (verbose) m_config->Print();
 	//	##############	Config done	##############"
 
+
+
+	cout << "isMC: " << isMC << endl;
+	cout << "sys_mode: " << sys_mode << endl;
+	cout << "centrality_scheme: " << centrality_scheme << endl;
+	cout << "n_unfold: " << n_unfold << endl;
+	cout << "verbose: " << verbose << endl;
+
+
+
+
 	std::string sys_path = "";
 	if (sys_mode == 0) sys_path = Form("nominal");
 	else if (sys_mode > 50 || sys_mode < 0) sys_path = Form("c%i", sys_mode);
@@ -82,6 +93,8 @@ int main(int argc, char ** argv)
 	if (apply_fake_uncert) fake_uncert = new TFile(Form("../raw_results/nominal/FF_MC_out_histo_pp_5p02_r001.root"));
 	TFile *f_output = new TFile(Form("output_pdf_%s/root/raw_unfolded_%s_%s.root", sys_path.c_str(), did.c_str(), dataset_type.c_str()),"recreate");
 
+//	TFile *f_output = new TFile(Form("iteration_test/raw_unfolded_iter%i_%s_%s.root",n_unfold, did.c_str(), dataset_type.c_str()),"recreate");
+//	cout << f_output->GetName() << endl;
 	int N_Y = 5;
 
 	TAxis* dR_binning = (TAxis*)((TH3*)f_mc->Get("h_dR_change_jetpt0_cent0"))->GetXaxis();

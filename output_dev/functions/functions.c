@@ -61,12 +61,12 @@ std::string num_to_cent(int scheme, int i)
 
 	if (scheme == 31)
 	{
-		if (i==0) cent_label = "0 - 10%";
-		if (i==1) cent_label = "10 - 20%";
-		if (i==2) cent_label = "20 - 30%";
-		if (i==3) cent_label = "30 - 40%";
-		if (i==4) cent_label = "40 - 60%";
-		if (i==5) cent_label = "60 - 80%";
+		if (i==0) cent_label = "0#font[122]{-}10%";
+		if (i==1) cent_label = "10#font[122]{-}20%";
+		if (i==2) cent_label = "20#font[122]{-}30%";
+		if (i==3) cent_label = "30#font[122]{-}40%";
+		if (i==4) cent_label = "40#font[122]{-}60%";
+		if (i==5) cent_label = "60#font[122]{-}80%";
 		if (i==6) cent_label = "Inclusive";
 	}
 
