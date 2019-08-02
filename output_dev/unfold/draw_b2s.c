@@ -183,7 +183,7 @@ void draw_b2s()
 			double x_left = 0.20, x_right = 0.93, y = 0.88, y_diff = 0.09;
 			ltx->SetTextAlign(11);
 			ltx->SetTextSize(18);
-			ltx->DrawLatexNDC(x_left, y, "#scale[1.3]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.3]{#font[72]{ATLAS}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));

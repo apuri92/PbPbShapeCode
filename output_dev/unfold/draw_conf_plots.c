@@ -681,7 +681,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_left, y, trk_label.c_str());
 				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(31);
-				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -770,7 +770,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_left, y, jet_label.c_str());
 				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(31);
-				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -861,7 +861,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_left, y, jet_label.c_str());
 				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", dR_label.c_str()));
 				ltx->SetTextAlign(31);
-				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -951,7 +951,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_right, y, Form("%s", jet_label.c_str()));
 				ltx->DrawLatexNDC(x_right, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(11);
-				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_left+0.38, y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -1048,7 +1048,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_right, y, jet_label.c_str());
 				ltx->DrawLatexNDC(x_right, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(11);
-				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -1163,7 +1163,7 @@ void draw_conf_plots()
 			ltx->SetTextAlign(31);
 			ltx->DrawLatexNDC(x_right, y=y, Form("%s", centrality.c_str()));
 			ltx->SetTextAlign(11);
-			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -1316,7 +1316,7 @@ void draw_conf_plots()
 			canvas->cd(1);
 			double x_left = 0.19, x_right = 0.92, y = 0.87, y_diff = 0.06;
 			ltx->SetTextAlign(11);
-			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
+			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS}}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
@@ -1424,7 +1424,7 @@ void draw_conf_plots()
 			canvas->cd(1);
 			double x_left = 0.19, x_right = 0.92, y = 0.87, y_diff = 0.06;
 			ltx->SetTextAlign(11);
-			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS} Internal}}");
+			ltx->DrawLatexNDC(x_left, y, "#scale[0.55]{#scale[1.5]{#font[72]{ATLAS}}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#scale[0.55]{#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("#scale[0.55]{%s}", jet_label.c_str()));
@@ -1551,7 +1551,7 @@ void draw_conf_plots()
 				ltx->DrawLatexNDC(x_left, y, Form("%s", jet_label.c_str()));
 				ltx->DrawLatexNDC(x_left, y-y_diff, Form("%s", centrality.c_str()));
 				ltx->SetTextAlign(31);
-				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_right, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 				ltx->DrawLatexNDC(x_right, y=y-y_diff, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));
@@ -1678,7 +1678,7 @@ void draw_conf_plots()
 			double x_left = 0.19, x_right = 0.92, y = 0.88, y_diff = 0.058;
 			ltx->SetTextAlign(11);
 			ltx->SetTextSize(28);
-			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+			ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 			ltx->DrawLatexNDC(x_left, y=y-y_diff, Form("%s", jet_label.c_str()));

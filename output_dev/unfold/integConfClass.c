@@ -156,7 +156,7 @@ void integConfClass::drawAll()
 		}
 //		else
 		ltx->SetTextAlign(11);
-		ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+		ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 		ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
 		ltx->DrawLatexNDC(x_left, y=y-y_diff, "#it{pp} #sqrt{#font[12]{s}} = 5.02 TeV, 25 pb^{-1}");
 		ltx->DrawLatexNDC(x_left+0.38, y=y, Form("anti-#font[12]{k}_{#font[12]{t}} R=0.4"));

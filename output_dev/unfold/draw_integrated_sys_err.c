@@ -218,7 +218,7 @@ void draw_sys_err(string config_file = "sys_config.cfg")
 
 				ltx->SetTextAlign(11);
 				double x_left = 0.19, x_right = 0.93, y = 0.88, y_diff = 0.045;
-				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS} Internal}");
+				ltx->DrawLatexNDC(x_left, y, "#scale[1.5]{#font[72]{ATLAS}}");
 				if (mode == "RDpT")
 				{
 					ltx->DrawLatexNDC(x_left, y=y-y_diff, "Pb+Pb #sqrt{#font[12]{s_{NN}}} = 5.02 TeV, 0.49 nb^{-1}");
