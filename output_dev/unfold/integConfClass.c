@@ -176,6 +176,48 @@ void integConfClass::drawAll()
 	delete ltx;
 }
 
+void integConfClass::writeToFile()
+{
+
+	string out_name = "";
+	if (mode.compare("DeltaDpT") == 0 && integType.compare("jetshape") == 0) out_name = "h_DeltaP";
+	if (mode.compare("DeltaDpT") == 0 && integType.compare("lowpt_integ") == 0) out_name = "h_DeltaTheta";
+	if (mode.compare("RDpT") == 0 && integType.compare("jetshape") == 0) out_name = "h_RP";
+	if (mode.compare("RDpT") == 0 && integType.compare("lowpt_integ") == 0) out_name = "h_RTheta";
+
+	output_file = new TFile(Form("output_pdf_nominal/hepdata/integrated_values_%s.root",out_name.c_str()), "recreate");
+
+	output_file->cd();
+	dR_binning->Write("dR_binning");
+	jetpT_binning->Write("jetpT_binning");
+	trkpT_binning->Write("trkpT_binning");
+
+
+	for (int i_cent = 0; i_cent < 6; i_cent++)
+	{
+		string centrality = num_to_cent(31,i_cent);
+
+		for (int i_jet = jet_pt_start; i_jet < jet_pt_end; i_jet++)
+		{
+			string jet_label = Form("%1.0f < #it{p}_{T}^{jet} < %1.0f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1));
+
+			h_nom[i_cent][i_jet]->SetTitle(Form("%s, %s, %s", out_name.c_str(), centrality.c_str(), jet_label.c_str()));
+			h_sys_p[i_cent][i_jet]->SetTitle(Form("%s_sysP, %s, %s", out_name.c_str(), centrality.c_str(), jet_label.c_str()));
+			h_sys_n[i_cent][i_jet]->SetTitle(Form("%s_sysN, %s, %s", out_name.c_str(), centrality.c_str(), jet_label.c_str()));
+
+			h_nom[i_cent][i_jet]->SetName(Form("%s_cent%i_jet%i", out_name.c_str(), i_cent, i_jet));
+			h_sys_p[i_cent][i_jet]->SetName(Form("%s_cent%i_jet%i_sysP", out_name.c_str(), i_cent, i_jet));
+			h_sys_n[i_cent][i_jet]->SetName(Form("%s_cent%i_jet%i_sysN", out_name.c_str(), i_cent, i_jet));
+
+
+			output_file->cd();
+			h_nom[i_cent][i_jet]->Write(Form("%s_cent%i_jet%i", out_name.c_str(), i_cent, i_jet));
+			h_sys_p[i_cent][i_jet]->Write(Form("%s_cent%i_jet%i_sysP", out_name.c_str(), i_cent, i_jet));
+			h_sys_n[i_cent][i_jet]->Write(Form("%s_cent%i_jet%i_sysN", out_name.c_str(), i_cent, i_jet));
+		}
+	}
+}
+
 
 void integConfClass::cleanUp()
 {

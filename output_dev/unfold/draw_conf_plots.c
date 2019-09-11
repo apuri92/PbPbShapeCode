@@ -87,6 +87,13 @@ void draw_conf_plots()
 	int N_dR = dR_binning->GetNbins();
 	int N_jetpt = jetpT_binning->GetNbins();
 	int N_trkpt = trkpT_binning->GetNbins();
+
+	f_output->cd();
+	dR_binning->Write("dR_binning");
+	jetpT_binning->Write("jetpT_binning");
+	trkpT_binning->Write("trkpT_binning");
+
+
 	double r_max_range = 0.8;
 	//indR
 	vector<vector<vector<TH1*>>> h_RDpT_final_ratio_indR (N_trkpt, vector<vector<TH1*>> (n_cent_cuts, vector<TH1*> (N_jetpt)));
@@ -274,13 +281,13 @@ void draw_conf_plots()
 					}
 					// removing points with poor closure (this happens for high z particles at the jet edge
 //					Jet pT [GeV]	Track pT [GeV]	R
-//					126-158 GeV	6-10			r > 0.3 (jet7_trk6_dR6)
-//								10-25 GeV	r > 0.3 (jet7_trk7_dR6)
-//								25-63 GeV	r > 0.2 (jet7_trk8_dR4)
-//					158-200 GeV	10-25 GeV	r > 0.4 (jet8_trk7_dR7)
-//								25-63 GeV	r > 0.3 (jet8_trk8_dR6)
-//					200-251 GeV	25-63 GeV	r > 0.3 (jet9_trk8_dR6)
-//					251-316 GeV	x	x
+//					126-158 GeV		6-10			r > 0.3 (jet7_trk6_dR6)
+//									10-25 GeV		r > 0.3 (jet7_trk7_dR6)
+//									25-63 GeV		r > 0.2 (jet7_trk8_dR4)
+//					158-200 GeV		10-25 GeV		r > 0.4 (jet8_trk7_dR7)
+//									25-63 GeV		r > 0.3 (jet8_trk8_dR6)
+//					200-251 GeV		25-63 GeV		r > 0.3 (jet9_trk8_dR6)
+//					251-316 GeV		x				x
 
 					if ((i_jet == 7 && i_trk == 6 && i_dR >= 6)
 						||
@@ -413,17 +420,66 @@ void draw_conf_plots()
 //				if (i_jet == 7 && i_cent == 0 && i_trk == 4)
 				{
 					f_output->cd();
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->SetTitle(Form("pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetTitle(Form("pTjet: %1.0f-%1.0f, pTtrk: %1.2f-%1.2f, cent:%s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetTitle(Form("pTjet: %1.0f-%1.0f, pTtrk: %1.2f-%1.2f, cent:%s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
 
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->SetName(Form("h_RDpT_indR_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->SetName(Form("g_RDpT_indR_trk%i_cent%i_jet%i_sys", i_trk, i_cent, i_jet));
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->SetName(Form("g_RDpT_indR_trk%i_cent%i_jet%i_stat", i_trk, i_cent, i_jet));
 
-					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->Write(Form("h_RDpT_indR_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
-					g_RDpT_final_sys_indR[i_trk][i_cent][i_jet]->Write(Form("g_RDpT_indR_trk%i_cent%i_jet%i_sys", i_trk, i_cent, i_jet));
-					g_RDpT_final_stat_indR[i_trk][i_cent][i_jet]->Write(Form("g_RDpT_indR_trk%i_cent%i_jet%i_stat", i_trk, i_cent, i_jet));
+
+					//RDpT
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->SetTitle(Form("RDpT Nominal - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_RDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetTitle(Form("RDpT SysPos - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_RDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetTitle(Form("RDpT SysNeg - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->SetName(Form("h_RDpT_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_RDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetName(Form("h_RDpT_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_RDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetName(Form("h_RDpT_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+					h_RDpT_final_ratio_indR[i_trk][i_cent][i_jet]->Write(Form("h_RDpT_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_RDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->Write(Form("h_RDpT_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_RDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->Write(Form("h_RDpT_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+
+					//DeltaDpT
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DeltaDpT Nominal - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DeltaDpT SysPos - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DeltaDpT SysNeg - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DeltaDpT_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DeltaDpT_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DeltaDpT_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+					h_DeltaDpT_final_indR[i_trk][i_cent][i_jet]->Write(Form("h_DeltaDpT_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_DeltaDpT_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->Write(Form("h_DeltaDpT_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_DeltaDpT_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->Write(Form("h_DeltaDpT_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+
+
+					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DpT PbPb Nominal - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DpT PbPb SysPos - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+					h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetTitle(Form("DpT PbPb SysNeg - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV, centrality: %s", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1), num_to_cent(31, i_cent).c_str()));
+
+					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DpT_PbPb_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DpT_PbPb_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->SetName(Form("h_DpT_PbPb_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+					h_ChPS_PbPb_final_ratio_indR[i_trk][i_cent][i_jet]->Write(Form("h_DpT_PbPb_trk%i_cent%i_jet%i", i_trk, i_cent, i_jet));
+					h_ChPS_PbPb_final_sys_Totalpos_indR[i_trk][i_cent][i_jet]->Write(Form("h_DpT_PbPb_trk%i_cent%i_jet%i_sysP", i_trk, i_cent, i_jet));
+					h_ChPS_PbPb_final_sys_Totalneg_indR[i_trk][i_cent][i_jet]->Write(Form("h_DpT_PbPb_trk%i_cent%i_jet%i_sysN", i_trk, i_cent, i_jet));
+
+
+
+					if (i_cent == 0)
+					{
+						h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->SetTitle(Form("DpT pp Nominal - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+						h_ChPS_pp_final_sys_Totalpos_indR[i_trk][6][i_jet]->SetTitle(Form("DpT pp SysPos -  pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+						h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->SetTitle(Form("DpT pp SysNeg - pTjet: %1.0f-%1.0f GeV, pTtrk: %1.2f-%1.2f GeV", jetpT_binning->GetBinLowEdge(i_jet+1), jetpT_binning->GetBinUpEdge(i_jet+1), trkpT_binning->GetBinLowEdge(i_trk+1), trkpT_binning->GetBinUpEdge(i_trk+1)));
+
+						h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->SetName(Form("h_DpT_pp_trk%i_cent%i_jet%i", i_trk, 6, i_jet));
+						h_ChPS_pp_final_sys_Totalpos_indR[i_trk][6][i_jet]->SetName(Form("h_DpT_pp_trk%i_cent%i_jet%i_sysP", i_trk, 6, i_jet));
+						h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->SetName(Form("h_DpT_pp_trk%i_cent%i_jet%i_sysN", i_trk, 6, i_jet));
+
+						h_ChPS_pp_final_ratio_indR[i_trk][6][i_jet]->Write(Form("h_DpT_pp_trk%i_cent%i_jet%i", i_trk, 6, i_jet));
+						h_ChPS_pp_final_sys_Totalpos_indR[i_trk][6][i_jet]->Write(Form("h_DpT_pp_trk%i_cent%i_jet%i_sysP", i_trk, 6, i_jet));
+						h_ChPS_pp_final_sys_Totalneg_indR[i_trk][6][i_jet]->Write(Form("h_DpT_pp_trk%i_cent%i_jet%i_sysN", i_trk, 6, i_jet));
+					}
 				}
 
 
@@ -932,7 +988,7 @@ void draw_conf_plots()
 					g_sys->GetYaxis()->SetRangeUser(0,5.2);
 					g_sys->GetYaxis()->SetNdivisions(505);
 
-					if (trk_itr == 0) g_sys->Draw("a E2");
+					if (trk_itr == 0) g_sys->Draw("a E2 text");
 					else g_sys->Draw("E2 same");
 					g_stat->Draw("P E1");
 

@@ -18,6 +18,7 @@ public:
 	vector<vector<TGraphAsymmErrors*>> g_sys;
 	vector<vector<TGraphAsymmErrors*>> g_stat;
 	string name;
+	TFile *output_file;
 
 	std::string rdptr_title = "#it{R}_{#it{D} (#it{p}_{T}, #it{r})}";
 	std::string deltadptr_title = "#it{#Delta} #it{D} (#it{p}_{T}, #it{r}) [GeV]";
@@ -84,6 +85,7 @@ public:
 		initHist();
 		makeGraph();
 		drawAll();
+		writeToFile();
 	}
 
 
@@ -92,6 +94,7 @@ public:
 		cleanUp();
 		delete f_nom;
 		delete f_sys;
+		delete output_file;
 	}
 
 
@@ -100,6 +103,7 @@ public:
 	void drawAll();
 	void cleanUp();
 	void setSpecifics();
+	void writeToFile();
 	TGraphAsymmErrors* shift(TGraphAsymmErrors* g, int variable, double shift_size = 0.0025);
 
 

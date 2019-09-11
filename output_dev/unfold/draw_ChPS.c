@@ -1321,7 +1321,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			delete c_resp_matrix;
 		}
 
-
+*/
 		//Draw evol_dRution plots
 		{
 			cout << "Doing evolution (as function of r)" << endl;
@@ -1368,6 +1368,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						SetHStyle_smallify(h_ChPS_raw_subtr_unf_bbb_indR.at(i_trk).at(i_cent).at(i_jet),5, doSmall);
 
 						SetHStyle_smallify(h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet),5, doSmall);
+						SetHStyle_smallify(h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet),3, doSmall);
 
 						if (i_jet == jet_pt_start && trk_itr == 0 && first_pass)
 						{
@@ -1412,7 +1413,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->GetXaxis()->SetRangeUser(0,0.8);
 						h_ChPS_ratio_closure_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("");
 //						h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->GetYaxis()->SetRangeUser(-0.01,0.01);
-//						h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("hist text");
+						h_ChPS_ratio_subtr_raw_indR.at(i_trk).at(i_cent).at(i_jet)->Draw("hist text same");
 
 
 						gPad->SetLogx(0);
@@ -1451,7 +1452,7 @@ void draw_ChPS(string config_file = "ff_config.cfg")
 			delete legend_evol_dR;
 		}
 
-*/
+
 	}
 	cout << "Clearing memory" << endl;
 	for (int i_trk = 0; i_trk < N_trkpt; i_trk++)
