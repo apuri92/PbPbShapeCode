@@ -18,6 +18,13 @@ void integConfClass::initHist()
 	vector<vector<TGraphAsymmErrors*>> tmp_g_sys (6, vector<TGraphAsymmErrors*> (11));
 	vector<vector<TGraphAsymmErrors*>> tmp_g_stat (6, vector<TGraphAsymmErrors*> (11));
 
+	double scalingForDeltaDpTLowpT = 1.;
+
+	int pt_lo_index = trkpT_binning->FindBin(1.01) - 1;
+	int pt_hi_index = trkpT_binning->FindBin(3.95) - 1;
+
+	if (mode.compare("DeltaDpT") == 0 && integType.compare("lowpt_integ") == 0) scalingForDeltaDpTLowpT = trkpT_binning->GetBinUpEdge(pt_hi_index+1)-trkpT_binning->GetBinLowEdge(pt_lo_index+1);
+	cout << scalingForDeltaDpTLowpT << endl;
 
 	for (int i_jet = 7; i_jet < 11; i_jet++)
 	{
@@ -26,6 +33,7 @@ void integConfClass::initHist()
 
 			name = Form("h_%s_%s_final_indR_cent%i_jetpt%i", integType.c_str(), mode.c_str(), i_cent, i_jet);
 			tmp_h_nom[i_cent][i_jet] = (TH1*)f_nom->Get(name.c_str());
+			tmp_h_nom[i_cent][i_jet]->Scale(scalingForDeltaDpTLowpT);
 
 			name = Form("h_%s_sys_cent%i_jetpt%i_total_p",mode.c_str(), i_cent, i_jet);
 			tmp_h_sys_p[i_cent][i_jet] = (TH1*)f_sys->Get(name.c_str());
@@ -247,7 +255,7 @@ void integConfClass::setSpecifics()
 	{
 		legend_x1 = 0.570, legend_y1 = 0.40, legend_x2 = legend_x1+0.25, legend_y2 = legend_y1+0.35;
 		line_x1 = 0.0, line_x2 = 0.8, line_y1 = 0.0, line_y2 = 0.0;
-		y_range_lo = -1, y_range_hi = 6;
+		y_range_lo = -1, y_range_hi = 18;
 		axis_label_y = lowpt_integ_deltadpt_title;
 		axis_label_x = r_title;
 	}
